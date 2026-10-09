@@ -1886,7 +1886,7 @@ dash.calc('skim_course', {
       if (first('fwh' + h.hole) && !reduce) bar.attr('width', gx(h.est_now)).transition().delay(400 + i * 40).duration(900).ease(d3.easeCubicOut).attr('width', gx(h.est_tomorrow));
       hb.appendChild(el);
     });
-    document.getElementById('fw-how').textContent = `How it's worked out: fairway moisture is anchored to the TurfRad mower scan, then dries with measured ET (k = ${P.k_per_mm_et} per mm, fitted from ${P.n_dry_days} dry days) plus rain. The Himalayan Spiio probe shapes the dry-down when it reads above its ${P.h_floor}% floor. Each hole's offset comes from SkimTurf's latest soil-moisture estimate. Water need = enough to lift a fairway forecast below ${P.trigger_pct}% back to ${P.target_pct}% over a ${P.root_mm} mm root zone. Fairway irrigation isn't logged, so watering only shows up at the next TurfRad scan.`;
+    document.getElementById('fw-how').textContent = `How it's worked out: fairway moisture is anchored to the TurfRad mower scan, then dries with measured ET (k = ${P.k_per_mm_et} per mm, fitted from ${P.n_dry_days} dry days) plus rain. The Himalayan Spiio probe shapes the dry-down when it reads above its ${P.h_floor}% floor. Each hole's offset from the course mean comes from its own TurfRad fairway scan (SkimTurf's estimate only where TurfRad missed a hole). Water need = enough to lift a fairway forecast below ${P.trigger_pct}% back to ${P.target_pct}% over a ${P.root_mm} mm root zone. Fairway irrigation isn't logged, so watering only shows up at the next TurfRad scan.`;
   }
 
   /* ---------------- motion pack 3 ---------------- */
@@ -2127,7 +2127,6 @@ dash.calc('skim_course', {
   enter(document.getElementById('today')); enter(document.getElementById('kpis')); requestAnimationFrame(moveBar);
 })();
 </script>
-
 
 <div class="pub-foot">Public copy of the Ranfurlie Greens Live dashboard · <span id="pub-built">rebuilt each morning by the 6am turf run</span> · read-only</div>
 </div></body></html>
