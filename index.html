@@ -72,7 +72,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 .rg-take { margin: .5rem 0 0; font-size: var(--cds-font-size-heading); line-height: 1.45; max-width: 62ch; color: var(--color-fg); }
 .rg-take b { font-weight: 600; }
 .rg-asof { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: .35rem; }
-.rg-tabs { display: flex; gap: .25rem; flex-wrap: wrap; border-bottom: 1px solid var(--color-border-line); }
+.rg-tabs { position: relative; display: flex; gap: .25rem; flex-wrap: wrap; border-bottom: 1px solid var(--color-border-line); }
 .rg-tab { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; padding: .55rem .9rem; font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg-muted); cursor: pointer; margin-bottom: -1px; }
 .rg-watch { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-body); }
 .rg-watch td { padding: .5rem .4rem; border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
@@ -95,7 +95,15 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 .rg-chip.prov { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-warn) 18%, transparent) 0 5px, transparent 5px 10px); color: var(--color-warn); font-weight: 600; }
 .rg-chip.na { opacity: .35; }
 .rg-tab:hover { color: var(--color-fg); }
-.rg-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); font-weight: 500; }
+.rg-tab[aria-selected="true"] { color: var(--color-fg); font-weight: 500; }
+.rg-tabbar { position: absolute; bottom: -1px; left: 0; height: 2px; width: 0; background: var(--color-fg); border-radius: 2px; pointer-events: none; }
+.rg-delta { display: inline-flex; align-items: center; gap: .25rem; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; color: var(--color-fg-muted); }
+.rg-delta b { font-weight: 600; }
+.rg-delta.up b { color: var(--color-ok); } .rg-delta.down b { color: var(--color-bad); } .rg-delta.neutral-up b, .rg-delta.neutral-down b { color: var(--color-fg); }
+.rg-kpi.rainy { position: relative; overflow: hidden; }
+.rg-rain { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.rg-kpi.rainy > *:not(.rg-rain) { position: relative; z-index: 1; }
+.rg-dial { width: 100%; height: 46px; display: block; margin-top: .1rem; }
 .rg-tab:focus-visible, .rg-btn:focus-visible, .rg-th:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
 .rg-page { display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
 .rg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr)); gap: var(--cds-gap-md); }
@@ -168,6 +176,10 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 .rg-fail { display: flex; align-items: center; justify-content: center; gap: .45rem; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); height: 100%; min-height: inherit; }
 .rg-fail::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
 @media (prefers-reduced-motion: no-preference) {
+  .rg-tabbar { transition: transform .45s cubic-bezier(.3,1.4,.5,1), width .45s cubic-bezier(.3,1.4,.5,1); }
+  .rg-delta { animation: rg-slide .7s var(--cds-ease-out) .9s both; }
+  .rg-chip.gap { animation: rg-gap 2.6s ease-in-out infinite; }
+  .rg-latest { animation: rg-alarm 2s ease-in-out infinite; }
   .rg-enter > * { animation: rg-rise .75s var(--cds-ease-out) both; }
   .rg-enter > *:nth-child(2) { animation-delay: .08s; } .rg-enter > *:nth-child(3) { animation-delay: .16s; } .rg-enter > *:nth-child(4) { animation-delay: .24s; }
   .rg-kpis.rg-enter > * { animation: rg-rise .7s var(--cds-ease-out) both; }
@@ -187,6 +199,8 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
   .rg-grow { transform-box: fill-box; transform-origin: bottom; animation: rg-grow 1.1s var(--cds-ease-out) both; }
   .rg-growx { transform-box: fill-box; transform-origin: left; animation: rg-growx 1.1s var(--cds-ease-out) both; }
 }
+@keyframes rg-slide { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+@keyframes rg-gap { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-bad) 22%, transparent); } }
 @keyframes rg-rise { from { opacity: .25; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes rg-comet { to { stroke-dashoffset: 0; } }
 @keyframes rg-ping { 0% { transform: scale(1); opacity: .55; } 80%, 100% { transform: scale(3.2); opacity: 0; } }
@@ -220,6 +234,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <button class="rg-tab" role="tab" id="tab-soil" data-page="soil" aria-selected="false">Soil</button>
     <button class="rg-tab" role="tab" id="tab-disease" data-page="disease" aria-selected="false">Disease cover</button>
     <button class="rg-tab" role="tab" id="tab-inputs" data-page="inputs" aria-selected="false">Inputs</button>
+    <span class="rg-tabbar" id="tabbar" aria-hidden="true"></span>
   </nav>
 
   <!-- TODAY -->
@@ -228,22 +243,26 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       <div class="rg-kpi hero">
         <span class="rg-kpi-l">GvX · 21-day, smoothed</span>
         <span class="rg-kpi-v" id="k-g21" data-source="daily" data-field="gvx21">—</span>
+        <span class="rg-delta" id="dl-gvx21" data-source="kpi_deltas" data-field="change" data-where="metric=gvx21"></span>
         <span class="rg-kpi-s">7-day <span id="k-g7" data-source="daily" data-field="gvx7">—</span> · 14-day <span id="k-g14" data-source="daily" data-field="gvx14">—</span> · 28-day <span id="k-g28" data-source="daily" data-field="gvx28">—</span></span>
         <svg class="rg-spark" id="sp-g21" data-source="daily" preserveAspectRatio="none"></svg>
       </div>
       <div class="rg-kpi">
         <span class="rg-kpi-l">Clip, mL/m²/day · 14 d</span>
         <span class="rg-kpi-v" id="k-clip" data-source="daily" data-field="clip_per_day_14d">—</span>
+        <span class="rg-delta" id="dl-clip" data-source="kpi_deltas" data-field="change" data-where="metric=clip_per_day_14d"></span>
         <span class="rg-kpi-s"><span id="k-cpm" data-source="daily" data-field="clip_per_mow_14d">—</span> per mow</span>
         <svg class="rg-spark" id="sp-clip" data-source="daily" preserveAspectRatio="none"></svg>
       </div>
       <div class="rg-kpi">
         <span class="rg-kpi-l">Growth potential · 14 d</span>
         <span class="rg-kpi-v" id="k-gp" data-source="daily" data-field="gp14">—</span>
+        <span class="rg-delta" id="dl-gp" data-source="kpi_deltas" data-field="change" data-where="metric=gp14"></span>
+        <svg class="rg-dial" id="dial-gp" data-source="daily"></svg>
         <span class="rg-kpi-s">cool-season GP, optimum 20 °C</span>
-        <svg class="rg-spark" id="sp-gp" data-source="daily" preserveAspectRatio="none"></svg>
       </div>
-      <div class="rg-kpi">
+      <div class="rg-kpi rainy" id="kpi-rain">
+        <canvas class="rg-rain" id="rain-cv" aria-hidden="true"></canvas>
         <span class="rg-kpi-l">Rain · last 14 days</span>
         <span class="rg-kpi-v"><span id="k-rain" data-source="daily" data-field="rain_14d">—</span><small style="font-size:.5em"> mm</small></span>
         <span class="rg-kpi-s">6th station, gauge faults blanked</span>
@@ -436,6 +455,17 @@ dash.calc('eth_window', {
     return { opens: add(14), best: add(21), closes: add(28) };
   },
 });
+dash.calc('kpi_deltas', {
+  inputs: ['daily'],
+  title: 'Change on a week ago',
+  description: 'Latest headline figures against the same figures seven days earlier.',
+  fn: (daily) => {
+    const last = daily[daily.length - 1], prev = daily[daily.length - 8];
+    if (!last || !prev) return [];
+    return ['gvx21', 'clip_per_day_14d', 'gp14', 'rain_14d'].map((m) => ({ metric: m, now: last[m], week_ago: prev[m],
+      change: last[m] == null || prev[m] == null ? null : Math.round((last[m] - prev[m]) * 100) / 100 }));
+  },
+});
 dash.calc('cover_summary', {
   inputs: ['coverage', 'coverage_verify'],
   title: 'Greens disease cover summary',
@@ -560,12 +590,13 @@ dash.calc('tdr_latest', {
     const now = new Date();
     const mel = new Date(now.toLocaleString('en-US', { timeZone: 'Australia/Melbourne' }));
     const next = new Date(mel); next.setHours(6, 30, 0, 0); if (next <= mel) next.setDate(next.getDate() + 1);
-    const mins = Math.round((next - mel) / 60000);
+    const secs = Math.max(0, Math.round((next - mel) / 1000));
     const hm = (m) => (m >= 60 ? Math.floor(m / 60) + ' h ' : '') + (m % 60) + ' m';
+    const hms = (x) => Math.floor(x / 3600) + ' h ' + String(Math.floor(x / 60) % 60).padStart(2, '0') + ' m ' + String(x % 60).padStart(2, '0') + ' s';
     const ago = runAt ? Math.max(0, Math.round((now - runAt) / 60000)) : null;
-    el.textContent = (ago != null ? 'pulled ' + hm(ago) + ' ago' : 'refreshed every morning by the 6am turf run') + ' · next pull in ' + hm(mins);
+    el.textContent = (ago != null ? 'pulled ' + hm(ago) + ' ago' : 'refreshed every morning by the 6am turf run') + ' · next pull in ' + (reduce ? hm(Math.round(secs / 60)) : hms(secs));
   }
-  setInterval(clockLine, 30000);
+  setInterval(clockLine, reduce ? 30000 : 1000);
 
   function axisStyle(g) { g.attr('font-size', null).attr('font-family', null).classed('rg-axis', true); }
   function lastBy(arr, f) { return arr.reduce((a, b) => (a == null || f(b) > f(a) ? b : a), null); }
@@ -577,11 +608,17 @@ dash.calc('tdr_latest', {
     if (!document.getElementById(p)) return;
     page = p;
     tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.page === p)));
+    moveBar();
     document.querySelectorAll('.rg-page').forEach((s) => (s.hidden = s.id !== p));
     if (push) dash.setLink(p);
     draw();
     const sec = document.getElementById(p); enter(sec); if (p === 'today') enter(document.getElementById('kpis')); if (p === 'disease') enter(document.getElementById('cover-kpis'));
   }
+  function moveBar() {
+    const bar = document.getElementById('tabbar'), t = tabs.find((x) => x.dataset.page === page); if (!bar || !t) return;
+    bar.style.width = t.offsetWidth + 'px'; bar.style.transform = `translate(${t.offsetLeft}px, ${t.offsetTop + t.offsetHeight - bar.parentElement.clientHeight}px)`;
+  }
+  window.addEventListener('resize', moveBar);
   tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.page, true)));
   tabs.forEach((t, i) => t.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); show(n.dataset.page, true); }
@@ -646,7 +683,58 @@ dash.calc('tdr_latest', {
     document.getElementById('k-cpm').textContent = last.clip_per_mow_14d == null ? '—' : f1(last.clip_per_mow_14d);
     countTo(document.getElementById('k-gp'), last.gp14, f2, 'gp');
     countTo(document.getElementById('k-rain'), last.rain_14d, f1, 'rain');
-    spark('sp-g21', recent, 'gvx21'); spark('sp-clip', recent, 'clip_per_day_14d'); spark('sp-gp', recent, 'gp14'); spark('sp-rain', recent, 'rain', 'bar');
+    spark('sp-g21', recent, 'gvx21'); spark('sp-clip', recent, 'clip_per_day_14d'); spark('sp-rain', recent, 'rain', 'bar');
+    drawDeltas(); dial(last.gp14); rainField(d.slice(-3).reduce((a, r) => a + (r.rain || 0), 0), last.rain_14d);
+    moveBar();
+  }
+  function drawDeltas() {
+    const v = val('kpi_deltas'); if (!Array.isArray(v)) return;
+    const fmt = { gvx21: f0, clip_per_day_14d: f1, gp14: f2, rain_14d: f1 };
+    [['gvx21', 'dl-gvx21', 'neutral'], ['clip_per_day_14d', 'dl-clip', 'neutral'], ['gp14', 'dl-gp', 'good-up']].forEach(([m, id, sense]) => {
+      const el = document.getElementById(id), r = v.find((x) => x.metric === m); if (!el || !r || r.change == null) return;
+      const up = r.change > 0, flat = Math.abs(r.change) < 1e-9;
+      el.className = 'rg-delta ' + (flat ? '' : sense === 'good-up' ? (up ? 'up' : 'down') : (up ? 'neutral-up' : 'neutral-down'));
+      el.replaceChildren();
+      const b = document.createElement('b'); b.textContent = (flat ? '■ ' : up ? '▲ ' : '▼ ') + (up ? '+' : '') + fmt[m](r.change);
+      el.append(b, document.createTextNode(' on last week'));
+    });
+  }
+  /* growth potential dial: needle swings in, settles with a little overshoot */
+  function dial(v) {
+    const svg = d3.select('#dial-gp'); const el = svg.node(); if (!el || v == null) return;
+    const W = el.clientWidth || 200, H = 46, cx = Math.min(W / 2, 60), r = 38;
+    svg.attr('viewBox', `0 0 ${W} ${H}`).selectAll('*').remove();
+    const g = svg.append('g').attr('transform', `translate(${cx},${H - 4})`);
+    const a = d3.scaleLinear([0, 1], [-Math.PI / 2, Math.PI / 2]);
+    const arc = d3.arc().innerRadius(r - 7).outerRadius(r).cornerRadius(3);
+    [[0, .3, 'var(--color-bad)'], [.3, .6, 'var(--color-warn)'], [.6, 1, 'var(--color-ok)']].forEach(([s0, s1, c]) =>
+      g.append('path').attr('d', arc({ startAngle: a(s0) + .02, endAngle: a(s1) - .02 })).attr('fill', c).attr('opacity', .35));
+    g.append('path').attr('d', arc({ startAngle: a(0), endAngle: a(Math.min(1, v)) })).attr('fill', 'var(--color-ok)').attr('opacity', .85);
+    const needle = g.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', -(r - 2)).attr('stroke', 'var(--color-fg)').attr('stroke-width', 2.2).attr('stroke-linecap', 'round');
+    g.append('circle').attr('r', 4).attr('fill', 'var(--color-fg)');
+    const deg = (x) => a(x) * 180 / Math.PI;
+    if (first('dial') && !reduce) needle.attr('transform', `rotate(${deg(0)})`).transition().delay(400).duration(1800).ease(d3.easeElasticOut.amplitude(1).period(.45)).attr('transform', `rotate(${deg(Math.min(1, v))})`);
+    else needle.attr('transform', `rotate(${deg(Math.min(1, v))})`);
+    svg.append('text').attr('class', 'rg-lbl').attr('x', cx + r + 10).attr('y', H - 22).text(v < .3 ? 'slow growth' : v < .6 ? 'moderate growth' : 'strong growth');
+    svg.append('text').attr('class', 'rg-lbl').attr('x', cx + r + 10).attr('y', H - 8).text('1.0 = optimum');
+  }
+  /* rain field: drops in the rain card, density from the last 3 days, gone when it's been dry */
+  function rainField(r3, r14) {
+    const cv = document.getElementById('rain-cv'); if (!cv || reduce) return;
+    const ctx = cv.getContext('2d');
+    const n = Math.round(Math.min(70, r3 * 4 + (r14 || 0) * .25));
+    let drops = null, col = cssColor(C()[1]);
+    addTick('rain', cv, (t) => {
+      const dpr = Math.min(2, window.devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
+      if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); drops = null; }
+      if (!drops) drops = d3.range(n).map(() => ({ x: Math.random() * W, y: Math.random() * H, v: 60 + Math.random() * 90, l: 6 + Math.random() * 8 }));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      ctx.strokeStyle = col.replace('rgb(', 'rgba(').replace(')', ',0.28)'); ctx.lineWidth = 1.2; ctx.lineCap = 'round';
+      const dt = 1 / 60;
+      ctx.beginPath();
+      for (const d of drops) { d.y += d.v * dt; d.x -= d.v * dt * .18; if (d.y > H + 10) { d.y = -10; d.x = Math.random() * (W + 20); } ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + d.l * .18, d.y - d.l); }
+      ctx.stroke();
+    });
   }
 
   /* ---------------- PGR clocks ---------------- */
@@ -880,6 +968,8 @@ dash.calc('tdr_latest', {
     const anim = first('heat');
     const cells = svg.append('g').selectAll('rect').data(r).join('rect').attr('class', 'rg-heat-cell').attr('x', (d) => x(d.date)).attr('y', (d) => y(d.green)).attr('width', x.bandwidth()).attr('height', y.bandwidth()).attr('rx', 2).attr('fill', (d) => col(d.ml_m2));
     if (anim && !reduce) cells.attr('opacity', 0).style('transform', 'scale(0.2)').transition().delay((d) => (dates.indexOf(d.date) + greens.indexOf(d.green) * 1.4) * 16).duration(520).ease(d3.easeBackOut.overshoot(2)).attr('opacity', 1).style('transform', 'scale(1)').on('end', function () { this.style.transform = ''; });
+    const lastD = dates[dates.length - 1];
+    svg.append('rect').attr('class', 'rg-latest').attr('x', x(lastD) - 2).attr('y', m.t - 2).attr('width', x.bandwidth() + 4).attr('height', ch * greens.length + 4).attr('rx', 4).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 1.5);
     const tip = tipFor(box);
     cells.on('pointerenter', (ev, d) => {
       d3.select(ev.currentTarget).attr('stroke', 'var(--color-fg)').attr('stroke-width', 1.5);
@@ -1037,6 +1127,10 @@ dash.calc('tdr_latest', {
     ends.forEach((e) => svg.append('text').attr('class', 'rg-lbl-b').attr('x', Math.min(e.X + 6, W - m.r + 6)).attr('y', e.Y + 4).attr('fill', e.isCur ? C()[0] : 'var(--color-fg-muted)').text(`${e.s} ${f0(e.v)}`));
     const at = svg.append('line').attr('x1', x(nowDos)).attr('x2', x(nowDos)).attr('y1', m.t).attr('y2', H - m.b).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '2 3');
     svg.append('text').attr('class', 'rg-lbl').attr('x', x(nowDos) + 4).attr('y', m.t + 10).text('today');
+    const pel = svg.append('g').selectAll('circle').data(d.filter((r) => r.season === cur && r.n_kg_ha >= 0.5)).join('circle')
+      .attr('cx', (r) => x(dos(r.season, r.date))).attr('r', (r) => 2.5 + Math.sqrt(r.n_kg_ha)).attr('fill', C()[0]).attr('stroke', 'var(--color-panel)').attr('stroke-width', 1.5);
+    if (first('npel') && !reduce) pel.attr('cy', m.t - 10).attr('opacity', 0).transition().delay((r, i) => 900 + i * 140).duration(1100).ease(d3.easeBounceOut).attr('cy', (r) => y(r.season_to_date_kg_ha)).attr('opacity', 1);
+    else pel.attr('cy', (r) => y(r.season_to_date_kg_ha));
     const tip = tipFor(box);
     svg.append('g').selectAll('circle').data(d.filter((r) => seasons.includes(r.season))).join('circle').attr('cx', (r) => x(dos(r.season, r.date))).attr('cy', (r) => y(r.season_to_date_kg_ha)).attr('r', 6).attr('fill', 'transparent')
       .on('pointerenter', (ev, r) => showTip(box, tip, x(dos(r.season, r.date)), y(r.season_to_date_kg_ha), (t) => { line(t, fDayY(pd(r.date)), null, 'd'); line(t, `+${f2(r.n_kg_ha)} kg N/ha · ${f1(r.season_to_date_kg_ha)} to date`); line(t, r.products, null, 'd'); }))
@@ -1060,7 +1154,7 @@ dash.calc('tdr_latest', {
     const xa = svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickValues(d.map((r) => r.month).filter((_, i) => i % step === 0)).tickFormat((s) => d3.utcFormat('%b %y')(pm(s))).tickSizeOuter(0)); axisStyle(xa);
     const bw = Math.min(32, x.bandwidth());
     const bars = svg.append('g').selectAll('rect').data(d).join('rect').attr('x', (r) => x(r.month) + (x.bandwidth() - bw) / 2).attr('width', bw).attr('y', (r) => y(r.greens_runtime_hrs || 0)).attr('height', (r) => y(0) - y(r.greens_runtime_hrs || 0)).attr('rx', 4).attr('fill', C()[1]);
-    if (first('irr')) bars.classed('rg-grow', true).style('animation-delay', (r, i) => (i * 60) + 'ms');
+    if (first('irr') && !reduce) bars.attr('y', y(0)).attr('height', 0).transition().delay((r, i) => i * 70).duration(1000).ease(d3.easeBackOut.overshoot(1.6)).attr('y', (r) => y(r.greens_runtime_hrs || 0)).attr('height', (r) => y(0) - y(r.greens_runtime_hrs || 0));
     const tip = tipFor(box);
     bars.on('pointerenter', (ev, r) => showTip(box, tip, x(r.month) + x.bandwidth(), y(r.greens_runtime_hrs || 0), (t) => { line(t, d3.utcFormat('%B %Y')(pm(r.month)), null, 'd'); line(t, `${f1(r.greens_runtime_hrs)} h total · ${f2(r.avg_hrs_per_green)} h per green`); }))
       .on('pointerleave', () => (tip.hidden = true));
@@ -1179,7 +1273,7 @@ dash.calc('tdr_latest', {
   const named = location.hash.slice(1);
   if (['today', 'growth', 'soil', 'disease', 'inputs'].includes(named)) show(named, false);
   dash.onData(draw);
-  enter(document.getElementById('today')); enter(document.getElementById('kpis'));
+  enter(document.getElementById('today')); enter(document.getElementById('kpis')); requestAnimationFrame(moveBar);
 })();
 </script>
 
