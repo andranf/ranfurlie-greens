@@ -240,6 +240,38 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 .rg-fw-h svg { display: block; width: 100%; height: 14px; margin-top: .3rem; overflow: visible; }
 @media (prefers-reduced-motion: no-preference) { .rg-fw-h.need { animation: rg-fwpulse 2.4s ease-in-out infinite; } }
 @keyframes rg-fwpulse { 0%,100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-warn) 35%, transparent); } }
+
+/* ---- motion pack 3 (Andy 9 Oct: "more animation, even more impressive") ---- */
+.rg-kpi { position: relative; }
+.rg-card::before, .rg-kpi::before { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0;
+  background: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--color-fg) 7%, transparent), transparent 60%); transition: opacity .35s; }
+.rg-card.rg-spot::before, .rg-kpi.rg-spot::before { opacity: 1; }
+.rg-card::after, .rg-kpi::after { content: ''; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none; opacity: 0; padding: 1px;
+  background: radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--color-fg) 45%, transparent), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; transition: opacity .35s; }
+.rg-card.rg-spot::after, .rg-kpi.rg-spot::after { opacity: .6; }
+.rg-fw-h .rg-sprk { position: absolute; bottom: .3rem; right: .5rem; width: 34px; height: 30px; margin: 0; overflow: visible; pointer-events: none; }
+.rg-fw-h .t { padding-right: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .rg-kpi { transition: transform .25s var(--cds-ease-out), box-shadow var(--cds-dur-slow) var(--cds-ease-out); transform-style: preserve-3d; will-change: transform; }
+  .rg-march { animation: rg-march 1.1s linear infinite; }
+  .rg-sprk .arm { transform-origin: 13px 20px; animation: rg-sweep 2.6s ease-in-out infinite alternate; }
+  .rg-sprk .drop { animation: rg-drop 1.3s ease-out infinite; }
+  .rg-sprk .drop:nth-child(2) { animation-delay: .25s; } .rg-sprk .drop:nth-child(3) { animation-delay: .5s; } .rg-sprk .drop:nth-child(4) { animation-delay: .75s; } .rg-sprk .drop:nth-child(5) { animation-delay: 1s; }
+  .rg-scan { animation: rg-scan 7s cubic-bezier(.45,0,.55,1) 1.8s infinite; }
+  .rg-shimmer { animation: rg-shimmer 4.5s ease-in-out 1.6s infinite; }
+  .rg-page.rg-enter { animation: rg-blurin .6s var(--cds-ease-out) both; }
+  .rg-tab[aria-selected="true"] { animation: rg-tabpop .45s cubic-bezier(.3,1.6,.5,1); }
+  .rg-kpi-v.rg-done { animation: rg-flash 1s var(--cds-ease-out); }
+}
+@keyframes rg-march { to { stroke-dashoffset: -18; } }
+@keyframes rg-sweep { from { transform: rotate(-38deg); } to { transform: rotate(38deg); } }
+@keyframes rg-drop { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(0, -14px); } }
+@keyframes rg-scan { 0% { transform: translateX(var(--from)); opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { transform: translateX(var(--to)); opacity: 0; } }
+@keyframes rg-shimmer { 0% { transform: translateX(var(--from)); } 60%, 100% { transform: translateX(var(--to)); } }
+@keyframes rg-blurin { from { opacity: 0; filter: blur(6px); transform: translateY(6px); } to { opacity: 1; filter: none; transform: none; } }
+@keyframes rg-tabpop { 0% { transform: scale(.94); } 100% { transform: scale(1); } }
+@keyframes rg-flash { 0% { text-shadow: 0 0 0 transparent; } 30% { text-shadow: 0 0 18px color-mix(in srgb, var(--color-fg) 35%, transparent); } 100% { text-shadow: 0 0 0 transparent; } }
 </style>
 
 <div class="rg">
@@ -1804,6 +1836,64 @@ dash.calc('skim_course', {
     document.getElementById('fw-how').textContent = `How it's worked out: fairway moisture is anchored to the TurfRad mower scan, then dries with measured ET (k = ${P.k_per_mm_et} per mm, fitted from ${P.n_dry_days} dry days) plus rain. The Himalayan Spiio probe shapes the dry-down when it reads above its ${P.h_floor}% floor. Each hole's offset comes from SkimTurf's latest soil-moisture estimate. Water need = enough to lift a fairway forecast below ${P.trigger_pct}% back to ${P.target_pct}% over a ${P.root_mm} mm root zone. Fairway irrigation isn't logged, so watering only shows up at the next TurfRad scan.`;
   }
 
+  /* ---------------- motion pack 3 ---------------- */
+  /* cursor spotlight + glowing border on every card, gentle 3D tilt on KPI tiles */
+  (function spot() {
+    let cur = null;
+    document.addEventListener('pointermove', (ev) => {
+      const el = ev.target.closest && ev.target.closest('.rg-card, .rg-kpi');
+      if (cur && cur !== el) { cur.classList.remove('rg-spot'); if (cur.classList.contains('rg-kpi')) cur.style.transform = ''; }
+      cur = el; if (!el) return;
+      const r = el.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+      el.style.setProperty('--mx', x + 'px'); el.style.setProperty('--my', y + 'px'); el.classList.add('rg-spot');
+      if (!reduce && el.classList.contains('rg-kpi')) {
+        const rx = ((y / r.height) - .5) * -7, ry = ((x / r.width) - .5) * 9;
+        el.style.transform = `perspective(700px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) translateY(-3px)`;
+      }
+    }, { passive: true });
+    document.addEventListener('pointerleave', () => { if (cur) { cur.classList.remove('rg-spot'); cur.style.transform = ''; cur = null; } });
+  })();
+  /* KPI numbers flash as their count-up lands */
+  const _countTo = countTo;
+  countTo = function (el, v, fmt, key) { const fresh = !played.has('count:' + key) && !reduce; _countTo(el, v, fmt, key); if (fresh && el) setTimeout(() => { el.classList.remove('rg-done'); void el.offsetWidth; el.classList.add('rg-done'); }, 1150); };
+  function fxScan(boxId) {
+    const svg = d3.select('#' + boxId + ' svg'); const n = svg.node(); if (!n || reduce || n.querySelector('.rg-scan')) return;
+    const vb = n.viewBox.baseVal; const W = vb.width, H = vb.height;
+    const id = 'scg-' + boxId;
+    const g = svg.append('defs').append('linearGradient').attr('id', id);
+    [[0, 0], [.5, .22], [1, 0]].forEach(([o, a]) => g.append('stop').attr('offset', o).attr('stop-color', 'var(--color-fg)').attr('stop-opacity', a));
+    svg.append('rect').attr('class', 'rg-scan').attr('x', 0).attr('y', 0).attr('width', 60).attr('height', H - 26).attr('fill', `url(#${id})`)
+      .style('--from', '40px').style('--to', (W - 40) + 'px').style('pointer-events', 'none').style('mix-blend-mode', 'overlay');
+  }
+  function fxShimmer(boxId) {
+    const svg = d3.select('#' + boxId + ' svg'); const n = svg.node(); if (!n || reduce || n.querySelector('.rg-shimmer')) return;
+    const vb = n.viewBox.baseVal; const W = vb.width, H = vb.height; const id = 'shg-' + boxId;
+    const g = svg.append('defs').append('linearGradient').attr('id', id);
+    [[0, 0], [.5, .35], [1, 0]].forEach(([o, a]) => g.append('stop').attr('offset', o).attr('stop-color', '#fff').attr('stop-opacity', a));
+    svg.append('rect').attr('class', 'rg-shimmer').attr('x', 0).attr('y', 0).attr('width', 120).attr('height', H - 24).attr('fill', `url(#${id})`)
+      .style('--from', '-120px').style('--to', (W + 20) + 'px').style('pointer-events', 'none').style('mix-blend-mode', 'soft-light');
+  }
+  function fxSprinklers() {
+    document.querySelectorAll('#fw-holes .rg-fw-h.need').forEach((el) => {
+      if (el.querySelector('.rg-sprk')) return;
+      const sv = d3.select(el).append('svg').attr('class', 'rg-sprk').attr('viewBox', '0 0 26 22').attr('aria-hidden', 'true');
+      sv.append('rect').attr('x', 11.5).attr('y', 17).attr('width', 3).attr('height', 5).attr('rx', 1).attr('fill', 'var(--color-fg-muted)');
+      const arm = sv.append('g').attr('class', 'arm');
+      d3.range(5).forEach((i) => arm.append('circle').attr('class', 'drop').attr('cx', 13 + (i - 2) * 2.2).attr('cy', 15 - Math.abs(i - 2) * .6).attr('r', 1.3).attr('fill', 'var(--color-warn)'));
+      arm.append('line').attr('x1', 13).attr('y1', 20).attr('x2', 13).attr('y2', 14).attr('stroke', 'var(--color-fg-muted)').attr('stroke-width', 1.4).attr('stroke-linecap', 'round');
+    });
+  }
+  function fxMarch() {
+    if (reduce) return;
+    document.querySelectorAll('#ch-fw-bal path[stroke-dasharray="5 4"], #ch-fw-bal path[stroke-dasharray="2 3"], #ch-tr-trend path[stroke-dasharray="5 4"]').forEach((p) => p.classList.add('rg-march'));
+  }
+  function fx() {
+    if (page === 'growth') fxScan('ch-heat');
+    if (page === 'turfrad') fxScan('ch-tr-heat');
+    if (page === 'fairways') { fxShimmer('ch-sk-health'); fxSprinklers(); fxMarch(); }
+    if (page === 'turfrad') fxMarch();
+  }
+
   function draw() {
     drawHeader(); clockLine();
     if (!flowOn && ok('daily')) { flowOn = true; startFlow(); }
@@ -1815,6 +1905,7 @@ dash.calc('skim_course', {
     if (page === 'fairways') { drawFwWater(); skKpis(); drawSkHealth(); drawSkTrend(); drawSkNut(); drawSkTee(); }
     if (page === 'inputs') { drawN(); drawIrr(); drawNTable(); drawPgrTable(); }
   }
+  const _draw = draw; draw = function () { _draw(); requestAnimationFrame(fx); };
   const named = location.hash.slice(1);
   if (['today', 'growth', 'soil', 'turfrad', 'fairways', 'disease', 'inputs'].includes(named)) show(named, false);
   dash.onData(draw);
