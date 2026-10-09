@@ -220,6 +220,16 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 .rg-play:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
 .rg-radar svg { display: block; width: 100%; height: auto; overflow: visible; }
 .rg-tr-flag { color: var(--color-warn); font-weight: 600; }
+
+.rg-hbar-row { cursor: default; }
+.rg-sm { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: var(--cds-gap-md); }
+.rg-sm-cell h4 { margin: 0 0 .25rem; font-size: var(--cds-font-size-caption); font-weight: 600; color: var(--color-fg-muted); }
+.rg-sm-cell .rg-sm-v { font-size: 1.35rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rg-nheat td.c { text-align: center; font-variant-numeric: tabular-nums; border-radius: 4px; }
+.rg-nheat { border-collapse: separate; border-spacing: 3px; width: 100%; font-size: var(--cds-font-size-caption); }
+.rg-nheat th { font-weight: 600; color: var(--color-fg-muted); text-align: center; padding: .2rem .3rem; white-space: nowrap; }
+.rg-nheat th:first-child, .rg-nheat td:first-child { text-align: left; }
+@media (prefers-reduced-motion: no-preference) { .rg-nheat.rg-pop td.c { animation: rg-rise .5s var(--cds-ease-out) both; } }
 </style>
 
 <div class="rg">
@@ -242,6 +252,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <button class="rg-tab" role="tab" id="tab-growth" data-page="growth" aria-selected="false">Growth</button>
     <button class="rg-tab" role="tab" id="tab-soil" data-page="soil" aria-selected="false">Soil</button>
     <button class="rg-tab" role="tab" id="tab-turfrad" data-page="turfrad" aria-selected="false">TurfRad</button>
+    <button class="rg-tab" role="tab" id="tab-fairways" data-page="fairways" aria-selected="false">Fairways</button>
     <button class="rg-tab" role="tab" id="tab-disease" data-page="disease" aria-selected="false">Disease cover</button>
     <button class="rg-tab" role="tab" id="tab-inputs" data-page="inputs" aria-selected="false">Inputs</button>
     <span class="rg-tabbar" id="tabbar" aria-hidden="true"></span>
@@ -423,6 +434,41 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     </div>
   </section>
 
+  <!-- FAIRWAYS (SkimTurf) -->
+  <section class="rg-page" id="fairways" role="tabpanel" aria-labelledby="tab-fairways" hidden>
+    <div class="rg-kpis" id="sk-kpis">
+      <div class="rg-kpi"><span class="rg-kpi-l">Fairways healthy · latest pass</span><span class="rg-kpi-v" id="sk-k-h">—</span><span class="rg-delta" id="sk-d-h"></span><span class="rg-kpi-s" id="sk-k-h-s">share of fairway area</span><svg class="rg-spark" id="sk-sp-h" preserveAspectRatio="none"></svg></div>
+      <div class="rg-kpi"><span class="rg-kpi-l">Fairway NDVI</span><span class="rg-kpi-v" id="sk-k-ndvi">—</span><span class="rg-delta" id="sk-d-ndvi"></span><span class="rg-kpi-s">area-weighted mean</span><svg class="rg-spark" id="sk-sp-ndvi" preserveAspectRatio="none"></svg></div>
+      <div class="rg-kpi"><span class="rg-kpi-l">Fairway leaf N</span><span class="rg-kpi-v" id="sk-k-n">—</span><span class="rg-delta" id="sk-d-n"></span><span class="rg-kpi-s">% of dry matter, satellite estimate</span><svg class="rg-spark" id="sk-sp-n" preserveAspectRatio="none"></svg></div>
+      <div class="rg-kpi"><span class="rg-kpi-l">Fairway soil moisture</span><span class="rg-kpi-v" id="sk-k-m">—</span><span class="rg-delta" id="sk-d-m"></span><span class="rg-kpi-s">satellite estimate, %</span><svg class="rg-spark" id="sk-sp-m" preserveAspectRatio="none"></svg></div>
+    </div>
+    <div class="rg-card" id="card-sk-health">
+      <div class="rg-row"><h3>Fairway health by hole</h3><span class="rg-note" id="sk-pass">—</span></div>
+      <p class="rg-note">SkimTurf satellite classification of each fairway: healthy, stressed and critical share of the area. Sorted by stressed share. Greens are excluded.</p>
+      <div class="rg-chart tall" id="ch-sk-health" data-source="skimturf"></div>
+    </div>
+    <div class="rg-card" id="card-sk-trend">
+      <h3>Fairways over the last 12 months</h3>
+      <p class="rg-note">Course fairway means, one point per satellite pass. The last month has every pass; earlier months show one pass each.</p>
+      <div class="rg-sm" id="ch-sk-trend" data-source="skimturf"></div>
+    </div>
+    <div class="rg-card" id="card-sk-nut">
+      <h3>Fairway nutrients by hole</h3>
+      <p class="rg-note">Leaf tissue estimates from the latest pass (N–S in %, micronutrients in mg/kg). Shading shows each hole against the course fairway mean: orange is low, blue is high.</p>
+      <div class="rg-tbox"><table class="rg-nheat" id="t-sk-nut" data-source="skimturf"></table></div>
+    </div>
+    <div class="rg-card" id="card-sk-tee">
+      <h3>Tees, latest pass</h3>
+      <p class="rg-note">Tee areas are small, so read these as a rough guide only.</p>
+      <div class="rg-tbox">
+        <table class="rg-table" id="t-sk-tee" data-source="skimturf">
+          <thead><tr><th>Hole</th><th class="n">Healthy %</th><th class="n">NDVI</th><th class="n">N %</th><th class="n">Moisture %</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
   <!-- DISEASE -->
   <section class="rg-page" id="disease" role="tabpanel" aria-labelledby="tab-disease" hidden>
     <div class="rg-kpis" id="cover-kpis">
@@ -559,6 +605,26 @@ dash.calc('turfrad_latest', {
   },
 });
 
+dash.calc('skim_course', {
+  inputs: ['skimturf'],
+  title: 'SkimTurf fairway summary by pass',
+  description: 'Area-weighted fairway means per satellite pass (holes 1–18; greens, chipping green and driving range excluded; cloud-masked holes skipped; passes under 80% fairway coverage dropped): healthy/stressed/critical share, NDVI, leaf N and soil moisture.',
+  fn: (sk) => {
+    const by = {};
+    for (const r of sk) {
+      if (r.type !== 'Fairway' || isNaN(+r.hole)) continue;
+      const o = by[r.date] || (by[r.date] = { date: r.date, a: 0, h: 0, s: 0, c: 0, w: 0, ndvi: 0, n: 0, m: 0, tot: 0 });
+      o.tot += r.area_m2 || 0;
+      if (r.ndvi == null) continue; /* cloud-masked on this pass */
+      o.a += r.area_m2 || 0; o.h += r.healthy_m2 || 0; o.s += r.stressed_m2 || 0; o.c += r.critical_m2 || 0;
+      const w = r.hexes || 0; o.w += w; o.ndvi += (r.ndvi || 0) * w; o.n += (r.nitrogen || 0) * w; o.m += (r.humid || 0) * w;
+    }
+    return Object.values(by).filter((o) => o.tot && o.a / o.tot >= 0.8).sort((a, b) => (a.date < b.date ? -1 : 1)).map((o) => ({ date: o.date, coverage_pct: 100 * o.a / o.tot,
+      healthy_pct: o.a ? 100 * o.h / o.a : null, stressed_pct: o.a ? 100 * o.s / o.a : null, critical_pct: o.a ? 100 * o.c / o.a : null,
+      ndvi: o.w ? o.ndvi / o.w : null, nitrogen: o.w ? o.n / o.w : null, moisture: o.w ? o.m / o.w : null }));
+  },
+});
+
 (() => {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const played = new Set();
@@ -680,7 +746,7 @@ dash.calc('turfrad_latest', {
     document.querySelectorAll('.rg-page').forEach((s) => (s.hidden = s.id !== p));
     if (push) dash.setLink(p);
     draw();
-    const sec = document.getElementById(p); enter(sec); if (p === 'today') enter(document.getElementById('kpis')); if (p === 'disease') enter(document.getElementById('cover-kpis')); if (p === 'turfrad') enter(document.getElementById('tr-kpis'));
+    const sec = document.getElementById(p); enter(sec); if (p === 'today') enter(document.getElementById('kpis')); if (p === 'disease') enter(document.getElementById('cover-kpis')); if (p === 'turfrad') enter(document.getElementById('tr-kpis')); if (p === 'fairways') enter(document.getElementById('sk-kpis'));
   }
   function moveBar() {
     const bar = document.getElementById('tabbar'), t = tabs.find((x) => x.dataset.page === page); if (!bar || !t) return;
@@ -1522,6 +1588,122 @@ dash.calc('turfrad_latest', {
     t.querySelectorAll('.rg-th').forEach((b) => { b.onclick = () => { trSort = { k: b.dataset.k, asc: trSort.k === b.dataset.k ? !trSort.asc : b.dataset.k === 'green' }; drawTrTable(); }; });
   }
 
+  /* ---------------- Fairways (SkimTurf) ---------------- */
+  function skLatest() { const r = rows('skimturf'); const last = r.reduce((a, x) => (x.date > a ? x.date : a), ''); return { last, r: r.filter((x) => x.date === last && !isNaN(+x.hole)) }; }
+  function skKpis() {
+    if (!ok('skim_course')) return;
+    const d = rows('skim_course'); if (!d.length) return;
+    const L = d[d.length - 1], P = d[d.length - 2];
+    const set = (id, v, fmt, key) => countTo(document.getElementById(id), v, fmt, key);
+    set('sk-k-h', L.healthy_pct, (x) => f0(x) + '%', 'sk-h'); set('sk-k-ndvi', L.ndvi, (x) => d3.format('.2f')(x), 'sk-ndvi');
+    set('sk-k-n', L.nitrogen, (x) => d3.format('.2f')(x) + '%', 'sk-n'); set('sk-k-m', L.moisture, (x) => f1(x) + '%', 'sk-m');
+    document.getElementById('sk-k-h-s').textContent = `stressed ${f0(L.stressed_pct)}% · critical ${f1(L.critical_pct)}% · ${fDay(pd(L.date))}`;
+    const delta = (id, a, b, fmt, unit) => { const el = document.getElementById(id); if (!P || a == null || b == null) { el.textContent = ''; return; } const c = a - b; el.replaceChildren(); const bb = document.createElement('b'); bb.textContent = (c > 0 ? '▲ +' : c < 0 ? '▼ ' : '■ ') + fmt(c) + unit; el.append(bb, document.createTextNode(' vs ' + fDay(pd(P.date)))); el.className = 'rg-delta neutral-' + (c >= 0 ? 'up' : 'down'); };
+    delta('sk-d-h', L.healthy_pct, P && P.healthy_pct, f0, ' pts'); delta('sk-d-ndvi', L.ndvi, P && P.ndvi, d3.format('.2f'), ''); delta('sk-d-n', L.nitrogen, P && P.nitrogen, d3.format('.2f'), ''); delta('sk-d-m', L.moisture, P && P.moisture, f1, ' pts');
+    const mini = (id, key) => { const svg = d3.select('#' + id); const el = svg.node(); if (!el) return; const W = el.clientWidth || 200, H = 34; svg.attr('viewBox', `0 0 ${W} ${H}`).selectAll('*').remove();
+      const s = d.filter((r) => r[key] != null); const x = d3.scaleUtc(d3.extent(s, (r) => pd(r.date)), [2, W - 4]), y = d3.scaleLinear(d3.extent(s, (r) => r[key]), [H - 3, 3]);
+      const p = svg.append('path').datum(s).attr('d', d3.line().x((r) => x(pd(r.date))).y((r) => y(r[key])).curve(d3.curveMonotoneX)).attr('fill', 'none').attr('stroke', C()[0]).attr('stroke-width', 1.6);
+      drawIn(p, 'sksp' + id); const e = s[s.length - 1]; ping(svg.append('g'), x(pd(e.date)), y(e[key]), C()[0], 2.4); };
+    mini('sk-sp-h', 'healthy_pct'); mini('sk-sp-ndvi', 'ndvi'); mini('sk-sp-n', 'nitrogen'); mini('sk-sp-m', 'moisture');
+  }
+
+  function drawSkHealth() {
+    const box = document.getElementById('ch-sk-health');
+    if (!guard(box, ['skimturf'])) return;
+    box.replaceChildren();
+    const { last, r } = skLatest();
+    document.getElementById('sk-pass').textContent = last ? 'Pass of ' + fDayY(pd(last)) : '—';
+    const f = r.filter((x) => x.type === 'Fairway' && x.area_m2 && x.ndvi != null).map((x) => ({ hole: x.hole, h: 100 * x.healthy_m2 / x.area_m2, s: 100 * x.stressed_m2 / x.area_m2, c: 100 * x.critical_m2 / x.area_m2, ndvi: x.ndvi, area: x.area_m2 }))
+      .sort((a, b) => (b.s + b.c) - (a.s + a.c));
+    const W = box.clientWidth, rowH = 17, m = { t: 6, r: 56, b: 24, l: 62 }, H = m.t + m.b + rowH * f.length;
+    const x = d3.scaleLinear([0, 100], [m.l, W - m.r]);
+    const y = d3.scaleBand(f.map((d) => d.hole), [m.t, m.t + rowH * f.length]).padding(.18);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    svg.append('g').attr('class', 'rg-gridl').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(5).tickSize(-(H - m.t - m.b)).tickFormat(''));
+    const xa = svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(5).tickSize(0).tickPadding(6).tickFormat((v) => v + '%')); axisStyle(xa); xa.select('.domain').remove();
+    svg.append('g').selectAll('text').data(f).join('text').attr('class', 'rg-lbl').attr('x', m.l - 6).attr('y', (d) => y(d.hole) + y.bandwidth() / 2 + 4).attr('text-anchor', 'end').text((d) => gName(d.hole) + ' fwy');
+    const cols = { h: 'var(--color-ok)', s: 'var(--color-warn)', c: 'var(--color-bad)' };
+    const anim = first('skhealth');
+    const g = svg.append('g').selectAll('g').data(f).join('g').attr('class', 'rg-hbar-row');
+    ['h', 's', 'c'].forEach((k, ki) => {
+      const off = (d) => (k === 'h' ? 0 : k === 's' ? d.h : d.h + d.s);
+      const rect = g.append('rect').attr('y', (d) => y(d.hole)).attr('height', y.bandwidth()).attr('rx', 2).attr('fill', cols[k]).attr('opacity', k === 'h' ? .75 : .9)
+        .attr('x', (d) => x(off(d))).attr('width', (d) => Math.max(0, x(off(d) + d[k]) - x(off(d))));
+      if (anim && !reduce) rect.attr('width', 0).attr('x', x(0)).transition().delay((d, i) => i * 40 + ki * 350).duration(700).ease(d3.easeCubicOut)
+        .attr('x', (d) => x(off(d))).attr('width', (d) => Math.max(0, x(off(d) + d[k]) - x(off(d))));
+    });
+    g.filter((d) => d.c >= 2).append('rect').attr('x', m.l - 2).attr('y', (d) => y(d.hole) - 2).attr('width', W - m.l - m.r + 4).attr('height', y.bandwidth() + 4).attr('rx', 4).attr('fill', 'none').attr('stroke', 'var(--color-bad)').attr('stroke-width', 1.5).attr('class', 'rg-alarm');
+    g.append('text').attr('class', 'rg-lbl-b').attr('x', W - m.r + 6).attr('y', (d) => y(d.hole) + y.bandwidth() / 2 + 4).text((d) => f0(d.s + d.c) + '%');
+    const tip = tipFor(box);
+    g.append('rect').attr('x', m.l).attr('width', W - m.l - m.r).attr('y', (d) => y(d.hole)).attr('height', y.bandwidth()).attr('fill', 'transparent')
+      .on('pointerenter', (ev, d) => showTip(box, tip, x(100), y(d.hole), (t) => { line(t, `${gName(d.hole)} fairway · ${f0(d.area)} m²`, null, 'd'); line(t, `Healthy ${f1(d.h)}%`, cols.h); line(t, `Stressed ${f1(d.s)}%`, cols.s); line(t, `Critical ${f1(d.c)}%`, cols.c); line(t, `NDVI ${d3.format('.2f')(d.ndvi)}`, null, 'd'); }))
+      .on('pointerleave', () => (tip.hidden = true));
+    const lg = document.createElement('div'); lg.className = 'rg-legend';
+    [['Healthy', cols.h], ['Stressed', cols.s], ['Critical', cols.c]].forEach(([n, c]) => { const sp = document.createElement('span'); const sw = document.createElement('i'); sw.className = 'sw'; sw.style.background = c; sw.style.display = 'inline-block'; sw.style.width = '10px'; sw.style.height = '10px'; sw.style.borderRadius = '2px'; sw.style.marginRight = '4px'; sp.append(sw, document.createTextNode(n + '  ')); lg.appendChild(sp); });
+    box.prepend(lg);
+  }
+
+  function drawSkTrend() {
+    const box = document.getElementById('ch-sk-trend');
+    if (!guard(box, ['skim_course'])) return;
+    box.replaceChildren();
+    const d = rows('skim_course');
+    const spec = [['healthy_pct', 'Healthy area', (v) => f0(v) + '%', C()[0]], ['ndvi', 'NDVI', d3.format('.2f'), C()[2]], ['nitrogen', 'Leaf N', (v) => d3.format('.2f')(v) + '%', C()[1]], ['moisture', 'Soil moisture', (v) => f1(v) + '%', C()[3] || C()[0]]];
+    const cellsEl = spec.map(() => { const c = document.createElement('div'); c.className = 'rg-sm-cell'; box.appendChild(c); return c; });
+    spec.forEach(([k, name, fmt, col], si) => {
+      const cell = cellsEl[si];
+      const h4 = document.createElement('h4'); h4.textContent = name; cell.appendChild(h4);
+      const s = d.filter((r) => r[k] != null); const L = s[s.length - 1];
+      const v = document.createElement('div'); v.className = 'rg-sm-v'; cell.appendChild(v); countTo(v, L ? L[k] : null, fmt, 'sksm' + k);
+      const W = cell.clientWidth || 220, H = 110, m = { t: 8, r: 8, b: 20, l: 8 };
+      const x = d3.scaleUtc(d3.extent(s, (r) => pd(r.date)), [m.l, W - m.r]);
+      const ext = d3.extent(s, (r) => r[k]); const pad = (ext[1] - ext[0]) * .15 || 1;
+      const y = d3.scaleLinear([ext[0] - pad, ext[1] + pad], [H - m.b, m.t]);
+      const svg = d3.select(cell).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+      const xa = svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(3).tickFormat(d3.utcFormat('%b %y')).tickSizeOuter(0)); axisStyle(xa);
+      const area = svg.append('path').datum(s).attr('d', d3.area().x((r) => x(pd(r.date))).y0(H - m.b).y1((r) => y(r[k])).curve(d3.curveMonotoneX)).attr('fill', col).attr('opacity', .12);
+      if (first('skarea' + k) && !reduce) area.attr('opacity', 0).transition().delay(500).duration(800).attr('opacity', .12);
+      const p = svg.append('path').datum(s).attr('d', d3.line().x((r) => x(pd(r.date))).y((r) => y(r[k])).curve(d3.curveMonotoneX)).attr('fill', 'none').attr('stroke', col).attr('stroke-width', 2);
+      drawIn(p, 'sktr' + k); comet(svg, p, col, 2);
+      svg.append('g').selectAll('circle').data(s).join('circle').attr('cx', (r) => x(pd(r.date))).attr('cy', (r) => y(r[k])).attr('r', 2.2).attr('fill', col);
+      ping(svg.append('g'), x(pd(L.date)), y(L[k]), col, 2.8);
+      const tip = tipFor(cell); cell.style.position = 'relative';
+      svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', H - m.t - m.b).attr('fill', 'transparent')
+        .on('pointermove', (ev) => { const [mx] = d3.pointer(ev); const r = s[d3.bisector((z) => pd(z.date)).center(s, x.invert(mx))]; showTip(cell, tip, x(pd(r.date)), y(r[k]), (t) => { line(t, fDayY(pd(r.date)), null, 'd'); line(t, `${name} ${fmt(r[k])}`, col); }); })
+        .on('pointerleave', () => (tip.hidden = true));
+    });
+  }
+
+  function drawSkNut() {
+    const t = document.getElementById('t-sk-nut');
+    if (!ok('skimturf')) return;
+    const { r } = skLatest();
+    const f = r.filter((x) => x.type === 'Fairway').sort((a, b) => greenSort(a.hole, b.hole));
+    const keys = [['nitrogen', 'N', 2], ['phosphorus', 'P', 2], ['potassium', 'K', 2], ['calcium', 'Ca', 2], ['magnesium', 'Mg', 2], ['sulfur', 'S', 2], ['iron', 'Fe', 0], ['manganese', 'Mn', 0], ['zinc', 'Zn', 0], ['copper', 'Cu', 0], ['boron', 'B', 1], ['sodium', 'Na', 0]];
+    const lo = cssColor('var(--color-warn)'), mid = cssColor('var(--color-panel)'), hi = cssColor(C()[0]);
+    t.replaceChildren();
+    const th = t.createTHead().insertRow(); const h0 = document.createElement('th'); h0.textContent = 'Fairway'; th.appendChild(h0);
+    keys.forEach(([, n]) => { const h = document.createElement('th'); h.textContent = n; th.appendChild(h); });
+    const stats = Object.fromEntries(keys.map(([k]) => { const v = f.map((x) => x[k]).filter((z) => z != null); return [k, { m: d3.mean(v), sd: d3.deviation(v) || 1 }]; }));
+    const tb = t.createTBody(); let i = 0;
+    f.forEach((x) => { const tr = tb.insertRow(); tr.insertCell().textContent = gName(x.hole);
+      keys.forEach(([k, , dp]) => { const c = tr.insertCell(); c.className = 'c'; const v = x[k]; c.textContent = v == null ? '–' : d3.format('.' + dp + 'f')(v);
+        if (v != null) { const z = Math.max(-2, Math.min(2, (v - stats[k].m) / stats[k].sd)); c.style.background = z < 0 ? d3.interpolateRgb(mid, lo)(-z / 2 * .85) : d3.interpolateRgb(mid, hi)(z / 2 * .7); if (Math.abs(z) > 1.4) c.style.fontWeight = '600'; c.title = `${f1(z)} SD from fairway mean`; }
+        c.style.animationDelay = (i++ * 6) + 'ms'; }); });
+    const trm = tb.insertRow(); const c0 = trm.insertCell(); c0.textContent = 'Mean'; c0.style.fontWeight = '600';
+    keys.forEach(([k, , dp]) => { const c = trm.insertCell(); c.className = 'c'; c.style.fontWeight = '600'; c.textContent = d3.format('.' + dp + 'f')(stats[k].m); });
+    if (first('sknut')) { t.classList.remove('rg-pop'); void t.offsetWidth; t.classList.add('rg-pop'); }
+  }
+
+  function drawSkTee() {
+    const tb = document.getElementById('t-sk-tee').tBodies[0];
+    if (!ok('skimturf')) return;
+    const { r } = skLatest();
+    tb.replaceChildren();
+    r.filter((x) => x.type === 'Teebox').sort((a, b) => greenSort(a.hole, b.hole)).forEach((x) => { const tr = tb.insertRow();
+      [gName(x.hole), x.area_m2 ? f0(100 * x.healthy_m2 / x.area_m2) : '–', d3.format('.2f')(x.ndvi), d3.format('.2f')(x.nitrogen), f1(x.humid)].forEach((v, i) => { const c = tr.insertCell(); if (i) c.className = 'n'; c.textContent = v; }); });
+  }
+
   function draw() {
     drawHeader(); clockLine();
     if (!flowOn && ok('daily')) { flowOn = true; startFlow(); }
@@ -1530,10 +1712,11 @@ dash.calc('turfrad_latest', {
     if (page === 'growth') { drawGvx(); drawHeat(); drawWx(); }
     if (page === 'soil') { drawSpiio('ch-moist', 'moisture_pct', '%', 12); drawSpiio('ch-stemp', 'soil_temp_c', '°', null); drawOm(); drawTdr(); }
     if (page === 'turfrad') { trKpis(); drawRadar(); drawTrTrend(); drawTrHeat(); drawTrTable(); }
+    if (page === 'fairways') { skKpis(); drawSkHealth(); drawSkTrend(); drawSkNut(); drawSkTee(); }
     if (page === 'inputs') { drawN(); drawIrr(); drawNTable(); drawPgrTable(); }
   }
   const named = location.hash.slice(1);
-  if (['today', 'growth', 'soil', 'turfrad', 'disease', 'inputs'].includes(named)) show(named, false);
+  if (['today', 'growth', 'soil', 'turfrad', 'fairways', 'disease', 'inputs'].includes(named)) show(named, false);
   dash.onData(draw);
   enter(document.getElementById('today')); enter(document.getElementById('kpis')); requestAnimationFrame(moveBar);
 })();
