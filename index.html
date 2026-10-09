@@ -211,6 +211,15 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 @keyframes rg-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rg-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes rg-growx { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.rg-radar { position: relative; }
+.rg-radar-ctl { display: flex; align-items: center; gap: var(--cds-gap-sm); flex-wrap: wrap; margin-block: 0 var(--cds-gap-sm); }
+.rg-radar-ctl input[type=range] { flex: 1 1 12rem; accent-color: var(--color-fg); min-width: 0; }
+.rg-radar-date { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 6.5rem; }
+.rg-play { appearance: none; border: 1px solid var(--color-border-line); background: none; color: var(--color-fg); border-radius: 999px; font: inherit; font-size: var(--cds-font-size-caption); padding: .25rem .8rem; cursor: pointer; }
+.rg-play:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.rg-radar svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rg-tr-flag { color: var(--color-warn); font-weight: 600; }
 </style>
 
 <div class="rg">
@@ -232,6 +241,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     <button class="rg-tab" role="tab" id="tab-today" data-page="today" aria-selected="true">Today</button>
     <button class="rg-tab" role="tab" id="tab-growth" data-page="growth" aria-selected="false">Growth</button>
     <button class="rg-tab" role="tab" id="tab-soil" data-page="soil" aria-selected="false">Soil</button>
+    <button class="rg-tab" role="tab" id="tab-turfrad" data-page="turfrad" aria-selected="false">TurfRad</button>
     <button class="rg-tab" role="tab" id="tab-disease" data-page="disease" aria-selected="false">Disease cover</button>
     <button class="rg-tab" role="tab" id="tab-inputs" data-page="inputs" aria-selected="false">Inputs</button>
     <span class="rg-tabbar" id="tabbar" aria-hidden="true"></span>
@@ -365,6 +375,54 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     </div>
   </section>
 
+  <!-- TURFRAD -->
+  <section class="rg-page" id="turfrad" role="tabpanel" aria-labelledby="tab-turfrad" hidden>
+    <div class="rg-kpis" id="tr-kpis">
+      <div class="rg-kpi"><span class="rg-kpi-l">Greens moisture · latest scan</span><span class="rg-kpi-v" id="tr-k-gm" data-source="turfrad_daily" data-field="green_moist">—</span><span class="rg-delta" id="tr-d-gm"></span><span class="rg-kpi-s" id="tr-k-gm-s">course greens mean, VWC %</span><svg class="rg-spark" id="tr-sp-gm" preserveAspectRatio="none"></svg></div>
+      <div class="rg-kpi"><span class="rg-kpi-l">Greens uniformity</span><span class="rg-kpi-v" id="tr-k-gu" data-source="turfrad_daily" data-field="green_unif">—</span><span class="rg-delta" id="tr-d-gu"></span><span class="rg-kpi-s">100 = perfectly even</span><svg class="rg-spark" id="tr-sp-gu" preserveAspectRatio="none"></svg></div>
+      <div class="rg-kpi"><span class="rg-kpi-l">Fairways moisture</span><span class="rg-kpi-v" id="tr-k-fm" data-source="turfrad_daily" data-field="fairway_moist">—</span><span class="rg-delta" id="tr-d-fm"></span><span class="rg-kpi-s" id="tr-k-fu">—</span><svg class="rg-spark" id="tr-sp-fm" preserveAspectRatio="none"></svg></div>
+      <div class="rg-kpi"><span class="rg-kpi-l">Driest green</span><span class="rg-kpi-v" id="tr-k-dry">—</span><span class="rg-kpi-s" id="tr-k-dry-s">—</span></div>
+    </div>
+    <div class="rg-card" id="card-radar">
+      <div class="rg-row"><h3>Greens radar</h3></div>
+      <p class="rg-note">Each disc is a green from the mower-mounted TurfRad scan. Fill is mean moisture, the ring is uniformity. Orange outline = under the 12% dry line. Press play to replay every scan.</p>
+      <div class="rg-radar-ctl">
+        <button class="rg-play" id="tr-play" type="button" aria-label="Replay scans">▶ Replay</button>
+        <input type="range" id="tr-slider" min="0" max="0" value="0" aria-label="Scan date">
+        <span class="rg-radar-date" id="tr-date">—</span>
+      </div>
+      <div class="rg-radar" id="ch-radar" data-source="turfrad"></div>
+    </div>
+    <div class="rg-card" id="card-tr-trend">
+      <h3>Moisture by scan</h3>
+      <p class="rg-note">TurfRad course means for greens and fairways, with the daily mean of the Spiio fixed probes for comparison. Bars are rain logged by TurfRad.</p>
+      <div class="rg-chart" id="ch-tr-trend" data-source="turfrad_daily spiio"></div>
+    </div>
+    <div class="rg-card" id="card-tr-heat">
+      <h3>Moisture by green</h3>
+      <p class="rg-note">Mean VWC % per green per scan. Orange outline = under 12%. Blank = not scanned.</p>
+      <div class="rg-chart tall" id="ch-tr-heat" data-source="turfrad"></div>
+    </div>
+    <div class="rg-card" id="card-tr-table">
+      <h3>Latest scan by green</h3>
+      <p class="rg-note">IR temperature is canopy SURFACE temperature from the scanner, not soil temperature. Low-quartile DU under 80 means dry patches within the green.</p>
+      <div class="rg-tbox">
+        <table class="rg-table" id="t-tr" data-source="turfrad_latest" data-row-key="green">
+          <thead><tr>
+            <th data-field="green"><button class="rg-th" data-k="green">Green</button></th>
+            <th class="n" data-field="moist_mean"><button class="rg-th" data-k="moist_mean">Mean %</button></th>
+            <th class="n" data-field="moist_min"><button class="rg-th" data-k="moist_min">Min %</button></th>
+            <th class="n" data-field="moist_max"><button class="rg-th" data-k="moist_max">Max %</button></th>
+            <th class="n" data-field="uniformity"><button class="rg-th" data-k="uniformity">Uniformity</button></th>
+            <th class="n" data-field="du_lq"><button class="rg-th" data-k="du_lq">DU LQ</button></th>
+            <th class="n" data-field="ir_temp_c"><button class="rg-th" data-k="ir_temp_c">IR surface °C</button></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
   <!-- DISEASE -->
   <section class="rg-page" id="disease" role="tabpanel" aria-labelledby="tab-disease" hidden>
     <div class="rg-kpis" id="cover-kpis">
@@ -491,6 +549,16 @@ dash.calc('tdr_latest', {
   },
 });
 
+dash.calc('turfrad_latest', {
+  inputs: ['turfrad'],
+  title: 'Latest TurfRad scan per green',
+  description: 'Each green as of the most recent TurfRad scan date: mean, min and max moisture, uniformity, low-quartile DU and IR surface temperature.',
+  fn: (tr) => {
+    const last = tr.reduce((a, r) => (r.date > a ? r.date : a), '');
+    return tr.filter((r) => r.date === last).map((r) => ({ green: r.green, date: r.date, moist_mean: r.moist_mean, moist_min: r.moist_min, moist_max: r.moist_max, uniformity: r.uniformity, du_lq: r.du_lq, ir_temp_c: r.ir_temp_c }));
+  },
+});
+
 (() => {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const played = new Set();
@@ -612,7 +680,7 @@ dash.calc('tdr_latest', {
     document.querySelectorAll('.rg-page').forEach((s) => (s.hidden = s.id !== p));
     if (push) dash.setLink(p);
     draw();
-    const sec = document.getElementById(p); enter(sec); if (p === 'today') enter(document.getElementById('kpis')); if (p === 'disease') enter(document.getElementById('cover-kpis'));
+    const sec = document.getElementById(p); enter(sec); if (p === 'today') enter(document.getElementById('kpis')); if (p === 'disease') enter(document.getElementById('cover-kpis')); if (p === 'turfrad') enter(document.getElementById('tr-kpis'));
   }
   function moveBar() {
     const bar = document.getElementById('tabbar'), t = tabs.find((x) => x.dataset.page === page); if (!bar || !t) return;
@@ -1261,6 +1329,199 @@ dash.calc('tdr_latest', {
     rows('coverage_verify').forEach((r) => { const tr = tb.insertRow(); [r.product, r.last_applied, r.reason].forEach((v) => { tr.insertCell().textContent = v; }); });
   }
 
+  /* ---------------- TurfRad ---------------- */
+  const trTint = (v) => {
+    const dry = cssColor('var(--color-warn)'), mid = cssColor('var(--cds-chart-grid)'), wet = cssColor(C()[0]);
+    if (v <= 12) return d3.interpolateRgb(dry, mid)(Math.max(0, v / 12) * .6);
+    return d3.interpolateRgb(mid, wet)(Math.min(1, .2 + .8 * (v - 12) / 18));
+  };
+  function trKpis() {
+    const box = document.getElementById('tr-kpis');
+    const d = rows('turfrad_daily');
+    if (!ok('turfrad_daily') || !d.length) return;
+    const L = d[d.length - 1], P = d[d.length - 2];
+    document.querySelectorAll('#tr-kpis [data-source="turfrad_daily"]').forEach((el) => el.setAttribute('data-where', 'date=' + L.date));
+    countTo(document.getElementById('tr-k-gm'), L.green_moist, (x) => f1(x) + '%', 'tr-gm');
+    countTo(document.getElementById('tr-k-gu'), L.green_unif, (x) => f1(x), 'tr-gu');
+    countTo(document.getElementById('tr-k-fm'), L.fairway_moist, (x) => f1(x) + '%', 'tr-fm');
+    document.getElementById('tr-k-gm-s').textContent = `${L.greens_scanned} greens scanned ${fDay(pd(L.date))}`;
+    document.getElementById('tr-k-fu').textContent = `uniformity ${f1(L.fairway_unif)}`;
+    const delta = (id, a, b, unit) => { const el = document.getElementById(id); if (!P || a == null || b == null) { el.textContent = ''; return; } const c = a - b; el.replaceChildren(); const bb = document.createElement('b'); bb.textContent = (Math.abs(c) < .05 ? '■ ' : c > 0 ? '▲ +' : '▼ ') + f1(c) + unit; el.append(bb, document.createTextNode(' vs ' + fDay(pd(P.date)))); el.className = 'rg-delta ' + (Math.abs(c) < .05 ? '' : c > 0 ? 'neutral-up' : 'neutral-down'); };
+    delta('tr-d-gm', L.green_moist, P && P.green_moist, ' pts'); delta('tr-d-gu', L.green_unif, P && P.green_unif, ''); delta('tr-d-fm', L.fairway_moist, P && P.fairway_moist, ' pts');
+    const mini = (id, key) => { const svg = d3.select('#' + id); const el = svg.node(); if (!el) return; const W = el.clientWidth || 200, H = 34; svg.attr('viewBox', `0 0 ${W} ${H}`).selectAll('*').remove();
+      const x = d3.scaleLinear([0, d.length - 1], [2, W - 4]), y = d3.scaleLinear(d3.extent(d, (r) => r[key]), [H - 3, 3]);
+      const p = svg.append('path').datum(d).attr('d', d3.line().x((_, i) => x(i)).y((r) => y(r[key])).curve(d3.curveMonotoneX)).attr('fill', 'none').attr('stroke', C()[0]).attr('stroke-width', 1.6);
+      drawIn(p, 'trsp' + id); ping(svg.append('g'), x(d.length - 1), y(L[key]), C()[0], 2.4); };
+    mini('tr-sp-gm', 'green_moist'); mini('tr-sp-gu', 'green_unif'); mini('tr-sp-fm', 'fairway_moist');
+    const lat = rows('turfrad_latest');
+    if (lat.length) {
+      const lo = lat.reduce((a, b) => (b.moist_mean < a.moist_mean ? b : a));
+      const dry = lat.filter((r) => r.moist_mean <= 12).length;
+      const k = document.getElementById('tr-k-dry'); k.textContent = gName(lo.green) + ' · ' + f1(lo.moist_mean) + '%'; k.classList.toggle('rg-warn', lo.moist_mean <= 12);
+      document.getElementById('tr-k-dry-s').textContent = dry ? `${dry} green${dry > 1 ? 's' : ''} under 12% on the last scan` : 'no greens under 12% on the last scan';
+    }
+  }
+
+  let trIdx = null, trTimer = 0, trPlayed = false;
+  function drawRadar() {
+    const box = document.getElementById('ch-radar');
+    if (!guard(box, ['turfrad'])) return;
+    if (trTimer) { clearInterval(trTimer); trTimer = 0; trIdx = null; document.getElementById('tr-play').textContent = '▶ Replay'; }
+    box.replaceChildren();
+    const r = rows('turfrad');
+    const dates = [...new Set(r.map((x) => x.date))].sort();
+    const by = d3.group(r, (x) => x.date);
+    const greens = d3.range(1, 19).map(String);
+    const W = box.clientWidth || 600, cols = W < 520 ? 6 : 9, rowsN = Math.ceil(18 / cols);
+    const cell = W / cols, R = Math.min(cell * .36, 34), H = rowsN * cell + 8;
+    const svg = d3.select(box).append('svg').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H).attr('role', 'img').attr('aria-label', 'TurfRad greens moisture map');
+    const pos = (g) => { const i = +g - 1; return { x: cell * (i % cols) + cell / 2, y: cell * Math.floor(i / cols) + cell / 2 + 4 }; };
+    const arc = d3.arc().innerRadius(R + 3).outerRadius(R + 7).startAngle(0).cornerRadius(2);
+    const tip = tipFor(box);
+    const nodes = greens.map((g) => {
+      const { x, y } = pos(g);
+      const G = svg.append('g').attr('transform', `translate(${x},${y})`);
+      G.append('path').attr('d', arc.endAngle(Math.PI * 2)()).attr('fill', 'var(--cds-chart-grid)');
+      const ring = G.append('path').attr('fill', C()[1]);
+      const glow = G.append('circle').attr('r', R).attr('fill', 'var(--color-fg)').attr('opacity', 0);
+      const disc = G.append('circle').attr('r', R).attr('fill', 'var(--cds-chart-grid)');
+      const alarm = G.append('circle').attr('r', R + 1).attr('fill', 'none').attr('stroke', 'var(--color-warn)').attr('stroke-width', 2.5).attr('opacity', 0);
+      const vt = G.append('text').attr('class', 'rg-lbl-b').attr('text-anchor', 'middle').attr('y', 2).attr('font-size', Math.max(11, R * .42)).attr('font-weight', 600);
+      G.append('text').attr('class', 'rg-lbl').attr('text-anchor', 'middle').attr('y', R * .5 + 6).text(gName(g));
+      G.append('circle').attr('r', R + 8).attr('fill', 'transparent')
+        .on('pointerenter', () => { const d = (by.get(dates[trIdx]) || []).find((z) => z.green === g); showTip(box, tip, x + R, y - R, (t) => { line(t, `${gName(g)} green · ${fDayY(pd(dates[trIdx]))}`, null, 'd'); if (!d) { line(t, 'not scanned'); return; } line(t, `Mean ${f1(d.moist_mean)}%  (${f1(d.moist_min)}–${f1(d.moist_max)})`); line(t, `Uniformity ${f1(d.uniformity)} · DU LQ ${f1(d.du_lq)}`); line(t, `IR surface ${f1(d.ir_temp_c)} °C`, null, 'd'); }); })
+        .on('pointerleave', () => (tip.hidden = true));
+      return { g, x, y, ring, disc, alarm, vt, glow, cur: { m: 0, u: 0 } };
+    });
+    /* radar sweep */
+    const cx = W / 2, cy = H / 2, RR = Math.hypot(W, H) / 2;
+    const defs = svg.append('defs');
+    const lg = defs.append('linearGradient').attr('id', 'tr-beam').attr('x1', 0).attr('x2', 1).attr('y1', 0).attr('y2', 0);
+    lg.append('stop').attr('offset', 0).attr('stop-color', C()[0]).attr('stop-opacity', 0);
+    lg.append('stop').attr('offset', 1).attr('stop-color', C()[0]).attr('stop-opacity', .22);
+    defs.append('clipPath').attr('id', 'tr-clip').append('rect').attr('x', 0).attr('y', 0).attr('width', W).attr('height', H);
+    const beam = svg.insert('g', ':first-child').attr('clip-path', 'url(#tr-clip)').append('path').attr('fill', 'url(#tr-beam)').attr('d', `M${cx},${cy} L${cx + RR},${cy} A${RR},${RR} 0 0 0 ${cx + RR * Math.cos(-0.5)},${cy + RR * Math.sin(-0.5)} Z`).attr('opacity', reduce ? 0 : 1);
+    const ang = nodes.map((n) => Math.atan2(n.y - cy, n.x - cx));
+    addTick('tr-sweep', box, (t) => {
+      const a = ((t / 2600) * Math.PI * 2) % (Math.PI * 2);
+      beam.attr('transform', `rotate(${a * 180 / Math.PI},${cx},${cy})`);
+      nodes.forEach((n, i) => { let d = (a - ang[i]) % (Math.PI * 2); if (d < 0) d += Math.PI * 2; n.glow.attr('opacity', d < .55 ? .18 * (1 - d / .55) : 0).attr('r', R + 2 + (d < .55 ? 6 * (1 - d / .55) : 0)); });
+    });
+    const slider = document.getElementById('tr-slider'), dateEl = document.getElementById('tr-date'), play = document.getElementById('tr-play');
+    slider.max = String(dates.length - 1);
+    const setDate = (i, dur) => {
+      trIdx = i; slider.value = String(i); dateEl.textContent = fDayY(pd(dates[i]));
+      const m = new Map((by.get(dates[i]) || []).map((z) => [z.green, z]));
+      nodes.forEach((n) => {
+        const d = m.get(n.g);
+        const tm = d ? d.moist_mean : null, tu = d ? d.uniformity : 0;
+        n.disc.transition().duration(reduce ? 0 : dur).attr('fill', tm == null ? 'var(--cds-chart-grid)' : trTint(tm)).attr('opacity', tm == null ? .35 : 1);
+        n.alarm.attr('opacity', tm != null && tm <= 12 ? 1 : 0).classed('rg-alarm', tm != null && tm <= 12);
+        const from = n.cur.u, fm = n.cur.m;
+        n.ring.transition().duration(reduce ? 0 : dur).attrTween('d', () => (k) => arc.endAngle(Math.PI * 2 * (from + (tu / 100 - from) * k))());
+        n.vt.transition().duration(reduce ? 0 : dur).tween('text', function () { return (k) => { this.textContent = tm == null ? '–' : f0(fm + (tm - fm) * k); }; });
+        n.cur = { m: tm == null ? fm : tm, u: tu / 100 };
+      });
+    };
+    slider.oninput = () => { stopPlay(); setDate(+slider.value, 250); };
+    const stopPlay = () => { if (trTimer) { clearInterval(trTimer); trTimer = 0; play.textContent = '▶ Replay'; } };
+    const startPlay = () => {
+      stopPlay(); let i = 0; setDate(0, 0); play.textContent = '❚❚ Pause';
+      trTimer = setInterval(() => { i++; if (i >= dates.length || !box.isConnected) { stopPlay(); return; } setDate(i, 380); }, 420);
+    };
+    play.onclick = () => (trTimer ? stopPlay() : startPlay());
+    if (!trPlayed && !reduce) { trPlayed = true; startPlay(); }
+    else setDate(trIdx == null ? dates.length - 1 : Math.min(trIdx, dates.length - 1), 0);
+  }
+
+  function drawTrTrend() {
+    const box = document.getElementById('ch-tr-trend');
+    if (!guard(box, ['turfrad_daily'])) return;
+    box.replaceChildren();
+    const d = rows('turfrad_daily');
+    const sp = d3.rollups(rows('spiio').filter((v) => v.moisture_pct != null), (v) => d3.mean(v, (z) => z.moisture_pct), (v) => (v.date || String(v.time).slice(0, 10))).map(([date, v]) => ({ date, v })).sort((a, b) => d3.ascending(a.date, b.date));
+    const W = box.clientWidth, H = 260, m = { t: 14, r: 92, b: 28, l: 34 };
+    const x = d3.scaleUtc(d3.extent(d, (r) => pd(r.date)), [m.l, W - m.r]);
+    const ymax = Math.max(d3.max(d, (r) => Math.max(r.green_moist, r.fairway_moist)), d3.max(sp, (r) => r.v) || 0) + 3;
+    const y = d3.scaleLinear([0, ymax], [H - m.b, m.t]).nice();
+    const yr = d3.scaleLinear([0, Math.max(10, d3.max(d, (r) => r.rain_mm))], [H - m.b, H - m.b - 60]);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    svg.append('rect').attr('x', m.l).attr('width', W - m.l - m.r).attr('y', y(12)).attr('height', y(0) - y(12)).attr('fill', 'var(--color-warn)').attr('opacity', .08);
+    svg.append('g').attr('class', 'rg-gridl').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(''));
+    const ya = svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(0).tickPadding(6).tickFormat((v) => v + '%')); axisStyle(ya); ya.select('.domain').remove();
+    const xa = svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(W / 110))).tickFormat(d3.utcFormat('%-d %b')).tickSizeOuter(0)); axisStyle(xa);
+    const anim = first('trtrend');
+    const bars = svg.append('g').selectAll('rect').data(d.filter((r) => r.rain_mm > 0)).join('rect').attr('x', (r) => x(pd(r.date)) - 3).attr('width', 6).attr('y', (r) => yr(r.rain_mm)).attr('height', (r) => yr(0) - yr(r.rain_mm)).attr('rx', 2).attr('fill', C()[1]).attr('opacity', .45);
+    if (anim) bars.classed('rg-grow', true).style('animation-delay', (r, i) => (i * 60) + 'ms');
+    const series = [
+      { k: 'green_moist', name: 'Greens', col: C()[0], data: d.map((r) => ({ date: r.date, v: r.green_moist })) },
+      { k: 'fairway_moist', name: 'Fairways', col: C()[2], data: d.map((r) => ({ date: r.date, v: r.fairway_moist })) },
+      { k: 'spiio', name: 'Spiio probes', col: C()[3] || C()[1], data: sp, dash: '5 4' },
+    ];
+    const ends = [];
+    series.forEach((s) => {
+      if (!s.data.length) return;
+      const p = svg.append('path').datum(s.data).attr('d', d3.line().x((r) => x(pd(r.date))).y((r) => y(r.v)).curve(d3.curveMonotoneX)).attr('fill', 'none').attr('stroke', s.col).attr('stroke-width', 2.2).attr('stroke-linecap', 'round').attr('stroke-dasharray', s.dash || null);
+      if (!s.dash) { drawIn(p, 'trtr' + s.k); comet(svg, p, s.col, 2.2); }
+      svg.append('g').selectAll('circle').data(s.data).join('circle').attr('cx', (r) => x(pd(r.date))).attr('cy', (r) => y(r.v)).attr('r', 2.4).attr('fill', s.col);
+      const e = s.data[s.data.length - 1]; ping(svg.append('g'), x(pd(e.date)), y(e.v), s.col, 3);
+      ends.push({ s, v: e.v, y: y(e.v) });
+    });
+    ends.sort((a, b) => a.y - b.y); for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 13) ends[i].y = ends[i - 1].y + 13;
+    ends.forEach((e) => svg.append('text').attr('class', 'rg-lbl-b').attr('x', W - m.r + 6).attr('y', e.y + 4).attr('fill', e.s.col).text(`${e.s.name} ${f1(e.v)}%`));
+    const tip = tipFor(box);
+    const rule = svg.append('line').attr('y1', m.t).attr('y2', H - m.b).attr('stroke', 'var(--cds-chart-axis)').attr('opacity', 0);
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', H - m.t - m.b).attr('fill', 'transparent')
+      .on('pointermove', (ev) => {
+        const [mx] = d3.pointer(ev); const r = d[d3.bisector((z) => pd(z.date)).center(d, x.invert(mx))]; const X = x(pd(r.date));
+        rule.attr('x1', X).attr('x2', X).attr('opacity', 1);
+        const s = sp.find((z) => z.date === r.date);
+        showTip(box, tip, X, m.t + 10, (t) => { line(t, fDayY(pd(r.date)), null, 'd'); line(t, `Greens ${f1(r.green_moist)}% · unif ${f1(r.green_unif)}`, C()[0]); line(t, `Fairways ${f1(r.fairway_moist)}% · unif ${f1(r.fairway_unif)}`, C()[2]); if (s) line(t, `Spiio mean ${f1(s.v)}%`, C()[3] || C()[1]); line(t, `Rain ${f1(r.rain_mm)} mm`, C()[1]); });
+      })
+      .on('pointerleave', () => { tip.hidden = true; rule.attr('opacity', 0); });
+  }
+
+  function drawTrHeat() {
+    const box = document.getElementById('ch-tr-heat');
+    if (!guard(box, ['turfrad'])) return;
+    box.replaceChildren();
+    const r = rows('turfrad');
+    const dates = [...new Set(r.map((x) => x.date))].sort();
+    const greens = [...new Set(r.map((x) => x.green))].sort(greenSort);
+    const W = box.clientWidth, m = { t: 6, r: 8, b: 30, l: 62 };
+    const cw = Math.max(6, (W - m.l - m.r) / dates.length), ch = 15;
+    const H = m.t + m.b + ch * greens.length;
+    const x = d3.scaleBand(dates, [m.l, m.l + cw * dates.length]).padding(.08);
+    const y = d3.scaleBand(greens, [m.t, m.t + ch * greens.length]).padding(.08);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    svg.append('g').selectAll('text').data(greens).join('text').attr('class', 'rg-lbl').attr('x', m.l - 6).attr('y', (g) => y(g) + y.bandwidth() / 2 + 4).attr('text-anchor', 'end').text((g) => 'Green ' + g);
+    const step = Math.ceil(dates.length / Math.max(2, Math.floor((W - m.l) / 70)));
+    svg.append('g').selectAll('text').data(dates.filter((_, i) => i % step === 0)).join('text').attr('class', 'rg-lbl').attr('x', (d) => x(d) + x.bandwidth() / 2).attr('y', H - 10).attr('text-anchor', 'middle').text((d) => fDay(pd(d)));
+    const anim = first('trheat');
+    const cells = svg.append('g').selectAll('rect').data(r).join('rect').attr('class', 'rg-heat-cell').attr('x', (d) => x(d.date)).attr('y', (d) => y(d.green)).attr('width', x.bandwidth()).attr('height', y.bandwidth()).attr('rx', 2)
+      .attr('fill', (d) => trTint(d.moist_mean)).attr('stroke', (d) => (d.moist_mean <= 12 ? 'var(--color-warn)' : null)).attr('stroke-width', 1.5);
+    if (anim && !reduce) cells.attr('opacity', 0).transition().delay((d) => dates.indexOf(d.date) * 45 + greens.indexOf(d.green) * 8).duration(420).attr('opacity', 1);
+    const lastD = dates[dates.length - 1];
+    svg.append('rect').attr('class', 'rg-latest').attr('x', x(lastD) - 2).attr('y', m.t - 2).attr('width', x.bandwidth() + 4).attr('height', ch * greens.length + 4).attr('rx', 4).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 1.5);
+    const tip = tipFor(box);
+    cells.on('pointerenter', (ev, d) => {
+      d3.select(ev.currentTarget).attr('stroke', 'var(--color-fg)');
+      showTip(box, tip, x(d.date) + x.bandwidth(), y(d.green), (t) => { line(t, fDayY(pd(d.date)), null, 'd'); line(t, `Green ${d.green}  ${f1(d.moist_mean)}% · unif ${f1(d.uniformity)}`); });
+    }).on('pointerleave', (ev, d) => { d3.select(ev.currentTarget).attr('stroke', d.moist_mean <= 12 ? 'var(--color-warn)' : null); tip.hidden = true; });
+  }
+
+  let trSort = { k: 'green', asc: true };
+  function drawTrTable() {
+    const t = document.getElementById('t-tr'); const tb = t.tBodies[0];
+    if (!ok('turfrad_latest')) return;
+    const keys = ['green', 'moist_mean', 'moist_min', 'moist_max', 'uniformity', 'du_lq', 'ir_temp_c'];
+    const data = [...rows('turfrad_latest')].sort((a, b) => { const c = trSort.k === 'green' ? greenSort(a.green, b.green) : d3.ascending(a[trSort.k], b[trSort.k]); return trSort.asc ? c : -c; });
+    tb.replaceChildren();
+    data.forEach((r) => { const tr = tb.insertRow(); keys.forEach((k) => { const c = tr.insertCell(); if (k !== 'green') c.className = 'n'; c.textContent = k === 'green' ? gName(r.green) : f1(r[k]);
+      if ((k === 'moist_mean' && r[k] <= 12) || (k === 'du_lq' && r[k] < 80) || (k === 'uniformity' && r[k] < 80)) c.classList.add('rg-tr-flag'); }); });
+    t.querySelectorAll('.rg-th').forEach((b) => { b.onclick = () => { trSort = { k: b.dataset.k, asc: trSort.k === b.dataset.k ? !trSort.asc : b.dataset.k === 'green' }; drawTrTable(); }; });
+  }
+
   function draw() {
     drawHeader(); clockLine();
     if (!flowOn && ok('daily')) { flowOn = true; startFlow(); }
@@ -1268,14 +1529,16 @@ dash.calc('tdr_latest', {
     if (page === 'disease') { drawCoverKpis(); drawCoverLine(); drawMatrix(); drawVerify(); }
     if (page === 'growth') { drawGvx(); drawHeat(); drawWx(); }
     if (page === 'soil') { drawSpiio('ch-moist', 'moisture_pct', '%', 12); drawSpiio('ch-stemp', 'soil_temp_c', '°', null); drawOm(); drawTdr(); }
+    if (page === 'turfrad') { trKpis(); drawRadar(); drawTrTrend(); drawTrHeat(); drawTrTable(); }
     if (page === 'inputs') { drawN(); drawIrr(); drawNTable(); drawPgrTable(); }
   }
   const named = location.hash.slice(1);
-  if (['today', 'growth', 'soil', 'disease', 'inputs'].includes(named)) show(named, false);
+  if (['today', 'growth', 'soil', 'turfrad', 'disease', 'inputs'].includes(named)) show(named, false);
   dash.onData(draw);
   enter(document.getElementById('today')); enter(document.getElementById('kpis')); requestAnimationFrame(moveBar);
 })();
 </script>
+
 
 <div class="pub-foot">Public copy of the Ranfurlie Greens Live dashboard · <span id="pub-built">rebuilt each morning by the 6am turf run</span> · read-only</div>
 </div></body></html>
