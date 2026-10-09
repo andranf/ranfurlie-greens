@@ -281,6 +281,34 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 .rg-rstat .s { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
 .rg-rstat .s b { color: var(--color-fg); }
 .rg-rcharts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: var(--cds-gap-md); margin-top: var(--cds-gap-sm); }
+
+.rg-dw-lede { font-size: var(--cds-font-size-body, 1rem); margin: 0; }
+.rg-dw-row { display: grid; grid-template-columns: 64px minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--cds-gap-md); align-items: start; padding: .7rem .6rem; border-radius: 10px; border: 1px solid var(--color-border-line); position: relative; }
+.rg-dw-row + .rg-dw-row { margin-top: var(--cds-gap-sm); }
+.rg-dw-row.act { border-color: var(--color-warn); }
+@media (max-width: 52rem) { .rg-dw-row { grid-template-columns: 56px minmax(0, 1fr); } .rg-dw-row > .z, .rg-dw-row > .o { grid-column: 2; } }
+.rg-dw-row svg.g { width: 64px; height: 44px; overflow: visible; }
+.rg-dw-row .nm { font-weight: 600; }
+.rg-dw-row .lv { font-size: var(--cds-font-size-caption); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.rg-dw-row .dr { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: .15rem; }
+.rg-dw-strip { display: flex; gap: .35rem; margin-top: .35rem; align-items: center; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rg-dw-strip i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; background: var(--cds-chart-grid); }
+.rg-dw-row .z, .rg-dw-row .o { font-size: var(--cds-font-size-caption); display: flex; flex-direction: column; gap: .25rem; }
+.rg-dw-zone { display: inline-flex; gap: .35rem; align-items: center; }
+.rg-dw-zone b { font-weight: 600; }
+.rg-dw-zone .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+.rg-dw-opt { line-height: 1.35; }
+.rg-dw-opt b { font-weight: 600; }
+.rg-dw-opt .m { color: var(--color-fg-muted); }
+.rg-dw-quiet { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: var(--cds-gap-sm); }
+@media (prefers-reduced-motion: no-preference) {
+  .rg-dw-row.act { animation: rg-dwpulse 2.6s ease-in-out infinite; }
+  .rg-dw-strip i { animation: rg-pop .5s cubic-bezier(.3,1.6,.5,1) both; }
+  .rg-dw-row.act .lv { animation: rg-blink 1.8s ease-in-out infinite; }
+}
+@keyframes rg-dwpulse { 0%,100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-warn) 28%, transparent); } }
+@keyframes rg-pop { from { transform: scale(0); } to { transform: scale(1); } }
+@keyframes rg-blink { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
 </style>
 
 <div class="rg">
@@ -340,6 +368,13 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
         <span class="rg-kpi-s">6th station, gauge faults blanked</span>
         <svg class="rg-spark" id="sp-rain" data-source="daily" preserveAspectRatio="none"></svg>
       </div>
+    </div>
+
+    <div class="rg-card" id="card-dwatch">
+      <div class="rg-row"><h3>Disease watch</h3><span class="rg-note" id="dw-src">—</span></div>
+      <p class="rg-dw-lede" id="dw-lede">—</p>
+      <div id="dw-rows" data-source="disease_watch"></div>
+      <div class="rg-dw-quiet" id="dw-quiet"></div>
     </div>
 
     <div class="rg-grid">
@@ -2020,10 +2055,64 @@ dash.calc('skim_course', {
       .on('pointerleave', () => { tip.hidden = true; rule.attr('opacity', 0); });
   }
 
+  /* ---------------- Disease watch ---------------- */
+  function drawDiseaseWatch() {
+    const box = document.getElementById('dw-rows');
+    if (!guard(box, ['disease_watch'])) return;
+    box.replaceChildren();
+    const r = rows('disease_watch'); if (!r.length) return;
+    const LV = ['none', 'low', 'moderate', 'high'];
+    const col = (l) => (l === 'high' ? 'var(--color-bad)' : l === 'moderate' ? 'var(--color-warn)' : l === 'low' ? C()[0] : 'var(--cds-chart-grid)');
+    const zn = { greens: 'Greens', approach: 'Approaches', fairways: 'Fairways', tees: 'Tees' };
+    const act = r.filter((d) => d.action), watch = r.filter((d) => !d.action && LV.indexOf(d.level_peak) >= 1), quiet = r.filter((d) => LV.indexOf(d.level_peak) === 0);
+    document.getElementById('dw-src').textContent = `Weather models on the next 3 days · soil ${f1(r[0].soil_today)} °C (${r[0].soil_src})`;
+    document.getElementById('dw-lede').innerHTML = act.length
+      ? `<b>${act.length} need${act.length === 1 ? 's' : ''} attention:</b> ` + act.map((d) => `${d.label} (${d.level_peak}${d.peak_date !== d.as_of ? ' by ' + fDay(pd(d.peak_date)) : ''}) — no cover on ${d.exposed_zones.map((z) => zn[z] || z).join(', ').toLowerCase()}`).join('; ') + '.'
+      : (watch.length ? `No disease needs a spray right now. Watching ${watch.map((d) => d.label).join(', ')}.` : 'No weather-driven disease threat in the next 3 days.');
+    [...act, ...watch].forEach((d, i) => {
+      const row = document.createElement('div'); row.className = 'rg-dw-row' + (d.action ? ' act' : '');
+      /* threat meter: half-circle arc filling to the peak level, needle swings in */
+      const g = d3.select(row).append('svg').attr('class', 'g').attr('viewBox', '0 0 64 44');
+      const arc = d3.arc().innerRadius(20).outerRadius(27).cornerRadius(2);
+      const gg = g.append('g').attr('transform', 'translate(32,36)');
+      [0, 1, 2].forEach((k) => gg.append('path').attr('d', arc.startAngle(-Math.PI / 2 + k * Math.PI / 3 + .03).endAngle(-Math.PI / 2 + (k + 1) * Math.PI / 3 - .03)()).attr('fill', [C()[0], 'var(--color-warn)', 'var(--color-bad)'][k]).attr('opacity', LV.indexOf(d.level_peak) > k ? .9 : .18));
+      const target = -90 + 180 * (LV.indexOf(d.level_peak) - .5) / 3;
+      const nd = gg.append('g'); nd.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', -24).attr('stroke', 'var(--color-fg)').attr('stroke-width', 2).attr('stroke-linecap', 'round'); nd.append('circle').attr('r', 3.2).attr('fill', 'var(--color-fg)');
+      if (first('dwn' + d.disease) && !reduce) nd.attr('transform', 'rotate(-90)').transition().delay(250 + i * 150).duration(1200).ease(d3.easeElasticOut.amplitude(1).period(.45)).attr('transform', `rotate(${target})`);
+      else nd.attr('transform', `rotate(${target})`);
+      if (d.action && !reduce) { const t0 = performance.now(); addTick('dwj' + d.disease, row, (t) => { if (t - t0 < 1700) return; nd.attr('transform', `rotate(${target + Math.sin(t / 140) * 1.6})`); }); }
+      const a = document.createElement('div');
+      const nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = d.label;
+      const lv = document.createElement('div'); lv.className = 'lv'; lv.style.color = col(d.level_peak); lv.textContent = d.level_peak + ' risk' + (d.peak_date !== d.as_of ? ' by ' + fDay(pd(d.peak_date)) : ' today');
+      const dr = document.createElement('div'); dr.className = 'dr'; dr.textContent = d.note_peak;
+      const st = document.createElement('div'); st.className = 'rg-dw-strip';
+      d.days.forEach((x, k) => { const dot = document.createElement('i'); dot.style.background = col(x.level); dot.title = `${fDay(pd(x.date))}: ${x.level}`; dot.style.animationDelay = (400 + i * 120 + k * 90) + 'ms'; st.appendChild(dot); });
+      st.appendChild(document.createTextNode('today → +3 days'));
+      a.append(nm, lv, dr, st);
+      const z = document.createElement('div'); z.className = 'z';
+      d.zones.forEach((zz) => { const e = document.createElement('span'); e.className = 'rg-dw-zone'; const dot = document.createElement('span'); dot.className = 'dot';
+        const ok = zz.status === 'covered' && (zz.covered_until || '') >= d.peak_date;
+        dot.style.background = ok ? 'var(--color-ok)' : 'var(--color-warn)'; const b = document.createElement('b'); b.textContent = zn[zz.zone] || zz.zone;
+        e.append(dot, b, document.createTextNode(ok ? ` covered to ${fDay(pd(zz.covered_until))} (${zz.by})` : zz.status === 'covered' ? ` lapses ${fDay(pd(zz.covered_until))}` : (zz.provisional ? ' no cover on record' : ' no cover'))); z.appendChild(e); });
+      const o = document.createElement('div'); o.className = 'o';
+      if (d.action || LV.indexOf(d.level_peak) >= 2) {
+        if (d.options.length) {
+          const h = document.createElement('div'); h.className = 'lv'; h.style.color = 'var(--color-fg-muted)'; h.textContent = 'Held in the shed, AU label claim'; o.appendChild(h);
+          d.options.forEach((op) => { const e = document.createElement('div'); e.className = 'rg-dw-opt';
+            const b = document.createElement('b'); b.textContent = op.product; const m = document.createElement('span'); m.className = 'm';
+            m.textContent = ` · ${op.active ? op.active + ', ' : ''}FRAC ${op.frac} · ${op.mode} · ${op.interval_days} d` + (op.water_in ? ` · ${/^no/i.test(op.water_in) ? 'do not water in' : /^(yes|irrigate|water in|wash|6-10|5-10|sufficient)/i.test(op.water_in) ? 'water in' : op.water_in}` : '') + (op.confirmed ? '' : ' · claim partly verified');
+            e.append(b, m); o.appendChild(e); });
+        } else { o.textContent = 'No product we hold carries a confirmed AU claim for this.'; }
+      }
+      row.append(a, z, o); box.appendChild(row);
+    });
+    document.getElementById('dw-quiet').textContent = quiet.length ? 'Quiet: ' + quiet.map((d) => `${d.label} — ${d.note_today.split(' · ')[0]}`).join(' · ') : '';
+  }
+
   function draw() {
     drawHeader(); clockLine();
     if (!flowOn && ok('daily')) { flowOn = true; startFlow(); }
-    if (page === 'today') { drawRainfall(); drawKpis(); drawClocks(); drawProbes(); drawWatch(); drawSources(); }
+    if (page === 'today') { drawDiseaseWatch(); drawRainfall(); drawKpis(); drawClocks(); drawProbes(); drawWatch(); drawSources(); }
     if (page === 'disease') { drawCoverKpis(); drawCoverLine(); drawMatrix(); drawVerify(); }
     if (page === 'growth') { drawGvx(); drawHeat(); drawWx(); }
     if (page === 'soil') { drawSpiio('ch-moist', 'moisture_pct', '%', 12); drawSpiio('ch-stemp', 'soil_temp_c', '°', null); drawOm(); drawTdr(); }
