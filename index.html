@@ -272,6 +272,15 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 @keyframes rg-blurin { from { opacity: 0; filter: blur(6px); transform: translateY(6px); } to { opacity: 1; filter: none; transform: none; } }
 @keyframes rg-tabpop { 0% { transform: scale(.94); } 100% { transform: scale(1); } }
 @keyframes rg-flash { 0% { text-shadow: 0 0 0 transparent; } 30% { text-shadow: 0 0 18px color-mix(in srgb, var(--color-fg) 35%, transparent); } 100% { text-shadow: 0 0 0 transparent; } }
+
+.rg-rstats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: var(--cds-gap-md); }
+.rg-rstat { display: flex; gap: .8rem; align-items: center; min-width: 0; }
+.rg-rstat svg { flex: 0 0 auto; width: 78px; height: 78px; overflow: visible; }
+.rg-rstat .l { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rg-rstat .v { font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.rg-rstat .s { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.rg-rstat .s b { color: var(--color-fg); }
+.rg-rcharts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: var(--cds-gap-md); margin-top: var(--cds-gap-sm); }
 </style>
 
 <div class="rg">
@@ -343,6 +352,15 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
         <h3>Soil moisture now</h3>
         <p class="rg-note">Spiio fixed probes, latest 4-hour reading. Dashed line is the 12% dry line.</p>
         <div class="rg-probes" id="probes" data-source="spiio"></div>
+      </div>
+    </div>
+
+    <div class="rg-card" id="card-rainfall">
+      <div class="rg-row"><h3>Rainfall</h3><span class="rg-note" id="rf-src">—</span></div>
+      <div class="rg-rstats" id="rf-stats" data-source="rain_summary"></div>
+      <div class="rg-rcharts">
+        <div><p class="rg-note" id="rf-mtitle">Each month against the long-term average</p><div class="rg-chart short" id="ch-rf-month" data-source="rain_monthly"></div></div>
+        <div><p class="rg-note" id="rf-ctitle">Running total this year against the average year</p><div class="rg-chart short" id="ch-rf-cum" data-source="rain_ytd"></div></div>
       </div>
     </div>
 
@@ -1894,10 +1912,118 @@ dash.calc('skim_course', {
     if (page === 'turfrad') fxMarch();
   }
 
+  /* ---------------- Rainfall at a glance ---------------- */
+  function drawRainfall() {
+    const box = document.getElementById('rf-stats');
+    if (!guard(box, ['rain_summary', 'rain_monthly', 'rain_ytd'])) return;
+    box.replaceChildren();
+    const S = rows('rain_summary')[0]; if (!S) return;
+    const mName = d3.utcFormat('%B')(pd(S.month + '-01'));
+    document.getElementById('rf-src').textContent = `${S.gauge} vs ${S.normals}`;
+    const pct = (a, b) => (b ? Math.round(100 * a / b) : null);
+    const sgn = (a, b) => { const d = a - b; return (d >= 0 ? '+' : '−') + f0(Math.abs(d)) + ' mm'; };
+    const stats = [
+      { key: 'm', l: `${mName} so far`, v: S.mtd_mm, ring: S.mtd_mm / S.month_mean_mm,
+        s: `<b>${pct(S.mtd_mm, S.month_mean_mm)}%</b> of the ${mName} average (${f1(S.month_mean_mm)} mm). Average to this date ${f1(S.mtd_mean_to_date_mm)} mm` + (S.mtd_blank_days ? ` · ${S.mtd_blank_days} gauge-fault days` : '') },
+      { key: 'y', l: `${S.as_of.slice(0, 4)} to date`, v: S.ytd_mm, ring: S.ytd_mm / S.annual_mean_mm,
+        s: `<b>${sgn(S.ytd_mm, S.ytd_mean_to_date_mm)}</b> vs the average to this date (${f0(S.ytd_mean_to_date_mm)} mm). <b>${pct(S.ytd_mm, S.annual_mean_mm)}%</b> of a normal year` + (S.ytd_blank_days ? ` · ${S.ytd_blank_days} gauge-fault days not counted` : '') },
+      { key: 'l', l: 'Last 12 months', v: S.last12_mm, ring: S.last12_mm / S.annual_mean_mm,
+        s: `<b>${pct(S.last12_mm, S.annual_mean_mm)}%</b> of the annual average (${f0(S.annual_mean_mm)} mm), ${mName} counted to date` },
+    ];
+    stats.forEach((st0, i) => {
+      const el = document.createElement('div'); el.className = 'rg-rstat';
+      const svg = d3.select(el).append('svg').attr('viewBox', '0 0 78 78').attr('role', 'img').attr('aria-label', `${st0.l}: ${f1(st0.v)} mm`);
+      const R = 33, arc = d3.arc().innerRadius(R - 6).outerRadius(R).startAngle(0).cornerRadius(3);
+      const g = svg.append('g').attr('transform', 'translate(39,39)');
+      g.append('path').attr('d', arc.endAngle(Math.PI * 2)()).attr('fill', 'var(--cds-chart-grid)');
+      const frac = Math.max(0, st0.ring || 0), over = frac > 1;
+      const fg = g.append('path').attr('fill', over ? C()[1] : C()[0]);
+      const end = Math.PI * 2 * Math.min(1, frac);
+      if (first('rfring' + st0.key) && !reduce) fg.transition().delay(200 + i * 180).duration(1300).ease(d3.easeCubicOut).attrTween('d', () => (t) => arc.endAngle(end * t)());
+      else fg.attr('d', arc.endAngle(end)());
+      if (over) { const extra = Math.PI * 2 * Math.min(1, frac - 1); const ia = d3.arc().innerRadius(R - 11).outerRadius(R - 8).startAngle(0).cornerRadius(2);
+        const ex = g.append('path').attr('fill', C()[1]).attr('opacity', .55);
+        if (first('rfx' + st0.key) && !reduce) ex.transition().delay(1500 + i * 180).duration(900).attrTween('d', () => (t) => ia.endAngle(extra * t)()); else ex.attr('d', ia.endAngle(extra)()); }
+      /* falling drops inside the ring */
+      const clipId = 'rfc-' + st0.key; svg.append('clipPath').attr('id', clipId).append('circle').attr('cx', 39).attr('cy', 39).attr('r', R - 8);
+      const dg = svg.append('g').attr('clip-path', `url(#${clipId})`);
+      const drops = d3.range(7).map((k) => ({ x: 14 + Math.random() * 50, sp: 22 + Math.random() * 26, off: Math.random() * 60, len: 4 + Math.random() * 4 }));
+      const dl = dg.selectAll('line').data(drops).join('line').attr('stroke', C()[1]).attr('stroke-width', 1.4).attr('stroke-linecap', 'round').attr('opacity', .55);
+      const lvl = 70 - 52 * Math.min(1, frac);
+      const pool = dg.append('rect').attr('x', 0).attr('width', 78).attr('y', lvl).attr('height', 78).attr('fill', C()[1]).attr('opacity', .16);
+      addTick('rfdrops' + st0.key, el, (t) => { const s_ = t / 1000;
+        dl.attr('x1', (d) => d.x).attr('x2', (d) => d.x - 1).attr('y1', (d) => { const y = ((s_ * d.sp + d.off) % (lvl - 4)) + 4; return y; }).attr('y2', (d) => ((s_ * d.sp + d.off) % (lvl - 4)) + 4 + d.len);
+        pool.attr('y', lvl + Math.sin(s_ * 2 + i) * 1.2); });
+      if (reduce) dl.attr('opacity', 0);
+      const tx = document.createElement('div'); tx.style.minWidth = '0';
+      const l = document.createElement('div'); l.className = 'l'; l.textContent = st0.l;
+      const v = document.createElement('div'); v.className = 'v'; countTo(v, st0.v, (x) => f1(x) + ' mm', 'rf' + st0.key);
+      const sm = document.createElement('div'); sm.className = 's'; sm.innerHTML = st0.s;
+      tx.append(l, v, sm); el.appendChild(tx); box.appendChild(el);
+    });
+    drawRainMonths(); drawRainCum(S);
+  }
+  function drawRainMonths() {
+    const box = document.getElementById('ch-rf-month'); box.replaceChildren();
+    const r = rows('rain_monthly').slice(-12);
+    const W = box.clientWidth, H = 200, m = { t: 12, r: 8, b: 26, l: 36 };
+    const x = d3.scaleBand(r.map((d) => d.month), [m.l, W - m.r]).padding(.28);
+    const y = d3.scaleLinear([0, d3.max(r, (d) => Math.max(d.mm, d.bom_mean || 0)) * 1.1], [H - m.b, m.t]).nice();
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    svg.append('g').attr('class', 'rg-gridl').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(W - m.l - m.r)).tickFormat(''));
+    const ya = svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickPadding(6).tickFormat((v) => v)); axisStyle(ya); ya.select('.domain').remove();
+    const xa = svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).tickFormat((s_) => d3.utcFormat('%b')(pd(s_ + '-01')).slice(0, W < 500 ? 1 : 3)).tickSizeOuter(0)); axisStyle(xa);
+    svg.append('g').selectAll('rect').data(r).join('rect').attr('x', (d) => x(d.month) - 3).attr('width', x.bandwidth() + 6).attr('y', (d) => y(d.bom_mean)).attr('height', (d) => y(0) - y(d.bom_mean)).attr('rx', 3).attr('fill', 'none').attr('stroke', 'var(--cds-chart-axis)').attr('stroke-dasharray', '3 2');
+    const anim = first('rfmon');
+    const bars = svg.append('g').selectAll('rect').data(r).join('rect').attr('x', (d) => x(d.month)).attr('width', x.bandwidth()).attr('y', (d) => y(d.mm)).attr('height', (d) => y(0) - y(d.mm)).attr('rx', 2)
+      .attr('fill', (d) => (d.mm >= d.bom_mean ? C()[1] : C()[0])).attr('opacity', (d) => (d.partial ? .55 : .9));
+    if (anim) bars.classed('rg-grow', true).style('animation-delay', (d, i) => (i * 55) + 'ms');
+    svg.append('g').selectAll('line').data(r).join('line').attr('x1', (d) => x(d.month) - 3).attr('x2', (d) => x(d.month) + x.bandwidth() + 3).attr('y1', (d) => y(d.bom_median)).attr('y2', (d) => y(d.bom_median)).attr('stroke', 'var(--color-fg)').attr('stroke-width', 1.5);
+    const cur = r.find((d) => d.partial); if (cur) svg.append('text').attr('class', 'rg-lbl').attr('x', x(cur.month) + x.bandwidth() / 2).attr('y', y(cur.mm) - 4).attr('text-anchor', 'middle').text('so far');
+    const tip = tipFor(box);
+    svg.append('g').selectAll('rect').data(r).join('rect').attr('x', (d) => x(d.month) - 4).attr('width', x.step()).attr('y', m.t).attr('height', H - m.t - m.b).attr('fill', 'transparent')
+      .on('pointerenter', (ev, d) => showTip(box, tip, x(d.month) + x.bandwidth(), y(Math.max(d.mm, d.bom_mean)), (t) => { line(t, d3.utcFormat('%B %Y')(pd(d.month + '-01')) + (d.partial ? ' (to date)' : ''), null, 'd'); line(t, `Gauge ${f1(d.mm)} mm`, d.mm >= d.bom_mean ? C()[1] : C()[0]); line(t, `Average ${f1(d.bom_mean)} · median ${f1(d.bom_median)} mm`); if (d.blank_days) line(t, `${d.blank_days} gauge-fault day${d.blank_days > 1 ? 's' : ''} not counted`, null, 'd'); }))
+      .on('pointerleave', () => (tip.hidden = true));
+    document.getElementById('rf-mtitle').textContent = 'Last 12 months: teal above the BoM average, blue below. Dashed box = average, black tick = median';
+  }
+  function drawRainCum(S) {
+    const box = document.getElementById('ch-rf-cum'); box.replaceChildren();
+    const r = rows('rain_ytd');
+    const W = box.clientWidth, H = 200, m = { t: 12, r: 70, b: 26, l: 40 };
+    const x = d3.scaleUtc([pd(r[0].date), pd(S.as_of.slice(0, 4) + '-12-31')], [m.l, W - m.r]);
+    const y = d3.scaleLinear([0, Math.max(S.annual_mean_mm, d3.max(r, (d) => d.cum_mm)) * 1.05], [H - m.b, m.t]).nice();
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    svg.append('g').attr('class', 'rg-gridl').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(W - m.l - m.r)).tickFormat(''));
+    const ya = svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(0).tickPadding(6)); axisStyle(ya); ya.select('.domain').remove();
+    const xa = svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(d3.utcMonth.every(W < 500 ? 3 : 2)).tickFormat(d3.utcFormat('%b')).tickSizeOuter(0)); axisStyle(xa);
+    const yr = S.as_of.slice(0, 4);
+    /* average year, full length */
+    const full = []; let cm = 0; const nm = rows('rain_monthly');
+    const means = {}; nm.forEach((d) => { means[+d.month.slice(5)] = d.bom_mean; });
+    for (let d = pd(yr + '-01-01'); d <= pd(yr + '-12-31'); d = d3.utcDay.offset(d, 1)) { const mo = d.getUTCMonth() + 1; const dim = new Date(Date.UTC(+yr, mo, 0)).getUTCDate(); cm += (means[mo] || 0) / dim; full.push({ d, v: cm }); }
+    svg.append('path').datum(full).attr('d', d3.line().x((p) => x(p.d)).y((p) => y(p.v))).attr('fill', 'none').attr('stroke', 'var(--cds-chart-axis)').attr('stroke-dasharray', '4 3').attr('stroke-width', 1.5);
+    svg.append('text').attr('class', 'rg-lbl').attr('x', W - m.r + 6).attr('y', y(full[full.length - 1].v) + 4).text(`avg ${f0(full[full.length - 1].v)}`);
+    /* surplus / deficit band */
+    const area = d3.area().x((d) => x(pd(d.date))).y0((d) => y(d.cum_mean_mm)).y1((d) => y(d.cum_mm));
+    const clipA = 'rfca'; const defs = svg.append('defs');
+    const band = svg.append('path').datum(r).attr('d', area).attr('fill', S.ytd_mm >= S.ytd_mean_to_date_mm ? C()[1] : 'var(--color-warn)').attr('opacity', .16);
+    const p = svg.append('path').datum(r).attr('d', d3.line().x((d) => x(pd(d.date))).y((d) => y(d.cum_mm)).curve(d3.curveStepAfter)).attr('fill', 'none').attr('stroke', C()[1]).attr('stroke-width', 2.2);
+    drawIn(p, 'rfcum'); comet(svg, p, C()[1], 2.2);
+    if (first('rfband') && !reduce) band.attr('opacity', 0).transition().delay(1200).duration(800).attr('opacity', .16);
+    const L = r[r.length - 1]; ping(svg.append('g'), x(pd(L.date)), y(L.cum_mm), C()[1], 3);
+    svg.append('text').attr('class', 'rg-lbl-b').attr('x', x(pd(L.date)) + 8).attr('y', y(L.cum_mm) - 6).attr('fill', C()[1]).text(`${f0(L.cum_mm)} mm`);
+    const tip = tipFor(box);
+    const rule = svg.append('line').attr('y1', m.t).attr('y2', H - m.b).attr('stroke', 'var(--cds-chart-axis)').attr('opacity', 0);
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', x(pd(L.date)) - m.l).attr('height', H - m.t - m.b).attr('fill', 'transparent')
+      .on('pointermove', (ev) => { const [mx] = d3.pointer(ev); const d = r[d3.bisector((z) => pd(z.date)).center(r, x.invert(mx))]; const X = x(pd(d.date)); rule.attr('x1', X).attr('x2', X).attr('opacity', 1);
+        showTip(box, tip, X, y(d.cum_mm), (t) => { line(t, fDayY(pd(d.date)), null, 'd'); line(t, `This year ${f1(d.cum_mm)} mm`, C()[1]); line(t, `Average to date ${f1(d.cum_mean_mm)} mm`); line(t, `${d.cum_mm >= d.cum_mean_mm ? 'Ahead' : 'Behind'} by ${f1(Math.abs(d.cum_mm - d.cum_mean_mm))} mm`, null, 'd'); }); })
+      .on('pointerleave', () => { tip.hidden = true; rule.attr('opacity', 0); });
+  }
+
   function draw() {
     drawHeader(); clockLine();
     if (!flowOn && ok('daily')) { flowOn = true; startFlow(); }
-    if (page === 'today') { drawKpis(); drawClocks(); drawProbes(); drawWatch(); drawSources(); }
+    if (page === 'today') { drawRainfall(); drawKpis(); drawClocks(); drawProbes(); drawWatch(); drawSources(); }
     if (page === 'disease') { drawCoverKpis(); drawCoverLine(); drawMatrix(); drawVerify(); }
     if (page === 'growth') { drawGvx(); drawHeat(); drawWx(); }
     if (page === 'soil') { drawSpiio('ch-moist', 'moisture_pct', '%', 12); drawSpiio('ch-stemp', 'soil_temp_c', '°', null); drawOm(); drawTdr(); }
