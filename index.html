@@ -230,6 +230,16 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 .rg-nheat th { font-weight: 600; color: var(--color-fg-muted); text-align: center; padding: .2rem .3rem; white-space: nowrap; }
 .rg-nheat th:first-child, .rg-nheat td:first-child { text-align: left; }
 @media (prefers-reduced-motion: no-preference) { .rg-nheat.rg-pop td.c { animation: rg-rise .5s var(--cds-ease-out) both; } }
+
+.rg-fw-holes { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); gap: var(--cds-gap-sm); }
+.rg-fw-h { border: 1px solid var(--color-border-line); border-radius: 10px; padding: .5rem .6rem; position: relative; overflow: hidden; }
+.rg-fw-h .t { display: flex; justify-content: space-between; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rg-fw-h .v { font-size: 1.15rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rg-fw-h .n { font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.rg-fw-h.need { border-color: var(--color-warn); }
+.rg-fw-h svg { display: block; width: 100%; height: 14px; margin-top: .3rem; overflow: visible; }
+@media (prefers-reduced-motion: no-preference) { .rg-fw-h.need { animation: rg-fwpulse 2.4s ease-in-out infinite; } }
+@keyframes rg-fwpulse { 0%,100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-warn) 35%, transparent); } }
 </style>
 
 <div class="rg">
@@ -441,6 +451,19 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       <div class="rg-kpi"><span class="rg-kpi-l">Fairway NDVI</span><span class="rg-kpi-v" id="sk-k-ndvi">—</span><span class="rg-delta" id="sk-d-ndvi"></span><span class="rg-kpi-s">area-weighted mean</span><svg class="rg-spark" id="sk-sp-ndvi" preserveAspectRatio="none"></svg></div>
       <div class="rg-kpi"><span class="rg-kpi-l">Fairway leaf N</span><span class="rg-kpi-v" id="sk-k-n">—</span><span class="rg-delta" id="sk-d-n"></span><span class="rg-kpi-s">% of dry matter, satellite estimate</span><svg class="rg-spark" id="sk-sp-n" preserveAspectRatio="none"></svg></div>
       <div class="rg-kpi"><span class="rg-kpi-l">Fairway soil moisture</span><span class="rg-kpi-v" id="sk-k-m">—</span><span class="rg-delta" id="sk-d-m"></span><span class="rg-kpi-s">satellite estimate, %</span><svg class="rg-spark" id="sk-sp-m" preserveAspectRatio="none"></svg></div>
+    </div>
+    <div class="rg-card" id="card-fw-water">
+      <div class="rg-row"><h3>Fairway water need</h3><span class="rg-note" id="fw-asof">—</span></div>
+      <p class="rg-note" id="fw-lede">—</p>
+      <div class="rg-kpis" id="fw-kpis" style="margin-block: var(--cds-gap-sm)">
+        <div class="rg-kpi"><span class="rg-kpi-l">Fairway moisture now</span><span class="rg-kpi-v" id="fw-k-now">—</span><span class="rg-kpi-s" id="fw-k-now-s">—</span></div>
+        <div class="rg-kpi"><span class="rg-kpi-l">By tomorrow morning</span><span class="rg-kpi-v" id="fw-k-tom">—</span><span class="rg-kpi-s" id="fw-k-tom-s">—</span></div>
+        <div class="rg-kpi"><span class="rg-kpi-l">Fairways to water tonight</span><span class="rg-kpi-v" id="fw-k-holes">—</span><span class="rg-kpi-s" id="fw-k-kl">—</span></div>
+        <div class="rg-kpi"><span class="rg-kpi-l">Himalayan gauge</span><span class="rg-kpi-v" id="fw-k-h">—</span><span class="rg-kpi-s" id="fw-k-h-s">—</span></div>
+      </div>
+      <div class="rg-chart" id="ch-fw-bal" data-source="fairway_balance fairway_params"></div>
+      <div class="rg-fw-holes" id="fw-holes" data-source="fairway_water"></div>
+      <p class="rg-note" style="margin-top: var(--cds-gap-sm)" id="fw-how">—</p>
     </div>
     <div class="rg-card" id="card-sk-health">
       <div class="rg-row"><h3>Fairway health by hole</h3><span class="rg-note" id="sk-pass">—</span></div>
@@ -1704,6 +1727,83 @@ dash.calc('skim_course', {
       [gName(x.hole), x.area_m2 ? f0(100 * x.healthy_m2 / x.area_m2) : '–', d3.format('.2f')(x.ndvi), d3.format('.2f')(x.nitrogen), f1(x.humid)].forEach((v, i) => { const c = tr.insertCell(); if (i) c.className = 'n'; c.textContent = v; }); });
   }
 
+  /* ---------------- Fairway water need ---------------- */
+  function drawFwWater() {
+    const box = document.getElementById('ch-fw-bal');
+    if (!guard(box, ['fairway_balance', 'fairway_params', 'fairway_water'])) return;
+    box.replaceChildren();
+    const s = rows('fairway_balance'), P = rows('fairway_params')[0] || {}, H = rows('fairway_water');
+    const today = P.as_of; const tom = s.find((r) => r.date > today);
+    document.getElementById('fw-asof').textContent = 'Model as of ' + (today ? fDayY(pd(today)) : '—');
+    const need = H.filter((h) => h.need_mm > 0).sort((a, b) => b.need_mm - a.need_mm);
+    const soon = H.filter((h) => h.need_mm === 0 && h.days_to_trigger === 1);
+    document.getElementById('fw-lede').textContent = need.length
+      ? `Water tonight: ${need.map((h) => gName(h.hole) + ' ' + f1(h.need_mm) + ' mm').join(', ')}.` + (soon.length ? ` Next to cross ${P.trigger_pct}% tomorrow: ${soon.map((h) => gName(h.hole)).join(', ')}.` : '')
+      : (soon.length ? `No fairway needs water tonight. ${soon.map((h) => gName(h.hole)).join(', ')} reach ${P.trigger_pct}% tomorrow.` : `No fairway needs water tonight.`);
+    countTo(document.getElementById('fw-k-now'), P.course_now, (x) => f1(x) + '%', 'fw-now');
+    document.getElementById('fw-k-now-s').textContent = P.course_now_kind === 'measured' ? 'TurfRad scan today' : 'estimated since last TurfRad scan';
+    countTo(document.getElementById('fw-k-tom'), tom ? tom.est : null, (x) => f1(x) + '%', 'fw-tom');
+    document.getElementById('fw-k-tom-s').textContent = `ET ${f1(P.et_today_mm)} mm today, rain ${f1(P.rain_today_mm)} mm (forecast)`;
+    countTo(document.getElementById('fw-k-holes'), P.need_holes, f0, 'fw-holes');
+    document.getElementById('fw-k-kl').textContent = P.need_kl ? `${f1(P.need_kl)} kL to lift them to ${P.target_pct}%` : `trigger ${P.trigger_pct}%, refill to ${P.target_pct}%`;
+    const hk = document.getElementById('fw-k-h'); hk.textContent = P.himalayan_now == null ? '—' : f1(P.himalayan_now) + '%';
+    const hAct = P.himalayan_now != null && P.himalayan_now > P.h_floor;
+    document.getElementById('fw-k-h-s').textContent = hAct ? `reading, weighted ${f0(P.h_weight * 100)}% in the dry-down` : `at its ${P.h_floor}% floor, not used`;
+    /* chart: band trigger..target, measured dots, estimate line, forecast dashed, ET bars, Himalayan line */
+    const W = box.clientWidth, Ht = 250, m = { t: 14, r: 92, b: 28, l: 34 };
+    const x = d3.scaleUtc(d3.extent(s, (r) => pd(r.date)), [m.l, W - m.r]);
+    const y = d3.scaleLinear([0, Math.max(P.fc_pct || 30, d3.max(s, (r) => r.est) + 2)], [Ht - m.b, m.t]);
+    const ye = d3.scaleLinear([0, Math.max(6, d3.max(s, (r) => r.et_mm || 0))], [Ht - m.b, Ht - m.b - 50]);
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${Ht}`).attr('height', Ht);
+    svg.append('rect').attr('x', m.l).attr('width', W - m.l - m.r).attr('y', y(P.target_pct)).attr('height', y(P.trigger_pct) - y(P.target_pct)).attr('fill', 'var(--color-ok)').attr('opacity', .07);
+    svg.append('rect').attr('x', m.l).attr('width', W - m.l - m.r).attr('y', y(P.trigger_pct)).attr('height', y(0) - y(P.trigger_pct)).attr('fill', 'var(--color-warn)').attr('opacity', .07);
+    svg.append('g').attr('class', 'rg-gridl').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(''));
+    const ya = svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(0).tickPadding(6).tickFormat((v) => v + '%')); axisStyle(ya); ya.select('.domain').remove();
+    const xa = svg.append('g').attr('transform', `translate(0,${Ht - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(W / 100))).tickFormat(d3.utcFormat('%-d %b')).tickSizeOuter(0)); axisStyle(xa);
+    [[P.trigger_pct, 'trigger'], [P.target_pct, 'refill to']].forEach(([v, n]) => { svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(v)).attr('y2', y(v)).attr('stroke', n === 'trigger' ? 'var(--color-warn)' : 'var(--color-ok)').attr('stroke-dasharray', '4 4'); svg.append('text').attr('class', 'rg-lbl').attr('x', m.l + 4).attr('y', y(v) - 4).text(`${n} ${v}%`); });
+    const anim = first('fwbal');
+    const bars = svg.append('g').selectAll('rect').data(s.filter((r) => r.et_mm)).join('rect').attr('x', (r) => x(pd(r.date)) - 3).attr('width', 6).attr('y', (r) => ye(r.et_mm)).attr('height', (r) => ye(0) - ye(r.et_mm)).attr('rx', 2).attr('fill', C()[2]).attr('opacity', (r) => (r.kind === 'forecast' ? .25 : .45));
+    if (anim) bars.classed('rg-grow', true).style('animation-delay', (r, i) => (i * 25) + 'ms');
+    const hs = s.filter((r) => r.himalayan != null);
+    if (hs.length) { const yh = d3.scaleLinear([0, 30], [Ht - m.b, m.t]); const hp = svg.append('path').datum(hs).attr('d', d3.line().x((r) => x(pd(r.date))).y((r) => yh(r.himalayan)).curve(d3.curveMonotoneX)).attr('fill', 'none').attr('stroke', C()[3] || C()[1]).attr('stroke-width', 1.6).attr('stroke-dasharray', '2 3'); drawIn(hp, 'fwh'); }
+    const past = s.filter((r) => r.kind !== 'forecast'), fut = s.filter((r) => r.date >= today);
+    const ln = d3.line().x((r) => x(pd(r.date))).y((r) => y(r.est)).curve(d3.curveMonotoneX);
+    const p1 = svg.append('path').datum(past).attr('d', ln).attr('fill', 'none').attr('stroke', C()[0]).attr('stroke-width', 2.2); drawIn(p1, 'fwest'); comet(svg, p1, C()[0], 2.2);
+    const p2 = svg.append('path').datum(fut).attr('d', ln).attr('fill', 'none').attr('stroke', C()[0]).attr('stroke-width', 2.2).attr('stroke-dasharray', '5 4').attr('opacity', .8);
+    if (anim && !reduce) p2.attr('opacity', 0).transition().delay(1200).duration(600).attr('opacity', .8);
+    svg.append('g').selectAll('circle').data(s.filter((r) => r.measured != null)).join('circle').attr('cx', (r) => x(pd(r.date))).attr('cy', (r) => y(r.measured)).attr('r', 3).attr('fill', 'var(--color-panel)').attr('stroke', C()[0]).attr('stroke-width', 1.6);
+    const now = s.find((r) => r.date === today); if (now) ping(svg.append('g'), x(pd(now.date)), y(now.est), C()[0], 3.2);
+    const last = s[s.length - 1];
+    svg.append('text').attr('class', 'rg-lbl-b').attr('x', W - m.r + 6).attr('y', y(last.est) + 4).attr('fill', C()[0]).text(`${f1(last.est)}% ${fDay(pd(last.date))}`);
+    if (hs.length) svg.append('text').attr('class', 'rg-lbl-b').attr('x', W - m.r + 6).attr('y', Ht - m.b - 30).attr('fill', C()[3] || C()[1]).text('Himalayan');
+    svg.append('text').attr('class', 'rg-lbl').attr('x', W - m.r + 6).attr('y', Ht - m.b - 4).attr('fill', C()[2]).text('ET mm');
+    const tip = tipFor(box);
+    const rule = svg.append('line').attr('y1', m.t).attr('y2', Ht - m.b).attr('stroke', 'var(--cds-chart-axis)').attr('opacity', 0);
+    svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', W - m.l - m.r).attr('height', Ht - m.t - m.b).attr('fill', 'transparent')
+      .on('pointermove', (ev) => { const [mx] = d3.pointer(ev); const r = s[d3.bisector((z) => pd(z.date)).center(s, x.invert(mx))]; const X = x(pd(r.date)); rule.attr('x1', X).attr('x2', X).attr('opacity', 1);
+        showTip(box, tip, X, m.t + 10, (t) => { line(t, fDayY(pd(r.date)) + (r.kind === 'forecast' ? ' · forecast' : r.kind === 'measured' ? ' · TurfRad scan' : ' · estimate'), null, 'd'); line(t, `Fairways ${f1(r.est)}%`, C()[0]); if (r.et_mm != null) line(t, `ET ${f1(r.et_mm)} mm · rain ${f1(r.rain_mm)} mm`, C()[2]); if (r.himalayan != null) line(t, `Himalayan ${f1(r.himalayan)}%${r.h_used ? ' (used)' : ''}`, C()[3] || C()[1]); }); })
+      .on('pointerleave', () => { tip.hidden = true; rule.attr('opacity', 0); });
+    /* per-hole tiles with an animated moisture gauge */
+    const hb = document.getElementById('fw-holes'); hb.replaceChildren();
+    const gx = d3.scaleLinear([5, 30], [0, 100]).clamp(true);
+    H.slice().sort((a, b) => (b.need_mm - a.need_mm) || (a.est_tomorrow - b.est_tomorrow)).forEach((h, i) => {
+      const el = document.createElement('div'); el.className = 'rg-fw-h' + (h.need_mm > 0 ? ' need' : '');
+      const t = document.createElement('div'); t.className = 't'; const a = document.createElement('span'); a.textContent = gName(h.hole) + ' fwy'; const b2 = document.createElement('span'); b2.textContent = h.stressed_pct != null ? h.stressed_pct + '% stressed' : ''; t.append(a, b2);
+      const v = document.createElement('div'); v.className = 'v'; v.textContent = f1(h.est_now) + '% → ' + f1(h.est_tomorrow) + '%';
+      const n = document.createElement('div'); n.className = 'n' + (h.need_mm > 0 ? ' rg-warn' : '');
+      n.textContent = h.need_mm > 0 ? `Water ${f1(h.need_mm)} mm · ${f1(h.volume_kl)} kL` : (h.days_to_trigger != null ? `hits ${P.trigger_pct}% in ${h.days_to_trigger} day${h.days_to_trigger === 1 ? '' : 's'}` : `above ${P.trigger_pct}% all week`);
+      el.append(t, v, n);
+      const sv = d3.select(el).append('svg').attr('viewBox', '0 0 100 14').attr('preserveAspectRatio', 'none');
+      sv.append('rect').attr('x', 0).attr('y', 4).attr('width', 100).attr('height', 6).attr('rx', 3).attr('fill', 'var(--cds-chart-grid)');
+      sv.append('rect').attr('x', gx(P.trigger_pct)).attr('y', 4).attr('width', gx(P.target_pct) - gx(P.trigger_pct)).attr('height', 6).attr('fill', 'var(--color-ok)').attr('opacity', .25);
+      const bar = sv.append('rect').attr('x', 0).attr('y', 4).attr('height', 6).attr('rx', 3).attr('fill', h.est_tomorrow < P.trigger_pct ? 'var(--color-warn)' : C()[0]).attr('width', gx(h.est_tomorrow));
+      sv.append('line').attr('x1', gx(h.est_now)).attr('x2', gx(h.est_now)).attr('y1', 1).attr('y2', 13).attr('stroke', 'var(--color-fg)').attr('stroke-width', 1.2).attr('vector-effect', 'non-scaling-stroke');
+      if (first('fwh' + h.hole) && !reduce) bar.attr('width', gx(h.est_now)).transition().delay(400 + i * 40).duration(900).ease(d3.easeCubicOut).attr('width', gx(h.est_tomorrow));
+      hb.appendChild(el);
+    });
+    document.getElementById('fw-how').textContent = `How it's worked out: fairway moisture is anchored to the TurfRad mower scan, then dries with measured ET (k = ${P.k_per_mm_et} per mm, fitted from ${P.n_dry_days} dry days) plus rain. The Himalayan Spiio probe shapes the dry-down when it reads above its ${P.h_floor}% floor. Each hole's offset comes from SkimTurf's latest soil-moisture estimate. Water need = enough to lift a fairway forecast below ${P.trigger_pct}% back to ${P.target_pct}% over a ${P.root_mm} mm root zone. Fairway irrigation isn't logged, so watering only shows up at the next TurfRad scan.`;
+  }
+
   function draw() {
     drawHeader(); clockLine();
     if (!flowOn && ok('daily')) { flowOn = true; startFlow(); }
@@ -1712,7 +1812,7 @@ dash.calc('skim_course', {
     if (page === 'growth') { drawGvx(); drawHeat(); drawWx(); }
     if (page === 'soil') { drawSpiio('ch-moist', 'moisture_pct', '%', 12); drawSpiio('ch-stemp', 'soil_temp_c', '°', null); drawOm(); drawTdr(); }
     if (page === 'turfrad') { trKpis(); drawRadar(); drawTrTrend(); drawTrHeat(); drawTrTable(); }
-    if (page === 'fairways') { skKpis(); drawSkHealth(); drawSkTrend(); drawSkNut(); drawSkTee(); }
+    if (page === 'fairways') { drawFwWater(); skKpis(); drawSkHealth(); drawSkTrend(); drawSkNut(); drawSkTee(); }
     if (page === 'inputs') { drawN(); drawIrr(); drawNTable(); drawPgrTable(); }
   }
   const named = location.hash.slice(1);
