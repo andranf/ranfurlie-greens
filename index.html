@@ -309,6 +309,16 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 @keyframes rg-dwpulse { 0%,100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-warn) 28%, transparent); } }
 @keyframes rg-pop { from { transform: scale(0); } to { transform: scale(1); } }
 @keyframes rg-blink { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+
+.rg-wb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--cds-gap-md); }
+.rg-wb-stat { position: relative; padding: .55rem .7rem; border: 1px solid var(--color-border-line); border-radius: 10px; overflow: hidden; min-width: 0; }
+.rg-wb-stat .l { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.rg-wb-stat .v { font-size: 1.45rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.rg-wb-stat .s { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.rg-wb-stat canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .55; }
+.rg-wb-stat > div { position: relative; }
+.rg-wb-bar { height: 6px; border-radius: 3px; background: var(--cds-chart-grid); margin-top: .35rem; position: relative; overflow: hidden; }
+.rg-wb-bar i { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
 </style>
 
 <div class="rg">
@@ -388,6 +398,13 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
         <p class="rg-note">Spiio fixed probes, latest 4-hour reading. Dashed line is the 12% dry line.</p>
         <div class="rg-probes" id="probes" data-source="spiio"></div>
       </div>
+    </div>
+
+    <div class="rg-card" id="card-wbal">
+      <div class="rg-row"><h3>ET and water balance</h3><span class="rg-note" id="wb-src">—</span></div>
+      <div class="rg-wb-stats" id="wb-stats" data-source="water_balance"></div>
+      <p class="rg-note" style="margin: .2rem 0 0">Rain above the line, ET below it. The line is the running balance (rain − ET) over the window: falling = the profile is drying.</p>
+      <div class="rg-chart short" id="ch-wb" data-source="water_balance"></div>
     </div>
 
     <div class="rg-card" id="card-rainfall">
@@ -2109,10 +2126,94 @@ dash.calc('skim_course', {
     document.getElementById('dw-quiet').textContent = quiet.length ? 'Quiet: ' + quiet.map((d) => `${d.label} — ${d.note_today.split(' · ')[0]}`).join(' · ') : '';
   }
 
+  /* ---------------- ET and water balance ---------------- */
+  function drawWaterBalance() {
+    const box = document.getElementById('wb-stats');
+    if (!guard(box, ['water_balance'])) return;
+    box.replaceChildren();
+    const w = rows('water_balance'); const past = w.filter((r) => r.kind !== 'forecast'); const fut = w.filter((r) => r.kind === 'forecast');
+    const today = w.find((r) => r.kind === 'today'); const yday = past.filter((r) => r.kind === 'past').slice(-1)[0];
+    const sum = (a, k) => a.reduce((t, r) => t + (r[k] || 0), 0);
+    const win = (n) => { const x = past.slice(-n); const e = sum(x, 'et_mm'), r = sum(x, 'rain_mm'); return { e, r, net: r - e }; };
+    const w7 = win(7), w30 = win(30), wf = { e: sum(fut, 'et_mm'), r: sum(fut, 'rain_mm') }; wf.net = wf.r - wf.e;
+    const sgn = (v) => (v >= 0 ? '+' : '−') + f1(Math.abs(v)) + ' mm';
+    const kl = (v) => `${v >= 0 ? '+' : '−'}${f0(Math.abs(v) * 10)} kL/ha`;
+    document.getElementById('wb-src').textContent = 'ET: SpecConnect Main (measured) · Open-Meteo for today and forecast · rain: 6th-hole gauge';
+    const stats = [
+      { k: 'et', l: 'ET today', v: today ? today.et_mm : null, fmt: (x) => f1(x) + ' mm', vapour: true,
+        s: `forecast · yesterday ${yday ? f1(yday.et_mm) + ' mm (' + yday.et_src + ')' : '—'}` },
+      { k: 'w7', l: 'Last 7 days', v: w7.net, fmt: sgn, s: `rain ${f1(w7.r)} − ET ${f1(w7.e)} mm · ${kl(w7.net)}`, bar: w7 },
+      { k: 'w30', l: 'Last 30 days', v: w30.net, fmt: sgn, s: `rain ${f1(w30.r)} − ET ${f1(w30.e)} mm · ${kl(w30.net)}`, bar: w30 },
+      { k: 'wf', l: `Next ${fut.length} days (forecast)`, v: wf.net, fmt: sgn, s: `rain ${f1(wf.r)} − ET ${f1(wf.e)} mm · ${kl(wf.net)}`, bar: wf },
+    ];
+    stats.forEach((st0, i) => {
+      const el = document.createElement('div'); el.className = 'rg-wb-stat';
+      if (st0.vapour && !reduce) {
+        const cv = document.createElement('canvas'); el.appendChild(cv); const ctx = cv.getContext('2d');
+        const parts = d3.range(18).map(() => ({ x: Math.random(), sp: .25 + Math.random() * .45, off: Math.random(), r: 1 + Math.random() * 2.2 }));
+        const col = cssColor('var(--color-warn)');
+        addTick('wbvap', el, (t) => { const W = cv.clientWidth, H = cv.clientHeight; if (!W) return; const dpr = Math.min(2, window.devicePixelRatio || 1);
+          if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); const sec = t / 1000;
+          parts.forEach((p) => { const y = 1 - ((sec * p.sp * .35 + p.off) % 1); const a = Math.sin(Math.PI * (1 - y)) * .5;
+            ctx.beginPath(); ctx.arc(W * (p.x + Math.sin(sec * 1.3 + p.off * 9) * .03), H * y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = col.replace('rgb(', 'rgba(').replace(')', `,${a.toFixed(2)})`); ctx.fill(); }); });
+      }
+      const inner = document.createElement('div');
+      const l = document.createElement('div'); l.className = 'l'; l.textContent = st0.l;
+      const v = document.createElement('div'); v.className = 'v'; countTo(v, st0.v, st0.fmt, 'wb' + st0.k);
+      if (st0.k !== 'et') v.style.color = st0.v < 0 ? 'var(--color-warn)' : C()[1];
+      const sm = document.createElement('div'); sm.className = 's'; sm.textContent = st0.s;
+      inner.append(l, v, sm);
+      if (st0.bar) { const b = document.createElement('div'); b.className = 'rg-wb-bar'; const mx = Math.max(st0.bar.r, st0.bar.e, 1);
+        const ri = document.createElement('i'); ri.style.left = '0'; ri.style.background = C()[1]; const ei = document.createElement('i'); ei.style.right = '0'; ei.style.background = 'var(--color-warn)';
+        b.append(ri, ei); inner.appendChild(b);
+        const go = () => { ri.style.width = (50 * st0.bar.r / mx) + '%'; ei.style.width = (50 * st0.bar.e / mx) + '%'; };
+        if (first('wbbar' + st0.k) && !reduce) { ri.style.width = '0'; ei.style.width = '0'; ri.style.transition = ei.style.transition = 'width 1.1s cubic-bezier(.2,.8,.2,1)'; setTimeout(go, 250 + i * 150); } else go(); }
+      el.appendChild(inner); box.appendChild(el);
+    });
+    /* chart */
+    const cb = document.getElementById('ch-wb'); cb.replaceChildren();
+    const W = cb.clientWidth, H = 210, m = { t: 14, r: 64, b: 26, l: 36 };
+    const x = d3.scaleBand(w.map((r) => r.date), [m.l, W - m.r]).padding(.2);
+    const top = Math.max(8, d3.max(w, (r) => r.rain_mm || 0)), bot = Math.max(4, d3.max(w, (r) => r.et_mm || 0));
+    const y = d3.scaleLinear([-bot * 1.1, top * 1.05], [H - m.b, m.t]);
+    let run = 0; const bal = past.map((r) => { run += (r.rain_mm || 0) - (r.et_mm || 0); return { date: r.date, v: run }; });
+    let run2 = run; const lineF = [bal[bal.length - 1]].concat(fut.map((r) => { run2 += (r.rain_mm || 0) - (r.et_mm || 0); return { date: r.date, v: run2 }; }));
+    const yl = d3.scaleLinear(d3.extent(bal.concat(lineF), (d) => d.v).map((v, i) => v + (i ? 5 : -5)), [H - m.b, m.t]);
+    const svg = d3.select(cb).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(0)).attr('y2', y(0)).attr('stroke', 'var(--cds-chart-axis)');
+    const ya = svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(0).tickPadding(6).tickFormat((v) => Math.abs(v))); axisStyle(ya); ya.select('.domain').remove();
+    const yr = svg.append('g').attr('transform', `translate(${W - m.r},0)`).call(d3.axisRight(yl).ticks(4).tickSize(0).tickPadding(6).tickFormat((v) => (v > 0 ? '+' : '') + f0(v))); axisStyle(yr); yr.select('.domain').remove();
+    const step = Math.ceil(w.length / Math.max(2, Math.floor(W / 80)));
+    svg.append('g').selectAll('text').data(w.filter((_, i) => i % step === 0)).join('text').attr('class', 'rg-lbl').attr('x', (r) => x(r.date) + x.bandwidth() / 2).attr('y', H - 8).attr('text-anchor', 'middle').text((r) => fDay(pd(r.date)));
+    const fx0 = x(fut[0] ? fut[0].date : w[w.length - 1].date) - x.step() * .1;
+    if (fut.length) svg.append('rect').attr('x', fx0).attr('y', m.t).attr('width', W - m.r - fx0).attr('height', H - m.t - m.b).attr('fill', 'var(--cds-chart-grid)').attr('opacity', .35);
+    const anim = first('wbch');
+    const rb = svg.append('g').selectAll('rect').data(w.filter((r) => r.rain_mm > 0)).join('rect').attr('x', (r) => x(r.date)).attr('width', x.bandwidth()).attr('y', (r) => y(r.rain_mm)).attr('height', (r) => y(0) - y(r.rain_mm)).attr('rx', 2).attr('fill', C()[1]).attr('opacity', (r) => (r.kind === 'forecast' ? .45 : .9));
+    const eb = svg.append('g').selectAll('rect').data(w.filter((r) => r.et_mm != null)).join('rect').attr('x', (r) => x(r.date)).attr('width', x.bandwidth()).attr('y', y(0)).attr('height', (r) => y(-r.et_mm) - y(0)).attr('rx', 2).attr('fill', 'var(--color-warn)').attr('opacity', (r) => (r.kind === 'forecast' ? .4 : r.et_src === 'measured' ? .85 : .6));
+    if (anim && !reduce) { rb.attr('y', y(0)).attr('height', 0).transition().delay((r, i) => i * 25).duration(600).attr('y', (r) => y(r.rain_mm)).attr('height', (r) => y(0) - y(r.rain_mm));
+      eb.attr('height', 0).transition().delay((r, i) => i * 20).duration(600).attr('height', (r) => y(-r.et_mm) - y(0)); }
+    const cx = (d) => x(d.date) + x.bandwidth() / 2;
+    const p = svg.append('path').datum(bal).attr('d', d3.line().x(cx).y((d) => yl(d.v)).curve(d3.curveMonotoneX)).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 2);
+    drawIn(p, 'wbline'); comet(svg, p, C()[0], 2);
+    svg.append('path').datum(lineF).attr('d', d3.line().x(cx).y((d) => yl(d.v)).curve(d3.curveMonotoneX)).attr('fill', 'none').attr('stroke', 'var(--color-fg)').attr('stroke-width', 2).attr('stroke-dasharray', '5 4').attr('class', reduce ? '' : 'rg-march');
+    const L = bal[bal.length - 1]; ping(svg.append('g'), cx(L), yl(L.v), C()[0], 3);
+    svg.append('text').attr('class', 'rg-lbl-b').attr('x', W - m.r + 6).attr('y', m.t + 2).text('balance, mm');
+    const tip = tipFor(cb);
+    svg.append('g').selectAll('rect').data(w).join('rect').attr('x', (r) => x(r.date)).attr('width', x.step()).attr('y', m.t).attr('height', H - m.t - m.b).attr('fill', 'transparent')
+      .on('pointerenter', (ev, r) => showTip(cb, tip, x(r.date) + x.bandwidth(), y(0), (t) => { line_(t, r); }))
+      .on('pointerleave', () => (tip.hidden = true));
+    function line_(t, r) { line(t, fDayY(pd(r.date)) + (r.kind === 'forecast' ? ' · forecast' : r.kind === 'today' ? ' · today (forecast)' : ''), null, 'd');
+      line(t, `Rain ${r.rain_mm == null ? '— (' + (r.rain_src || 'no data') + ')' : f1(r.rain_mm) + ' mm'}`, C()[1]);
+      line(t, `ET ${r.et_mm == null ? '—' : f1(r.et_mm) + ' mm (' + r.et_src + ')'}`, 'var(--color-warn)');
+      if (r.net_mm != null) line(t, `Net ${sgn(r.net_mm)}`); }
+  }
+
   function draw() {
     drawHeader(); clockLine();
     if (!flowOn && ok('daily')) { flowOn = true; startFlow(); }
-    if (page === 'today') { drawDiseaseWatch(); drawRainfall(); drawKpis(); drawClocks(); drawProbes(); drawWatch(); drawSources(); }
+    if (page === 'today') { drawDiseaseWatch(); drawWaterBalance(); drawRainfall(); drawKpis(); drawClocks(); drawProbes(); drawWatch(); drawSources(); }
     if (page === 'disease') { drawCoverKpis(); drawCoverLine(); drawMatrix(); drawVerify(); }
     if (page === 'growth') { drawGvx(); drawHeat(); drawWx(); }
     if (page === 'soil') { drawSpiio('ch-moist', 'moisture_pct', '%', 12); drawSpiio('ch-stemp', 'soil_temp_c', '°', null); drawOm(); drawTdr(); }
