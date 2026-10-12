@@ -41,7 +41,8 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
   window.dash = { data: data, onData: function(fn){ subs.push(fn); fn(); }, calc: function(){}, loader: function(){},
     colors: dark ? ['#5aa2f0','#3fc7b4','#f0a35a','#b48ef0','#e874a5','#9bd164','#f0d35a','#8aa0b8'] : ['#2f6fd0','#14998a','#d27a1c','#7b52d0','#c2407a','#5f9a2a','#b39400','#5e7387'],
     refresh: function(){}, params: function(){ return {}; }, setParams: function(){}, resetParams: function(){},
-    setLink: function(n){ try { history.replaceState(null, '', '#' + n); } catch (e) {} } };
+    setLink: function(){} };
+  try { if (/^#(today|plan|fleet|usage|cutting|parts|costs|history|checks)$/.test(location.hash || '')) history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
   window.MX_UPDATE = {"url": "https://hooks.zapier.com/hooks/catch/18429017/hEf82SxQsbv7jyqU/"};
 })();
 </script>
