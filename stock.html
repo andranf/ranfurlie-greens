@@ -123,7 +123,7 @@ $('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(body());toa
 $('#clear').onclick=()=>{if(confirm('Clear this count and start again?')){state={};$('#extra').value='';save();render();tick()}};
 ['#who','#extra'].forEach(s=>$(s).addEventListener('input',()=>{save();tick()}));$('#q').addEventListener('input',render);
 fetch('stock.json?x='+Date.now()).then(r=>r.json()).then(d=>{D=d;const s=load();if(s.snap===d.snapshot||s.snap){state=s.state||{};$('#extra').value=s.extra||''}$('#who').value=s.who||'';
-  const n=d.items.filter(i=>i.expected>0).length;$('#sub').textContent=`${n} products on the shelf per GreenKeeper · updated ${d.built}`+(d.counted_30d?` · ${d.counted_30d} counted in the last 30 days`:'');
+  const n=d.items.filter(i=>i.expected>0).length;$('#sub').textContent=`${n} products expected on the shelf (KD stocktake + purchases − GreenKeeper use) · updated ${d.built}`+(d.counted_30d?` · ${d.counted_30d} counted in the last 30 days`:'');
   const types=['All',...new Set(d.items.map(i=>i.type))];const C=$('#chips');
   types.forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.setAttribute('aria-pressed',t===type);b.onclick=()=>{type=t;[...C.children].forEach(x=>x.setAttribute('aria-pressed',x.textContent===t));render()};C.appendChild(b)});
   const z=document.createElement('button');z.className='chip';z.textContent='Show zero on record';z.setAttribute('aria-pressed','false');z.onclick=()=>{showZero=!showZero;z.setAttribute('aria-pressed',String(showZero));render()};C.appendChild(z);
