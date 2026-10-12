@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Ranfurlie Shed Stocktake</title>
+<style>
+:root{--bg:#f6f6f2;--panel:#fff;--fg:#1c1d1a;--muted:#6b6c66;--line:#e3e3dc;--acc:#2f6fdb;--ok:#2e8540;--warn:#b7791f;--bad:#c53030;--chip:#efefe8}
+@media (prefers-color-scheme:dark){:root{--bg:#121311;--panel:#1c1d1a;--fg:#ecece6;--muted:#a3a49c;--line:#33342f;--acc:#6b9cf0;--ok:#5cb870;--warn:#e0a547;--bad:#ef6b6b;--chip:#272824}}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 16px}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+h1{font-size:1.15rem;margin:0}.sub{color:var(--muted);font-size:.82rem}
+.top{display:flex;align-items:center;gap:12px}.ring{width:46px;height:46px;flex:0 0 auto}.ring circle{transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1)}
+.bar{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+input[type=text],input[type=search],input[type=number],select,textarea{font:inherit;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+input[type=search]{flex:1 1 180px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:4px 11px;font-size:.82rem;white-space:nowrap;cursor:pointer;color:var(--fg)}
+.chip[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+main{padding:12px 0 140px}
+.grp{margin:16px 0 6px;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0;animation:rise .35s ease-out both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card.ok{border-color:color-mix(in srgb,var(--ok) 55%,var(--line))}.card.diff{border-color:color-mix(in srgb,var(--warn) 60%,var(--line))}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.nm{font-weight:600}.exp{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.86rem}.exp b{color:var(--fg)}
+.flag{color:var(--warn);font-size:.78rem;margin-top:2px}
+.btns{display:flex;gap:6px;flex:0 0 auto}
+.b{border:1px solid var(--line);background:var(--chip);color:var(--fg);border-radius:10px;padding:8px 12px;font:inherit;font-size:.86rem;cursor:pointer;touch-action:manipulation}
+.b.okb[aria-pressed=true]{background:var(--ok);border-color:var(--ok);color:#fff;animation:pop .35s}.b.dfb[aria-pressed=true]{background:var(--warn);border-color:var(--warn);color:#fff;animation:pop .35s}
+@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+.edit{display:none;margin-top:10px;gap:8px;flex-wrap:wrap;align-items:center}.card.diff .edit{display:flex}
+.edit label{font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.edit input[type=number]{width:96px}.edit .tot{font-variant-numeric:tabular-nums;font-size:.86rem}
+.edit input.note{flex:1 1 200px}
+.var{font-size:.8rem;font-weight:600}.var.neg{color:var(--bad)}.var.pos{color:var(--ok)}
+.last{font-size:.76rem;color:var(--muted)}
+footer{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+footer .wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.send{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 16px;font:inherit;font-weight:600;flex:1 1 140px;cursor:pointer}
+.send:disabled{opacity:.45}.ghost{background:none;border:1px solid var(--line);border-radius:12px;padding:11px 10px;flex:0 0 auto;font:inherit;color:var(--fg);cursor:pointer}
+.sum{font-size:.82rem;color:var(--muted);width:100%}
+details{margin:12px 0}summary{cursor:pointer;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:10px;font-size:.86rem;opacity:0;transition:opacity .3s}.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="top">
+    <svg class="ring" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="var(--line)" stroke-width="5"/><circle id="ringfg" cx="23" cy="23" r="19" fill="none" stroke="var(--ok)" stroke-width="5" stroke-linecap="round" transform="rotate(-90 23 23)" stroke-dasharray="119.4" stroke-dashoffset="119.4"/><text id="ringtx" x="23" y="27" text-anchor="middle" font-size="11" font-weight="600" fill="var(--fg)">0%</text></svg>
+    <div><h1>Shed stocktake</h1><div class="sub" id="sub">Loading…</div></div>
+  </div>
+  <div class="bar"><input type="text" id="who" placeholder="Your name" autocomplete="name" style="flex:0 1 150px"><input type="search" id="q" placeholder="Search products"></div>
+  <div class="chips" id="chips" role="group" aria-label="Product type"></div>
+</div></header>
+<main><div class="wrap" id="list"></div>
+<div class="wrap"><details><summary>Found something that isn't on the list?</summary>
+  <p class="sub">Add it here. Name, amount and unit (e.g. "Banner Maxx, 10 L").</p>
+  <textarea id="extra" rows="3" style="width:100%" placeholder="One product per line"></textarea>
+</details>
+<p class="sub">Expected amounts come from GreenKeeper's inventory each morning. Tap <b>✓</b> if the shelf matches, or <b>≠</b> to enter what's really there. Send emails the counts to Andy. The morning run checks them, corrects GreenKeeper and logs every change.</p></div>
+</main>
+<footer><div class="wrap">
+  <button class="send" id="send" disabled>Send count</button>
+  <button class="ghost" id="copy" title="Copy the count as text">Copy</button>
+  <button class="ghost" id="clear" title="Start again">Reset</button>
+  <div class="sum" id="sum"></div>
+</div></footer>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+const $=(s)=>document.querySelector(s);
+const KEY='rgc-stock-v1';let D=null,state={},type='All',showZero=false;
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({snap:D&&D.snapshot,who:$('#who').value,state,extra:$('#extra').value}))}catch(e){}};
+const fmt=(v)=>(Math.round(v*100)/100).toLocaleString('en-AU',{maximumFractionDigits:2});
+const expTxt=(i)=>{if(!i.expected)return'<b>0</b> on record';if(i.cont){const n=Math.floor(i.expected/i.cont+1e-9),r=i.expected-n*i.cont;return n?`<b>${fmt(i.expected)} ${i.unit}</b> · ${n} × ${fmt(i.cont)} ${i.unit}${r>0.01?' + '+fmt(r)+' '+i.unit:''}`:`<b>${fmt(i.expected)} ${i.unit}</b> · part of a ${fmt(i.cont)} ${i.unit} container`}return`<b>${fmt(i.expected)} ${i.unit}</b>`};
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
+function total(i,s){const n=parseFloat(s.full)||0,p=parseFloat(s.part)||0;return i.cont?n*i.cont+p:p}
+function render(){
+  const L=$('#list');L.replaceChildren();const q=$('#q').value.trim().toLowerCase();let g='',k=0;
+  D.items.filter(i=>(type==='All'||i.type===type)&&(!q||i.name.toLowerCase().includes(q))&&(showZero||i.expected>0||state[i.id]||q)).forEach(i=>{
+    if(i.type!==g){g=i.type;const h=document.createElement('div');h.className='grp';h.textContent=g;L.appendChild(h)}
+    const s=state[i.id]||{};const c=document.createElement('div');c.className='card'+(s.st==='ok'?' ok':s.st==='diff'?' diff':'');c.style.animationDelay=Math.min(k++,14)*25+'ms';
+    const last=i.last_count?`<div class="last">Last counted ${i.last_count.date} by ${i.last_count.by}: ${fmt(i.last_count.counted)} ${i.unit}</div>`:'';
+    c.innerHTML=`<div class="row"><div><div class="nm"></div><div class="exp">${expTxt(i)}</div>${i.flag?`<div class="flag">⚠ ${i.flag}</div>`:''}${last}</div>
+      <div class="btns"><button class="b okb" aria-pressed="${s.st==='ok'}" aria-label="Matches">✓</button><button class="b dfb" aria-pressed="${s.st==='diff'}" aria-label="Different">≠</button></div></div>
+      <div class="edit">${i.cont?`<label>Full ${fmt(i.cont)} ${i.unit} containers<input type="number" inputmode="decimal" min="0" step="1" class="full" value="${s.full??''}"></label>`:''}
+      <label>${i.cont?'Plus part container':'Amount'} (${i.unit})<input type="number" inputmode="decimal" min="0" step="0.1" class="part" value="${s.part??''}"></label>
+      <span class="tot"></span><input type="text" class="note" placeholder="Note (optional)" value="${(s.note||'').replace(/"/g,'&quot;')}"></div>`;
+    c.querySelector('.nm').textContent=i.name;
+    const upd=()=>{const ss=state[i.id];const t=c.querySelector('.tot');if(!ss||ss.st!=='diff'){t.textContent='';return}
+      const tot=total(i,ss);const has=(ss.full??'')!==''||(ss.part??'')!=='';const d=tot-i.expected;
+      t.innerHTML=has?`= ${fmt(tot)} ${i.unit} <span class="var ${d<0?'neg':'pos'}">${d>=0?'+':'−'}${fmt(Math.abs(d))}</span>`:'enter the count';};
+    c.querySelector('.okb').onclick=()=>{state[i.id]=s.st==='ok'?undefined:{st:'ok'};if(!state[i.id])delete state[i.id];save();render();tick()};
+    c.querySelector('.dfb').onclick=()=>{state[i.id]=s.st==='diff'?undefined:{st:'diff',full:'',part:''};if(!state[i.id])delete state[i.id];save();render();tick();if(state[i.id]){const f=L.querySelector(`[data-id="${i.id}"] input`);}};
+    c.dataset.id=i.id;
+    c.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{const ss=state[i.id]||(state[i.id]={st:'diff'});ss.full=c.querySelector('.full')?.value??'';ss.part=c.querySelector('.part').value;ss.note=c.querySelector('.note').value;save();upd();tick()});
+    upd();L.appendChild(c);
+  });
+  if(!L.children.length){L.innerHTML='<p class="sub" style="margin-top:24px">Nothing matches.</p>'}
+}
+function done(){return Object.entries(state).filter(([id,s])=>s&&(s.st==='ok'||(s.st==='diff'&&((s.full??'')!==''||(s.part??'')!==''))))}
+function tick(){
+  const n=D.items.filter(i=>i.expected>0).length,d=done().length,p=Math.min(1,d/Math.max(1,n));
+  $('#ringfg').style.strokeDashoffset=119.4*(1-p);$('#ringtx').textContent=Math.round(p*100)+'%';
+  const diffs=done().filter(([,s])=>s.st==='diff').length;
+  $('#sum').textContent=d?`${d} counted · ${d-diffs} match · ${diffs} different`+($('#who').value?'':' · add your name'):'Tick products as you go. You can send a part count.';
+  $('#send').disabled=!d||!$('#who').value.trim();
+}
+function body(){
+  const by=Object.fromEntries(D.items.map(i=>[i.id,i]));const ok=[],cnt=[];
+  done().forEach(([id,s])=>{if(s.st==='ok')ok.push(id);else{const i=by[id];cnt.push(`CNT ${id} | ${fmt(total(i,s))} ${i.unit} | exp ${i.expected} | ${i.name}${s.note?' | '+s.note.replace(/\|/g,'/'):''}`)}});
+  const ex=$('#extra').value.trim().split(/\n+/).filter(Boolean).map(l=>'NEW | '+l.replace(/\|/g,'/'));
+  return [`STOCKTAKE v1 | snapshot ${D.snapshot} | by ${$('#who').value.trim()} | sent ${new Date().toISOString()}`,ok.length?'OK '+ok.join(','):'',...cnt,...ex,'END'].filter(Boolean).join('\n');
+}
+$('#send').onclick=()=>{const b=body(),n=done().length;const sub=`Ranfurlie stocktake | ${new Date().toISOString().slice(0,10)} | ${$('#who').value.trim()} | ${n} items`;
+  location.href=`mailto:${D.send_to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(b)}`;toast('Opening your email app — press Send there');};
+$('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(body());toast('Copied. Paste into an email to Andy')}catch(e){prompt('Copy this text',body())}};
+$('#clear').onclick=()=>{if(confirm('Clear this count and start again?')){state={};$('#extra').value='';save();render();tick()}};
+['#who','#extra'].forEach(s=>$(s).addEventListener('input',()=>{save();tick()}));$('#q').addEventListener('input',render);
+fetch('stock.json?x='+Date.now()).then(r=>r.json()).then(d=>{D=d;const s=load();if(s.snap===d.snapshot||s.snap){state=s.state||{};$('#extra').value=s.extra||''}$('#who').value=s.who||'';
+  const n=d.items.filter(i=>i.expected>0).length;$('#sub').textContent=`${n} products on the shelf per GreenKeeper · updated ${d.built}`+(d.counted_30d?` · ${d.counted_30d} counted in the last 30 days`:'');
+  const types=['All',...new Set(d.items.map(i=>i.type))];const C=$('#chips');
+  types.forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.setAttribute('aria-pressed',t===type);b.onclick=()=>{type=t;[...C.children].forEach(x=>x.setAttribute('aria-pressed',x.textContent===t));render()};C.appendChild(b)});
+  const z=document.createElement('button');z.className='chip';z.textContent='Show zero on record';z.setAttribute('aria-pressed','false');z.onclick=()=>{showZero=!showZero;z.setAttribute('aria-pressed',String(showZero));render()};C.appendChild(z);
+  render();tick();}).catch(()=>{$('#sub').textContent='Could not load the product list. Check your connection and reload.'});
+})();
+</script>
+</body>
+</html>
