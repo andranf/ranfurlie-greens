@@ -42,6 +42,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     colors: dark ? ['#5aa2f0','#3fc7b4','#f0a35a','#b48ef0','#e874a5','#9bd164','#f0d35a','#8aa0b8'] : ['#2f6fd0','#14998a','#d27a1c','#7b52d0','#c2407a','#5f9a2a','#b39400','#5e7387'],
     refresh: function(){}, params: function(){ return {}; }, setParams: function(){}, resetParams: function(){},
     setLink: function(n){ try { history.replaceState(null, '', '#' + n); } catch (e) {} } };
+  window.MX_UPDATE = {"url": "https://hooks.zapier.com/hooks/catch/18429017/hEf82SxQsbv7jyqU/"};
 })();
 </script>
 </head><body><div id="dash-root">
@@ -150,6 +151,34 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 .mx-src li{display:grid;grid-template-columns:auto 1fr auto;gap:.6rem;align-items:baseline;font-size:var(--cds-font-size-caption);}
 .mx-dot{width:.5rem;height:.5rem;border-radius:50%;display:inline-block;background:var(--color-fg-muted);}
 .mx-dot.live{background:var(--color-ok);} .mx-dot.waiting{background:var(--color-warn);}
+.mx-ufoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.25rem;}
+.mx-upd{font-size:var(--cds-font-size-caption);line-height:1.4;border-radius:8px;padding:.3rem .55rem;background:color-mix(in srgb,var(--color-fg) 5%,transparent);min-width:0;flex:1 1 12rem;}
+.mx-upd b{font-weight:600;} .mx-upd .mx-upd-n{color:var(--color-fg-muted);overflow-wrap:anywhere;}
+.mx-upd.done{background:color-mix(in srgb,var(--color-ok) 14%,transparent);} .mx-upd.done b{color:var(--color-ok);}
+.mx-upd.wait{background:color-mix(in srgb,var(--color-warn) 14%,transparent);} .mx-upd.wait b{color:var(--color-warn);}
+.mx-upd.prog b{color:var(--color-fg);} .mx-upd.appr{background:color-mix(in srgb,var(--color-bad) 10%,transparent);} .mx-upd.appr b{color:var(--color-bad);}
+.mx-upd.sent{background:none;border:1px dashed var(--color-border-line);color:var(--color-fg-muted);}
+.mx-ubtn{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);font-weight:600;border:1px solid var(--color-fg);background:var(--color-fg);color:var(--color-bg);border-radius:999px;padding:.32rem .9rem;cursor:pointer;white-space:nowrap;}
+.mx-ubtn:hover{opacity:.88;} .mx-ubtn:focus-visible{outline:2px solid var(--color-fg);outline-offset:2px;}
+.mx-ubtn.sm{padding:.18rem .6rem;font-weight:500;}
+.mx-modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;padding:0;}
+@media (min-width:40rem){.mx-modal{align-items:center;padding:1rem;}}
+.mx-modal[hidden]{display:none;}
+.mx-dlg{background:var(--color-panel);color:var(--color-fg);width:100%;max-width:32rem;max-height:92vh;overflow:auto;border-radius:14px 14px 0 0;padding:1.1rem 1.1rem 1.3rem;display:flex;flex-direction:column;gap:.7rem;box-shadow:0 10px 40px rgba(0,0,0,.3);}
+@media (min-width:40rem){.mx-dlg{border-radius:14px;}}
+.mx-dlg h3{margin:0;font-size:1.1rem;}
+.mx-dlg label{display:flex;flex-direction:column;gap:.25rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+.mx-dlg input,.mx-dlg textarea{font:inherit;font-size:16px;color:var(--color-fg);background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:8px;padding:.5rem .6rem;width:100%;}
+.mx-dlg textarea{min-height:5.5rem;resize:vertical;}
+.mx-dlg .two{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;}
+.mx-sts{display:flex;flex-wrap:wrap;gap:.4rem;}
+.mx-sts button{appearance:none;font:inherit;font-size:.9rem;border:1px solid var(--color-border-line);background:var(--color-bg);color:var(--color-fg);border-radius:999px;padding:.45rem .8rem;cursor:pointer;}
+.mx-sts button[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);}
+.mx-dlg .acts{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.2rem;}
+.mx-dlg .acts button{appearance:none;font:inherit;border-radius:999px;padding:.55rem 1.1rem;cursor:pointer;border:1px solid var(--color-border-line);background:var(--color-panel);color:var(--color-fg);}
+.mx-dlg .acts .go{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);font-weight:600;}
+.mx-dlg .acts button[disabled]{opacity:.5;cursor:default;}
+.mx-umsg{margin:0;font-size:var(--cds-font-size-caption);min-height:1.1em;} .mx-umsg.bad{color:var(--color-bad);} .mx-umsg.ok{color:var(--color-ok);}
 </style>
 
 <div class="mx">
@@ -192,8 +221,15 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 
   <div class="mx-card" id="card-worklist">
     <div class="mx-row"><h3>Mechanic worklist</h3><span class="mx-note">Same list as the weekday #machinery post · most urgent first</span></div>
-    <p class="mx-note">Faults first (safety ahead of the rest), then services: overdue items on machines used every day rank highest. Tick the card in Slack when it's done and reply with the hour meter reading; the next hourly run takes it off this list.</p>
+    <p class="mx-note">Faults first (safety ahead of the rest), then services: overdue items on machines used every day rank highest. When a job is done, tick its card in Slack with the hour meter reading, or press <b>Update</b> on the shared link (contractors use the site code). The next hourly run takes it off this list.</p>
     <ol class="mx-wl" id="wl" data-source="m_worklist"></ol>
+  </div>
+
+  <div class="mx-card" id="card-updates">
+    <div class="mx-row"><h3>Latest updates</h3><span class="mx-note">From contractors and staff on the shared link · last 30 days</span></div>
+    <div class="mx-tbox short"><table class="mx-table" id="t-updates" data-source="m_updates" data-row-key="id"><thead><tr>
+      <th data-field="when">When</th><th data-field="machine">Machine</th><th data-field="job" class="hn">Job</th><th data-field="status">Update</th><th data-field="by">By</th><th data-field="note">Note</th>
+    </tr></thead><tbody></tbody></table></div>
   </div>
 
   <div class="mx-grid">
@@ -388,7 +424,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       <p><b>Hours.</b> Telematics machines (Reelmaster 5010-Hs, eTriFlex 2, Workman GTX 2) report their hour meter to Toro Intelli360 and are read every hour. Every other machine is projected from its last reading at the rate it has been used on the job board; ~ marks an estimate. A meter reading in a worklist reply resets it.</p>
       <p><b>What's due.</b> Each machine's OEM schedule (operator's manual, in the machinery bible) is counted from the last time that service, or a bigger one, was recorded. Break-in services count from new. Club practice (backlap, grind, greasing, blades) carries over the old taskTracker intervals.</p>
       <p><b>No record.</b> A machine bought before 2024 with no record of a service is assumed to have had it at the last multiple of the interval; a newer one is counted from new, so a missing record shows as overdue.</p>
-      <p><b>Closing a job.</b> Tick the worklist card in #machinery and reply with the hours. The hourly run logs it and the item drops off.</p>
+      <p><b>Closing a job.</b> Tick the worklist card in #machinery and reply with the hours, or press <b>Update</b> on the job on the shared link: Done, In progress, Waiting on parts, Needs approval or a note, with the hour meter reading. Contractors need the site code. Updates post to #machinery straight away; the hourly run logs finished work and the item drops off.</p>
     </div>
   </div>
 </section>
@@ -458,6 +494,97 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
   }
   function link(url, text) { var a = el('a', 'mx-a', text); a.href = url; a.target = '_blank'; a.rel = 'noopener'; return a; }
 
+  // ---------- job updates (shared link only: contractors and staff press Update; the hook posts to #machinery + Notion)
+  var UPDURL = (window.MX_UPDATE && window.MX_UPDATE.url) || null;
+  var SENT = {};
+  var USTAT = [['done', 'Done'], ['in_progress', 'In progress'], ['waiting_parts', 'Waiting on parts'], ['needs_approval', 'Needs approval'], ['note', 'Note only']];
+  var UCLS = { 'Done': 'done', 'In progress': 'prog', 'Waiting on parts': 'wait', 'Needs approval': 'appr', 'Note': 'note' };
+  function store(k, v) { try { if (v === undefined) return window.localStorage.getItem(k) || ''; window.localStorage.setItem(k, v); } catch (e) { return ''; } return ''; }
+  function updChip(u, key) {
+    if (key && SENT[key]) return el('div', 'mx-upd sent', 'Sent: ' + SENT[key] + '. It shows here within the hour.');
+    if (!u) return null;
+    var c = el('div', 'mx-upd ' + (UCLS[u.status] || 'note'));
+    c.appendChild(el('b', null, u.status));
+    c.appendChild(document.createTextNode(' · ' + u.by + (u.company ? ' (' + u.company + ')' : '') + ' · ' + u.when + (u.hours ? ' · ' + f1(u.hours) + ' h' : '')));
+    if (u.note) c.appendChild(el('div', 'mx-upd-n', u.note));
+    return c;
+  }
+  function updButton(job, key, small) {
+    if (!UPDURL) return null;
+    var b = el('button', 'mx-ubtn' + (small ? ' sm' : ''), 'Update'); b.type = 'button';
+    b.setAttribute('aria-label', 'Update: ' + job.machine + ', ' + job.job);
+    b.addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); openUpd(job, key); });
+    return b;
+  }
+  function updFoot(u, job, key) {
+    var chip = updChip(u, key), btn = updButton(job, key);
+    if (!chip && !btn) return null;
+    var f = el('div', 'mx-ufoot'); if (chip) f.appendChild(chip); else f.appendChild(el('span')); if (btn) f.appendChild(btn); return f;
+  }
+  var UM = null, UJOB = null, UKEY = null, USEL = null;
+  function field(lbl, tag, attrs) { var l = el('label', null, lbl); var i = document.createElement(tag); Object.keys(attrs || {}).forEach(function (k) { i.setAttribute(k, attrs[k]); }); l.appendChild(i); return [l, i]; }
+  function buildUpd() {
+    UM = el('div', 'mx-modal'); UM.hidden = true; UM.setAttribute('role', 'dialog'); UM.setAttribute('aria-modal', 'true'); UM.setAttribute('aria-labelledby', 'upd-t');
+    var d = el('div', 'mx-dlg'); UM.appendChild(d);
+    var h = el('h3', null, 'Update job'); h.id = 'upd-t'; d.appendChild(h);
+    UM._what = el('p', 'mx-note'); d.appendChild(UM._what);
+    var sts = el('div', 'mx-sts'); sts.setAttribute('role', 'group'); sts.setAttribute('aria-label', 'Status');
+    UM._sts = USTAT.map(function (s) { var b = el('button', null, s[1]); b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.dataset.st = s[0];
+      b.addEventListener('click', function () { USEL = s[0]; UM._sts.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); }); sts.appendChild(b); return b; });
+    d.appendChild(sts);
+    var hrs = field('Hour meter reading (if you have it)', 'input', { inputmode: 'decimal', autocomplete: 'off', maxlength: '9' }); d.appendChild(hrs[0]); UM._hours = hrs[1];
+    var nt = field('What was done, or what is needed', 'textarea', { maxlength: '600', rows: '4' }); d.appendChild(nt[0]); UM._note = nt[1];
+    var pt = field('Parts used or needed (optional)', 'input', { maxlength: '300', autocomplete: 'off' }); d.appendChild(pt[0]); UM._parts = pt[1];
+    var two = el('div', 'two'); var nm = field('Your name', 'input', { maxlength: '60', autocomplete: 'name' }); var co = field('Company', 'input', { maxlength: '60', autocomplete: 'organization' });
+    two.appendChild(nm[0]); two.appendChild(co[0]); d.appendChild(two); UM._name = nm[1]; UM._co = co[1];
+    var cd = field('Site code', 'input', { inputmode: 'numeric', maxlength: '6', autocomplete: 'off' }); d.appendChild(cd[0]); UM._code = cd[1];
+    UM._msg = el('p', 'mx-umsg'); UM._msg.setAttribute('role', 'status'); d.appendChild(UM._msg);
+    var acts = el('div', 'acts'); var cx = el('button', null, 'Cancel'); cx.type = 'button'; var go = el('button', 'go', 'Send update'); go.type = 'button';
+    acts.appendChild(cx); acts.appendChild(go); d.appendChild(acts); UM._go = go;
+    cx.addEventListener('click', closeUpd);
+    UM.addEventListener('click', function (e) { if (e.target === UM) closeUpd(); });
+    UM.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeUpd(); });
+    go.addEventListener('click', sendUpd);
+    document.querySelector('.mx').appendChild(UM);
+  }
+  function openUpd(job, key) {
+    if (!UM) buildUpd();
+    UJOB = job; UKEY = key; USEL = null;
+    UM._what.textContent = job.machine + (job.job ? ': ' + job.job : '');
+    UM._sts.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
+    UM._hours.value = ''; UM._note.value = ''; UM._parts.value = '';
+    UM._name.value = store('mx_upd_name'); UM._co.value = store('mx_upd_co'); UM._code.value = store('mx_upd_code');
+    UM._msg.textContent = ''; UM._msg.className = 'mx-umsg'; UM._go.disabled = false;
+    UM.hidden = false; UM._sts[0].focus();
+  }
+  function closeUpd() { if (UM) UM.hidden = true; }
+  function sendUpd() {
+    var bad = function (t) { UM._msg.textContent = t; UM._msg.className = 'mx-umsg bad'; };
+    if (!USEL) return bad('Pick Done, In progress, Waiting on parts, Needs approval or Note only.');
+    var name = UM._name.value.trim(), code = UM._code.value.trim(), note = UM._note.value.trim();
+    if (!name) return bad('Add your name.');
+    if (!/^\d{4,6}$/.test(code)) return bad('Enter the site code.');
+    if (USEL !== 'done' && !note) return bad('Add a short note so the crew knows what is happening.');
+    var h = UM._hours.value.trim(); if (h && !/^\d{1,6}([.,]\d{1,2})?$/.test(h)) return bad('Hours should be a number, e.g. 1234.5');
+    var body = new URLSearchParams();
+    var put = function (k, v) { body.append(k, v == null ? '' : String(v)); };
+    put('code', code); put('status', USEL); put('kind', UJOB.kind); put('ref', UJOB.ref); put('machine', UJOB.machine); put('job', UJOB.job);
+    put('items', JSON.stringify(UJOB.items || [])); put('hours', h.replace(',', '.')); put('note', note); put('parts', UM._parts.value.trim());
+    put('name', name); put('company', UM._co.value.trim());
+    UM._go.disabled = true; UM._msg.className = 'mx-umsg'; UM._msg.textContent = 'Sending…';
+    fetch(UPDURL, { method: 'POST', mode: 'no-cors', body: body }).then(function () {
+      store('mx_upd_name', name); store('mx_upd_co', UM._co.value.trim()); store('mx_upd_code', code);
+      var lab = USTAT.filter(function (s) { return s[0] === USEL; })[0][1];
+      SENT[UKEY] = lab; UM._msg.className = 'mx-umsg ok'; UM._msg.textContent = 'Sent. Thanks.';
+      setTimeout(function () { closeUpd(); draw(); }, 900);
+    }).catch(function () { UM._go.disabled = false; bad('Could not send. Check your signal and try again.'); });
+  }
+  function jobFromCard(c) { return c.kind === 'fault' ? { kind: 'fault', ref: c.ref || '', machine: c.machine, job: c.job, items: [] }
+    : { kind: 'service', ref: (c.items || []).map(function (i) { return i.id; }).join(','), machine: c.machine, job: c.job,
+        items: (c.items || []).map(function (i) { return { id: i.id, fleet: i.fleet || c.machine, label: i.label, interval_h: i.interval_h, kind: i.kind }; }) }; }
+  function jobFromFault(f) { return { kind: 'fault', ref: f.id || '', machine: f.fleet || f.machine || '', job: f.job, items: [] }; }
+  function jobFromItem(it) { return { kind: 'service', ref: it.id, machine: it.fleet, job: it.label, items: [{ id: it.id, fleet: it.fleet, label: it.label, interval_h: it.interval_h, kind: it.kind }] }; }
+
   // ---------- tabs
   var tabs = $$('.mx-tab');
   function show(page, noLink) {
@@ -504,16 +631,26 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
         if (c.parts && c.parts.length) li.appendChild(el('div', 'mx-wc-p', 'Parts: ' + c.parts.join('; ')));
         var meta = []; if (c.labour_h) meta.push('Labour ~' + c.labour_h + ' h'); if (c.hours_now) meta.push('hours ~' + f0(c.hours_now)); if (c.ref) meta.push(c.ref);
         if (meta.length) li.appendChild(el('div', 'mx-wc-p', meta.join(' · ')));
+        var job = jobFromCard(c); var uf = updFoot(c.upd, job, 'wl:' + (c.ref || job.ref)); if (uf) li.appendChild(uf);
         ol.appendChild(li);
       });
       if (!wl.length && D('m_worklist').status === 'ok') ol.appendChild(el('li', 'mx-empty', 'Nothing on the list.'));
     }
     table('t-faults', R('m_faults'), {
       fleet: function (r) { var a = el('span', 'mx-wc-m', r.fleet || r.machine); a.addEventListener('click', function (e) { e.stopPropagation(); openMachine(r.fleet); }); return a; },
-      job: function (r, td) { td.className = 'wrap'; var d = el('div', null, r.job); if (r.note) d.appendChild(el('div', 'mx-note', r.note)); return d; },
+      job: function (r, td) { td.className = 'wrap'; var d = el('div', null, r.job); if (r.note) d.appendChild(el('div', 'mx-note', r.note));
+        var uf = updFoot(r.upd, jobFromFault(r), 'f:' + r.id); if (uf) d.appendChild(uf); return d; },
       priority: function (r) { return pill(r.priority === 'High' ? 'overdue' : r.priority === 'Medium' ? 'due' : 'ok', r.priority + (r.safety ? ' · safety' : '')); },
       id: function (r) { return r.link ? link(r.link, r.id) : r.id; }
     }, { empty: 'No open faults.' });
+    if (!failed($('#t-updates'), 'm_updates')) table('t-updates', R('m_updates'), {
+      when: function (r) { return r.when; },
+      machine: function (r) { var a = el('span', 'mx-wc-m', r.machine); a.addEventListener('click', function (e) { e.stopPropagation(); openMachine(r.machine.split(',')[0].trim()); }); return a; },
+      job: function (r, td) { td.className = 'wrap hn'; return r.job; },
+      status: function (r) { return pill(r.status === 'Done' ? 'ok' : r.status === 'Waiting on parts' ? 'due' : r.status === 'Needs approval' ? 'overdue' : 'soon', r.status); },
+      by: function (r) { return r.by + (r.company ? ' (' + r.company + ')' : ''); },
+      note: function (r, td) { td.className = 'wrap'; return (r.hours ? f1(r.hours) + ' h. ' : '') + (r.note || '') + (r.parts ? ' Parts: ' + r.parts : ''); }
+    }, { sortVal: { when: function (r) { return r.received; } }, empty: 'No updates yet.' });
     drawState();
   }
   function drawState() {
@@ -593,6 +730,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     box.hidden = false; box.replaceChildren();
     var hd = el('div', 'mx-row'); var h3 = el('h3', null, r.fleet + ': ' + r.label); hd.appendChild(h3);
     var op = el('button', 'mx-chip', 'Open machine sheet'); op.addEventListener('click', function () { openMachine(r.fleet); }); hd.appendChild(op); box.appendChild(hd);
+    var uf = updFoot(r.upd, jobFromItem(r), 'i:' + r.id); if (uf) box.appendChild(uf);
     itemBlock(r, box);
   }
   function drawTimeline() {
@@ -679,7 +817,8 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     add('Usual days', (r.likely_days || []).join(' ')); add('Last used', r.last_used);
     box.appendChild(dl);
     if (r.notes) box.appendChild(el('p', 'mx-note', r.notes));
-    (r.faults || []).forEach(function (f) { box.appendChild(el('p', 'mx-wc-w mx-bad', 'Open fault: ' + f.job + (f.days_open != null ? ' (' + f.days_open + ' days)' : ''))); });
+    (r.faults || []).forEach(function (f) { box.appendChild(el('p', 'mx-wc-w mx-bad', 'Open fault: ' + f.job + (f.days_open != null ? ' (' + f.days_open + ' days)' : '')));
+      var ff = R('m_faults').filter(function (x) { return x.id === f.id; })[0]; var uf = updFoot(ff ? ff.upd : null, { kind: 'fault', ref: f.id, machine: r.fleet, job: f.job, items: [] }, 'f:' + f.id); if (uf) box.appendChild(uf); });
     // weekday bars
     if (r.dow_p && r.dow_p.length) {
       box.appendChild(el('p', 'mx-sub', 'Days on the job board, last 12 months'));
@@ -697,7 +836,8 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       its.forEach(function (it) {
         var dt = el('details', 'mx-iv'); var sm = el('summary'); sm.appendChild(document.createTextNode(it.label + '  ')); sm.appendChild(pill(it.status, ST_LABEL[it.status]));
         var sub = el('span', null, '  ' + (it.to_go_h != null ? (it.to_go_h < 0 ? f0(-it.to_go_h) + ' h overdue' : f0(it.to_go_h) + ' h to go') : '') + (it.due_date ? ' · ' + fmtD(it.due_date) : '')); sm.appendChild(sub);
-        dt.appendChild(sm); var inner = el('div'); itemBlock(it, inner); dt.appendChild(inner); box.appendChild(dt);
+        if (it.upd && UCLS[it.upd.status]) { sm.appendChild(document.createTextNode('  ')); sm.appendChild(pill(it.upd.status === 'Done' ? 'ok' : it.upd.status === 'Waiting on parts' ? 'due' : 'soon', it.upd.status)); }
+        dt.appendChild(sm); var inner = el('div'); var uf = updFoot(it.upd, jobFromItem(it), 'i:' + it.id); if (uf) inner.appendChild(uf); itemBlock(it, inner); dt.appendChild(inner); box.appendChild(dt);
       });
     }
     // model bible
@@ -890,5 +1030,5 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 })();
 </script>
 
-<div class="pub-foot">Ranfurlie Golf Club machinery · public read-only copy · <span id="pub-built">updated hourly</span></div>
+<div class="pub-foot">Ranfurlie Golf Club machinery · shared copy · <span id="pub-built">updated hourly</span></div>
 </div></body></html>
