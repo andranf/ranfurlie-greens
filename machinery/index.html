@@ -497,6 +497,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
   // ---------- job updates (shared link only: contractors and staff press Update; the hook posts to #machinery + Notion)
   var UPDURL = (window.MX_UPDATE && window.MX_UPDATE.url) || null;
   var SENT = {};
+  (function () { var m = /[?&#]k=(\d{4,6})\b/.exec((location.search || '') + (location.hash || '')); if (m) { try { window.localStorage.setItem('mx_upd_code', m[1]); } catch (e) {} window.__MXK = m[1]; } })();
   var USTAT = [['done', 'Done'], ['in_progress', 'In progress'], ['waiting_parts', 'Waiting on parts'], ['needs_approval', 'Needs approval'], ['note', 'Note only']];
   var UCLS = { 'Done': 'done', 'In progress': 'prog', 'Waiting on parts': 'wait', 'Needs approval': 'appr', 'Note': 'note' };
   function store(k, v) { try { if (v === undefined) return window.localStorage.getItem(k) || ''; window.localStorage.setItem(k, v); } catch (e) { return ''; } return ''; }
@@ -537,7 +538,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     var pt = field('Parts used or needed (optional)', 'input', { maxlength: '300', autocomplete: 'off' }); d.appendChild(pt[0]); UM._parts = pt[1];
     var two = el('div', 'two'); var nm = field('Your name', 'input', { maxlength: '60', autocomplete: 'name' }); var co = field('Company', 'input', { maxlength: '60', autocomplete: 'organization' });
     two.appendChild(nm[0]); two.appendChild(co[0]); d.appendChild(two); UM._name = nm[1]; UM._co = co[1];
-    var cd = field('Site code', 'input', { inputmode: 'numeric', maxlength: '6', autocomplete: 'off' }); d.appendChild(cd[0]); UM._code = cd[1];
+    var cd = field('Site code', 'input', { inputmode: 'numeric', maxlength: '6', autocomplete: 'off' }); d.appendChild(cd[0]); UM._code = cd[1]; UM._codeL = cd[0];
     UM._msg = el('p', 'mx-umsg'); UM._msg.setAttribute('role', 'status'); d.appendChild(UM._msg);
     var acts = el('div', 'acts'); var cx = el('button', null, 'Cancel'); cx.type = 'button'; var go = el('button', 'go', 'Send update'); go.type = 'button';
     acts.appendChild(cx); acts.appendChild(go); d.appendChild(acts); UM._go = go;
@@ -553,7 +554,8 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     UM._what.textContent = job.machine + (job.job ? ': ' + job.job : '');
     UM._sts.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
     UM._hours.value = ''; UM._note.value = ''; UM._parts.value = '';
-    UM._name.value = store('mx_upd_name'); UM._co.value = store('mx_upd_co'); UM._code.value = store('mx_upd_code');
+    UM._name.value = store('mx_upd_name'); UM._co.value = store('mx_upd_co'); UM._code.value = window.__MXK || store('mx_upd_code');
+    UM._codeL.hidden = !!window.__MXK;
     UM._msg.textContent = ''; UM._msg.className = 'mx-umsg'; UM._go.disabled = false;
     UM.hidden = false; UM._sts[0].focus();
   }
@@ -643,7 +645,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       priority: function (r) { return pill(r.priority === 'High' ? 'overdue' : r.priority === 'Medium' ? 'due' : 'ok', r.priority + (r.safety ? ' · safety' : '')); },
       id: function (r) { return r.link ? link(r.link, r.id) : r.id; }
     }, { empty: 'No open faults.' });
-    if (!failed($('#t-updates'), 'm_updates')) table('t-updates', R('m_updates'), {
+    if (!failed($('#t-updates'), 'm_updates')) table('t-updates', R('m_updates').filter(function (r) { return r.id !== 'none'; }), {
       when: function (r) { return r.when; },
       machine: function (r) { var a = el('span', 'mx-wc-m', r.machine); a.addEventListener('click', function (e) { e.stopPropagation(); openMachine(r.machine.split(',')[0].trim()); }); return a; },
       job: function (r, td) { td.className = 'wrap hn'; return r.job; },
