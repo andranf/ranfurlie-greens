@@ -505,7 +505,15 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   var f0 = d3.format(',.0f'), f1 = d3.format(',.1f'), f2 = d3.format(',.2f'), pct = d3.format('.0%');
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   function D(id) { try { return dash.data(id); } catch (e) { return { status: 'error', data: [] }; } }
-  function R(id) { var d = D(id); return d.status === 'ok' && Array.isArray(d.data) ? d.data : []; }
+  // the dashboard runtime can hand nested fields (do_first, items, parts, upd ...) over as JSON text: parse them back once per dataset
+  var NORM = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function unj(v) { if (typeof v === 'string' && v.length > 1) { var c = v.charAt(0); if (c === '{' || c === '[') { try { return JSON.parse(v); } catch (e) { return v; } } } return v; }
+  function R(id) {
+    var d = D(id); if (d.status !== 'ok' || !Array.isArray(d.data)) return [];
+    var x = d.data; if (!NORM) return x; var y = NORM.get(x); if (y) return y;
+    y = x.map(function (r) { if (!r || typeof r !== 'object') return r; var o = {}; Object.keys(r).forEach(function (k) { o[k] = unj(r[k]); }); return o; });
+    NORM.set(x, y); return y;
+  }
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
