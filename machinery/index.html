@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ranfurlie Machinery Live</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--font-anthropic-sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--font-anthropic-serif:'Fraunces',Georgia,'Times New Roman',serif;
+--color-bg:#f6f6f2;--color-panel:#ffffff;--color-fg:#1c1d1a;--color-fg-muted:#6b6c66;--color-border-line:#e3e3dc;
+--color-ok:#1f8a3b;--color-warn:#b86e00;--color-bad:#c2332b;
+--cds-chart-grid:#ecece6;--cds-chart-axis:#c9c9c0;--cds-chart-reference:#9a9a92;--cds-chart-muted:#b9b9b0;--cds-chart-status-critical:#c2332b;
+--cds-surface-popover:#ffffff;--cds-border:#dcdcd4;--cds-shadow-popover:0 6px 24px rgba(0,0,0,.12);--cds-text-secondary:#6b6c66;
+--cds-font-size-caption:.78rem;--cds-font-size-body:.9rem;--cds-font-size-heading:1.02rem;--cds-font-size-title:1.9rem;--cds-font-weight-medium:550;
+--cds-gap-xs:.25rem;--cds-gap-sm:.5rem;--cds-gap-md:.9rem;--cds-gap-lg:1.4rem;--cds-gap-xl:2rem;
+--cds-pad-xs:.3rem;--cds-pad-sm:.55rem;--cds-pad-md:.85rem;--cds-pad-lg:1.15rem;--cds-pad-xl:2rem;--cds-radius:12px;
+--cds-dur-slow:.45s;--cds-ease-out:cubic-bezier(.2,.8,.2,1);color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--color-bg:#121311;--color-panel:#1b1c1a;--color-fg:#f0f0ea;--color-fg-muted:#9d9e96;--color-border-line:#2c2d2a;
+--color-ok:#4cc26a;--color-warn:#f2b13a;--color-bad:#ef6a5f;--cds-chart-grid:#262724;--cds-chart-axis:#3d3e3a;--cds-chart-reference:#7d7e77;--cds-chart-muted:#55564f;
+--cds-chart-status-critical:#ef6a5f;--cds-surface-popover:#22231f;--cds-border:#34352f;--cds-shadow-popover:0 6px 24px rgba(0,0,0,.5);--cds-text-secondary:#9d9e96;color-scheme:dark}}
+html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(--font-anthropic-sans);-webkit-font-smoothing:antialiased}
+#dash-root{--dash-gutter:clamp(14px,3vw,32px);max-width:1280px;margin-inline:auto;padding-inline:var(--dash-gutter)}
+[hidden]{display:none!important}
+.dash-skeleton{color:transparent;background:var(--cds-chart-grid);border-radius:6px}
+.pub-foot{font-size:.75rem;color:var(--color-fg-muted);padding:1.5rem 0 2rem;border-top:1px solid var(--color-border-line);margin-top:2rem}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+(function(){
+  var DATA = null, subs = [];
+  var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+  function data(id){
+    if (DATA === null) return {status:'loading', data:[]};
+    if (Object.prototype.hasOwnProperty.call(DATA, id)) { var d = DATA[id]; if (d == null) return {status:'missing', data:[]};
+      return {status:'ok', data:d, columns: Array.isArray(d) && d[0] ? Object.keys(d[0]) : [], meta:[]}; }
+    return {status:'missing', data:[]};
+  }
+  fetch('data.json?v=' + Date.now()).then(function(r){ return r.json(); }).then(function(d){ DATA = d; subs.forEach(function(f){ f(); }); })
+    .catch(function(){ DATA = {}; subs.forEach(function(f){ f(); }); });
+  var t = null;
+  window.addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(function(){ subs.forEach(function(f){ f(); }); }, 150); });
+  window.dash = { data: data, onData: function(fn){ subs.push(fn); fn(); }, calc: function(){}, loader: function(){},
+    colors: dark ? ['#5aa2f0','#3fc7b4','#f0a35a','#b48ef0','#e874a5','#9bd164','#f0d35a','#8aa0b8'] : ['#2f6fd0','#14998a','#d27a1c','#7b52d0','#c2407a','#5f9a2a','#b39400','#5e7387'],
+    refresh: function(){}, params: function(){ return {}; }, setParams: function(){}, resetParams: function(){},
+    setLink: function(n){ try { history.replaceState(null, '', '#' + n); } catch (e) {} } };
+})();
+</script>
+</head><body><div id="dash-root">
+<style>
+#dash-root{--dash-gutter:clamp(12px,3vw,28px);}
+.mx{font-family:var(--font-anthropic-sans);color:var(--color-fg);display:flex;flex-direction:column;gap:var(--cds-gap-lg);padding-block:var(--cds-pad-sm) var(--cds-pad-xl);}
+.mx *{box-sizing:border-box;}
+.mx-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--cds-gap-md);padding-block:var(--cds-pad-md);}
+.mx-head-text{min-width:0;flex:1 1 26rem;}
+.mx-title{font-family:var(--font-anthropic-serif);font-weight:400;font-size:clamp(1.7rem,3.4vw,2.5rem);line-height:1.1;margin:0;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+.mx-live{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-anthropic-sans);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--color-border-line);border-radius:999px;padding:.15rem .55rem;}
+.mx-live i{width:.5rem;height:.5rem;border-radius:50%;background:var(--color-ok);display:inline-block;}
+.mx-take{margin:.5rem 0 0;font-size:var(--cds-font-size-heading);line-height:1.45;max-width:70ch;}
+.mx .mx-take b{font-weight:600;}
+.mx-asof{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-top:.35rem;}
+.mx-tabs{position:relative;display:flex;gap:.25rem;flex-wrap:wrap;border-bottom:1px solid var(--color-border-line);}
+.mx-tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;padding:.55rem .85rem;font:inherit;font-size:var(--cds-font-size-body);color:var(--color-fg-muted);cursor:pointer;margin-bottom:-1px;}
+.mx-tab:hover{color:var(--color-fg);}
+.mx-tab[aria-selected="true"]{color:var(--color-fg);font-weight:500;border-bottom-color:var(--color-fg);}
+.mx-tab:focus-visible,.mx-btn:focus-visible,.mx-chip:focus-visible{outline:2px solid var(--color-fg);outline-offset:2px;}
+.mx-page{display:flex;flex-direction:column;gap:var(--cds-gap-lg);}
+.mx-page[hidden]{display:none;}
+.mx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,21rem),1fr));gap:var(--cds-gap-md);}
+.mx-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);min-width:0;position:relative;display:flex;flex-direction:column;gap:var(--cds-gap-sm);}
+.mx-card h3{margin:0;font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);}
+.mx-row{display:flex;align-items:baseline;justify-content:space-between;gap:var(--cds-gap-sm);flex-wrap:wrap;}
+.mx-note{margin:0;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.45;}
+.mx-sec{font-size:var(--cds-font-size-caption);text-transform:uppercase;letter-spacing:.08em;color:var(--color-fg-muted);margin:0;}
+.mx-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,10.5rem),1fr));gap:var(--cds-gap-md);}
+.mx-kpi{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-md) var(--cds-pad-lg);display:flex;flex-direction:column;gap:.2rem;min-width:0;}
+.mx-kpi-l{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+.mx-kpi-v{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);line-height:1.05;font-variant-numeric:tabular-nums;}
+.mx-kpi-s{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-variant-numeric:tabular-nums;}
+.mx-kpi.bad .mx-kpi-v{color:var(--color-bad);} .mx-kpi.warn .mx-kpi-v{color:var(--color-warn);}
+.mx-ok{color:var(--color-ok);} .mx-warn{color:var(--color-warn);} .mx-bad{color:var(--color-bad);} .mx-mut{color:var(--color-fg-muted);}
+.mx-pill{display:inline-flex;align-items:center;gap:.3rem;border-radius:999px;padding:.08rem .5rem;font-size:var(--cds-font-size-caption);font-weight:500;white-space:nowrap;border:1px solid var(--color-border-line);}
+.mx-pill i{width:.45rem;height:.45rem;border-radius:50%;display:inline-block;background:var(--color-fg-muted);}
+.mx-pill.overdue,.mx-pill.Overdue,.mx-pill.Fault{color:var(--color-bad);border-color:color-mix(in srgb,var(--color-bad) 40%,transparent);} .mx-pill.overdue i,.mx-pill.Overdue i,.mx-pill.Fault i{background:var(--color-bad);}
+.mx-pill.due,.mx-pill.Due{color:var(--color-warn);border-color:color-mix(in srgb,var(--color-warn) 40%,transparent);} .mx-pill.due i,.mx-pill.Due i{background:var(--color-warn);}
+.mx-pill.soon,.mx-pill.Soon{color:var(--color-fg);} .mx-pill.soon i,.mx-pill.Soon i{background:var(--color-warn);opacity:.5;}
+.mx-pill.ok,.mx-pill.OK{color:var(--color-ok);} .mx-pill.ok i,.mx-pill.OK i{background:var(--color-ok);}
+.mx-pill.Parked,.mx-pill.Gone{color:var(--color-fg-muted);}
+.mx-do{border-left:4px solid var(--color-bad);}
+.mx-do-t{font-size:var(--cds-font-size-heading);font-weight:600;margin:0;}
+.mx-wl{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:var(--cds-gap-md);}
+.mx-wc{border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-md) var(--cds-pad-lg);display:flex;flex-direction:column;gap:.35rem;min-width:0;background:var(--color-bg);}
+.mx-wc.fault{border-left:4px solid var(--color-bad);} .mx-wc.service{border-left:4px solid var(--color-warn);}
+.mx-wc-h{display:flex;gap:.6rem;align-items:baseline;}
+.mx-wc-n{font-family:var(--font-anthropic-serif);font-size:1.5rem;line-height:1;color:var(--color-fg-muted);min-width:1.6rem;}
+.mx-wc-m{font-weight:600;cursor:pointer;} .mx-wc-m:hover{text-decoration:underline;}
+.mx-wc-mo{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+.mx-wc-j{margin:0;font-size:var(--cds-font-size-body);line-height:1.4;}
+.mx-wc-w{font-size:var(--cds-font-size-caption);font-weight:600;}
+.mx-wc ul{margin:0;padding-left:1.1rem;font-size:var(--cds-font-size-caption);line-height:1.45;}
+.mx-wc-p{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.45;}
+.mx-ctl{display:flex;flex-wrap:wrap;gap:var(--cds-gap-sm);align-items:center;}
+.mx-chip{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);background:var(--color-panel);color:var(--color-fg);border-radius:999px;padding:.3rem .75rem;cursor:pointer;}
+.mx-chip[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);}
+.mx-in,.mx-sel{font:inherit;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);background:var(--color-panel);color:var(--color-fg);border-radius:8px;padding:.35rem .6rem;min-width:0;}
+.mx-in{flex:1 1 12rem;max-width:22rem;}
+.mx-tbox{overflow:auto;max-height:34rem;border-top:1px solid var(--color-border-line);}
+.mx-tbox.short{max-height:22rem;}
+.mx-table{width:100%;border-collapse:collapse;font-size:var(--cds-font-size-caption);font-variant-numeric:tabular-nums;}
+.mx-table th{position:sticky;top:0;background:var(--color-panel);text-align:left;font-weight:500;color:var(--color-fg-muted);padding:.45rem .5rem;border-bottom:1px solid var(--color-border-line);white-space:nowrap;cursor:pointer;user-select:none;z-index:1;}
+.mx-table th[aria-sort="ascending"]::after{content:" ▲";font-size:.7em;} .mx-table th[aria-sort="descending"]::after{content:" ▼";font-size:.7em;}
+.mx-table td{padding:.42rem .5rem;border-bottom:1px solid var(--color-border-line);vertical-align:top;}
+.mx-table td.n,.mx-table th.n{text-align:right;}
+.mx-table tbody tr{cursor:pointer;} .mx-table tbody tr:hover td{background:color-mix(in srgb,var(--color-fg) 4%,transparent);}
+.mx-table tr.sel td{background:color-mix(in srgb,var(--color-warn) 10%,transparent);}
+.mx-table td.wrap{white-space:normal;min-width:12rem;}
+@media (max-width:40rem){.mx-table .hn{display:none;}}
+.mx-chart{width:100%;position:relative;min-height:240px;}
+.mx-chart.tall{min-height:360px;}
+.mx-chart svg{display:block;overflow:visible;}
+.mx-axis text{fill:var(--color-fg-muted);font-size:11px;font-family:var(--font-anthropic-sans);}
+.mx-axis path,.mx-axis line{stroke:var(--cds-chart-axis);}
+.mx-gridl line{stroke:var(--cds-chart-grid);} .mx-gridl path{display:none;}
+.mx-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-xs) var(--cds-pad-sm);font-size:var(--cds-font-size-caption);z-index:5;max-width:18rem;line-height:1.4;}
+.mx-tip .d{color:var(--cds-text-secondary);}
+.mx-tip .sw{display:inline-block;width:.55rem;height:.55rem;border-radius:2px;margin-right:.35rem;}
+.mx-legend{display:flex;flex-wrap:wrap;gap:.35rem .9rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+.mx-legend span{display:inline-flex;align-items:center;gap:.3rem;} .mx-legend i{width:.6rem;height:.6rem;border-radius:2px;display:inline-block;}
+.mx-heat{border-collapse:separate;border-spacing:3px;font-size:var(--cds-font-size-caption);width:100%;min-width:30rem;}
+.mx-heat th{font-weight:500;color:var(--color-fg-muted);text-align:left;white-space:nowrap;padding:.15rem .3rem;}
+.mx-heat td.c{text-align:center;border-radius:5px;padding:.3rem .2rem;font-variant-numeric:tabular-nums;min-width:2.4rem;}
+.mx-heat td.m{white-space:nowrap;padding-right:.6rem;cursor:pointer;} .mx-heat td.m:hover{text-decoration:underline;}
+.mx-heat tr.cat td{padding-top:.6rem;color:var(--color-fg-muted);text-transform:uppercase;letter-spacing:.06em;font-size:.7rem;}
+.mx-dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,11rem),1fr));gap:.5rem 1rem;margin:0;}
+.mx-dl div{min-width:0;} .mx-dl dt{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);} .mx-dl dd{margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;}
+.mx-list{margin:0;padding-left:1.1rem;font-size:var(--cds-font-size-caption);line-height:1.5;}
+.mx-sub{font-size:var(--cds-font-size-body);font-weight:600;margin:.4rem 0 0;}
+.mx-iv{border-top:1px solid var(--color-border-line);padding-top:.5rem;}
+.mx-iv summary{cursor:pointer;font-size:var(--cds-font-size-body);font-weight:500;}
+.mx-iv summary span{font-weight:400;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);}
+.mx-bars{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;align-items:end;height:70px;}
+.mx-bars div{background:var(--color-ok);border-radius:4px 4px 0 0;min-height:2px;opacity:.85;}
+.mx-bl{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:.7rem;color:var(--color-fg-muted);text-align:center;}
+.mx-a{color:inherit;}
+.mx-empty{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);padding:.6rem 0;}
+.mx-fail{display:flex;align-items:center;justify-content:center;gap:.4rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);min-height:4rem;}
+.mx-fail::before{content:"";width:.375rem;height:.375rem;border-radius:50%;background:var(--color-bad);}
+[data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow);}
+[data-dash-source-state=empty]{color:transparent;}
+.mx-how p{margin:.2rem 0 .5rem;font-size:var(--cds-font-size-body);line-height:1.5;max-width:75ch;}
+.mx-src{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem;}
+.mx-src li{display:grid;grid-template-columns:auto 1fr auto;gap:.6rem;align-items:baseline;font-size:var(--cds-font-size-caption);}
+.mx-dot{width:.5rem;height:.5rem;border-radius:50%;display:inline-block;background:var(--color-fg-muted);}
+.mx-dot.live{background:var(--color-ok);} .mx-dot.waiting{background:var(--color-warn);}
+</style>
+
+<div class="mx">
+<header class="mx-head" id="top">
+  <div class="mx-head-text">
+    <h1 class="mx-title">Ranfurlie Machinery <span class="mx-live"><i></i>Live</span></h1>
+    <p class="mx-take dash-skeleton" id="takeaway" data-source="m_summary">—</p>
+    <div class="mx-asof">Updated <span data-source="m_summary" data-field="built_label" data-row="0">—</span> · refreshed every hour from Toro Intelli360, the #machinery fault log and the service log · hours marked ~ are estimated from use since the last reading</div>
+  </div>
+</header>
+
+<nav class="mx-tabs" role="tablist" aria-label="Dashboard pages">
+  <button class="mx-tab" role="tab" id="tab-today" data-page="today" aria-selected="true">Today</button>
+  <button class="mx-tab" role="tab" id="tab-plan" data-page="plan" aria-selected="false">Service plan</button>
+  <button class="mx-tab" role="tab" id="tab-fleet" data-page="fleet" aria-selected="false">Fleet</button>
+  <button class="mx-tab" role="tab" id="tab-usage" data-page="usage" aria-selected="false">Usage</button>
+  <button class="mx-tab" role="tab" id="tab-cutting" data-page="cutting" aria-selected="false">Cutting units</button>
+  <button class="mx-tab" role="tab" id="tab-parts" data-page="parts" aria-selected="false">Parts</button>
+  <button class="mx-tab" role="tab" id="tab-costs" data-page="costs" aria-selected="false">Costs</button>
+  <button class="mx-tab" role="tab" id="tab-history" data-page="history" aria-selected="false">History</button>
+  <button class="mx-tab" role="tab" id="tab-checks" data-page="checks" aria-selected="false">Checks &amp; sources</button>
+</nav>
+
+<!-- TODAY -->
+<section class="mx-page" id="today" role="tabpanel" aria-labelledby="tab-today">
+  <div class="mx-kpis">
+    <div class="mx-kpi" id="k1"><span class="mx-kpi-l">Jobs on today's list</span><span class="mx-kpi-v" data-source="m_summary" data-field="worklist_n" data-row="0">—</span><span class="mx-kpi-s"><span data-source="m_summary" data-field="worklist_total" data-row="0">—</span> machines or faults need attention</span></div>
+    <div class="mx-kpi bad" id="k2"><span class="mx-kpi-l">Machines with overdue service</span><span class="mx-kpi-v" data-source="m_summary" data-field="units_overdue" data-row="0">—</span><span class="mx-kpi-s"><span data-source="m_summary" data-field="items_overdue" data-row="0">—</span> overdue items in all</span></div>
+    <div class="mx-kpi warn" id="k3"><span class="mx-kpi-l">Services due in the next 7 days</span><span class="mx-kpi-v" data-source="m_summary" data-field="items_due7" data-row="0">—</span><span class="mx-kpi-s">projected from each machine's use</span></div>
+    <div class="mx-kpi" id="k4"><span class="mx-kpi-l">Open faults</span><span class="mx-kpi-v" data-source="m_summary" data-field="faults_open" data-row="0">—</span><span class="mx-kpi-s"><span data-source="m_summary" data-field="faults_safety" data-row="0">—</span> safety-related</span></div>
+    <div class="mx-kpi" id="k5"><span class="mx-kpi-l">Fleet hours per week</span><span class="mx-kpi-v" data-source="m_summary" data-field="fleet_hours_week" data-row="0">—</span><span class="mx-kpi-s"><span data-source="m_summary" data-field="active" data-row="0">—</span> machines in service, <span data-source="m_summary" data-field="telematics" data-row="0">—</span> on telematics</span></div>
+    <div class="mx-kpi" id="k6"><span class="mx-kpi-l">Parts to order, next 30 days</span><span class="mx-kpi-v" data-source="m_summary" data-field="order_lines" data-row="0">—</span><span class="mx-kpi-s">lines · $<span data-source="m_summary" data-field="order_aud" data-row="0">—</span> priced so far</span></div>
+  </div>
+
+  <div class="mx-card mx-do" id="card-dofirst" data-source="m_summary">
+    <p class="mx-sec">Do first</p>
+    <p class="mx-do-t" id="dofirst">—</p>
+    <p class="mx-note" id="dofirst-why"></p>
+  </div>
+
+  <div class="mx-card" id="card-worklist">
+    <div class="mx-row"><h3>Mechanic worklist</h3><span class="mx-note">Same list as the weekday #machinery post · most urgent first</span></div>
+    <p class="mx-note">Faults first (safety ahead of the rest), then services: overdue items on machines used every day rank highest. Tick the card in Slack when it's done and reply with the hour meter reading; the next hourly run takes it off this list.</p>
+    <ol class="mx-wl" id="wl" data-source="m_worklist"></ol>
+  </div>
+
+  <div class="mx-grid">
+    <div class="mx-card" id="card-faults">
+      <div class="mx-row"><h3>Open faults</h3><span class="mx-note">Notion Machinery Jobs · #machinery</span></div>
+      <div class="mx-tbox short"><table class="mx-table" id="t-faults" data-source="m_faults" data-row-key="id"><thead><tr>
+        <th data-field="id">Ref</th><th data-field="fleet">Machine</th><th data-field="job">Fault</th><th data-field="priority">Priority</th><th data-field="days_open" class="n">Days open</th>
+      </tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="mx-card" id="card-state">
+      <div class="mx-row"><h3>Machine status</h3><span class="mx-note">Machines in service, by worst open item</span></div>
+      <div class="mx-chart" id="ch-state" data-source="m_fleet" style="min-height:200px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICE PLAN -->
+<section class="mx-page" id="plan" role="tabpanel" aria-labelledby="tab-plan" hidden>
+  <div class="mx-card" id="card-timeline">
+    <div class="mx-row"><h3>Next 8 weeks</h3><span class="mx-note">Projected from each machine's hours and how fast it is running them up</span></div>
+    <p class="mx-note">One row per machine. A dot is a service or reel job on the day it falls due at the current rate of use; red ones are already overdue. Hover for detail, click to open the item.</p>
+    <div class="mx-chart tall" id="ch-timeline" data-source="m_items"></div>
+  </div>
+  <div class="mx-card" id="card-items">
+    <div class="mx-row"><h3>Every scheduled item</h3><span class="mx-note" id="items-count"></span></div>
+    <div class="mx-ctl" id="plan-ctl">
+      <button class="mx-chip" data-st="act" aria-pressed="true">Overdue + due + 14 days</button>
+      <button class="mx-chip" data-st="overdue" aria-pressed="false">Overdue</button>
+      <button class="mx-chip" data-st="all" aria-pressed="false">All</button>
+      <select class="mx-sel" id="plan-cat" aria-label="Category"><option value="">All categories</option></select>
+      <select class="mx-sel" id="plan-kind" aria-label="Type"><option value="">All types</option><option value="oem">OEM service</option><option value="breakin">Break-in</option><option value="practice">Club practice (reels, blades, grease)</option><option value="calendar">Calendar (monthly / yearly)</option><option value="intelli">Intelli360</option></select>
+      <input class="mx-in" id="plan-q" type="search" placeholder="Search machine, item, part number" aria-label="Search items">
+    </div>
+    <div class="mx-tbox"><table class="mx-table" id="t-items" data-source="m_items" data-row-key="id"><thead><tr>
+      <th data-field="fleet">Machine</th><th data-field="label">Item</th><th data-field="status">Status</th><th data-field="to_go_h" class="n">Hours to go</th><th data-field="due_date">Due</th><th data-field="hours_now" class="n hn">Hours now</th><th data-field="basis" class="hn">Based on</th><th data-field="kit_aud" class="n hn">Parts $</th><th data-field="labour_h" class="n hn">Labour h</th><th data-field="id" class="hn">ID</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="mx-card" id="item-detail" data-source="m_items" hidden></div>
+</section>
+
+<!-- FLEET -->
+<section class="mx-page" id="fleet" role="tabpanel" aria-labelledby="tab-fleet" hidden>
+  <div class="mx-card" id="card-fleet">
+    <div class="mx-row"><h3>The fleet</h3><span class="mx-note" id="fleet-count"></span></div>
+    <p class="mx-note">Click a machine for its full sheet: service schedule, fluids, parts, daily checks, history and how it is used.</p>
+    <div class="mx-ctl">
+      <select class="mx-sel" id="fleet-cat" aria-label="Category"><option value="">All categories</option></select>
+      <select class="mx-sel" id="fleet-st" aria-label="Status"><option value="live">In service + parked</option><option value="Active">In service</option><option value="Disabled">Parked</option><option value="Gone">Gone (traded)</option><option value="all">Everything</option></select>
+      <input class="mx-in" id="fleet-q" type="search" placeholder="Search name, model, serial" aria-label="Search fleet">
+    </div>
+    <div class="mx-tbox"><table class="mx-table" id="t-fleet" data-source="m_fleet" data-row-key="fleet"><thead><tr>
+      <th data-field="fleet">Machine</th><th data-field="model" class="hn">Model</th><th data-field="state">State</th><th data-field="hours" class="n">Hours</th><th data-field="rate_week" class="n hn">h / week</th><th data-field="next_label">Next service</th><th data-field="next_to_go_h" class="n">Hours to go</th><th data-field="own" class="hn">Owned / leased</th><th data-field="hoc" class="n hn">HOC mm</th><th data-field="area" class="hn">Area</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="mx-card" id="machine" data-source="m_fleet m_items m_models m_history m_usage" hidden></div>
+</section>
+
+<!-- USAGE -->
+<section class="mx-page" id="usage" role="tabpanel" aria-labelledby="tab-usage" hidden>
+  <div class="mx-card" id="card-heat">
+    <div class="mx-row"><h3>Which days each machine goes out</h3><span class="mx-note">Share of weekdays it was booked on the job board (last 12 months, or since it arrived)</span></div>
+    <p class="mx-note">Darker = more likely to be out that day. Book servicing on the days a machine is usually free. Machines are only counted when they were put on the board, so daily-use mowers read lower than reality; new machines have only a few weeks of history.</p>
+    <div style="overflow-x:auto"><table class="mx-heat" id="heat" data-source="m_usage"></table></div>
+  </div>
+  <div class="mx-card" id="card-monthly">
+    <div class="mx-row"><h3>Machine hours by month</h3><span class="mx-note">Job-board hours, all machines, by category</span></div>
+    <div class="mx-legend" id="lg-monthly"></div>
+    <div class="mx-chart" id="ch-monthly" data-source="m_usage_monthly"></div>
+  </div>
+  <div class="mx-card" id="card-util">
+    <div class="mx-row"><h3>Utilisation</h3><span class="mx-note">Last 12 months on the job board</span></div>
+    <div class="mx-tbox"><table class="mx-table" id="t-usage" data-source="m_usage" data-row-key="fleet"><thead><tr>
+      <th data-field="fleet">Machine</th><th data-field="cat" class="hn">Category</th><th data-field="uses_365" class="n">Days used</th><th data-field="task_h_365" class="n">Hours</th><th data-field="rate_week" class="n">h / week now</th><th data-field="likely_days">Usual days</th><th data-field="last_used" class="hn">Last used</th><th data-field="top_tasks" class="hn">Main jobs</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<!-- CUTTING -->
+<section class="mx-page" id="cutting" role="tabpanel" aria-labelledby="tab-cutting" hidden>
+  <div class="mx-card" id="card-hoc">
+    <div class="mx-row"><h3>Heights of cut and bedknives</h3><span class="mx-note">Reel mowers in service</span></div>
+    <p class="mx-note">Height of cut as set now, the bedknife that suits it (from the OEM bedknife charts), and when each mower was last backlapped and ground. A knife used below its rated height scalps and wears fast.</p>
+    <div class="mx-tbox"><table class="mx-table" id="t-hoc" data-source="m_hoc" data-row-key="fleet"><thead><tr>
+      <th data-field="fleet">Machine</th><th data-field="area">Area</th><th data-field="hoc" class="n">HOC mm</th><th data-field="knives">Bedknife for this height</th><th data-field="backlap">Backlap</th><th data-field="grind">Grind</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div id="hoc-guides" class="mx-grid" data-source="m_hoc"></div>
+</section>
+
+<!-- PARTS -->
+<section class="mx-page" id="parts" role="tabpanel" aria-labelledby="tab-parts" hidden>
+  <div class="mx-card" id="card-order">
+    <div class="mx-row"><h3>Order list, next 30 days</h3><span class="mx-note">Parts for every service overdue or due within 30 days, less stock on the shelf</span></div>
+    <p class="mx-note">Prices: club average cost from the workshop stock list first, then what taskTracker recorded as paid (ex GST), then Australian retail. "equiv." = an aftermarket equivalent's price where no genuine price was found.</p>
+    <div class="mx-tbox"><table class="mx-table" id="t-order" data-source="m_order" data-row-key="part_no"><thead><tr>
+      <th data-field="part_no">Part no.</th><th data-field="name">Part</th><th data-field="qty" class="n">Need</th><th data-field="on_hand" class="n">On hand</th><th data-field="to_order" class="n">To order</th><th data-field="price" class="n">Each $</th><th data-field="line_aud" class="n">Line $</th><th data-field="first_due">First due</th><th data-field="machines" class="hn">For</th><th data-field="supplier" class="hn">Supplier</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="mx-card" id="card-fluids">
+    <div class="mx-row"><h3>Fluids for the same services</h3><span class="mx-note">Litres, next 30 days</span></div>
+    <div class="mx-tbox short"><table class="mx-table" id="t-fluids" data-source="m_fluids" data-row-key="key"><thead><tr>
+      <th data-field="what">Fluid</th><th data-field="spec">Spec</th><th data-field="litres" class="n">Litres</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="mx-card" id="card-catalog">
+    <div class="mx-row"><h3>Parts catalogue</h3><span class="mx-note" id="cat-count"></span></div>
+    <p class="mx-note">Every service and wear part in the machinery bible, with OEM numbers checked against the parts books. "Checked: no" means the number could not be confirmed in a parts book: confirm it with the dealer before ordering.</p>
+    <div class="mx-ctl">
+      <select class="mx-sel" id="cat-model" aria-label="Model"><option value="">All models</option></select>
+      <select class="mx-sel" id="cat-kind" aria-label="Kind"><option value="">Service + wear parts</option><option value="service">Service parts</option><option value="wear">Wear parts</option></select>
+      <input class="mx-in" id="cat-q" type="search" placeholder="Search part name or number" aria-label="Search parts">
+    </div>
+    <div class="mx-tbox"><table class="mx-table" id="t-catalog" data-source="m_catalog" data-row-key="key"><thead><tr>
+      <th data-field="model">Model</th><th data-field="name">Part</th><th data-field="part_no">Part no.</th><th data-field="intervals" class="hn">Every (h)</th><th data-field="price" class="n">Each $</th><th data-field="equiv" class="hn">Equivalent</th><th data-field="supplier" class="hn">Supplier</th><th data-field="verified">Checked</th><th data-field="on_hand" class="n hn">On hand</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<!-- COSTS -->
+<section class="mx-page" id="costs" role="tabpanel" aria-labelledby="tab-costs" hidden>
+  <div class="mx-kpis">
+    <div class="mx-kpi"><span class="mx-kpi-l">Machinery leases per month</span><span class="mx-kpi-v">$<span data-source="m_summary" data-field="lease_month" data-row="0">—</span></span><span class="mx-kpi-s">ex GST · $<span data-source="m_summary" data-field="lease_year" data-row="0">—</span> a year</span></div>
+    <div class="mx-kpi"><span class="mx-kpi-l">Machinery repairs + maintenance, FY to date</span><span class="mx-kpi-v">$<span data-source="m_summary" data-field="fin_rm_ytd" data-row="0">—</span></span><span class="mx-kpi-s">forecast to date $<span data-source="m_summary" data-field="fin_rm_ytd_fc" data-row="0">—</span> · full year $<span data-source="m_summary" data-field="fin_rm_fy_fc" data-row="0">—</span></span></div>
+    <div class="mx-kpi"><span class="mx-kpi-l">Brandt contract mechanic days</span><span class="mx-kpi-v" data-source="m_summary" data-field="fin_contract_days" data-row="0">—</span><span class="mx-kpi-s">all Brandt R&amp;M $<span data-source="m_summary" data-field="fin_brandt_ytd" data-row="0">—</span> FY to date</span></div>
+    <div class="mx-kpi"><span class="mx-kpi-l">Fuel &amp; oil, FY to date</span><span class="mx-kpi-v">$<span data-source="m_summary" data-field="fin_fuel_ytd" data-row="0">—</span></span><span class="mx-kpi-s">full-year forecast $<span data-source="m_summary" data-field="fin_fuel_fy_fc" data-row="0">—</span></span></div>
+  </div>
+  <div class="mx-card" id="card-fin">
+    <div class="mx-row"><h3>Machinery spend by month, FY26/27</h3><span class="mx-note">Repairs &amp; maintenance + machinery parts, actual against the FY2627 forecast</span></div>
+    <div class="mx-legend" id="lg-fin"></div>
+    <div class="mx-chart" id="ch-fin" data-source="m_fin_monthly"></div>
+  </div>
+  <div class="mx-card" id="card-unitcost">
+    <div class="mx-row"><h3>Cost to run each machine</h3><span class="mx-note">Lease share + planned-maintenance parts, per year and per hour</span></div>
+    <p class="mx-note">PM parts a year = each OEM service's priced parts kit × how many times a year the machine's hours bring it round. It leaves out labour, tyres, repairs and parts with no price yet (counted in "unpriced"). A lease shared by several machines is split evenly.</p>
+    <div class="mx-tbox"><table class="mx-table" id="t-costs" data-source="m_costs" data-row-key="fleet"><thead><tr>
+      <th data-field="fleet">Machine</th><th data-field="own" class="hn">Owned / leased</th><th data-field="lease_month" class="n">Lease $/mth</th><th data-field="hours_year" class="n">Hours / yr</th><th data-field="pm_parts_year" class="n">PM parts $/yr</th><th data-field="pm_unpriced" class="n hn">Unpriced</th><th data-field="cost_per_h" class="n">$ / hour</th><th data-field="age" class="n hn">Age (yrs)</th><th data-field="replacement" class="hn">Replacement plan</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="mx-grid">
+    <div class="mx-card" id="card-leases">
+      <div class="mx-row"><h3>Leases and planned replacements</h3><span class="mx-note">finance/capex_leases.csv</span></div>
+      <div class="mx-tbox short"><table class="mx-table" id="t-leases" data-source="m_leases" data-row-key="id"><thead><tr>
+        <th data-field="id">ID</th><th data-field="item">What</th><th data-field="status">Status</th><th data-field="monthly" class="n">$ / month</th><th data-field="end">Ends</th><th data-field="remaining_months" class="n">Months left</th>
+      </tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="mx-card" id="card-spend">
+      <div class="mx-row"><h3>Machinery spend this FY</h3><span class="mx-note">Every "Maintenance - Machinery" invoice line</span></div>
+      <div class="mx-tbox short"><table class="mx-table" id="t-spend" data-source="m_fin_spend" data-row-key="key"><thead><tr>
+        <th data-field="date">Date</th><th data-field="provider">Supplier</th><th data-field="amount" class="n">$</th><th data-field="comment">What</th>
+      </tr></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section class="mx-page" id="history" role="tabpanel" aria-labelledby="tab-history" hidden>
+  <div class="mx-card" id="card-histm">
+    <div class="mx-row"><h3>Jobs completed by month</h3><span class="mx-note">Services, reel work and repairs closed</span></div>
+    <div class="mx-legend" id="lg-hist"></div>
+    <div class="mx-chart" id="ch-hist" data-source="m_history_monthly"></div>
+  </div>
+  <div class="mx-card" id="card-hist">
+    <div class="mx-row"><h3>Service and repair record</h3><span class="mx-note">taskTracker history (to 12 Oct 2026) and everything closed since</span></div>
+    <div class="mx-ctl"><input class="mx-in" id="hist-q" type="search" placeholder="Search machine or job" aria-label="Search history"></div>
+    <div class="mx-tbox"><table class="mx-table" id="t-hist" data-source="m_history" data-row-key="key"><thead><tr>
+      <th data-field="date">Date</th><th data-field="fleet">Machine</th><th data-field="item">Job</th><th data-field="kind">Type</th><th data-field="hours" class="n hn">Hours</th><th data-field="ref" class="hn">Ref</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<!-- CHECKS -->
+<section class="mx-page" id="checks" role="tabpanel" aria-labelledby="tab-checks" hidden>
+  <div class="mx-card" id="card-checks">
+    <div class="mx-row"><h3>Things to check</h3><span class="mx-note" id="chk-count"></span></div>
+    <p class="mx-note">Records that don't add up (serials, hour meters, duplicates) and the corrections made to the old taskTracker templates and the Notion parts list when the machinery bible was built.</p>
+    <div class="mx-ctl">
+      <button class="mx-chip" data-sev="check" aria-pressed="true">To confirm</button>
+      <button class="mx-chip" data-sev="info" aria-pressed="false">Worth knowing</button>
+      <button class="mx-chip" data-sev="fixed" aria-pressed="false">Corrected in the bible</button>
+    </div>
+    <div class="mx-tbox"><table class="mx-table" id="t-checks" data-source="m_checks" data-row-key="key"><thead><tr>
+      <th data-field="fleet">Machine / model</th><th data-field="issue">What</th><th data-field="fix">Fix</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="mx-grid">
+    <div class="mx-card" id="card-sources">
+      <h3>Where the numbers come from</h3>
+      <ul class="mx-src" id="sources" data-source="m_status"></ul>
+    </div>
+    <div class="mx-card mx-how" id="card-how">
+      <h3>How the service plan works</h3>
+      <p><b>Hours.</b> Telematics machines (Reelmaster 5010-Hs, eTriFlex 2, Workman GTX 2) report their hour meter to Toro Intelli360 and are read every hour. Every other machine is projected from its last reading at the rate it has been used on the job board; ~ marks an estimate. A meter reading in a worklist reply resets it.</p>
+      <p><b>What's due.</b> Each machine's OEM schedule (operator's manual, in the machinery bible) is counted from the last time that service, or a bigger one, was recorded. Break-in services count from new. Club practice (backlap, grind, greasing, blades) carries over the old taskTracker intervals.</p>
+      <p><b>No record.</b> A machine bought before 2024 with no record of a service is assumed to have had it at the last multiple of the interval; a newer one is counted from new, so a missing record shows as overdue.</p>
+      <p><b>Closing a job.</b> Tick the worklist card in #machinery and reply with the hours. The hourly run logs it and the item drops off.</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var PAGES = ['today', 'plan', 'fleet', 'usage', 'cutting', 'parts', 'costs', 'history', 'checks'];
+  var state = { page: 'today', planSt: 'act', planCat: '', planKind: '', planQ: '', item: null, fleetCat: '', fleetSt: 'live', fleetQ: '', machine: null,
+                catModel: '', catKind: '', catQ: '', histQ: '', sev: 'check', sorts: {} };
+  var f0 = d3.format(',.0f'), f1 = d3.format(',.1f'), f2 = d3.format(',.2f'), pct = d3.format('.0%');
+  var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  function D(id) { try { return dash.data(id); } catch (e) { return { status: 'error', data: [] }; } }
+  function R(id) { var d = D(id); return d.status === 'ok' && Array.isArray(d.data) ? d.data : []; }
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function fmtN(v, f) { return v == null || v === '' || isNaN(+v) ? '' : (f || f1)(+v); }
+  function fmtD(s) { if (!s) return ''; var d = new Date(String(s).slice(0, 10) + 'T00:00:00'); return isNaN(d) ? String(s) : d3.timeFormat('%-d %b %Y')(d); }
+  function fmtDs(s) { if (!s) return ''; var d = new Date(String(s).slice(0, 10) + 'T00:00:00'); return isNaN(d) ? String(s) : d3.timeFormat('%-d %b')(d); }
+  function pill(st, label) { var p = el('span', 'mx-pill ' + st); p.appendChild(el('i')); p.appendChild(document.createTextNode(label || st)); return p; }
+  var ST_LABEL = { overdue: 'overdue', due: 'due', soon: 'soon', ok: 'ok' };
+  function cssVar(name) { var v = getComputedStyle(document.querySelector('.mx')).getPropertyValue(name).trim(); return v || '#888'; }
+  function failed(box, id) { var s = D(id).status; if (s === 'error' || s === 'connect' || s === 'declined') { box.replaceChildren(el('div', 'mx-fail', 'Failed to load')); return true; } return false; }
+  function tip(box) { var t = box.querySelector(':scope > .mx-tip'); if (!t) { t = el('div', 'mx-tip'); t.hidden = true; box.appendChild(t); } return t; }
+  function placeTip(t, box, x, y) { var bw = box.clientWidth; t.hidden = false; var w = t.offsetWidth; var l = Math.min(Math.max(0, x + 12), bw - w - 4); t.style.left = l + 'px'; t.style.top = Math.max(0, y - t.offsetHeight - 10) + 'px'; }
+
+  // ---------- generic sortable table
+  function table(id, rows, cols, opts) {
+    opts = opts || {};
+    var t = document.getElementById(id); if (!t) return;
+    var tb = t.tBodies[0]; var key = t.getAttribute('data-row-key');
+    var s = state.sorts[id];
+    var ths = $$('thead th', t);
+    ths.forEach(function (th) {
+      var f = th.getAttribute('data-field');
+      th.setAttribute('aria-sort', s && s.f === f ? (s.dir > 0 ? 'ascending' : 'descending') : 'none');
+      if (!th._wired) { th._wired = true; th.tabIndex = 0;
+        var go = function () { var cur = state.sorts[id]; state.sorts[id] = { f: f, dir: cur && cur.f === f ? -cur.dir : (opts.numeric && opts.numeric.indexOf(f) >= 0 ? -1 : 1) }; table(id, t._rows, cols, t._opts); };
+        th.addEventListener('click', go); th.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); }); }
+    });
+    t._rows = rows; t._opts = opts;
+    var rs = rows.slice();
+    if (s) {
+      var sv = (opts.sortVal && opts.sortVal[s.f]) || function (r) { return r[s.f]; };
+      rs.sort(function (a, b) { var x = sv(a), y = sv(b); if (x == null || x === '') return 1; if (y == null || y === '') return -1;
+        if (typeof x === 'number' && typeof y === 'number') return (x - y) * s.dir; return String(x).localeCompare(String(y)) * s.dir; });
+    }
+    var frag = document.createDocumentFragment();
+    rs.forEach(function (r) {
+      var tr = document.createElement('tr'); tr.dataset.key = String(r[key]);
+      if (opts.selected && opts.selected(r)) tr.className = 'sel';
+      ths.forEach(function (th, i) {
+        var f = th.getAttribute('data-field'); var td = document.createElement('td');
+        td.className = th.className.replace('mx-', '');
+        var c = cols[f]; var v = r[f];
+        if (c) { var out = c(r, td); if (out instanceof Node) td.appendChild(out); else if (out != null) td.textContent = out; }
+        else td.textContent = v == null ? '' : (Array.isArray(v) ? v.join(', ') : String(v));
+        tr.appendChild(td);
+      });
+      frag.appendChild(tr);
+    });
+    tb.replaceChildren(frag);
+    if (!rows.length) { var tr = document.createElement('tr'); var td = document.createElement('td'); td.colSpan = ths.length; td.className = 'mx-empty'; td.textContent = opts.empty || 'Nothing to show.'; tr.appendChild(td); tb.appendChild(tr); }
+    if (opts.onClick && !t._clk) { t._clk = true; t.addEventListener('click', function (e) { var tr = e.target.closest('tr[data-key]'); if (tr && !e.target.closest('a')) opts.onClick(tr.dataset.key); }); }
+  }
+  function link(url, text) { var a = el('a', 'mx-a', text); a.href = url; a.target = '_blank'; a.rel = 'noopener'; return a; }
+
+  // ---------- tabs
+  var tabs = $$('.mx-tab');
+  function show(page, noLink) {
+    if (PAGES.indexOf(page) < 0) page = 'today';
+    state.page = page;
+    tabs.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.page === page ? 'true' : 'false'); });
+    PAGES.forEach(function (p) { var s = document.getElementById(p); if (s) s.hidden = p !== page; });
+    if (!noLink) dash.setLink(page);
+    draw();
+  }
+  tabs.forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.page); }); });
+  function openMachine(fl) { state.machine = fl; state.fleetSt = 'all'; $('#fleet-st').value = 'all'; show('fleet'); var m = document.getElementById('machine'); if (m) m.scrollIntoView({ block: 'start' }); }
+
+  // ---------- header + today
+  function drawHeader() {
+    var s = R('m_summary')[0]; var tk = $('#takeaway');
+    if (!s) { if (failed(tk, 'm_summary')) return; tk.textContent = '—'; return; }
+    tk.classList.remove('dash-skeleton');
+    tk.replaceChildren();
+    var b = function (t) { var x = el('b', null, t); tk.appendChild(x); };
+    var tx = function (t) { tk.appendChild(document.createTextNode(t)); };
+    b(String(s.units_overdue)); tx(' machines have overdue servicing and '); b(String(s.faults_open)); tx(' faults are open (' + s.faults_safety + ' safety). ');
+    if (s.do_first) { tx('Do first: '); b(s.do_first.machine); tx(', ' + s.do_first.job.charAt(0).toLowerCase() + s.do_first.job.slice(1) + '.'); }
+    $$('[data-source="m_summary"][data-field]').forEach(function (e) { var f = e.getAttribute('data-field'); var v = s[f];
+      if (v == null) { e.textContent = '—'; return; }
+      e.textContent = typeof v === 'number' ? (Math.abs(v) >= 1000 ? f0(v) : (Number.isInteger(v) ? String(v) : f1(v))) : String(v); });
+    var df = $('#dofirst'), dw = $('#dofirst-why');
+    if (s.do_first) { df.textContent = s.do_first.machine + ': ' + s.do_first.job; dw.textContent = s.do_first.why; } else { df.textContent = 'Nothing urgent.'; dw.textContent = ''; }
+  }
+  function drawToday() {
+    var ol = $('#wl'); var wl = R('m_worklist');
+    if (!failed(ol, 'm_worklist')) {
+      ol.replaceChildren();
+      wl.forEach(function (c) {
+        var li = el('li', 'mx-wc ' + c.kind);
+        var h = el('div', 'mx-wc-h'); h.appendChild(el('span', 'mx-wc-n', String(c.rank)));
+        var hm = el('div'); var m = el('div', 'mx-wc-m', c.machine); m.addEventListener('click', function () { openMachine((c.machines && c.machines[0]) || c.machine); });
+        hm.appendChild(m); hm.appendChild(el('div', 'mx-wc-mo', c.model || '')); h.appendChild(hm); li.appendChild(h);
+        var j = el('p', 'mx-wc-j', c.job); li.appendChild(j);
+        var w = el('div', 'mx-wc-w ' + (c.kind === 'fault' ? 'mx-bad' : (/overdue/.test(c.why) ? 'mx-bad' : 'mx-warn')), c.why + ((c.flags || []).indexOf('safety') >= 0 ? ' · safety' : ''));
+        li.appendChild(w);
+        if (c.note) li.appendChild(el('div', 'mx-wc-p', c.note));
+        if (c.tasks && c.tasks.length) { var ul = el('ul'); c.tasks.slice(0, 4).forEach(function (t) { ul.appendChild(el('li', null, t)); }); li.appendChild(ul); }
+        if (c.parts && c.parts.length) li.appendChild(el('div', 'mx-wc-p', 'Parts: ' + c.parts.join('; ')));
+        var meta = []; if (c.labour_h) meta.push('Labour ~' + c.labour_h + ' h'); if (c.hours_now) meta.push('hours ~' + f0(c.hours_now)); if (c.ref) meta.push(c.ref);
+        if (meta.length) li.appendChild(el('div', 'mx-wc-p', meta.join(' · ')));
+        ol.appendChild(li);
+      });
+      if (!wl.length && D('m_worklist').status === 'ok') ol.appendChild(el('li', 'mx-empty', 'Nothing on the list.'));
+    }
+    table('t-faults', R('m_faults'), {
+      fleet: function (r) { var a = el('span', 'mx-wc-m', r.fleet || r.machine); a.addEventListener('click', function (e) { e.stopPropagation(); openMachine(r.fleet); }); return a; },
+      job: function (r, td) { td.className = 'wrap'; var d = el('div', null, r.job); if (r.note) d.appendChild(el('div', 'mx-note', r.note)); return d; },
+      priority: function (r) { return pill(r.priority === 'High' ? 'overdue' : r.priority === 'Medium' ? 'due' : 'ok', r.priority + (r.safety ? ' · safety' : '')); },
+      id: function (r) { return r.link ? link(r.link, r.id) : r.id; }
+    }, { empty: 'No open faults.' });
+    drawState();
+  }
+  function drawState() {
+    var box = $('#ch-state'); if (failed(box, 'm_fleet')) return;
+    var rows = R('m_fleet').filter(function (r) { return r.status === 'Active'; });
+    var order = ['Fault', 'Overdue', 'Due', 'Soon', 'OK'];
+    var colors = { Fault: cssVar('--color-bad'), Overdue: cssVar('--color-bad'), Due: cssVar('--color-warn'), Soon: cssVar('--cds-chart-muted'), OK: cssVar('--color-ok') };
+    var cats = d3.groups(rows, function (r) { return r.cat; }).map(function (g) { var o = { cat: g[0], n: g[1].length }; order.forEach(function (k) { o[k] = g[1].filter(function (r) { return r.state === k; }); }); return o; })
+      .sort(function (a, b) { return b.n - a.n; });
+    box.replaceChildren(); if (!cats.length) return;
+    var W = box.clientWidth || 400, rowH = 24, H = cats.length * rowH + 24;
+    var lw = 0; var svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', '0 0 ' + W + ' ' + H);
+    var tmp = svg.append('text').attr('class', 'mx-axis').attr('font-size', 11); cats.forEach(function (c) { tmp.text(c.cat); lw = Math.max(lw, tmp.node().getComputedTextLength()); }); tmp.remove();
+    var x = d3.scaleLinear([0, d3.max(cats, function (c) { return c.n; })], [lw + 12, W - 30]);
+    var t = tip(box);
+    cats.forEach(function (c, i) {
+      var y = i * rowH + 4, x0 = x(0);
+      svg.append('text').attr('x', 0).attr('y', y + 13).attr('class', 'mx-axis').append('tspan').attr('fill', 'var(--color-fg-muted)').attr('font-size', 11).text(c.cat);
+      order.forEach(function (k) { var n = c[k].length; if (!n) return; var w = x(n) - x(0);
+        svg.append('rect').attr('x', x0).attr('y', y).attr('width', Math.max(1, w - 1)).attr('height', 16).attr('rx', 3).attr('fill', colors[k]).attr('opacity', k === 'Soon' ? .7 : .85)
+          .on('mousemove', function (ev) { t.replaceChildren(el('div', 'd', c.cat + ' · ' + k)); c[k].slice(0, 8).forEach(function (r) { t.appendChild(el('div', null, r.fleet)); }); if (c[k].length > 8) t.appendChild(el('div', 'd', '+' + (c[k].length - 8) + ' more')); var p = d3.pointer(ev, box); placeTip(t, box, p[0], p[1]); })
+          .on('mouseleave', function () { t.hidden = true; });
+        x0 += w; });
+      svg.append('text').attr('x', x0 + 4).attr('y', y + 13).attr('font-size', 11).attr('fill', 'var(--color-fg-muted)').text(c.n);
+    });
+    var lg = el('div', 'mx-legend'); order.forEach(function (k) { var s = el('span'); var i = el('i'); i.style.background = colors[k]; s.appendChild(i); s.appendChild(document.createTextNode(k)); lg.appendChild(s); }); box.appendChild(lg);
+  }
+
+  // ---------- service plan
+  function planRows() {
+    var q = state.planQ.toLowerCase();
+    return R('m_items').filter(function (r) {
+      if (r.unit_status !== 'Active') return false;
+      if (state.planSt === 'overdue' && r.status !== 'overdue') return false;
+      if (state.planSt === 'act' && r.status === 'ok') return false;
+      if (state.planCat && r.cat !== state.planCat) return false;
+      if (state.planKind && r.kind !== state.planKind) return false;
+      if (q) { var hay = (r.fleet + ' ' + r.label + ' ' + (r.parts || []).map(function (p) { return p.part_no + ' ' + p.name; }).join(' ')).toLowerCase(); if (hay.indexOf(q) < 0) return false; }
+      return true;
+    });
+  }
+  function drawPlan() {
+    var all = R('m_items'); var sel = $('#plan-cat');
+    if (sel.options.length < 2 && all.length) { Array.from(new Set(all.map(function (r) { return r.cat; }))).sort().forEach(function (c) { sel.appendChild(new Option(c, c)); }); }
+    var rows = planRows();
+    $('#items-count').textContent = rows.length + ' items';
+    var ORD = { overdue: 0, due: 1, soon: 2, ok: 3 };
+    table('t-items', rows, {
+      fleet: function (r) { return r.fleet; },
+      label: function (r, td) { td.className = 'wrap'; return r.label; },
+      status: function (r) { return pill(r.status, ST_LABEL[r.status] + (r.intelli ? ' · I360' : '')); },
+      to_go_h: function (r) { return r.to_go_h == null ? '' : f1(r.to_go_h); },
+      due_date: function (r) { return fmtD(r.due_date); },
+      hours_now: function (r) { return r.hours_now == null ? '' : f1(r.hours_now); },
+      kit_aud: function (r) { return r.kit_aud ? f2(r.kit_aud) : ''; },
+      labour_h: function (r) { return r.labour_h == null ? '' : String(r.labour_h); }
+    }, { sortVal: { status: function (r) { return ORD[r.status]; }, due_date: function (r) { return r.due_date || '9999'; } }, numeric: ['to_go_h', 'kit_aud'],
+         onClick: function (k) { state.item = k; drawItem(); var d = document.getElementById('item-detail'); d.scrollIntoView({ block: 'nearest' }); },
+         selected: function (r) { return r.id === state.item; }, empty: 'Nothing matches.' });
+    drawItem(); drawTimeline();
+  }
+  function itemBlock(r, parent) {
+    var dl = el('dl', 'mx-dl');
+    var add = function (k, v) { if (v == null || v === '') return; var d = el('div'); d.appendChild(el('dt', null, k)); d.appendChild(el('dd', null, v)); dl.appendChild(d); };
+    add('Status', ST_LABEL[r.status] + (r.intelli ? ' (Intelli360: ' + r.intelli + ')' : '')); add('Every', r.interval_h ? r.interval_h + ' h' + (r.months ? ' or ' + r.months + ' months' : '') : (r.every_days ? r.every_days + ' days' : (r.months ? r.months + ' months' : '')));
+    add('Hours now', r.hours_now != null ? f1(r.hours_now) : ''); add('Hours to go', r.to_go_h != null ? f1(r.to_go_h) : ''); add('Due', fmtD(r.due_date)); add('Last done', (r.last_date ? fmtD(r.last_date) : '') + (r.last_h != null ? ' at ' + f1(r.last_h) + ' h' : ''));
+    add('Based on', r.basis); add('Labour', r.labour_h ? r.labour_h + ' h' : ''); add('Source', r.source); add('Confidence', r.confidence);
+    parent.appendChild(dl);
+    if (r.note) parent.appendChild(el('p', 'mx-note', r.note));
+    if (r.tasks && r.tasks.length) { parent.appendChild(el('p', 'mx-sub', 'Tasks')); var ul = el('ul', 'mx-list'); r.tasks.forEach(function (t) { ul.appendChild(el('li', null, t)); }); parent.appendChild(ul); }
+    if (r.parts && r.parts.length) { parent.appendChild(el('p', 'mx-sub', 'Parts')); var ul2 = el('ul', 'mx-list'); r.parts.forEach(function (p) { var li = el('li', null, (p.name || '') + ' · ' + p.part_no + (p.qty && p.qty !== 1 ? ' × ' + p.qty : '') + (p.price ? ' · $' + f2(p.price) + (p.price_kind === 'equivalent' ? ' (equiv.)' : '') : '') + (p.on_hand ? ' · ' + p.on_hand + ' on hand' : '') + (p.verified === 'no' ? ' · number not confirmed' : '')); if (p.link) { li.appendChild(document.createTextNode(' · ')); li.appendChild(link(p.link, 'buy / look up')); } ul2.appendChild(li); }); parent.appendChild(ul2); }
+    if (r.fluids && r.fluids.length) { parent.appendChild(el('p', 'mx-sub', 'Fluids')); var ul3 = el('ul', 'mx-list'); r.fluids.forEach(function (f) { ul3.appendChild(el('li', null, (f.what || '') + ': ' + (f.spec || '') + (f.qty_l ? ' · ' + f.qty_l + ' L' : ''))); }); parent.appendChild(ul3); }
+  }
+  function drawItem() {
+    var box = $('#item-detail'); var r = R('m_items').filter(function (x) { return x.id === state.item; })[0];
+    if (!r) { box.hidden = true; return; }
+    box.hidden = false; box.replaceChildren();
+    var hd = el('div', 'mx-row'); var h3 = el('h3', null, r.fleet + ': ' + r.label); hd.appendChild(h3);
+    var op = el('button', 'mx-chip', 'Open machine sheet'); op.addEventListener('click', function () { openMachine(r.fleet); }); hd.appendChild(op); box.appendChild(hd);
+    itemBlock(r, box);
+  }
+  function drawTimeline() {
+    var box = $('#ch-timeline'); if (state.page !== 'plan') return; if (failed(box, 'm_items')) return;
+    var today = d3.timeDay.floor(new Date()); var end = d3.timeDay.offset(today, 56);
+    var rows = R('m_items').filter(function (r) { return r.unit_status === 'Active' && r.due_date && (r.status !== 'ok' || (r.kind !== 'calendar' && new Date(r.due_date + 'T00:00:00') <= end)); });
+    if (state.planCat) rows = rows.filter(function (r) { return r.cat === state.planCat; });
+    var by = d3.groups(rows, function (r) { return r.fleet; }).map(function (g) { return { fleet: g[0], items: g[1], first: d3.min(g[1], function (r) { return r.due_date; }) }; })
+      .sort(function (a, b) { return a.first < b.first ? -1 : a.first > b.first ? 1 : a.fleet.localeCompare(b.fleet); });
+    box.replaceChildren(); if (!by.length) { box.appendChild(el('div', 'mx-empty', 'Nothing due in the next 8 weeks.')); return; }
+    var W = box.clientWidth || 600, rowH = 22, top = 24, H = top + by.length * rowH + 8;
+    box.style.minHeight = H + 'px';
+    var svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', '0 0 ' + W + ' ' + H);
+    var tmp = svg.append('text').attr('font-size', 11); var lw = 0; by.forEach(function (b) { tmp.text(b.fleet); lw = Math.max(lw, tmp.node().getComputedTextLength()); }); tmp.remove();
+    lw = Math.min(lw, W * 0.42);
+    var x = d3.scaleTime([today, end], [lw + 14, W - 10]);
+    var ax = svg.append('g').attr('class', 'mx-axis').attr('transform', 'translate(0,' + (top - 6) + ')').call(d3.axisTop(x).ticks(Math.max(2, Math.floor((W - lw) / 90))).tickFormat(d3.timeFormat('%-d %b')).tickSizeOuter(0));
+    ax.attr('font-size', null).attr('font-family', null);
+    svg.append('g').attr('class', 'mx-gridl').attr('transform', 'translate(0,' + top + ')').call(d3.axisTop(x).ticks(d3.timeWeek.every(1)).tickSize(-(H - top)).tickFormat('')).select('.domain').remove();
+    var t = tip(box); var colors = { overdue: cssVar('--color-bad'), due: cssVar('--color-warn'), soon: dash.colors[0], ok: cssVar('--cds-chart-muted') };
+    by.forEach(function (b, i) {
+      var y = top + i * rowH + rowH / 2;
+      var lab = svg.append('text').attr('x', 0).attr('y', y + 4).attr('font-size', 11).attr('fill', 'var(--color-fg)').style('cursor', 'pointer').text(b.fleet);
+      while (lab.node().getComputedTextLength() > lw && lab.text().length > 4) lab.text(lab.text().slice(0, -2) + '…');
+      lab.on('click', function () { openMachine(b.fleet); });
+      svg.append('line').attr('x1', lw + 14).attr('x2', W - 10).attr('y1', y).attr('y2', y).attr('stroke', 'var(--cds-chart-grid)');
+      var groups = d3.groups(b.items, function (r) { return r.due_date; });
+      groups.forEach(function (g) {
+        var d = new Date(g[0] + 'T00:00:00'); if (d < today) d = today; if (d > end) return;
+        var worst = g[1].slice().sort(function (a, c) { return ['overdue', 'due', 'soon', 'ok'].indexOf(a.status) - ['overdue', 'due', 'soon', 'ok'].indexOf(c.status); })[0];
+        svg.append('circle').attr('cx', x(d)).attr('cy', y).attr('r', Math.min(8, 4 + g[1].length)).attr('fill', colors[worst.status]).attr('opacity', .9).style('cursor', 'pointer')
+          .on('mousemove', function (ev) { t.replaceChildren(el('div', 'd', b.fleet + ' · ' + fmtD(g[0]))); g[1].slice(0, 6).forEach(function (r) { t.appendChild(el('div', null, r.label + (r.to_go_h != null ? ' (' + (r.to_go_h < 0 ? f0(-r.to_go_h) + ' h over' : f0(r.to_go_h) + ' h to go') + ')' : ''))); }); var p = d3.pointer(ev, box); placeTip(t, box, p[0], p[1]); })
+          .on('mouseleave', function () { t.hidden = true; })
+          .on('click', function () { state.item = worst.id; drawPlan(); document.getElementById('item-detail').scrollIntoView({ block: 'nearest' }); });
+      });
+    });
+  }
+  $$('#plan-ctl .mx-chip').forEach(function (b) { b.addEventListener('click', function () { state.planSt = b.dataset.st; $$('#plan-ctl .mx-chip').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); drawPlan(); }); });
+  $('#plan-cat').addEventListener('change', function (e) { state.planCat = e.target.value; drawPlan(); });
+  $('#plan-kind').addEventListener('change', function (e) { state.planKind = e.target.value; drawPlan(); });
+  $('#plan-q').addEventListener('input', function (e) { state.planQ = e.target.value; drawPlan(); });
+
+  // ---------- fleet
+  function drawFleet() {
+    var all = R('m_fleet'); var sel = $('#fleet-cat');
+    if (sel.options.length < 2 && all.length) Array.from(new Set(all.map(function (r) { return r.cat; }))).sort().forEach(function (c) { sel.appendChild(new Option(c, c)); });
+    var q = state.fleetQ.toLowerCase();
+    var rows = all.filter(function (r) {
+      if (state.fleetSt === 'live' && r.status === 'Gone') return false;
+      if (['Active', 'Disabled', 'Gone'].indexOf(state.fleetSt) >= 0 && r.status !== state.fleetSt) return false;
+      if (state.fleetCat && r.cat !== state.fleetCat) return false;
+      if (q && (r.fleet + ' ' + r.make + ' ' + r.model + ' ' + (r.serial || '') + ' ' + (r.asset_no || '')).toLowerCase().indexOf(q) < 0) return false;
+      return true; });
+    $('#fleet-count').textContent = rows.length + ' machines';
+    var SO = { Fault: 0, Overdue: 1, Due: 2, Soon: 3, OK: 4, Parked: 5, Gone: 6 };
+    table('t-fleet', rows, {
+      model: function (r) { return r.make + ' ' + r.model; },
+      state: function (r) { return pill(r.state, r.state); },
+      hours: function (r) { return r.km ? f0(r.km) + ' km' : (r.hours == null ? '' : (r.hours_est ? '~' : '') + f1(r.hours)); },
+      rate_week: function (r) { return r.rate_week ? f1(r.rate_week) : ''; },
+      next_label: function (r, td) { td.className = 'wrap'; return r.next_label || ''; },
+      next_to_go_h: function (r) { return r.next_to_go_h == null ? '' : f1(r.next_to_go_h); },
+      own: function (r) { return (r.own || '') + (r.lease ? ' (' + r.lease + ')' : '') + (r.tele ? ' · I360' : ''); },
+      hoc: function (r) { return r.hoc == null ? '' : String(r.hoc); }
+    }, { sortVal: { state: function (r) { return SO[r.state]; } }, numeric: ['hours', 'rate_week'], onClick: function (k) { state.machine = k; drawMachine(); document.getElementById('machine').scrollIntoView({ block: 'start' }); },
+         selected: function (r) { return r.fleet === state.machine; } });
+    drawMachine();
+  }
+  function drawMachine() {
+    var box = $('#machine'); var r = R('m_fleet').filter(function (x) { return x.fleet === state.machine; })[0];
+    if (!r) { box.hidden = true; return; }
+    box.hidden = false; box.replaceChildren();
+    var hd = el('div', 'mx-row'); hd.appendChild(el('h3', null, r.fleet)); hd.appendChild(pill(r.state, r.state)); box.appendChild(hd);
+    box.appendChild(el('p', 'mx-note', r.make + ' ' + r.model + (r.engine ? ' · ' + r.engine : '')));
+    var dl = el('dl', 'mx-dl'); var add = function (k, v) { if (v == null || v === '' || v === false) return; var d = el('div'); d.appendChild(el('dt', null, k)); d.appendChild(el('dd', null, String(v))); dl.appendChild(d); };
+    add('Hours', r.km ? f0(r.km) + ' km (odometer)' : (r.hours != null ? (r.hours_est ? '~' : '') + f1(r.hours) : 'no reading'));
+    add('Last reading', r.last_reading ? f1(r.last_reading.hours) + ' h · ' + fmtD(r.last_reading.date) + ' · ' + r.last_reading.source : '');
+    add('Use', r.rate_week ? f1(r.rate_week) + ' h/week (' + r.rate_src + ')' : 'no recent use');
+    add('Intelli360', r.tele ? (r.intelli_hours != null ? f1(r.intelli_hours) + ' h' : 'yes') + (r.intelli_serial ? ' · s/n ' + r.intelli_serial : '') : '');
+    add('Serial', r.serial); add('Year', r.year); add('Asset no.', r.asset_no); add('Area', r.area); add('Height of cut', r.hoc != null ? r.hoc + ' mm' : '');
+    add('Owned / leased', (r.own || '') + (r.lease_item ? ' · ' + r.lease + ' ' + r.lease_item : '') + (r.lease_end ? ' · ends ' + fmtD(r.lease_end) : ''));
+    add('Lease share', r.lease_month_share ? '$' + f0(r.lease_month_share) + '/month' + (r.lease_shared ? ' (split evenly)' : '') : '');
+    add('Purchase price', r.price ? '$' + f0(r.price) : ''); add('Replacement plan', r.replacement ? r.replacement.id + ' ' + r.replacement.item + ' · ' + r.replacement.start + ' (' + r.replacement.status + ')' : '');
+    add('Usual days', (r.likely_days || []).join(' ')); add('Last used', r.last_used);
+    box.appendChild(dl);
+    if (r.notes) box.appendChild(el('p', 'mx-note', r.notes));
+    (r.faults || []).forEach(function (f) { box.appendChild(el('p', 'mx-wc-w mx-bad', 'Open fault: ' + f.job + (f.days_open != null ? ' (' + f.days_open + ' days)' : ''))); });
+    // weekday bars
+    if (r.dow_p && r.dow_p.length) {
+      box.appendChild(el('p', 'mx-sub', 'Days on the job board, last 12 months'));
+      var bars = el('div', 'mx-bars'); var mx = d3.max(r.dow_p) || 1;
+      r.dow_p.forEach(function (p, i) { var b = el('div'); b.style.height = Math.max(2, 70 * p / mx) + 'px'; b.title = ''; bars.appendChild(b); });
+      var bl = el('div', 'mx-bl'); r.dow_p.forEach(function (p, i) { bl.appendChild(el('span', null, DOW[i] + ' ' + pct(p))); });
+      box.appendChild(bars); box.appendChild(bl);
+      if (r.top_tasks && r.top_tasks.length) box.appendChild(el('p', 'mx-note', 'Main jobs: ' + r.top_tasks.map(function (t) { return t[0] + ' (' + t[1] + ')'; }).join(', ')));
+      if (r.operators && r.operators.length) box.appendChild(el('p', 'mx-note', 'Most often driven by: ' + r.operators.map(function (t) { return t[0]; }).join(', ')));
+    }
+    // service items
+    var its = R('m_items').filter(function (x) { return x.fleet === r.fleet; });
+    if (its.length) {
+      box.appendChild(el('p', 'mx-sub', 'Service schedule'));
+      its.forEach(function (it) {
+        var dt = el('details', 'mx-iv'); var sm = el('summary'); sm.appendChild(document.createTextNode(it.label + '  ')); sm.appendChild(pill(it.status, ST_LABEL[it.status]));
+        var sub = el('span', null, '  ' + (it.to_go_h != null ? (it.to_go_h < 0 ? f0(-it.to_go_h) + ' h overdue' : f0(it.to_go_h) + ' h to go') : '') + (it.due_date ? ' · ' + fmtD(it.due_date) : '')); sm.appendChild(sub);
+        dt.appendChild(sm); var inner = el('div'); itemBlock(it, inner); dt.appendChild(inner); box.appendChild(dt);
+      });
+    }
+    // model bible
+    var md = R('m_models').filter(function (m) { return m.slug === r.slug; })[0];
+    if (md) {
+      box.appendChild(el('p', 'mx-sub', 'Machinery bible: ' + md.make + ' ' + md.model + (md.model_numbers && md.model_numbers.length ? ' (' + md.model_numbers.join(', ') + ')' : '')));
+      if (md.daily_checks && md.daily_checks.length) { var d1 = el('details', 'mx-iv'); d1.appendChild(el('summary', null, 'Daily / pre-start checks')); var ul = el('ul', 'mx-list'); md.daily_checks.forEach(function (c) { ul.appendChild(el('li', null, c)); }); d1.appendChild(ul); box.appendChild(d1); }
+      if (md.fluids && md.fluids.length) { var d2 = el('details', 'mx-iv'); d2.appendChild(el('summary', null, 'Fluids and capacities')); var ul2 = el('ul', 'mx-list'); md.fluids.forEach(function (f) { ul2.appendChild(el('li', null, (f.system || '') + ': ' + (f.spec || '') + (f.capacity_l ? ' · ' + f.capacity_l + ' L' : ''))); }); d2.appendChild(ul2); box.appendChild(d2); }
+      if (md.reel && (md.reel.guidance || (md.reel.bedknives || []).length)) { var d3e = el('details', 'mx-iv'); d3e.appendChild(el('summary', null, 'Reels / blades')); if (md.reel.guidance) d3e.appendChild(el('p', 'mx-note', md.reel.guidance)); var ul3 = el('ul', 'mx-list'); (md.reel.bedknives || []).forEach(function (b) { ul3.appendChild(el('li', null, b.part_no + ' · ' + b.name + ' · ' + b.hoc_range_mm)); }); d3e.appendChild(ul3); box.appendChild(d3e); }
+      if (md.known_issues && md.known_issues.length) { var d4 = el('details', 'mx-iv'); d4.appendChild(el('summary', null, 'Known issues')); var ul4 = el('ul', 'mx-list'); md.known_issues.forEach(function (k) { ul4.appendChild(el('li', null, k)); }); d4.appendChild(ul4); box.appendChild(d4); }
+      if (md.notes) { var d5 = el('details', 'mx-iv'); d5.appendChild(el('summary', null, 'Notes')); d5.appendChild(el('p', 'mx-note', md.notes)); box.appendChild(d5); }
+      if (md.sources && md.sources.length) { var d6 = el('details', 'mx-iv'); d6.appendChild(el('summary', null, 'Manuals and sources')); var ul6 = el('ul', 'mx-list'); md.sources.forEach(function (s) { var li = el('li'); if (s.url && /^https?:/.test(s.url)) li.appendChild(link(s.url, s.title || s.url)); else li.textContent = s.title || ''; ul6.appendChild(li); }); d6.appendChild(ul6); box.appendChild(d6); }
+    }
+    var hist = R('m_history').filter(function (h) { return h.fleet === r.fleet; }).slice(0, 25);
+    if (hist.length) { var d7 = el('details', 'mx-iv'); d7.appendChild(el('summary', null, 'Recent history (' + hist.length + ')')); var ul7 = el('ul', 'mx-list'); hist.forEach(function (h) { ul7.appendChild(el('li', null, fmtD(h.date) + ' · ' + h.item + (h.hours ? ' · ' + f1(h.hours) + ' h' : '') + (h.ref ? ' · ' + h.ref : ''))); }); d7.appendChild(ul7); box.appendChild(d7); }
+  }
+  $('#fleet-cat').addEventListener('change', function (e) { state.fleetCat = e.target.value; drawFleet(); });
+  $('#fleet-st').addEventListener('change', function (e) { state.fleetSt = e.target.value; drawFleet(); });
+  $('#fleet-q').addEventListener('input', function (e) { state.fleetQ = e.target.value; drawFleet(); });
+
+  // ---------- usage
+  function drawUsage() {
+    var tbl = $('#heat'); if (!failed(tbl, 'm_usage')) {
+      var rows = R('m_usage').filter(function (r) { return r.status === 'Active' && (r.uses_365 || 0) > 0; });
+      var c0 = d3.color(cssVar('--color-panel')) ? cssVar('--color-panel') : '#fff'; var c1 = cssVar('--color-ok');
+      var ramp = d3.interpolateRgb(c0, c1);
+      tbl.replaceChildren(); var th = el('tr'); th.appendChild(el('th', null, '')); DOW.forEach(function (d) { th.appendChild(el('th', null, d)); }); th.appendChild(el('th', null, 'Days used')); var thead = el('thead'); thead.appendChild(th); tbl.appendChild(thead);
+      var tb = el('tbody');
+      d3.groups(rows, function (r) { return r.cat; }).sort(function (a, b) { return a[0].localeCompare(b[0]); }).forEach(function (g) {
+        var cr = el('tr', 'cat'); var ct = el('td', null, g[0]); ct.colSpan = 9; cr.appendChild(ct); tb.appendChild(cr);
+        g[1].sort(function (a, b) { return (b.uses_365 || 0) - (a.uses_365 || 0); }).forEach(function (r) {
+          var tr = el('tr'); var m = el('td', 'm', r.fleet); m.addEventListener('click', function () { openMachine(r.fleet); }); tr.appendChild(m);
+          (r.dow_p || [0, 0, 0, 0, 0, 0, 0]).forEach(function (p) { var td = el('td', 'c', p > 0 ? pct(p) : ''); td.style.background = ramp(Math.min(1, p * 1.6) * .85); if (p > .45) td.style.color = 'var(--color-bg)'; tr.appendChild(td); });
+          tr.appendChild(el('td', 'c', String(r.uses_365 || 0))); tb.appendChild(tr);
+        });
+      });
+      tbl.appendChild(tb);
+    }
+    drawMonthly();
+    table('t-usage', R('m_usage').filter(function (r) { return r.status !== 'Gone'; }), {
+      task_h_365: function (r) { return r.task_h_365 == null ? '' : f1(r.task_h_365); }, rate_week: function (r) { return r.rate_week ? f1(r.rate_week) : ''; },
+      likely_days: function (r) { return (r.likely_days || []).join(' '); }, last_used: function (r) { return fmtD(r.last_used); },
+      top_tasks: function (r, td) { td.className = 'wrap hn'; return (r.top_tasks || []).slice(0, 3).map(function (t) { return t[0]; }).join(', '); },
+      fleet: function (r) { return r.fleet; }
+    }, { numeric: ['uses_365', 'task_h_365', 'rate_week'], onClick: function (k) { openMachine(k); } });
+  }
+  function stacked(boxId, lgId, rows, keys, opts) {
+    var box = document.getElementById(boxId); box.replaceChildren(); if (!rows.length) return;
+    var W = box.clientWidth || 600, H = 240, m = { t: 10, r: 10, b: 26, l: 44 };
+    var colors = {}; keys.forEach(function (k, i) { colors[k] = dash.colors[i % dash.colors.length]; });
+    var lg = document.getElementById(lgId); if (lg) { lg.replaceChildren(); keys.forEach(function (k) { var s = el('span'); var i = el('i'); i.style.background = colors[k]; s.appendChild(i); s.appendChild(document.createTextNode(k)); lg.appendChild(s); }); }
+    var data = rows.map(function (r) { var o = { month: r.month }; keys.forEach(function (k) { o[k] = +r[k] || 0; }); return o; });
+    var series = d3.stack().keys(keys)(data);
+    var ymax = d3.max(series, function (s) { return d3.max(s, function (d) { return d[1]; }); }) || 1;
+    var y = d3.scaleLinear([0, ymax], [H - m.b, m.t]).nice();
+    var svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', '0 0 ' + W + ' ' + H);
+    var ya = svg.append('g').attr('class', 'mx-axis').call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('~s')));
+    ya.attr('font-size', null).attr('font-family', null);
+    var lw = 0; ya.selectAll('text').each(function () { lw = Math.max(lw, this.getComputedTextLength()); }); m.l = lw + 12; ya.attr('transform', 'translate(' + m.l + ',0)');
+    var x = d3.scaleBand(data.map(function (d) { return d.month; }), [m.l, W - m.r]).padding(.25);
+    svg.append('g').attr('class', 'mx-gridl').attr('transform', 'translate(' + m.l + ',0)').call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(''));
+    var xa = svg.append('g').attr('class', 'mx-axis').attr('transform', 'translate(0,' + (H - m.b) + ')').call(d3.axisBottom(x).tickFormat(function (d) { var dt = new Date(d + '-01T00:00:00'); return d3.timeFormat(dt.getMonth() === 0 ? '%b %y' : '%b')(dt); }).tickSizeOuter(0));
+    xa.attr('font-size', null).attr('font-family', null);
+    var step = Math.ceil(data.length / Math.max(2, Math.floor(W / 56))); xa.selectAll('.tick').attr('opacity', function (d, i) { return i % step ? 0 : 1; });
+    var t = tip(box);
+    series.forEach(function (s) { svg.append('g').selectAll('rect').data(s).join('rect').attr('x', function (d) { return x(d.data.month); }).attr('width', x.bandwidth()).attr('y', function (d) { return y(d[1]); }).attr('height', function (d) { return Math.max(0, y(d[0]) - y(d[1])); }).attr('fill', colors[s.key]); });
+    svg.append('g').selectAll('rect').data(data).join('rect').attr('x', function (d) { return x(d.month); }).attr('width', x.bandwidth()).attr('y', m.t).attr('height', H - m.b - m.t).attr('fill', 'transparent')
+      .on('mousemove', function (ev, d) { t.replaceChildren(el('div', 'd', d3.timeFormat('%B %Y')(new Date(d.month + '-01T00:00:00')))); keys.slice().reverse().forEach(function (k) { if (!d[k]) return; var line = el('div'); var sw = el('span', 'sw'); sw.style.background = colors[k]; line.appendChild(sw); line.appendChild(document.createTextNode(k + ': ' + (opts && opts.fmt ? opts.fmt(d[k]) : f0(d[k])))); t.appendChild(line); }); var p = d3.pointer(ev, box); placeTip(t, box, p[0], p[1]); })
+      .on('mouseleave', function () { t.hidden = true; });
+  }
+  function drawMonthly() {
+    if (failed($('#ch-monthly'), 'm_usage_monthly')) return;
+    var rows = R('m_usage_monthly'); var keys = []; rows.forEach(function (r) { Object.keys(r).forEach(function (k) { if (k !== 'month' && keys.indexOf(k) < 0) keys.push(k); }); });
+    keys.sort(function (a, b) { return d3.sum(rows, function (r) { return r[b] || 0; }) - d3.sum(rows, function (r) { return r[a] || 0; }); });
+    stacked('ch-monthly', 'lg-monthly', rows, keys, { fmt: function (v) { return f0(v) + ' h'; } });
+  }
+
+  // ---------- cutting
+  function drawCutting() {
+    table('t-hoc', R('m_hoc'), {
+      hoc: function (r) { return r.hoc == null ? 'not recorded' : String(r.hoc); },
+      knives: function (r, td) { td.className = 'wrap'; var fit = (r.knives || []).filter(function (k) { return k.fits; });
+        var pref = fit.filter(function (k) { return /tournament/i.test(k.name) && r.hoc >= 3; })[0] || fit[0];
+        return pref ? pref.part_no + ' ' + pref.name + ' (' + pref.range + ')' + (fit.length > 1 ? ' · ' + (fit.length - 1) + ' other options fit' : '') : 'No listed knife covers this height'; },
+      backlap: function (r) { var b = r.backlap; if (!b) return ''; var s = el('span'); s.appendChild(pill(b.status, b.status)); s.appendChild(document.createTextNode(' last ' + (b.last ? fmtDs(b.last) : '–') + (b.due ? ' · due ' + fmtDs(b.due) : ''))); return s; },
+      grind: function (r) { var b = r.grind; if (!b) return ''; var s = el('span'); s.appendChild(pill(b.status, b.status)); s.appendChild(document.createTextNode(' last ' + (b.last ? fmtDs(b.last) : '–') + (b.due ? ' · due ' + fmtDs(b.due) : '') + (b.every_h ? ' · every ' + b.every_h + ' h' : ''))); return s; }
+    }, { onClick: function (k) { openMachine(k); } });
+    var g = $('#hoc-guides'); g.replaceChildren(); var seen = {};
+    R('m_hoc').forEach(function (r) { if (!r.guidance || seen[r.model]) return; seen[r.model] = 1; var c = el('div', 'mx-card'); c.appendChild(el('h3', null, r.model)); c.appendChild(el('p', 'mx-note', r.guidance)); g.appendChild(c); });
+  }
+
+  // ---------- parts
+  function drawParts() {
+    var pr = function (r) { return r.price ? f2(r.price) + (r.price_kind === 'equivalent' ? ' equiv.' : '') : ''; };
+    table('t-order', R('m_order'), {
+      price: pr, line_aud: function (r) { return r.line_aud ? f2(r.line_aud) : ''; }, first_due: function (r) { return fmtDs(r.first_due); },
+      machines: function (r, td) { td.className = 'wrap hn'; return (r.machines || []).join(', '); }, qty: function (r) { return String(r.qty); },
+      supplier: function (r, td) { td.className = 'wrap hn'; return r.link ? link(r.link, r.supplier || 'link') : (r.supplier || ''); },
+      name: function (r, td) { td.className = 'wrap'; return (r.name || '') + (r.verified === 'no' ? ' (number not confirmed)' : ''); }
+    }, { numeric: ['line_aud', 'qty', 'to_order'], empty: 'Nothing to order in the next 30 days.' });
+    table('t-fluids', R('m_fluids'), { spec: function (r, td) { td.className = 'wrap'; return r.spec; }, litres: function (r) { return f1(r.litres); } }, {});
+    var all = R('m_catalog'); var sel = $('#cat-model');
+    if (sel.options.length < 2 && all.length) Array.from(new Set(all.map(function (r) { return r.model; }))).sort().forEach(function (c) { sel.appendChild(new Option(c, c)); });
+    var q = state.catQ.toLowerCase();
+    var rows = all.filter(function (r) { if (state.catModel && r.model !== state.catModel) return false; if (state.catKind && r.kind !== state.catKind) return false;
+      if (q && ((r.name || '') + ' ' + (r.part_no || '') + ' ' + (r.alt || '') + ' ' + (r.units || []).join(' ')).toLowerCase().indexOf(q) < 0) return false; return true; });
+    $('#cat-count').textContent = rows.length + ' parts';
+    table('t-catalog', rows, {
+      name: function (r, td) { td.className = 'wrap'; return r.name; }, intervals: function (r) { return (r.intervals || []).join(', '); }, price: pr,
+      equiv: function (r, td) { td.className = 'wrap hn'; return r.equiv ? (r.equiv_url ? link(r.equiv_url, r.equiv) : r.equiv) : ''; },
+      supplier: function (r, td) { td.className = 'wrap hn'; return r.link && /^https?:/.test(r.link) ? link(r.link, r.supplier || 'link') : (r.supplier || ''); },
+      verified: function (r) { return r.verified === 'yes' ? 'yes' : (r.verified || ''); }, on_hand: function (r) { return r.on_hand ? String(r.on_hand) : ''; }
+    }, { numeric: ['price'] });
+  }
+  $('#cat-model').addEventListener('change', function (e) { state.catModel = e.target.value; drawParts(); });
+  $('#cat-kind').addEventListener('change', function (e) { state.catKind = e.target.value; drawParts(); });
+  $('#cat-q').addEventListener('input', function (e) { state.catQ = e.target.value; drawParts(); });
+
+  // ---------- costs
+  function drawCosts() {
+    var box = $('#ch-fin');
+    if (!failed(box, 'm_fin_monthly')) {
+      var rows = R('m_fin_monthly'); box.replaceChildren();
+      if (rows.length) {
+        var W = box.clientWidth || 600, H = 240, m = { t: 10, r: 10, b: 26, l: 50 };
+        var data = rows.map(function (r) { return { month: r.month, fc: (r.rm_fc || 0) + (r.parts_fc || 0), act: r.rm_act == null ? null : (r.rm_act || 0) + (r.parts_act || 0) }; });
+        var y = d3.scaleLinear([0, d3.max(data, function (d) { return Math.max(d.fc, d.act || 0); }) || 1], [H - m.b, m.t]).nice();
+        var svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', '0 0 ' + W + ' ' + H);
+        var ya = svg.append('g').attr('class', 'mx-axis').call(d3.axisLeft(y).ticks(5).tickFormat(function (v) { return '$' + d3.format('~s')(v); })); ya.attr('font-size', null).attr('font-family', null);
+        var lw = 0; ya.selectAll('text').each(function () { lw = Math.max(lw, this.getComputedTextLength()); }); m.l = lw + 12; ya.attr('transform', 'translate(' + m.l + ',0)');
+        svg.append('g').attr('class', 'mx-gridl').attr('transform', 'translate(' + m.l + ',0)').call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(''));
+        var x = d3.scaleBand(data.map(function (d) { return d.month; }), [m.l, W - m.r]).padding(.2); var xi = d3.scaleBand(['fc', 'act'], [0, x.bandwidth()]).padding(.1);
+        var xa = svg.append('g').attr('class', 'mx-axis').attr('transform', 'translate(0,' + (H - m.b) + ')').call(d3.axisBottom(x).tickFormat(function (d) { return d3.timeFormat('%b')(new Date(d + '-01T00:00:00')); }).tickSizeOuter(0)); xa.attr('font-size', null).attr('font-family', null);
+        var cF = cssVar('--cds-chart-muted'), cA = dash.colors[0];
+        var t = tip(box);
+        data.forEach(function (d) {
+          svg.append('rect').attr('x', x(d.month) + xi('fc')).attr('width', xi.bandwidth()).attr('y', y(d.fc)).attr('height', y(0) - y(d.fc)).attr('rx', 3).attr('fill', cF);
+          if (d.act != null) svg.append('rect').attr('x', x(d.month) + xi('act')).attr('width', xi.bandwidth()).attr('y', y(d.act)).attr('height', y(0) - y(d.act)).attr('rx', 3).attr('fill', d.act > d.fc ? cssVar('--cds-chart-status-critical') : cA);
+          svg.append('rect').attr('x', x(d.month)).attr('width', x.bandwidth()).attr('y', m.t).attr('height', H - m.b - m.t).attr('fill', 'transparent')
+            .on('mousemove', function (ev) { t.replaceChildren(el('div', 'd', d3.timeFormat('%B %Y')(new Date(d.month + '-01T00:00:00')))); var a = el('div'); var s1 = el('span', 'sw'); s1.style.background = cA; a.appendChild(s1); a.appendChild(document.createTextNode('Actual: ' + (d.act == null ? 'not yet' : '$' + f0(d.act)))); t.appendChild(a); var b = el('div'); var s2 = el('span', 'sw'); s2.style.background = cF; b.appendChild(s2); b.appendChild(document.createTextNode('Forecast: $' + f0(d.fc))); t.appendChild(b); var p = d3.pointer(ev, box); placeTip(t, box, p[0], p[1]); })
+            .on('mouseleave', function () { t.hidden = true; });
+        });
+        var lg = $('#lg-fin'); lg.replaceChildren(); [['Actual', cA], ['Over forecast', cssVar('--cds-chart-status-critical')], ['Forecast', cF]].forEach(function (k) { var s = el('span'); var i = el('i'); i.style.background = k[1]; s.appendChild(i); s.appendChild(document.createTextNode(k[0])); lg.appendChild(s); });
+      }
+    }
+    table('t-costs', R('m_costs'), {
+      own: function (r) { return (r.own || '') + (r.lease ? ' (' + r.lease + (r.lease_shared ? ', shared' : '') + ')' : ''); },
+      lease_month: function (r) { return r.lease_month ? f0(r.lease_month) : ''; }, hours_year: function (r) { return r.hours_year ? f0(r.hours_year) : ''; },
+      pm_parts_year: function (r) { return r.pm_parts_year ? f0(r.pm_parts_year) : ''; }, pm_unpriced: function (r) { return r.pm_unpriced ? String(r.pm_unpriced) : ''; },
+      cost_per_h: function (r) { return r.cost_per_h ? f2(r.cost_per_h) : ''; }, age: function (r) { return r.age == null ? '' : String(r.age); },
+      replacement: function (r, td) { td.className = 'wrap hn'; return r.replacement ? r.replacement.id + ' · ' + r.replacement.start + ' · ' + r.replacement.status : ''; }
+    }, { numeric: ['lease_month', 'hours_year', 'pm_parts_year', 'cost_per_h'], onClick: function (k) { openMachine(k); } });
+    table('t-leases', R('m_leases'), { item: function (r, td) { td.className = 'wrap'; return r.item; }, monthly: function (r) { return r.monthly ? f2(r.monthly) : (r.upfront ? 'upfront $' + f0(r.upfront) : ''); }, end: function (r) { return fmtD(r.end); },
+      remaining_months: function (r) { return r.remaining_months == null ? '' : String(r.remaining_months); } }, {});
+    table('t-spend', R('m_fin_spend').slice().reverse(), { date: function (r) { return fmtD(r.date); }, amount: function (r) { return f2(r.amount); }, comment: function (r, td) { td.className = 'wrap'; return r.comment; } }, { numeric: ['amount'] });
+  }
+
+  // ---------- history
+  function drawHistory() {
+    if (!failed($('#ch-hist'), 'm_history_monthly')) stacked('ch-hist', 'lg-hist', R('m_history_monthly'), ['Service', 'Reels', 'Repair'], { fmt: function (v) { return f0(v) + ' jobs'; } });
+    var q = state.histQ.toLowerCase();
+    table('t-hist', R('m_history').filter(function (r) { return !q || ((r.fleet || '') + ' ' + (r.item || '') + ' ' + (r.ref || '')).toLowerCase().indexOf(q) >= 0; }), {
+      date: function (r) { return fmtD(r.date); }, item: function (r, td) { td.className = 'wrap'; return r.item; }, hours: function (r) { return r.hours ? f1(r.hours) : ''; }
+    }, { onClick: function (k) { var r = R('m_history').filter(function (h) { return h.key === k; })[0]; if (r) openMachine(r.fleet); } });
+  }
+  $('#hist-q').addEventListener('input', function (e) { state.histQ = e.target.value; drawHistory(); });
+
+  // ---------- checks + sources
+  function drawChecks() {
+    var all = R('m_checks'); var rows = all.filter(function (r) { return r.sev === state.sev; });
+    $('#chk-count').textContent = all.filter(function (r) { return r.sev === 'check'; }).length + ' to confirm · ' + all.filter(function (r) { return r.sev === 'fixed'; }).length + ' corrections made';
+    table('t-checks', rows, { issue: function (r, td) { td.className = 'wrap'; return r.issue; }, fix: function (r, td) { td.className = 'wrap'; return r.fix; }, fleet: function (r, td) { td.className = 'wrap'; return r.fleet; } }, {});
+    var ul = $('#sources'); if (failed(ul, 'm_status')) return; ul.replaceChildren();
+    R('m_status').forEach(function (s) { var li = el('li'); li.appendChild(el('span', 'mx-dot ' + (s.state || ''))); var d = el('div'); d.appendChild(el('div', null, s.source)); d.appendChild(el('div', 'mx-note', s.note || '')); li.appendChild(d); li.appendChild(el('span', 'mx-note', s.latest ? fmtD(s.latest) : '–')); ul.appendChild(li); });
+  }
+  $$('#card-checks .mx-chip').forEach(function (b) { b.addEventListener('click', function () { state.sev = b.dataset.sev; $$('#card-checks .mx-chip').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); drawChecks(); }); });
+
+  // ---------- draw loop
+  var DRAW = { today: drawToday, plan: drawPlan, fleet: drawFleet, usage: drawUsage, cutting: drawCutting, parts: drawParts, costs: drawCosts, history: drawHistory, checks: drawChecks };
+  function draw() {
+    try { drawHeader(); } catch (e) { console.error(e); }
+    try { DRAW[state.page](); } catch (e) { console.error(e); }
+    var pb = document.getElementById('pub-built'); var s = R('m_summary')[0]; if (pb && s) pb.textContent = 'updated ' + s.built_label + ', refreshed hourly';
+  }
+  var first = true;
+  dash.onData(function () {
+    draw();
+    if (first && R('m_summary').length) { first = false; var h = (location.hash || '').slice(1); if (PAGES.indexOf(h) >= 0 && h !== state.page) show(h, true); }
+  });
+})();
+</script>
+
+<div class="pub-foot">Ranfurlie Golf Club machinery · public read-only copy · <span id="pub-built">updated hourly</span></div>
+</div></body></html>
