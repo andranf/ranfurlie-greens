@@ -424,7 +424,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       <p><b>Hours.</b> Telematics machines (Reelmaster 5010-Hs, eTriFlex 2, Workman GTX 2) report their hour meter to Toro Intelli360 and are read every hour. Every other machine is projected from its last reading at the rate it has been used on the job board; ~ marks an estimate. A meter reading in a worklist reply resets it.</p>
       <p><b>What's due.</b> Each machine's OEM schedule (operator's manual, in the machinery bible) is counted from the last time that service, or a bigger one, was recorded. Break-in services count from new. Club practice (backlap, grind, greasing, blades) carries over the old taskTracker intervals.</p>
       <p><b>No record.</b> A machine bought before 2024 with no record of a service is assumed to have had it at the last multiple of the interval; a newer one is counted from new, so a missing record shows as overdue.</p>
-      <p><b>Closing a job.</b> Tick the worklist card in #machinery and reply with the hours, or press <b>Update</b> on the job on the shared link: Done, In progress, Waiting on parts, Needs approval or a note, with the hour meter reading. Contractors need the site code. Updates post to #machinery straight away; the hourly run logs finished work and the item drops off.</p>
+      <p><b>Closing a job.</b> Tick the worklist card in #machinery and reply with the hours, or press <b>Update</b> on the job on the shared link: Done, In progress, Waiting on parts, Needs approval or a note, with the time spent and the hour meter reading. Contractors need the site code. Updates post to #machinery straight away; the hourly run logs finished work and the item drops off.</p>
     </div>
   </div>
 </section>
@@ -506,7 +506,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     if (!u) return null;
     var c = el('div', 'mx-upd ' + (UCLS[u.status] || 'note'));
     c.appendChild(el('b', null, u.status));
-    c.appendChild(document.createTextNode(' · ' + u.by + (u.company ? ' (' + u.company + ')' : '') + ' · ' + u.when + (u.hours ? ' · ' + f1(u.hours) + ' h' : '')));
+    c.appendChild(document.createTextNode(' · ' + u.by + (u.company ? ' (' + u.company + ')' : '') + ' · ' + u.when + (u.time_h ? ' · ' + u.time_h + ' h on the job' : '') + (u.hours ? ' · meter ' + f1(u.hours) + ' h' : '')));
     if (u.note) c.appendChild(el('div', 'mx-upd-n', u.note));
     return c;
   }
@@ -533,7 +533,8 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     UM._sts = USTAT.map(function (s) { var b = el('button', null, s[1]); b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.dataset.st = s[0];
       b.addEventListener('click', function () { USEL = s[0]; UM._sts.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); }); sts.appendChild(b); return b; });
     d.appendChild(sts);
-    var hrs = field('Hour meter reading (if you have it)', 'input', { inputmode: 'decimal', autocomplete: 'off', maxlength: '9' }); d.appendChild(hrs[0]); UM._hours = hrs[1];
+    var tt = field('Time spent on the job (hours, e.g. 1.5)', 'input', { inputmode: 'decimal', autocomplete: 'off', maxlength: '6' }); d.appendChild(tt[0]); UM._time = tt[1];
+    var hrs = field('Machine hour meter reading (if you have it)', 'input', { inputmode: 'decimal', autocomplete: 'off', maxlength: '9' }); d.appendChild(hrs[0]); UM._hours = hrs[1];
     var nt = field('What was done, or what is needed', 'textarea', { maxlength: '600', rows: '4' }); d.appendChild(nt[0]); UM._note = nt[1];
     var pt = field('Parts used or needed (optional)', 'input', { maxlength: '300', autocomplete: 'off' }); d.appendChild(pt[0]); UM._parts = pt[1];
     var two = el('div', 'two'); var nm = field('Your name', 'input', { maxlength: '60', autocomplete: 'name' }); var co = field('Company', 'input', { maxlength: '60', autocomplete: 'organization' });
@@ -553,7 +554,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     UJOB = job; UKEY = key; USEL = null;
     UM._what.textContent = job.machine + (job.job ? ': ' + job.job : '');
     UM._sts.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
-    UM._hours.value = ''; UM._note.value = ''; UM._parts.value = '';
+    UM._hours.value = ''; UM._time.value = ''; UM._note.value = ''; UM._parts.value = '';
     UM._name.value = store('mx_upd_name'); UM._co.value = store('mx_upd_co'); UM._code.value = window.__MXK || store('mx_upd_code');
     UM._codeL.hidden = !!window.__MXK;
     UM._msg.textContent = ''; UM._msg.className = 'mx-umsg'; UM._go.disabled = false;
@@ -567,11 +568,12 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     if (!name) return bad('Add your name.');
     if (!/^\d{4,6}$/.test(code)) return bad('Enter the site code.');
     if (USEL !== 'done' && !note) return bad('Add a short note so the crew knows what is happening.');
-    var h = UM._hours.value.trim(); if (h && !/^\d{1,6}([.,]\d{1,2})?$/.test(h)) return bad('Hours should be a number, e.g. 1234.5');
+    var h = UM._hours.value.trim(); if (h && !/^\d{1,6}([.,]\d{1,2})?$/.test(h)) return bad('Hour meter reading should be a number, e.g. 1234.5');
+    var tm = UM._time.value.trim().replace(',', '.'); if (tm && (!/^\d{1,3}(\.\d{1,2})?$/.test(tm) || +tm <= 0 || +tm > 200)) return bad('Time spent should be in hours, e.g. 1.5');
     var body = new URLSearchParams();
     var put = function (k, v) { body.append(k, v == null ? '' : String(v)); };
     put('code', code); put('status', USEL); put('kind', UJOB.kind); put('ref', UJOB.ref); put('machine', UJOB.machine); put('job', UJOB.job);
-    put('items', JSON.stringify(UJOB.items || [])); put('hours', h.replace(',', '.')); put('note', note); put('parts', UM._parts.value.trim());
+    put('items', JSON.stringify(UJOB.items || [])); put('hours', h.replace(',', '.')); put('time', tm); put('note', note); put('parts', UM._parts.value.trim());
     put('name', name); put('company', UM._co.value.trim());
     UM._go.disabled = true; UM._msg.className = 'mx-umsg'; UM._msg.textContent = 'Sending…';
     fetch(UPDURL, { method: 'POST', mode: 'no-cors', body: body }).then(function () {
@@ -651,7 +653,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
       job: function (r, td) { td.className = 'wrap hn'; return r.job; },
       status: function (r) { return pill(r.status === 'Done' ? 'ok' : r.status === 'Waiting on parts' ? 'due' : r.status === 'Needs approval' ? 'overdue' : 'soon', r.status); },
       by: function (r) { return r.by + (r.company ? ' (' + r.company + ')' : ''); },
-      note: function (r, td) { td.className = 'wrap'; return (r.hours ? f1(r.hours) + ' h. ' : '') + (r.note || '') + (r.parts ? ' Parts: ' + r.parts : ''); }
+      note: function (r, td) { td.className = 'wrap'; return (r.time_h ? r.time_h + ' h on the job. ' : '') + (r.hours ? 'Meter ' + f1(r.hours) + ' h. ' : '') + (r.note || '') + (r.parts ? ' Parts: ' + r.parts : ''); }
     }, { sortVal: { when: function (r) { return r.received; } }, empty: 'No updates yet.' });
     drawState();
   }
