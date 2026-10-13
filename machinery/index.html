@@ -42,7 +42,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
     colors: dark ? ['#5aa2f0','#3fc7b4','#f0a35a','#b48ef0','#e874a5','#9bd164','#f0d35a','#8aa0b8'] : ['#2f6fd0','#14998a','#d27a1c','#7b52d0','#c2407a','#5f9a2a','#b39400','#5e7387'],
     refresh: function(){}, params: function(){ return {}; }, setParams: function(){}, resetParams: function(){},
     setLink: function(){} };
-  try { if (/^#(today|plan|fleet|usage|cutting|parts|costs|history|checks)$/.test(location.hash || '')) history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  try { if (/^#(today|plan|fleet|usage|cutting|parts|explore|costs|history|checks)$/.test(location.hash || '')) history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
   window.MX_UPDATE = {"url": "https://hooks.zapier.com/hooks/catch/18429017/hEf82SxQsbv7jyqU/"};
 })();
 </script>
@@ -263,6 +263,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   <button class="mx-tab" role="tab" id="tab-usage" data-page="usage" aria-selected="false">Usage</button>
   <button class="mx-tab" role="tab" id="tab-cutting" data-page="cutting" aria-selected="false">Cutting units</button>
   <button class="mx-tab" role="tab" id="tab-parts" data-page="parts" aria-selected="false">Parts</button>
+  <button class="mx-tab" role="tab" id="tab-explore" data-page="explore" aria-selected="false">3D 5010-H</button>
   <button class="mx-tab" role="tab" id="tab-costs" data-page="costs" aria-selected="false">Costs</button>
   <button class="mx-tab" role="tab" id="tab-history" data-page="history" aria-selected="false">History</button>
   <button class="mx-tab" role="tab" id="tab-checks" data-page="checks" aria-selected="false">Checks &amp; sources</button>
@@ -414,6 +415,81 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   </div>
 </section>
 
+<!-- 3D EXPLORER -->
+<section class="mx-page" id="explore" role="tabpanel" aria-labelledby="tab-explore" hidden>
+  <style>
+  .x3 [hidden]{display:none!important;}
+  .x3{display:grid;grid-template-columns:minmax(0,1fr) 22rem;gap:var(--cds-gap-md);align-items:start;}
+  @media (max-width:60rem){.x3{grid-template-columns:minmax(0,1fr);}}
+  .x3-view{position:relative;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);overflow:hidden;background:var(--color-panel);}
+  .x3-stage{position:relative;height:clamp(22rem,62vh,44rem);}
+  .x3-stage canvas{display:block;width:100%;height:100%;cursor:grab;}
+  .x3-stage canvas:active{cursor:grabbing;}
+  .x3-status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;color:var(--color-fg-muted);font-size:var(--cds-font-size-body);}
+  .x3-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);box-shadow:var(--cds-shadow-popover);border-radius:8px;padding:.3rem .55rem;font-size:var(--cds-font-size-caption);white-space:nowrap;z-index:3;}
+  .x3-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+  .x3-lbl{position:absolute;left:0;top:0;pointer-events:auto;appearance:none;font:inherit;font-size:.7rem;line-height:1.2;padding:.18rem .45rem;border-radius:999px;border:1px solid var(--cds-border);background:color-mix(in srgb,var(--cds-surface-popover) 88%,transparent);color:var(--color-fg);cursor:pointer;white-space:nowrap;backdrop-filter:blur(4px);}
+  .x3-lbl:hover{border-color:var(--color-fg);}
+  .x3-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .9rem;padding:.6rem .8rem;border-top:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-bar label{display:flex;align-items:center;gap:.5rem;flex:1 1 14rem;}
+  .x3-ex{flex:1;accent-color:var(--color-fg);}
+  .x3-tg{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);padding:.3rem .65rem;border:1px solid var(--color-border-line);border-radius:999px;background:none;color:var(--color-fg);cursor:pointer;}
+  .x3-tg[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);}
+  .x3-hint{width:100%;}
+  .x3-side{display:flex;flex-direction:column;gap:var(--cds-gap-md);min-width:0;}
+  .x3-panel,.x3-listbox{border:1px solid var(--color-border-line);border-radius:var(--cds-radius);background:var(--color-panel);padding:var(--cds-pad-md);}
+  .x3-ph{display:flex;justify-content:space-between;gap:.5rem;align-items:flex-start;}
+  .x3-psys{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);text-transform:uppercase;letter-spacing:.05em;}
+  .x3-pt{margin:.15rem 0 0;font-family:var(--font-anthropic-serif);font-weight:400;font-size:1.3rem;line-height:1.2;}
+  .x3-x{appearance:none;border:0;background:none;font-size:1.4rem;line-height:1;color:var(--color-fg-muted);cursor:pointer;padding:0 .2rem;}
+  .x3-pd{font-size:var(--cds-font-size-body);line-height:1.45;margin:.6rem 0;}
+  .x3-pn{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-plist{display:flex;flex-direction:column;border-top:1px solid var(--color-border-line);}
+  .x3-pr{border-bottom:1px solid var(--color-border-line);}
+  .x3-pr summary{list-style:none;display:flex;justify-content:space-between;gap:.6rem;padding:.55rem 0;cursor:pointer;}
+  .x3-pr summary::-webkit-details-marker{display:none;}
+  .x3-prl{min-width:0;} .x3-prn{font-size:var(--cds-font-size-body);line-height:1.3;}
+  .x3-prno{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-prr{text-align:right;flex:none;font-variant-numeric:tabular-nums;}
+  .x3-prp{font-size:var(--cds-font-size-body);font-weight:500;}
+  .x3-pro{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);} .x3-pro.ok{color:var(--color-ok);}
+  .x3-prb{padding:0 0 .7rem;}
+  .x3-prb dl{display:grid;grid-template-columns:auto 1fr;gap:.25rem .7rem;margin:0 0 .6rem;font-size:var(--cds-font-size-caption);}
+  .x3-prb dt{color:var(--color-fg-muted);} .x3-prb dd{margin:0;overflow-wrap:anywhere;}
+  .x3-acts{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .x3-btn{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);padding:.35rem .7rem;border-radius:8px;border:1px solid var(--color-border-line);background:none;color:var(--color-fg);text-decoration:none;cursor:pointer;}
+  .x3-btn.pri{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);}
+  .x3-pf{margin-top:.7rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-pf a,.x3-link{color:var(--color-fg);} .x3-link{appearance:none;border:0;background:none;font:inherit;padding:0;text-decoration:underline;cursor:pointer;}
+  .x3-listbox h3{margin:0 0 .5rem;font-size:var(--cds-font-size-heading);font-weight:500;}
+  .x3-list{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;}
+  .x3-lgh{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.15rem;}
+  .x3-li{display:block;width:100%;text-align:left;appearance:none;border:0;background:none;font:inherit;font-size:var(--cds-font-size-body);padding:.28rem .45rem;border-radius:6px;color:var(--color-fg);cursor:pointer;}
+  .x3-li:hover{background:color-mix(in srgb,var(--color-fg) 6%,transparent);} .x3-li.on{background:color-mix(in srgb,var(--color-warn) 16%,transparent);}
+  .x3-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.45;}
+  </style>
+  <div class="mx-card">
+    <div class="mx-row"><h3>Reelmaster 5010-H in 3D</h3><span class="mx-note">Fairway Mowers 1, 2 and 3 · model 03950</span></div>
+    <p class="mx-note">Drag to turn, scroll or pinch to zoom, right-drag to pan. Click any part for its part numbers, price, what's on the shelf and where to order. Slide to blow the machine apart: halfway separates the assemblies, all the way strips the cutting units down to reel, bedknife, rollers and motor.</p>
+  </div>
+  <div class="x3" id="x3">
+    <div class="x3-view">
+      <div class="x3-stage"><div class="x3-status">Loading…</div><div class="x3-labels"></div><div class="x3-tip" hidden></div></div>
+      <div class="x3-bar">
+        <label>Assembled <input class="x3-ex" type="range" min="0" max="100" value="0" aria-label="Exploded view"> Blown apart</label>
+        <button class="x3-tg x3-xray" aria-pressed="false">See through hood</button>
+        <button class="x3-tg x3-ground" aria-pressed="true">Grass</button>
+        <button class="x3-tg x3-reset">Reset view</button>
+      </div>
+    </div>
+    <div class="x3-side">
+      <div class="x3-panel" hidden></div>
+      <div class="x3-listbox"><h3>Components</h3><div class="x3-list"></div></div>
+      <p class="x3-note">Model built from Toro's published 5010-H dimensions (2.82 m long, 1.52 m wheelbase, 2.54 m cut, 26.5x14-12 front and 20x12-10 rear tyres); shapes are simplified and some component positions are approximate. Part numbers come from parts books 3471-213 (Mowers 1 and 3), 3478-264 (Mower 2) and cutting-unit book 3451-988. Prices are ex GST: club cost from workshop stock first, then AU retail, then an aftermarket equivalent. Stock counts update hourly.</p>
+    </div>
+  </div>
+</section>
+
 <!-- COSTS -->
 <section class="mx-page" id="costs" role="tabpanel" aria-labelledby="tab-costs" hidden>
   <div class="mx-kpis">
@@ -499,7 +575,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
 <script>
 (function () {
   'use strict';
-  var PAGES = ['today', 'plan', 'fleet', 'usage', 'cutting', 'parts', 'costs', 'history', 'checks'];
+  var PAGES = ['today', 'plan', 'fleet', 'usage', 'cutting', 'parts', 'explore', 'costs', 'history', 'checks'];
   var state = { page: 'today', planSt: 'act', planCat: '', planKind: '', planQ: '', item: null, fleetCat: '', fleetSt: 'live', fleetQ: '', machine: null,
                 catModel: '', catKind: '', catQ: '', histQ: '', sev: 'check', sorts: {} };
   var f0 = d3.format(',.0f'), f1 = d3.format(',.1f'), f2 = d3.format(',.2f'), pct = d3.format('.0%');
@@ -1214,7 +1290,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   $$('#card-checks .mx-chip').forEach(function (b) { b.addEventListener('click', function () { state.sev = b.dataset.sev; $$('#card-checks .mx-chip').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); drawChecks(); }); });
 
   // ---------- draw loop
-  var DRAW = { today: drawToday, plan: drawPlan, fleet: drawFleet, usage: drawUsage, cutting: drawCutting, parts: drawParts, costs: drawCosts, history: drawHistory, checks: drawChecks };
+  var DRAW = { today: drawToday, plan: drawPlan, fleet: drawFleet, usage: drawUsage, cutting: drawCutting, parts: drawParts, explore: function () { var r = document.getElementById("x3"); if (r && r.__mx3d && r.__mx3d.resize) r.__mx3d.resize(); }, costs: drawCosts, history: drawHistory, checks: drawChecks };
   function draw() {
     try { drawHeader(); } catch (e) { console.error(e); }
     try { DRAW[state.page](); } catch (e) { console.error(e); }
@@ -1229,6 +1305,656 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     if (go) { first = false; FX.loaded(); var h = (location.hash || '').slice(1); if (PAGES.indexOf(h) >= 0 && h !== state.page) show(h, true); }
     else if (D('m_summary').status !== 'loading') FX.loaded();
   });
+})();
+</script>
+<script>
+/* Ranfurlie machinery 3D parts explorer - Toro Reelmaster 5010-H (03950).
+   Procedural model built from Toro's published dimensions (spec sheet / product page 03950):
+   length 2819 mm, wheelbase 1524 mm, transport width 2337 mm, width of cut 2540 mm, ROPS 2172 mm, seat 1600 mm,
+   front tyres 26.5x14-12, rear 20x12-10, five 22 in (559 mm) 5 in DPA cutting units. Shapes are simplified.
+   Part numbers: machinery bible (models/toro_reelmaster_5010h.json, parts catalogs 3471-213 / 3478-264, CU 3451-988).
+   Live price / on-hand come from the dashboard's m_catalog dataset when present. */
+(function () {
+  'use strict';
+  var THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+  // ------------------------------------------------------------------ parts data
+  var CAT_PC1 = 'https://www.toro.com/getpub/253209';   // Parts catalog 3471-213 (Mowers 1 and 3)
+  var CAT_PC2 = 'https://www.toro.com/getpub/270027';   // Parts catalog 3478-264 (Mower 2)
+  var CAT_CU = 'https://www.toro.com/getpub/254361';    // Cutting unit parts catalog 3451-988
+  var CAT_OM = 'https://www.toro.com/getpub/253206';    // Operator's manual 3471-210
+  var LOOKUP = 'https://www.toro.com/en/parts/partdetails?id=57149';
+  // Parts not in the machinery bible's service/wear lists (reference numbers from the catalogs)
+  var EXTRA = {
+    '138-6909': { name: 'Engine assembly, Kubota D1105 (s/n 418274365+, Mowers 1 and 3)', note: 'Major assembly. Dealer quote.' },
+    '145-2806': { name: 'Engine assembly, Kubota D1105 (s/n 420000000+, Mower 2)', note: 'Major assembly. Dealer quote.' },
+    '106-5277': { name: 'Air cleaner assembly', note: 'Complete housing. Service element is 108-3810.' },
+    '136-3726': { name: '12 V AGM battery for the 48 V pack (x4)', note: 'Replace as a set of four.' },
+    '139-8482': { name: 'Hybrid 48 V DC fuse kit', note: 'Keep one on the shelf: the 48 V cutting-unit fuses are separate from the 12 V block.' },
+    '161-9001': { name: 'Telematics gateway (Intelli360)', note: 'Fitted by the dealer. Reports hours to Intelli360.' },
+    '93-2242': { name: 'Hydraulic filter and head assembly', note: 'Club stocks one ($233.33). Only needed if the head is damaged: routine service is the 75-1310 element.' },
+    '108-3841': { name: 'Engine oil filter (alternative number)', note: 'Shown at the oil-filter position in PC 3478-264. Club stocks it. Confirm interchangeable with 127-0511.' },
+    '115-3299': { name: 'Reel bearing seal, flocked (x2 per reel)', note: '' },
+    '112-5290': { name: 'Roller bearing', note: 'In roller rebuild kit 114-5430.' },
+    '114-3717': { name: 'Roller oil seal', note: 'In roller rebuild kit 114-5430.' },
+    '03623': { name: 'Cutting unit, 5 in DPA 11-blade forward swept', note: 'Check the plates: the club has not recorded whether 03621, 03623 or 03624 came on the leased units.' }
+  };
+  // Snapshot of m_catalog for the 5010-H (13 Oct 2026); live dashboard data overrides it.
+  var SNAP = {
+    '127-0511': ['Engine oil filter', 24.0, 'genuine', 0, 'Toro dealer', null, '50 h, 150 h'],
+    '108-3810': ['Air filter (primary)', 27.58, 'genuine', 3, 'Toro dealer', null, '400 h'],
+    '114-4057': ['Air cleaner safety element (optional)', 20.54, 'equivalent', 0, 'Toro dealer', 'https://www.amacrongolf.com.au/products/f223f428ee/5592000042652949', ''],
+    '110-9049': ['Fuel/water separator filter (spin-on)', 45.0, 'genuine', 3, 'Toro dealer', null, '400 h'],
+    '98-7612': ['In-line engine fuel filter', 8.57, 'equivalent', 0, 'Toro dealer', 'https://www.amacrongolf.com.au/products/e407e6a76e/5592000028782583', '400 h'],
+    '75-1310': ['Hydraulic charge filter (element)', 89.7, 'equivalent', 0, 'Toro dealer', 'https://www.amacrongolf.com.au/products/e2dac8509d/5592000018986028', '1000 h'],
+    '104-3494': ['Alternator belt', 41.32, 'equivalent', 0, 'Toro dealer', 'https://www.amacrongolf.com.au/products/h7d44a8c0c/5592000020562605', '8 h, 100 h'],
+    '130-1411': ['Glow plug (x3)', 36.89, 'equivalent', 0, 'Toro / Kubota dealer', 'https://www.ebay.com.au/itm/286039723952', ''],
+    '121-6395': ['Engine oil Toro Premium 15W-40 (5 gal)', 4.68, 'genuine', 0, 'Toro dealer / club bulk oil', null, '50 h, 150 h'],
+    '133-8086': ['Toro PX Extended Life Hydraulic Fluid 5 gal', null, null, 0, 'Toro dealer', null, '2000 h'],
+    '108-1190': ['Premium all-purpose grease 14 oz', null, null, 0, 'Toro dealer', null, '50 h, 800 h'],
+    '132-8621': ['12 V starting battery', null, null, 0, 'Toro dealer', null, ''],
+    '145-2576': ['MVP hydraulic hose kit', null, null, 0, 'Toro dealer', null, ''],
+    '147-1257': ['Bedknife Tournament (5in DPA), HOC 3.8-9.5 mm', null, null, 0, 'Toro dealer', null, ''],
+    '137-6093': ['Bedknife EdgeMax Low HOC (std on 03623)', null, null, 0, 'Toro dealer', null, ''],
+    '147-1244': ['Bedknife Low HOC (std on 03624)', null, null, 0, 'Toro dealer', null, ''],
+    '119-4151': ['Bedknife screw (8 per knife)', 0.6, 'genuine', 0, 'Toro dealer / Turftines', 'https://www.tines.com.au/product/bedknife-screw-toro/', ''],
+    '140-5510': ['Reel bearing, sealed stainless (2 per reel)', null, null, 0, 'Toro dealer', null, ''],
+    '114-5430': ['Roller rebuild kit (greasable rollers)', null, null, 0, 'Toro dealer', null, ''],
+    '137-8427': ['Reel assy 5in 11-blade (22in)', null, null, 0, 'Toro dealer', null, '']
+  };
+  var STOCK_EXTRA = { '108-3841': [24.0, 1], '93-2242': [233.33, 1] };
+
+  // Pickable components: id -> description + part numbers
+  var COMP = {
+    hood: { name: 'Hood and rear body panels', sys: 'Body', desc: 'Lift the hood for the engine, air cleaner and radiator. Blow debris off the rear screen and radiator daily.', parts: [], cat: CAT_PC1 },
+    engine: { name: 'Engine: Kubota D1105 3-cyl diesel', sys: 'Engine', desc: '24.8 hp (18.5 kW) liquid-cooled diesel driving the generator. Oil 3.3 L 15W-40. First oil and filter change at 50 h, then every 150 h.', parts: ['127-0511', '108-3841', '121-6395', '130-1411', '138-6909', '145-2806'], cat: CAT_PC2 },
+    oilfilter: { name: 'Engine oil filter', sys: 'Engine', desc: 'Spin-on. Oil the gasket, hand tight then a further 1/2 to 3/4 turn. Change at 50 h, then every 150 h.', parts: ['127-0511', '108-3841'], cat: CAT_PC2 },
+    belt: { name: 'Alternator / fan belt', sys: 'Engine', desc: 'Check tension at 8 h and every 100 h: 11 mm deflection with 10 kg midway between the pulleys.', parts: ['104-3494'], cat: CAT_PC2 },
+    generator: { name: 'Hybrid generator (PowerMatch)', sys: 'Hybrid drive', desc: 'Driven off the engine. Feeds the 48 V reel motors and tops up the battery pack; PowerMatch adds over 40 hp of peak power.', parts: ['139-8482'], cat: CAT_PC2 },
+    aircleaner: { name: 'Air cleaner', sys: 'Engine', desc: 'Service only when the indicator shows red, or at 400 h. Early changes let dirt in.', parts: ['108-3810', '114-4057', '106-5277'], cat: CAT_PC2 },
+    radiator: { name: 'Radiator and oil cooler', sys: 'Cooling', desc: 'Rear mounted, 6 fins per inch, 5.2 L coolant. Clean the screen and cores daily; change coolant and hoses every 2 years.', parts: [], cat: CAT_PC1 },
+    fueltank: { name: 'Fuel tank (53 L diesel)', sys: 'Fuel', desc: '14 US gal (53 L). Drain water from the fuel/water separator daily.', parts: [], cat: CAT_PC1 },
+    fuelsep: { name: 'Fuel/water separator and in-line filter', sys: 'Fuel', desc: 'Spin-on separator and in-line engine filter, both every 400 h. Drain the bowl daily.', parts: ['110-9049', '98-7612'], cat: CAT_PC2 },
+    hydtank: { name: 'Hydraulic tank and charge filter', sys: 'Hydraulics', desc: '41.6 L of Toro PX. Charge filter every 1,000 h, fluid every 2,000 h (800 h for both if any non-PX fluid goes in). Hoses every 2 years.', parts: ['75-1310', '93-2242', '133-8086', '145-2576'], cat: CAT_PC2 },
+    battery48: { name: '48 V battery pack (4 x 12 V AGM)', sys: 'Hybrid drive', desc: 'Sealed, maintenance free. Buffers power for the electric reel motors. 48 V fuses are separate from the 12 V fuse block.', parts: ['136-3726', '139-8482'], cat: CAT_PC2 },
+    battery12: { name: '12 V starting battery', sys: 'Electrical', desc: '570 CCA. Clean terminals and check charge at 50 h.', parts: ['132-8621'], cat: CAT_PC2 },
+    seat: { name: 'Operator seat', sys: 'Operator station', desc: 'Deluxe high-back suspension seat with fore/aft, height and weight adjustment. Seat switch is an interlock.', parts: [], cat: CAT_PC1 },
+    rops: { name: 'ROPS (2-post) and seat belt', sys: 'Safety', desc: 'Check the ROPS mounts and seat belt daily. Do not drill, weld or modify the ROPS.', parts: [], cat: CAT_PC1 },
+    console: { name: 'Control console and InfoCenter', sys: 'Operator station', desc: 'Right-hand pivoting console: InfoCenter LCD for gauges, faults, service reminders, reel and backlap speed. Telematics gateway reports hours to Intelli360.', parts: ['161-9001'], cat: CAT_PC1 },
+    steering: { name: 'Steering wheel and tilt column', sys: 'Steering', desc: 'Rear-wheel power steering with its own hydraulic pump.', parts: [], cat: CAT_PC1 },
+    tyreFL: { name: 'Front tyre and wheel, left', sys: 'Traction', desc: '26.5 x 14-12 turf tyre on a hydrostatic wheel motor with drum brake. 83-103 kPa (12-15 psi). Lug nuts 94-122 N.m, hub nut 407-542 N.m.', parts: [], cat: CAT_PC1 },
+    tyreFR: { name: 'Front tyre and wheel, right', sys: 'Traction', desc: '26.5 x 14-12 turf tyre on a hydrostatic wheel motor with drum brake. 83-103 kPa (12-15 psi). Lug nuts 94-122 N.m, hub nut 407-542 N.m.', parts: [], cat: CAT_PC1 },
+    tyreRL: { name: 'Rear tyre and wheel, left', sys: 'Steering', desc: '20 x 12-10 turf tyre on the steer axle. 83-103 kPa (12-15 psi).', parts: [], cat: CAT_PC1 },
+    tyreRR: { name: 'Rear tyre and wheel, right', sys: 'Steering', desc: '20 x 12-10 turf tyre on the steer axle. 83-103 kPa (12-15 psi).', parts: [], cat: CAT_PC1 },
+    frame: { name: 'Main frame and footplate', sys: 'Chassis', desc: 'Grease all fittings after every wash (No. 2 lithium).', parts: ['108-1190'], cat: CAT_PC1 },
+    liftF: { name: 'Front lift arms and cylinders', sys: 'Hydraulics', desc: 'Raise and lower the three front cutting units. Check hoses for wear daily.', parts: ['145-2576', '108-1190'], cat: CAT_PC1 }
+  };
+  var CU_POS = { cu4: 'front left', cu1: 'front centre', cu5: 'front right', cu2: 'rear left', cu3: 'rear right' };
+  Object.keys(CU_POS).forEach(function (k) {
+    COMP[k] = { name: 'Cutting unit, ' + CU_POS[k], sys: 'Cutting units', desc: '22 in (559 mm) 5 in DPA cutting unit with its own 48 V electric reel motor. 5 grease fittings per unit at 50 h and after washing. HOC 6 mm on fairways.', parts: ['03623', '137-8427', '147-1257', '119-4151', '140-5510', '114-5430'], cat: CAT_CU };
+  });
+  var SUB = {
+    reel: { name: 'Reel (5 in, 11 blades)', desc: 'Backlap and check reel-to-bedknife contact daily. Grind when the land is over 3 mm: 30 deg relief to 1.3 mm land, end-to-end diameter within 0.25 mm.', parts: ['137-8427', '140-5510', '115-3299'] },
+    bedknife: { name: 'Bedknife and bedbar', desc: 'Tournament knife 147-1257 is the only listed knife that covers 6 mm. Bedknife screws 29.8 N.m (8 per knife); bedbar bolts 37-45 N.m. Replace at the lip limit (Tournament 3.4 mm).', parts: ['147-1257', '137-6093', '147-1244', '119-4151'] },
+    froller: { name: 'Front roller (Wiehle, grooved)', desc: 'Greasable. Rebuild with the roller kit when the bearings have play.', parts: ['114-5430', '112-5290', '114-3717'] },
+    rroller: { name: 'Rear roller', desc: 'Greasable. Same rebuild kit as the front roller.', parts: ['114-5430', '112-5290', '114-3717'] },
+    motor: { name: 'Reel motor (48 V electric)', desc: 'Direct electric drive, nine reel speed settings plus onboard backlap. Fused on the 48 V circuit.', parts: ['139-8482'] },
+    cuframe: { name: 'Cutting unit frame and side plates', desc: 'DPA (dual precision adjustment) at each end sets reel-to-bedknife contact.', parts: ['03623'] }
+  };
+
+  // ------------------------------------------------------------------ helpers
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  function money(v) { return v == null ? null : '$' + (v < 10 ? v.toFixed(2) : v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')); }
+  function norm(p) { return String(p || '').replace(/^toro\s*/i, '').replace(/[\s-]/g, '').toUpperCase(); }
+
+  function partInfo(no) {
+    var live = null;
+    try {
+      if (window.dash && dash.data) {
+        var d = dash.data('m_catalog');
+        if (d && d.status === 'ok' && Array.isArray(d.data)) {
+          for (var i = 0; i < d.data.length; i++) { var r = d.data[i]; if (r.slug === 'toro_reelmaster_5010h' && norm(r.part_no) === norm(no)) { live = r; break; } }
+        }
+      }
+    } catch (e) {}
+    if (live) return { no: no, name: live.name, price: live.price, kind: live.price_kind, onHand: live.on_hand, supplier: live.supplier, url: live.equiv_url || live.link, every: (live.intervals || []).map(function (h) { return h + ' h'; }).join(', '), note: live.note, alt: live.alt, equiv: live.equiv, live: true };
+    var s = SNAP[no];
+    if (s) return { no: no, name: s[0], price: s[1], kind: s[2], onHand: s[3], supplier: s[4], url: s[5], every: s[6] };
+    var x = EXTRA[no] || { name: no, note: '' };
+    var st = STOCK_EXTRA[no];
+    return { no: no, name: x.name, price: st ? st[0] : null, kind: st ? 'genuine' : null, onHand: st ? st[1] : 0, supplier: 'Toro dealer', url: null, every: '', note: x.note };
+  }
+
+  // ------------------------------------------------------------------ canvas textures
+  function canvasTex(THREE, w, h, draw, srgb, rep) {
+    var c = document.createElement('canvas'); c.width = w; c.height = h; var g = c.getContext('2d'); draw(g, w, h);
+    var t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; if (rep) t.repeat.set(rep[0], rep[1]); t.anisotropy = 8; return t;
+  }
+  function noise(g, w, h, a, b, amt) {
+    var id = g.getImageData(0, 0, w, h), d = id.data;
+    for (var i = 0; i < d.length; i += 4) { var n = (Math.random() - 0.5) * amt; d[i] = Math.max(0, Math.min(255, d[i] + n)); d[i + 1] = Math.max(0, Math.min(255, d[i + 1] + n)); d[i + 2] = Math.max(0, Math.min(255, d[i + 2] + n)); }
+    g.putImageData(id, 0, 0);
+  }
+
+  // ------------------------------------------------------------------ mount
+  function mount(root, opts) {
+    opts = opts || {};
+    if (root.__mx3d) { root.__mx3d.resize(); return root.__mx3d; }
+    var api = { resize: function () {} }; root.__mx3d = api;
+    var stage = root.querySelector('.x3-stage'), panel = root.querySelector('.x3-panel'), tip = root.querySelector('.x3-tip'), labels = root.querySelector('.x3-labels');
+    var status = root.querySelector('.x3-status');
+    status.textContent = 'Loading 3D engine…';
+    var probe = document.createElement('canvas');
+    if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) { status.textContent = 'This browser has WebGL turned off, so the 3D model cannot show. The parts list below still works.'; buildList(); return api; }
+    import(THREE_URL).then(function (THREE) { build(THREE); }).catch(function (e) { status.textContent = 'Could not load the 3D engine (' + (e && e.message || e) + '). Check the connection and reload.'; buildList(); });
+
+    var selectFn = null;
+    function buildList() {
+      var list = root.querySelector('.x3-list'); list.replaceChildren();
+      var groups = {};
+      Object.keys(COMP).forEach(function (k) { var c = COMP[k]; (groups[c.sys] = groups[c.sys] || []).push(k); });
+      Object.keys(groups).forEach(function (sys) {
+        var g = el('div', 'x3-lg'); g.appendChild(el('div', 'x3-lgh', sys));
+        groups[sys].forEach(function (k) { var b = el('button', 'x3-li', COMP[k].name); b.dataset.pid = k; b.addEventListener('click', function () { if (selectFn) selectFn(k, null, true); else showPanel(k, null); }); g.appendChild(b); });
+        list.appendChild(g);
+      });
+    }
+    function showPanel(pid, sub) {
+      var c = COMP[pid]; if (!c) { panel.hidden = true; return; }
+      var s = sub ? SUB[sub] : null;
+      panel.hidden = false; panel.replaceChildren();
+      var head = el('div', 'x3-ph');
+      var ht = el('div'); ht.appendChild(el('div', 'x3-psys', c.sys + (s ? ' · ' + c.name : '')));
+      ht.appendChild(el('h3', 'x3-pt', s ? s.name : c.name)); head.appendChild(ht);
+      var x = el('button', 'x3-x', '×'); x.setAttribute('aria-label', 'Close'); x.addEventListener('click', function () { if (selectFn) selectFn(null); else panel.hidden = true; }); head.appendChild(x);
+      panel.appendChild(head);
+      panel.appendChild(el('p', 'x3-pd', s ? s.desc : c.desc));
+      var nos = s ? s.parts : c.parts;
+      if (nos.length) {
+        var tl = el('div', 'x3-plist');
+        nos.forEach(function (no) {
+          var p = partInfo(no); var row = el('details', 'x3-pr');
+          var sm = el('summary');
+          var l = el('div', 'x3-prl'); l.appendChild(el('div', 'x3-prn', p.name)); l.appendChild(el('code', 'x3-prno', no));
+          sm.appendChild(l);
+          var r = el('div', 'x3-prr');
+          r.appendChild(el('div', 'x3-prp', p.price != null ? money(p.price) + (p.kind === 'equivalent' ? ' equiv.' : '') : 'quote'));
+          r.appendChild(el('div', 'x3-pro ' + (p.onHand > 0 ? 'ok' : ''), p.onHand > 0 ? p.onHand + ' on shelf' : 'none on shelf'));
+          sm.appendChild(r); row.appendChild(sm);
+          var body = el('div', 'x3-prb');
+          var dl = el('dl');
+          function add(k, v) { if (v == null || v === '') return; dl.appendChild(el('dt', null, k)); var dd = el('dd'); if (v.nodeType) dd.appendChild(v); else dd.textContent = v; dl.appendChild(dd); }
+          add('Price', p.price != null ? money(p.price) + ' ex GST' + (p.kind === 'equivalent' ? ' (aftermarket equivalent' + (p.equiv ? ': ' + p.equiv.replace(/\s*\$[\d.,]+$/, '') : '') + ')' : (p.kind === 'genuine' ? ' (genuine, club cost / AU retail)' : '')) : 'No public price. Ask the Toro dealer for a quote.');
+          add('On the shelf', String(p.onHand || 0) + (STOCK_EXTRA[no] && !p.live ? ' (workshop stock)' : ''));
+          add('Service', p.every);
+          add('Where to order', p.supplier);
+          add('Also', p.alt);
+          add('Note', p.note);
+          body.appendChild(dl);
+          var acts = el('div', 'x3-acts');
+          if (p.url) { var a = el('a', 'x3-btn pri', /amacron/.test(p.url) ? 'Order from Amacron' : (/tines/.test(p.url) ? 'Order from Turftines' : (/ebay/.test(p.url) ? 'View on eBay' : 'Order online'))); a.href = p.url; a.target = '_blank'; a.rel = 'noopener'; acts.appendChild(a); }
+          var tl2 = el('a', 'x3-btn', 'Toro parts lookup'); tl2.href = LOOKUP; tl2.target = '_blank'; tl2.rel = 'noopener'; acts.appendChild(tl2);
+          var cp = el('button', 'x3-btn', 'Copy part no.'); cp.addEventListener('click', function () { try { navigator.clipboard.writeText(no); cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy part no.'; }, 1200); } catch (e) {} }); acts.appendChild(cp);
+          body.appendChild(acts); row.appendChild(body); tl.appendChild(row);
+        });
+        panel.appendChild(tl);
+      } else panel.appendChild(el('p', 'x3-pn', 'No service or wear parts listed for this component. Use the parts book for structural parts.'));
+      var foot = el('div', 'x3-pf');
+      var cl = el('a', null, 'Parts book (PDF)'); cl.href = c.cat || CAT_PC1; cl.target = '_blank'; cl.rel = 'noopener'; foot.appendChild(cl);
+      foot.appendChild(document.createTextNode(' · '));
+      var om = el('a', null, "Operator's manual"); om.href = CAT_OM; om.target = '_blank'; om.rel = 'noopener'; foot.appendChild(om);
+      if (/^cu/.test(pid) && !sub) { foot.appendChild(document.createTextNode(' · ')); var bx = el('button', 'x3-link', 'Blow up this unit'); bx.addEventListener('click', function () { if (api.blowUnit) api.blowUnit(pid); }); foot.appendChild(bx); }
+      panel.appendChild(foot);
+      root.querySelectorAll('.x3-li').forEach(function (b) { b.classList.toggle('on', b.dataset.pid === pid); });
+    }
+    api.showPanel = showPanel;
+
+    // ================================================================ 3D
+    function build(THREE) {
+      buildList();
+      var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+      var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: !!opts.capture });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+      renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      stage.appendChild(renderer.domElement);
+      var scene = new THREE.Scene();
+      var bg = dark ? 0x161714 : 0xeef0ea;
+      scene.background = new THREE.Color(bg);
+      scene.fog = new THREE.Fog(bg, 9, 22);
+      var camera = new THREE.PerspectiveCamera(32, 1, 0.05, 80);
+
+      // ---- environment (studio + sky) for reflections
+      (function () {
+        var pm = new THREE.PMREMGenerator(renderer); var es = new THREE.Scene();
+        var sky = new THREE.Mesh(new THREE.SphereGeometry(20, 32, 16), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false,
+          vertexShader: 'varying vec3 p; void main(){ p = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+          fragmentShader: 'varying vec3 p; void main(){ float y=p.y; vec3 top=vec3(0.62,0.72,0.86); vec3 hor=vec3(0.95,0.95,0.92); vec3 grd=vec3(0.18,0.24,0.14); vec3 c = y>0. ? mix(hor,top,pow(y,0.6)) : mix(hor,grd,pow(-y,0.4)); gl_FragColor=vec4(c*1.15,1.); }' }));
+        es.add(sky);
+        function panelL(w, h, x, y, z, i) { var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(i, i, i), side: THREE.DoubleSide })); m.position.set(x, y, z); m.lookAt(0, 0, 0); es.add(m); }
+        panelL(8, 3, 0, 9, 0, 3.2); panelL(6, 4, 10, 4, 4, 2.2); panelL(5, 3, -9, 3, -6, 1.6); panelL(3, 6, -4, 5, 10, 1.4);
+        scene.environment = pm.fromScene(es, 0.02).texture; pm.dispose();
+      })();
+      var sun = new THREE.DirectionalLight(0xfff4e6, 2.6); sun.position.set(4.5, 8, 3.5); sun.castShadow = true;
+      sun.shadow.mapSize.set(2048, 2048); var sc = sun.shadow.camera; sc.left = -3.5; sc.right = 3.5; sc.top = 3.5; sc.bottom = -3.5; sc.near = 1; sc.far = 20; sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02; sun.shadow.radius = 4;
+      scene.add(sun); scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x3a4a2a, 0.35));
+
+      // ---- textures
+      var paintFlake = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); noise(g, w, h, 0, 0, 22); }, false, [6, 6]);
+      var grass = canvasTex(THREE, 1024, 1024, function (g, w, h) {
+        for (var s = 0; s < 8; s++) { g.fillStyle = s % 2 ? '#4f7a33' : '#5d8a3c'; g.fillRect(s * w / 8, 0, w / 8, h); }
+        for (var i = 0; i < 26000; i++) { var x = Math.random() * w, y = Math.random() * h; var l = 30 + Math.random() * 40; g.strokeStyle = 'hsla(' + (85 + Math.random() * 20) + ',45%,' + l + '%,0.35)'; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (Math.random() - 0.5) * 3, y - 2 - Math.random() * 4); g.stroke(); }
+      }, true, [4, 4]);
+      var tread = canvasTex(THREE, 512, 128, function (g, w, h) {
+        g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+        for (var i = 0; i < 64; i++) { var x = i * w / 64; g.fillStyle = '#fff'; g.fillRect(x + 1, h * 0.18, w / 64 * 0.55, h * 0.26); g.fillRect(x + w / 128, h * 0.56, w / 64 * 0.55, h * 0.26); }
+        g.filter = 'blur(1px)'; g.drawImage(g.canvas, 0, 0);
+      }, false, [1, 1]);
+      var fins = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#222'; g.fillRect(0, 0, w, h); g.strokeStyle = '#777'; g.lineWidth = 1; for (var x = 0; x < w; x += 4) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); } for (var y = 0; y < h; y += 32) { g.fillStyle = '#555'; g.fillRect(0, y, w, 3); } }, true, [3, 2]);
+      var diamond = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#7a7a7a'; g.fillRect(0, 0, w, h); g.fillStyle = '#d0d0d0'; for (var y = 0; y < h; y += 32) for (var x = 0; x < w; x += 32) { var o = (y / 32) % 2 ? 16 : 0; g.save(); g.translate(x + o + 8, y + 8); g.rotate(((x + y) / 32) % 2 ? 0.8 : -0.8); g.fillRect(-9, -2, 18, 4); g.restore(); } }, false, [5, 3]);
+      var vinyl = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#7f7f7f'; g.fillRect(0, 0, w, h); noise(g, w, h, 0, 0, 30); g.strokeStyle = '#3a3a3a'; g.lineWidth = 3; for (var y = 40; y < h; y += 64) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); } }, false, [1, 1]);
+      function decalTex(text, sub, color, bgc) {
+        return canvasTex(THREE, 1024, 256, function (g, w, h) {
+          g.clearRect(0, 0, w, h); if (bgc) { g.fillStyle = bgc; g.fillRect(0, 0, w, h); }
+          g.fillStyle = color; g.font = '700 120px "Inter Tight", Arial, sans-serif'; g.textBaseline = 'middle'; g.fillText(text, 24, sub ? 100 : 128);
+          if (sub) { g.font = '600 56px "Inter Tight", Arial, sans-serif'; g.fillText(sub, 28, 200); }
+        }, true, [1, 1]);
+      }
+      var screenTex = canvasTex(THREE, 256, 160, function (g, w, h) { g.fillStyle = '#0b1a10'; g.fillRect(0, 0, w, h); g.fillStyle = '#7dff9a'; g.font = '600 26px monospace'; g.fillText('RPM 3220', 14, 42); g.fillText('48V  51.2', 14, 82); g.fillText('REEL 7  6mm', 14, 122); g.fillRect(14, 136, 160, 8); }, true, [1, 1]);
+
+      // ---- materials (each mesh gets its own clone so it can glow on hover)
+      var M = {
+        red: new THREE.MeshPhysicalMaterial({ color: 0x9a0c15, roughness: 0.34, metalness: 0.05, clearcoat: 1, clearcoatRoughness: 0.12, bumpMap: paintFlake, bumpScale: 0.0015 }),
+        black: new THREE.MeshStandardMaterial({ color: 0x1b1b1b, roughness: 0.55, metalness: 0.25 }),
+        satin: new THREE.MeshStandardMaterial({ color: 0x2a2b2c, roughness: 0.42, metalness: 0.5 }),
+        steel: new THREE.MeshStandardMaterial({ color: 0xc9ccd0, roughness: 0.22, metalness: 1 }),
+        brushed: new THREE.MeshStandardMaterial({ color: 0x9da2a8, roughness: 0.35, metalness: 1 }),
+        chrome: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.05, metalness: 1 }),
+        rim: new THREE.MeshStandardMaterial({ color: 0xb8bcc0, roughness: 0.32, metalness: 0.75 }),
+        rubber: new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.9, metalness: 0, bumpMap: tread, bumpScale: 0.012 }),
+        engine: new THREE.MeshStandardMaterial({ color: 0x3a3d40, roughness: 0.5, metalness: 0.55 }),
+        alum: new THREE.MeshStandardMaterial({ color: 0xb0b3b5, roughness: 0.45, metalness: 0.8 }),
+        plastic: new THREE.MeshStandardMaterial({ color: 0x121212, roughness: 0.7, metalness: 0 }),
+        seat: new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.62, metalness: 0, bumpMap: vinyl, bumpScale: 0.004 }),
+        filterW: new THREE.MeshStandardMaterial({ color: 0xe8e6df, roughness: 0.4, metalness: 0.2 }),
+        filterR: new THREE.MeshPhysicalMaterial({ color: 0x9c121a, roughness: 0.35, metalness: 0.3, clearcoat: 0.6 }),
+        rad: new THREE.MeshStandardMaterial({ map: fins, roughness: 0.6, metalness: 0.6 }),
+        plate: new THREE.MeshStandardMaterial({ color: 0x8a8d90, roughness: 0.4, metalness: 0.85, bumpMap: diamond, bumpScale: 0.004 }),
+        hose: new THREE.MeshStandardMaterial({ color: 0x101010, roughness: 0.75 }),
+        battery: new THREE.MeshStandardMaterial({ color: 0x202224, roughness: 0.6 }),
+        yellow: new THREE.MeshStandardMaterial({ color: 0xe0b020, roughness: 0.5 }),
+        screen: new THREE.MeshStandardMaterial({ map: screenTex, emissive: 0xffffff, emissiveMap: screenTex, emissiveIntensity: 0.9, roughness: 0.2 }),
+        glass: new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.05, transmission: 0.6, transparent: true, opacity: 0.5 })
+      };
+      var pickables = [];
+      function mk(geo, mat, parent, pos, rot, noShadow) {
+        var m = new THREE.Mesh(geo, mat.clone()); if (pos) m.position.set(pos[0], pos[1], pos[2]); if (rot) m.rotation.set(rot[0], rot[1], rot[2]);
+        m.castShadow = !noShadow; m.receiveShadow = true; parent.add(m); return m;
+      }
+      function rbox(w, h, d, r, seg) {
+        r = Math.min(r, w / 2 - 1e-4, h / 2 - 1e-4, d / 2 - 1e-4); var s = new THREE.Shape(); var x = -w / 2 + r, y = -h / 2 + r, ww = w - 2 * r, hh = h - 2 * r;
+        s.moveTo(x, y); s.lineTo(x + ww, y); s.lineTo(x + ww, y + hh); s.lineTo(x, y + hh); s.lineTo(x, y);
+        var g = new THREE.ExtrudeGeometry(s, { depth: d - 2 * r, bevelEnabled: true, bevelThickness: r, bevelSize: r, bevelSegments: seg || 4, curveSegments: 4 });
+        g.translate(0, 0, -(d - 2 * r) / 2); g.computeVertexNormals(); return g;
+      }
+      function cyl(r, l, seg, r2) { var g = new THREE.CylinderGeometry(r2 == null ? r : r2, r, l, seg || 32); return g; }
+      function tube(pts, r, seg) { var c = new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); }), false, 'catmullrom', 0.2); return new THREE.TubeGeometry(c, seg || 48, r, 16, false); }
+      function polyTube(pts, r, rad) { // straight segments with rounded corners
+        var path = new THREE.CurvePath(); var V = pts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); });
+        for (var i = 0; i < V.length - 1; i++) {
+          var a = V[i], b = V[i + 1];
+          var a2 = i > 0 ? a.clone().add(b.clone().sub(a).setLength(rad)) : a;
+          var b2 = i < V.length - 2 ? b.clone().add(a.clone().sub(b).setLength(rad)) : b;
+          path.add(new THREE.LineCurve3(a2, b2));
+          if (i < V.length - 2) { var c2 = b.clone().add(V[i + 2].clone().sub(b).setLength(rad)); path.add(new THREE.QuadraticBezierCurve3(b2, b, c2)); }
+        }
+        return new THREE.TubeGeometry(path, 120, r, 16, false);
+      }
+
+      // ---- assemblies
+      var machine = new THREE.Group(); scene.add(machine);
+      var ASM = {}; // pid -> {g, home, ex}
+      function asm(pid, ex, parent) { var g = new THREE.Group(); g.userData.pid = pid; (parent || machine).add(g); ASM[pid] = { g: g, home: null, ex: new THREE.Vector3(ex[0], ex[1], ex[2]) }; return g; }
+
+      // coordinates: x forward (front of machine +x), y up, z right. Front axle at x=0, rear axle x=-1.524.
+      var FR = 0.3365, FW = 0.356, RR = 0.254, RW = 0.305, WB = 1.524, FT = 0.66, RT = 0.53;
+
+      // frame
+      var frame = asm('frame', [0, -0.25, 0]);
+      mk(rbox(1.95, 0.14, 0.12, 0.02), M.black, frame, [-0.62, 0.42, -0.36]);
+      mk(rbox(1.95, 0.14, 0.12, 0.02), M.black, frame, [-0.62, 0.42, 0.36]);
+      mk(rbox(0.16, 0.16, 1.0, 0.02), M.black, frame, [0.0, FR, 0]); // front axle housing
+      mk(rbox(0.65, 0.05, 1.05, 0.015), M.plate, frame, [0.08, 0.6, 0]); // footplate
+      mk(rbox(0.1, 0.14, 0.9, 0.03), M.black, frame, [0.40, 0.5, 0]); // front cross member
+      mk(rbox(0.12, 0.12, 0.8, 0.02), M.black, frame, [-WB, RR + 0.02, 0]); // rear axle
+      mk(rbox(0.9, 0.06, 1.2, 0.02), M.black, frame, [-0.45, 0.69, 0]); // seat deck
+      // hydraulic lines along the frame
+      [[-0.36, 1], [0.36, -1]].forEach(function (s) { mk(tube([[0.35, 0.52, s[0] * 0.9], [-0.2, 0.5, s[0] * 0.92], [-0.9, 0.46, s[0] * 0.95], [-1.3, 0.42, s[0] * 0.8]], 0.011), M.hose, frame); });
+
+      // operator platform & seat
+      var seat = asm('seat', [0.2, 0.6, 0]);
+      mk(rbox(0.5, 0.11, 0.5, 0.05, 6), M.seat, seat, [-0.42, 1.0, 0]);
+      var back = mk(rbox(0.12, 0.62, 0.5, 0.05, 6), M.seat, seat, [-0.68, 1.33, 0]); back.rotation.z = 0.12;
+      mk(rbox(0.28, 0.05, 0.07, 0.02), M.seat, seat, [-0.48, 1.16, -0.3]);
+      mk(rbox(0.22, 0.2, 0.36, 0.02), M.satin, seat, [-0.44, 0.83, 0]); // suspension
+      mk(rbox(0.08, 0.07, 0.02, 0.01), M.yellow, seat, [-0.2, 1.06, 0.2]); // seat adjust lever
+
+      var console_ = asm('console', [0.15, 0.35, 0.45]);
+      mk(rbox(0.5, 0.12, 0.16, 0.03), M.black, console_, [-0.32, 1.12, 0.36]);
+      mk(rbox(0.16, 0.05, 0.12, 0.02), M.black, console_, [-0.14, 1.2, 0.36]);
+      var scr = mk(new THREE.PlaneGeometry(0.11, 0.07), M.screen, console_, [-0.08, 1.235, 0.36], [-Math.PI / 2 + 0.5, 0, 0], true); scr.rotation.order = 'YXZ'; scr.rotation.y = Math.PI / 2;
+      for (var k = 0; k < 4; k++) mk(cyl(0.01, 0.02, 12), M.yellow, console_, [-0.24 - k * 0.05, 1.19, 0.4]);
+      mk(rbox(0.18, 0.04, 0.1, 0.015), M.satin, console_, [-0.36, 1.2, 0.33]); // joystick base
+      mk(cyl(0.012, 0.09, 12), M.black, console_, [-0.36, 1.25, 0.33]);
+
+      var steer = asm('steering', [0.35, 0.45, 0]);
+      mk(rbox(0.24, 0.42, 0.36, 0.05, 5), M.red, steer, [0.2, 0.82, 0]); // steering tower
+      mk(rbox(0.2, 0.04, 0.3, 0.02), M.black, steer, [0.2, 1.04, 0]);
+      var c0 = new THREE.Vector3(0.17, 1.02, 0), c1 = new THREE.Vector3(-0.08, 1.24, 0), cd = c1.clone().sub(c0);
+      var col = mk(cyl(0.032, cd.length(), 16), M.black, steer); col.position.copy(c0).add(c1).multiplyScalar(0.5); col.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), cd.clone().normalize());
+      var wgp = new THREE.Group(); wgp.position.copy(c1); wgp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), cd.clone().normalize()); steer.add(wgp);
+      mk(new THREE.TorusGeometry(0.19, 0.017, 14, 56), M.black, wgp);
+      mk(cyl(0.045, 0.05, 20), M.black, wgp, [0, 0, 0], [Math.PI / 2, 0, 0]);
+      for (var sp = 0; sp < 3; sp++) { var spk = mk(rbox(0.17, 0.022, 0.014, 0.006), M.black, wgp); var a = sp * Math.PI * 2 / 3 - Math.PI / 2; spk.position.set(Math.cos(a) * 0.1, Math.sin(a) * 0.1, 0); spk.rotation.z = a; }
+      mk(rbox(0.09, 0.02, 0.13, 0.008), M.black, steer, [0.0, 0.64, 0.2], [0, 0, 0.45]); // traction pedal
+      mk(rbox(0.07, 0.02, 0.08, 0.008), M.black, steer, [0.02, 0.64, -0.2], [0, 0, 0.45]); // brake / mow pedal
+
+      // ROPS
+      var rops = asm('rops', [0.1, 1.1, 0]);
+      mk(polyTube([[-0.82, 0.72, -0.56], [-0.86, 2.17 - 0.04, -0.52], [-0.86, 2.17 - 0.04, 0.52], [-0.82, 0.72, 0.56]], 0.04, 0.16), M.black, rops);
+      mk(rbox(0.12, 0.05, 0.16, 0.01), M.black, rops, [-0.82, 0.72, -0.56]); mk(rbox(0.12, 0.05, 0.16, 0.01), M.black, rops, [-0.82, 0.72, 0.56]);
+      mk(rbox(0.03, 0.05, 0.12, 0.01), M.black, rops, [-0.74, 1.5, -0.53]); // belt anchor
+      mk(rbox(0.004, 0.18, 0.06, 0.002), M.yellow, rops, [-0.81, 1.85, -0.56]); // label
+
+      // hood / rear body
+      var hood = asm('hood', [-0.6, 1.45, 0]);
+      (function () {
+        var s = new THREE.Shape(); // side profile in x-y
+        s.moveTo(-0.78, 0.7); s.lineTo(-0.78, 1.0); s.quadraticCurveTo(-0.8, 1.22, -1.0, 1.24); s.lineTo(-1.82, 1.2); s.quadraticCurveTo(-2.02, 1.18, -2.04, 0.98); s.lineTo(-2.06, 0.55); s.lineTo(-1.82, 0.55);
+        s.absarc(-WB, 0.5, 0.31, 0.2, Math.PI - 0.2, false); s.lineTo(-1.15, 0.7); s.lineTo(-0.78, 0.7);
+        var g = new THREE.ExtrudeGeometry(s, { depth: 1.04, bevelEnabled: true, bevelThickness: 0.07, bevelSize: 0.06, bevelSegments: 8, curveSegments: 32 });
+        g.translate(0, 0, -0.52); g.computeVertexNormals();
+        var m = mk(g, M.red, hood); m.userData.hoodShell = true;
+        // decals on both sides
+        [1, -1].forEach(function (sd) {
+          var d1 = mk(new THREE.PlaneGeometry(0.62, 0.155), new THREE.MeshStandardMaterial({ map: decalTex('TORO', null, '#ffffff'), transparent: true, roughness: 0.3 }), hood, [-1.45, 1.03, sd * 0.596], [0, sd > 0 ? 0 : Math.PI, 0], true);
+          var d2 = mk(new THREE.PlaneGeometry(0.62, 0.155), new THREE.MeshStandardMaterial({ map: decalTex('REELMASTER', '5010-H HYBRID', '#f2f2f2'), transparent: true, roughness: 0.3 }), hood, [-1.5, 0.84, sd * 0.596], [0, sd > 0 ? 0 : Math.PI, 0], true);
+          d1.userData.decal = d2.userData.decal = true;
+        });
+        // rear screen
+        var grill = mk(new THREE.PlaneGeometry(0.9, 0.36), M.rad, hood, [-2.105, 0.86, 0], [0, -Math.PI / 2, 0], true);
+        mk(rbox(0.04, 0.05, 1.0, 0.02), M.black, hood, [-2.1, 0.62, 0]);
+        // tail lights
+        [-0.45, 0.45].forEach(function (z) { mk(rbox(0.02, 0.06, 0.1, 0.01), new THREE.MeshStandardMaterial({ color: 0xff2a1a, emissive: 0x550000, roughness: 0.2 }), hood, [-2.1, 1.08, z]); });
+        // hood latch + fuel cap through the side
+        mk(cyl(0.045, 0.04, 24), M.black, hood, [-0.95, 1.21, -0.42]);
+      })();
+
+      // engine bay
+      var engine = asm('engine', [-0.2, 0.5, 0]);
+      mk(rbox(0.46, 0.34, 0.42, 0.03), M.engine, engine, [-1.38, 0.82, 0]); // block
+      mk(rbox(0.44, 0.1, 0.36, 0.03), M.engine, engine, [-1.38, 1.04, 0]); // head
+      mk(rbox(0.42, 0.06, 0.3, 0.03), M.satin, engine, [-1.38, 1.12, 0]); // rocker cover
+      for (var gp = 0; gp < 3; gp++) mk(cyl(0.012, 0.05, 10), M.brushed, engine, [-1.5 + gp * 0.12, 1.14, 0.16]);
+      mk(rbox(0.3, 0.06, 0.14, 0.02), M.alum, engine, [-1.38, 0.98, -0.25]); // intake manifold
+      mk(tube([[-1.38, 0.96, 0.24], [-1.36, 0.9, 0.34], [-1.55, 0.82, 0.42], [-1.95, 0.75, 0.44]], 0.032), M.satin, engine); // exhaust
+      mk(cyl(0.08, 0.34, 24), M.satin, engine, [-1.9, 0.72, 0.38], [Math.PI / 2, 0, 0]); // muffler
+      mk(rbox(0.18, 0.12, 0.3, 0.03), M.engine, engine, [-1.38, 0.6, 0]); // sump
+      var oilf = asm('oilfilter', [0, 0, -0.45], engine);
+      mk(cyl(0.048, 0.11, 32), M.filterW, oilf, [-1.3, 0.78, -0.26], [Math.PI / 2, 0, 0]);
+      mk(cyl(0.05, 0.012, 32), M.black, oilf, [-1.3, 0.78, -0.32], [Math.PI / 2, 0, 0]);
+      var belt = asm('belt', [0.35, 0, 0], engine);
+      mk(cyl(0.085, 0.03, 32), M.brushed, belt, [-1.14, 0.72, 0], [0, 0, Math.PI / 2]); // crank pulley
+      mk(cyl(0.06, 0.03, 32), M.brushed, belt, [-1.14, 0.98, -0.16], [0, 0, Math.PI / 2]); // alternator pulley
+      mk(cyl(0.07, 0.03, 32), M.brushed, belt, [-1.14, 1.0, 0.08], [0, 0, Math.PI / 2]); // fan/water pump pulley
+      mk(tube([[-1.13, 0.64, 0], [-1.13, 0.8, -0.09], [-1.13, 0.96, -0.22], [-1.13, 1.05, -0.12], [-1.13, 1.07, 0.08], [-1.13, 0.95, 0.15], [-1.13, 0.72, 0.09], [-1.13, 0.64, 0]], 0.009, 96), M.hose, belt);
+      mk(cyl(0.065, 0.13, 24), M.alum, belt, [-1.2, 0.98, -0.2], [0, 0, Math.PI / 2]); // alternator
+      var gen = asm('generator', [0.0, 0.35, 0.55], engine);
+      mk(cyl(0.16, 0.18, 40), M.satin, gen, [-1.66, 0.8, 0], [0, 0, Math.PI / 2]);
+      mk(cyl(0.165, 0.03, 40), M.alum, gen, [-1.58, 0.8, 0], [0, 0, Math.PI / 2]);
+      for (var fn = 0; fn < 10; fn++) mk(rbox(0.16, 0.012, 0.02, 0.004), M.alum, gen, [-1.68, 0.8 + Math.cos(fn * 0.628) * 0.165, Math.sin(fn * 0.628) * 0.165], [fn * 0.628, 0, 0]);
+      mk(tube([[-1.66, 0.97, 0.06], [-1.5, 1.1, 0.3], [-1.0, 0.9, 0.42], [-0.7, 0.72, 0.3]], 0.016), new THREE.MeshStandardMaterial({ color: 0xe06a10, roughness: 0.6 }), gen); // HV orange cable
+      var air = asm('aircleaner', [0, 0.7, -0.45]);
+      mk(cyl(0.085, 0.32, 40), M.black, air, [-1.5, 1.12, -0.38], [0, 0, Math.PI / 2]);
+      mk(cyl(0.09, 0.05, 40), M.black, air, [-1.68, 1.12, -0.38], [0, 0, Math.PI / 2]);
+      mk(cyl(0.03, 0.06, 16, 0.025), M.plastic, air, [-1.74, 1.08, -0.38], [0, 0, Math.PI / 2]); // vacuator valve
+      mk(cyl(0.012, 0.04, 12), new THREE.MeshStandardMaterial({ color: 0xff3020, roughness: 0.3 }), air, [-1.42, 1.22, -0.38]); // service indicator
+      mk(tube([[-1.33, 1.12, -0.38], [-1.25, 1.1, -0.3], [-1.3, 1.02, -0.22]], 0.035), M.hose, air);
+      var radiator = asm('radiator', [-0.6, 0.2, 0]);
+      mk(rbox(0.08, 0.42, 0.78, 0.01), M.alum, radiator, [-1.98, 0.87, 0]);
+      mk(new THREE.PlaneGeometry(0.72, 0.36), M.rad, radiator, [-2.025, 0.87, 0], [0, -Math.PI / 2, 0], true);
+      mk(new THREE.PlaneGeometry(0.72, 0.36), M.rad, radiator, [-1.935, 0.87, 0], [0, Math.PI / 2, 0], true);
+      mk(cyl(0.05, 0.12, 24), M.black, radiator, [-1.9, 0.87, 0.34], [Math.PI / 2, 0, 0]); // expansion tank
+      mk(cyl(0.2, 0.03, 6), M.plastic, radiator, [-1.86, 0.87, 0], [0, 0, Math.PI / 2]); // fan
+
+      // fuel + hydraulics + batteries
+      var fuel = asm('fueltank', [0, 0.15, -0.7]);
+      mk(rbox(0.46, 0.3, 0.22, 0.06, 6), M.plastic, fuel, [-0.98, 0.88, -0.4]);
+      mk(cyl(0.045, 0.05, 24), M.yellow, fuel, [-0.98, 1.05, -0.4]);
+      var fsep = asm('fuelsep', [0.25, 0.25, -0.75]);
+      mk(cyl(0.045, 0.1, 32), M.filterW, fsep, [-1.08, 0.64, -0.3]);
+      mk(cyl(0.04, 0.05, 24), M.glass, fsep, [-1.08, 0.565, -0.3]);
+      mk(rbox(0.1, 0.03, 0.1, 0.01), M.alum, fsep, [-1.08, 0.705, -0.3]);
+      mk(cyl(0.018, 0.08, 16), new THREE.MeshStandardMaterial({ color: 0xf2f2f2, roughness: 0.3, transparent: true, opacity: 0.7 }), fsep, [-1.22, 0.66, -0.3], [0, 0, Math.PI / 2]); // in-line filter
+      var hyd = asm('hydtank', [0, 0.15, 0.7]);
+      mk(rbox(0.44, 0.3, 0.22, 0.05, 6), M.black, hyd, [-0.98, 0.88, 0.4]);
+      mk(cyl(0.04, 0.05, 24), M.black, hyd, [-0.98, 1.05, 0.4]);
+      mk(cyl(0.05, 0.14, 32), M.filterR, hyd, [-1.0, 0.62, 0.22]); // charge filter
+      mk(rbox(0.12, 0.04, 0.12, 0.01), M.alum, hyd, [-1.0, 0.71, 0.22]);
+      var b48 = asm('battery48', [0.55, -0.3, 0]);
+      for (var bi = 0; bi < 4; bi++) {
+        var bx = -0.58 + (bi % 2) * 0.27, bz = bi < 2 ? -0.16 : 0.16;
+        mk(rbox(0.25, 0.2, 0.17, 0.01), M.battery, b48, [bx, 0.53, bz]);
+        mk(cyl(0.012, 0.02, 12), new THREE.MeshStandardMaterial({ color: 0xc02020 }), b48, [bx + 0.08, 0.64, bz]);
+        mk(cyl(0.012, 0.02, 12), M.black, b48, [bx - 0.08, 0.64, bz]);
+      }
+      mk(rbox(0.6, 0.02, 0.4, 0.005), M.black, b48, [-0.45, 0.42, 0]);
+      var b12 = asm('battery12', [0, 0.25, -0.7]);
+      mk(rbox(0.22, 0.18, 0.15, 0.01), M.battery, b12, [-0.95, 0.62, 0.02]);
+      mk(cyl(0.012, 0.02, 12), new THREE.MeshStandardMaterial({ color: 0xc02020 }), b12, [-0.88, 0.72, 0.02]);
+
+      // tyres + wheels
+      function tyreGeo(r, w, ri) {
+        var pts = [], n = 28;
+        for (var i = 0; i <= n; i++) { var t = i / n, a = -Math.PI / 2 + t * Math.PI; var bulge = Math.cos(a); pts.push(new THREE.Vector2(ri + (r - ri) * (0.55 + 0.45 * bulge), (w / 2) * Math.sin(a) * (0.96 + 0.04 * bulge))); }
+        var g = new THREE.LatheGeometry(pts, 96); g.rotateX(Math.PI / 2); return g;
+      }
+      function rimGeo(r, w) { var p = [[0.02, -w * 0.15], [r * 0.45, -w * 0.15], [r * 0.5, -w * 0.38], [r * 0.95, -w * 0.42], [r, -w * 0.48], [r, w * 0.48], [r * 0.95, w * 0.42], [r * 0.6, w * 0.4], [r * 0.55, w * 0.1], [0.02, w * 0.1]].map(function (q) { return new THREE.Vector2(q[0], q[1]); }); var g = new THREE.LatheGeometry(p, 64); g.rotateX(Math.PI / 2); return g; }
+      function wheel(pid, x, z, r, w, rimR, motor) {
+        var g = asm(pid, [0, 0, z > 0 ? 0.55 : -0.55]);
+        var wg = new THREE.Group(); wg.position.set(x, r, z); g.add(wg);
+        var tm = M.rubber.clone(); tm.bumpMap = tread.clone(); tm.bumpMap.needsUpdate = true; tm.bumpMap.repeat.set(1, 1);
+        var t = new THREE.Mesh(tyreGeo(r, w, rimR), tm); t.castShadow = t.receiveShadow = true; wg.add(t);
+        var rimm = mk(rimGeo(rimR, w), M.rim, wg); rimm.material.side = THREE.DoubleSide;
+        for (var i = 0; i < 6; i++) { var a = i * Math.PI / 3; mk(cyl(0.012, 0.03, 12), M.chrome, wg, [Math.cos(a) * rimR * 0.3, Math.sin(a) * rimR * 0.3, (z > 0 ? 1 : -1) * w * 0.12], [Math.PI / 2, 0, 0]); }
+        mk(cyl(rimR * 0.18, 0.04, 24), M.satin, wg, [0, 0, (z > 0 ? 1 : -1) * w * 0.12], [Math.PI / 2, 0, 0]);
+        if (motor) mk(cyl(0.11, 0.16, 32), M.satin, wg, [0, 0, -(z > 0 ? 1 : -1) * (w / 2 + 0.06)], [Math.PI / 2, 0, 0]);
+        wg.userData.spin = true; return g;
+      }
+      wheel('tyreFL', 0, -FT, FR, FW, 0.152, true); wheel('tyreFR', 0, FT, FR, FW, 0.152, true);
+      wheel('tyreRL', -WB, -RT, RR, RW, 0.127, false); wheel('tyreRR', -WB, RT, RR, RW, 0.127, false);
+      // front fenders (part of the frame)
+      [-FT, FT].forEach(function (z) { var s = new THREE.Shape(); s.absarc(0, 0, FR + 0.06, 0.25, Math.PI - 0.15, false); s.absarc(0, 0, FR + 0.035, Math.PI - 0.15, 0.25, true); var g = new THREE.ExtrudeGeometry(s, { depth: FW + 0.06, bevelEnabled: false, curveSegments: 40 }); g.translate(0, 0, -(FW + 0.06) / 2); mk(g, M.black, frame, [0, FR, z]); });
+
+      // cutting units
+      function reelGeo(R, L, blades, sweep) {
+        var pos = [], idx = [], nL = 40, nW = 3;
+        for (var b = 0; b < blades; b++) {
+          var a0 = b * Math.PI * 2 / blades, base = pos.length / 3;
+          for (var i = 0; i <= nL; i++) { var t = i / nL, z = -L / 2 + t * L, a = a0 + sweep * t;
+            for (var j = 0; j <= nW; j++) { var rr = R - 0.016 + 0.016 * j / nW, aa = a + 0.06 * (1 - j / nW); pos.push(Math.cos(aa) * rr, Math.sin(aa) * rr, z); } }
+          for (var i2 = 0; i2 < nL; i2++) for (var j2 = 0; j2 < nW; j2++) { var p = base + i2 * (nW + 1) + j2, q = p + nW + 1; idx.push(p, q, p + 1, q, q + 1, p + 1); }
+        }
+        var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+      }
+      function wiehle(r, L) { var p = [], n = 56; for (var i = 0; i <= n; i++) { var z = -L / 2 + L * i / n; var rr = (i % 2) ? r * 0.82 : r; if (i === 0 || i === n) rr = r * 0.7; p.push(new THREE.Vector2(rr, z)); } var g = new THREE.LatheGeometry(p, 40); g.rotateX(Math.PI / 2); return g; }
+      var CU = {};
+      function cuttingUnit(pid, x, z, ex) {
+        var g = asm(pid, ex); var u = new THREE.Group(); u.position.set(x, 0, z); g.add(u);
+        var L = 0.559, R = 0.0635, subs = {};
+        function sub(name, sx) { var s = new THREE.Group(); s.userData.sub = name; u.add(s); subs[name] = { g: s, ex: new THREE.Vector3(sx[0], sx[1], sx[2]) }; return s; }
+        var fr = sub('cuframe', [0, 0.32, 0]);
+        [-1, 1].forEach(function (s) { mk(rbox(0.36, 0.2, 0.014, 0.01), M.red, fr, [0, 0.13, s * (L / 2 + 0.03)]); mk(cyl(0.022, 0.03, 16), M.chrome, fr, [0.1, 0.18, s * (L / 2 + 0.045)], [Math.PI / 2, 0, 0]); });
+        mk(rbox(0.06, 0.05, L + 0.08, 0.015), M.red, fr, [-0.05, 0.24, 0]);
+        var sh = new THREE.Shape(); sh.absarc(0, 0, R + 0.03, 0.3, Math.PI * 0.95, false); sh.absarc(0, 0, R + 0.022, Math.PI * 0.95, 0.3, true);
+        var shg = new THREE.ExtrudeGeometry(sh, { depth: L + 0.04, bevelEnabled: false, curveSegments: 24 }); shg.translate(0, 0, -(L + 0.04) / 2); mk(shg, M.red, fr, [0, 0.13, 0]); // shield
+        mk(rbox(0.12, 0.05, 0.16, 0.015), M.black, fr, [0.0, 0.29, 0]); // carrier frame
+        var reel = sub('reel', [0, 0.14, 0]);
+        var rg = reelGeo(R, L - 0.02, 11, 0.55); var rm = mk(rg, M.steel, reel, [0, 0.13, 0]); rm.material.side = THREE.DoubleSide; rm.userData.spinReel = true;
+        mk(cyl(0.012, L + 0.04, 16), M.brushed, reel, [0, 0.13, 0], [Math.PI / 2, 0, 0]);
+        for (var sp2 = -2; sp2 <= 2; sp2++) mk(cyl(R - 0.004, 0.004, 24), M.brushed, reel, [0, 0.13, sp2 * (L / 4.6)], [Math.PI / 2, 0, 0]);
+        var bk = sub('bedknife', [0.05, -0.12, 0]);
+        mk(rbox(0.07, 0.02, L, 0.004), M.satin, bk, [0.005, 0.06, 0], [0, 0, -0.18]);
+        mk(rbox(0.05, 0.004, L - 0.01, 0.001), M.chrome, bk, [0.035, 0.068, 0], [0, 0, -0.18]);
+        for (var sc2 = 0; sc2 < 8; sc2++) mk(cyl(0.006, 0.006, 8), M.chrome, bk, [-0.005, 0.072, -L / 2 + 0.035 + sc2 * (L - 0.07) / 7]);
+        var fro = sub('froller', [0.2, -0.04, 0]);
+        mk(wiehle(0.032, L), M.brushed, fro, [0.16, 0.032, 0]);
+        var rro = sub('rroller', [-0.2, -0.04, 0]);
+        mk(cyl(0.032, L, 32), M.brushed, rro, [-0.16, 0.032, 0], [Math.PI / 2, 0, 0]);
+        [[0.16], [-0.16]].forEach(function (p) { [-1, 1].forEach(function (s) { mk(rbox(0.06, 0.08, 0.012, 0.006), M.red, p[0] > 0 ? fro : rro, [p[0] * 0.8, 0.07, s * (L / 2 + 0.02)]); }); });
+        var mo = sub('motor', [0, 0, z >= 0 ? 0.22 : -0.22]);
+        var mz = (z >= 0 ? 1 : -1) * (L / 2 + 0.09);
+        mk(cyl(0.055, 0.12, 32), M.satin, mo, [0, 0.13, mz], [Math.PI / 2, 0, 0]);
+        mk(cyl(0.057, 0.015, 32), M.red, mo, [0, 0.13, mz + (z >= 0 ? 0.06 : -0.06)], [Math.PI / 2, 0, 0]);
+        mk(tube([[0, 0.18, mz], [-0.04, 0.3, mz * 0.9], [-0.1, 0.36, mz * 0.6]], 0.008), new THREE.MeshStandardMaterial({ color: 0xe06a10, roughness: 0.6 }), mo);
+        CU[pid] = subs; return g;
+      }
+      var FX0 = 0.62, RX0 = -0.62;
+      cuttingUnit('cu4', FX0, -0.97, [0.35, 0.1, -0.35]);
+      cuttingUnit('cu1', FX0 + 0.06, 0, [0.6, 0.1, 0]);
+      cuttingUnit('cu5', FX0, 0.97, [0.35, 0.1, 0.35]);
+      cuttingUnit('cu2', RX0, -0.485, [0, -0.05, -0.75]);
+      cuttingUnit('cu3', RX0, 0.485, [0, -0.05, 0.75]);
+      // lift arms (front) and rear arms
+      var lift = asm('liftF', [0.3, 0.2, 0]);
+      [[-0.97, -0.62], [0, 0], [0.97, 0.62]].forEach(function (p) {
+        mk(tube([[0.38, 0.55, p[1] * 0.55], [0.5, 0.52, p[1] * 0.8], [FX0 + (p[0] === 0 ? 0.06 : 0), 0.4, p[0]]], 0.025), M.black, lift);
+      });
+      [-0.3, 0.3].forEach(function (z) { mk(cyl(0.03, 0.26, 24), M.satin, lift, [0.36, 0.62, z], [0, 0, 1.1]); mk(cyl(0.014, 0.16, 16), M.chrome, lift, [0.47, 0.57, z], [0, 0, 1.1]); });
+      [-0.485, 0.485].forEach(function (z) { mk(tube([[-0.2, 0.42, z * 0.5], [-0.4, 0.42, z * 0.9], [RX0, 0.38, z]], 0.022), M.black, frame); });
+
+      // ground
+      var ground = new THREE.Mesh(new THREE.CircleGeometry(12, 96), new THREE.MeshStandardMaterial({ map: grass, roughness: 0.95, metalness: 0 }));
+      ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+      var showGround = opts.ground !== false;
+      ground.visible = showGround;
+      var contact = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 3.4), new THREE.ShadowMaterial({ opacity: dark ? 0.55 : 0.32 }));
+      contact.rotation.x = -Math.PI / 2; contact.position.y = 0.001; contact.receiveShadow = true; contact.visible = !showGround; scene.add(contact);
+
+      // centre machine on its footprint
+      machine.position.x = (2.819 / 2) - (FX0 + 0.06 + 0.2);
+      Object.keys(ASM).forEach(function (k) { ASM[k].home = ASM[k].g.position.clone(); });
+      Object.keys(CU).forEach(function (k) { Object.keys(CU[k]).forEach(function (s) { CU[k][s].home = CU[k][s].g.position.clone(); }); });
+
+      // pickables
+      machine.traverse(function (o) { if (o.isMesh) { var p = o, pid = null, sb = null; while (p && p !== machine) { if (!sb && p.userData.sub) sb = p.userData.sub; if (p.userData.pid) { pid = p.userData.pid; break; } p = p.parent; } if (pid) { o.userData.pick = pid; o.userData.subPick = sb; pickables.push(o); } } });
+
+      // ---- orbit controls (custom)
+      var tgt = new THREE.Vector3(0, 0.75, 0), sph = { r: 6.2, th: 0.85, ph: 1.12 }, goal = { r: 6.2, th: 0.85, ph: 1.12, t: tgt.clone() }, dragging = null, lastP = null, pinch = null, autoRot = !opts.capture, idleT = 0;
+      function applyCam() { camera.position.set(tgt.x + sph.r * Math.sin(sph.ph) * Math.cos(sph.th), tgt.y + sph.r * Math.cos(sph.ph), tgt.z + sph.r * Math.sin(sph.ph) * Math.sin(sph.th)); camera.lookAt(tgt); }
+      var cv = renderer.domElement; cv.style.touchAction = 'none';
+      var ptrs = {};
+      cv.addEventListener('pointerdown', function (e) { cv.setPointerCapture(e.pointerId); ptrs[e.pointerId] = { x: e.clientX, y: e.clientY }; dragging = (e.button === 2 || e.shiftKey) ? 'pan' : 'rot'; lastP = { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY }; autoRot = false; idleT = 0; });
+      cv.addEventListener('pointermove', function (e) {
+        if (ptrs[e.pointerId]) ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
+        var ids = Object.keys(ptrs);
+        if (ids.length === 2) { var a = ptrs[ids[0]], b = ptrs[ids[1]]; var d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch) goal.r = Math.max(1.2, Math.min(14, goal.r * pinch / d)); pinch = d; return; }
+        if (!dragging) { hover(e); return; }
+        var dx = e.clientX - lastP.x, dy = e.clientY - lastP.y; lastP.x = e.clientX; lastP.y = e.clientY;
+        if (dragging === 'rot') { goal.th += dx * 0.006; goal.ph = Math.max(0.15, Math.min(1.52, goal.ph - dy * 0.006)); }
+        else { var right = new THREE.Vector3(); camera.getWorldDirection(right); right.cross(camera.up).normalize(); var s = goal.r * 0.0012; goal.t.addScaledVector(right, -dx * s); goal.t.y += dy * s; }
+      });
+      function up(e) { var moved = lastP && Math.hypot(e.clientX - lastP.x0, e.clientY - lastP.y0) > 5; delete ptrs[e.pointerId]; if (Object.keys(ptrs).length < 2) pinch = null; if (dragging && !moved && Object.keys(ptrs).length === 0) click(e); dragging = null; }
+      cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', function (e) { delete ptrs[e.pointerId]; dragging = null; pinch = null; });
+      cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      cv.addEventListener('wheel', function (e) { e.preventDefault(); goal.r = Math.max(1.2, Math.min(14, goal.r * Math.exp(e.deltaY * 0.0012))); autoRot = false; }, { passive: false });
+      cv.addEventListener('pointerleave', function () { setHover(null); });
+
+      // ---- picking
+      var exT = 0, exGoal = 0, xray = false, blowOne = null, setXray = function () {};
+      var UNDER_HOOD = ['engine', 'oilfilter', 'belt', 'generator', 'aircleaner', 'radiator', 'fueltank', 'fuelsep', 'hydtank', 'battery12'];
+      var ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hovered = null, selected = null, selSub = null;
+      function pickAt(e) { var r = cv.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera);
+        var hits = ray.intersectObjects(pickables, false).filter(function (h) { return h.object.visible && !(xray && h.object.userData.pick === 'hood'); }); return hits[0] ? hits[0].object : null; }
+      function glow(pid, sub, v) { pickables.forEach(function (m) { if (m.userData.pick === pid && (!sub || m.userData.subPick === sub)) { if (m.material.emissive) { m.material.emissive.setHex(v); } } }); }
+      function setHover(o) {
+        var key = o ? o.userData.pick + '|' + (/^cu/.test(o.userData.pick) && exT > 0.5 ? o.userData.subPick : '') : null;
+        if (hovered === key) return;
+        if (hovered) { var hp = hovered.split('|'); if (!(selected === hp[0] && (!selSub || selSub === hp[1]))) glow(hp[0], hp[1] || null, 0x000000); }
+        hovered = key; cv.style.cursor = o ? 'pointer' : 'grab';
+        if (o) { var p = key.split('|'); if (!(selected === p[0])) glow(p[0], p[1] || null, 0x2a1400); tip.hidden = false; tip.textContent = p[1] ? SUB[p[1]].name : COMP[p[0]].name; } else tip.hidden = true;
+      }
+      function hover(e) { var o = pickAt(e); setHover(o); if (o) { var r = stage.getBoundingClientRect(); tip.style.left = (e.clientX - r.left + 14) + 'px'; tip.style.top = (e.clientY - r.top + 12) + 'px'; } }
+      function click(e) { var o = pickAt(e); if (!o) { select(null); return; } var pid = o.userData.pick; var sb = /^cu/.test(pid) && exT > 0.5 ? o.userData.subPick : null; select(pid, sb, false); }
+      var box = new THREE.Box3();
+      function select(pid, sub, focus) {
+        if (selected) glow(selected, null, 0x000000);
+        selected = pid; selSub = sub || null;
+        if (!pid) { panel.hidden = true; root.querySelectorAll('.x3-li').forEach(function (b) { b.classList.remove('on'); }); return; }
+        glow(pid, selSub, 0x8a3c00);
+        showPanel(pid, selSub);
+        if (UNDER_HOOD.indexOf(pid) >= 0 && exT < 0.3 && !xray) setXray(true);
+        if (focus) { box.setFromObject(ASM[pid].g); var c = box.getCenter(new THREE.Vector3()); var s = box.getSize(new THREE.Vector3()).length(); goal.t.copy(c); if (Math.abs(c.z) > 0.15) { var sd = c.z > 0 ? 1 : -1; goal.th = sd * (c.x < 0 ? 2.1 : 1.15); } goal.r = Math.max(2.6, Math.min(7, s * 2.6)); goal.ph = Math.min(goal.ph, 0.95); autoRot = false; }
+      }
+      selectFn = function (pid, sub, focus) { select(pid, sub, focus); };
+
+      // ---- explode + x-ray + labels
+      
+      var slider = root.querySelector('.x3-ex'); var xb = root.querySelector('.x3-xray'); var rb = root.querySelector('.x3-reset'); var gb = root.querySelector('.x3-ground');
+      if (slider) slider.addEventListener('input', function () { exGoal = slider.value / 100; blowOne = null; });
+      setXray = function (v) { xray = v; if (xb) xb.setAttribute('aria-pressed', xray); pickables.forEach(function (m) { if (m.userData.pick === 'hood') { m.material.transparent = xray; m.material.opacity = xray ? 0.07 : 1; if (m.material.clearcoat != null) m.material.clearcoat = xray ? 0 : 1; m.material.depthWrite = !xray; m.castShadow = !xray; } }); };
+      if (xb) xb.addEventListener('click', function () { setXray(!xray); });
+      if (gb) gb.addEventListener('click', function () { showGround = !showGround; ground.visible = showGround; contact.visible = !showGround; gb.setAttribute('aria-pressed', showGround); });
+      if (rb) rb.addEventListener('click', function () { goal.r = 6.2; goal.th = 0.85; goal.ph = 1.12; goal.t.set(0, 0.75, 0); exGoal = 0; blowOne = null; if (slider) slider.value = 0; select(null); });
+      api.blowUnit = function (pid) { blowOne = pid; exGoal = 1; if (slider) slider.value = 100; select(pid, null, true); };
+      var LBL = ['engine', 'hood', 'rops', 'seat', 'aircleaner', 'radiator', 'battery48', 'hydtank', 'fueltank', 'generator', 'cu1', 'cu2', 'cu3', 'cu4', 'cu5', 'tyreFR', 'console'];
+      var lblEls = {};
+      LBL.forEach(function (k) { var d = el('button', 'x3-lbl', COMP[k].name.replace(/^Cutting unit, /, 'CU ').replace(/:.*$/, '').replace(/ \(.*\)$/, '')); d.addEventListener('click', function () { select(k, null, true); }); labels.appendChild(d); lblEls[k] = d; });
+      var tmpV = new THREE.Vector3();
+      function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+      // ---- resize + loop
+      function resize() { var w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+      api.resize = resize; var ro = window.ResizeObserver ? new ResizeObserver(resize) : null; if (ro) ro.observe(stage); else window.addEventListener('resize', resize);
+      resize(); status.textContent = ''; status.hidden = true;
+      var clock = new THREE.Clock(), running = true;
+      api.pause = function (p) { var was = running; running = !p; if (running && !was) { clock.getDelta(); loop(); } };
+      function loop() { if (!running) return; requestAnimationFrame(loop); step(Math.min(clock.getDelta(), 0.05), clock.elapsedTime); }
+      api.renderNow = function (n) { for (var i = 0; i < (n || 1); i++) step(0.25, 1); };
+      function step(dt, t) {
+        idleT += dt; if (!autoRot && idleT > 25 && !selected) autoRot = true;
+        if (autoRot) goal.th += dt * 0.12;
+        var k = 1 - Math.pow(0.0008, dt);
+        sph.r += (goal.r - sph.r) * k; sph.th += (goal.th - sph.th) * k; sph.ph += (goal.ph - sph.ph) * k; tgt.lerp(goal.t, k); applyCam();
+        exT += (exGoal - exT) * (1 - Math.pow(0.004, dt));
+        var a1 = ease(Math.min(1, exT * 2)), a2 = ease(Math.max(0, exT * 2 - 1));
+        Object.keys(ASM).forEach(function (id) { var A = ASM[id]; var f = blowOne ? (id === blowOne ? 0.6 : 0) : a1; A.g.position.copy(A.home).addScaledVector(A.ex, f); });
+        Object.keys(CU).forEach(function (id) { var f = blowOne ? (id === blowOne ? a2 : 0) : a2; Object.keys(CU[id]).forEach(function (s) { var S = CU[id][s]; S.g.position.copy(S.home).addScaledVector(S.ex, f * 1.4); }); });
+        machine.traverse(function (o) { if (o.userData && o.userData.spinReel) o.rotation.z = t * (exT > 0.5 ? 1.2 : 0); });
+        if (selected) { var pulse = 0.5 + 0.5 * Math.sin(t * 4); glow(selected, selSub, new THREE.Color(0x8a3c00).multiplyScalar(0.55 + 0.7 * pulse).getHex()); }
+        // labels
+        var showL = exT > 0.25; var r = stage.getBoundingClientRect();
+        LBL.forEach(function (id) { var d = lblEls[id]; if (!showL || (blowOne && id !== blowOne)) { d.hidden = true; return; } box.setFromObject(ASM[id].g); box.getCenter(tmpV); tmpV.y = box.max.y + 0.05; tmpV.project(camera); if (tmpV.z > 1) { d.hidden = true; return; } d.hidden = false; d.style.transform = 'translate(' + ((tmpV.x + 1) / 2 * r.width).toFixed(0) + 'px,' + ((1 - tmpV.y) / 2 * r.height).toFixed(0) + 'px) translate(-50%,-100%)'; d.style.opacity = Math.min(1, (exT - 0.25) * 4); });
+        renderer.render(scene, camera);
+      }
+      applyCam(); loop();
+      api.THREE = THREE; api.renderer = renderer; api.scene = scene; api.camera = camera;
+      api.view = function (th, ph, r, ex) { goal.th = th; goal.ph = ph; goal.r = r; if (ex != null) { exGoal = ex; if (slider) slider.value = ex * 100; } autoRot = false; };
+      api.select = function (pid, sub) { select(pid, sub, true); };
+    }
+    return api;
+  }
+
+  window.MX3D = { mount: mount, COMP: COMP };
+})();
+
+(function () {
+  var sec = document.getElementById('explore'), root = document.getElementById('x3'), api = null;
+  function chk() { if (!sec || sec.hidden) { if (api && api.pause) api.pause(true); return; } if (!api) api = window.MX3D.mount(root); else { if (api.pause) api.pause(false); api.resize(); } }
+  if (sec && window.MutationObserver) new MutationObserver(chk).observe(sec, { attributes: true, attributeFilter: ['hidden'] });
+  chk();
 })();
 </script>
 
