@@ -301,7 +301,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
 
   <div class="mx-card" id="card-worklist">
     <div class="mx-row"><h3>Mechanic worklist</h3><span class="mx-note">Same list as the weekday #machinery post · most urgent first</span></div>
-    <p class="mx-note">Faults first (safety ahead of the rest), then services: overdue items on machines used every day rank highest. When a job is done, tick its card in Slack with the hour meter reading, or press <b>Update</b> on the shared link (contractors use the site code). The next hourly run takes it off this list.</p>
+    <p class="mx-note">Faults first (safety ahead of the rest), then services: overdue items on machines used every day rank highest. When a job is done, tick its card in Slack with the hour meter reading, or press <b>Update</b> on the shared link. The next hourly run takes it off this list.</p>
     <ol class="mx-wl" id="wl" data-source="m_worklist"></ol>
   </div>
 
@@ -590,7 +590,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       <p><b>Hours.</b> Telematics machines (Reelmaster 5010-Hs, eTriFlex 2, Workman GTX 2) report their hour meter to Toro Intelli360 and are read every hour. Every other machine is projected from its last reading at the rate it has been used on the job board; ~ marks an estimate. A meter reading in a worklist reply resets it.</p>
       <p><b>What's due.</b> Each machine's OEM schedule (operator's manual, in the machinery bible) is counted from the last time that service, or a bigger one, was recorded. Break-in services count from new. Club practice (backlap, grind, greasing, blades) carries over the old taskTracker intervals.</p>
       <p><b>No record.</b> A machine bought before 2024 with no record of a service is assumed to have had it at the last multiple of the interval; a newer one is counted from new, so a missing record shows as overdue.</p>
-      <p><b>Closing a job.</b> Tick the worklist card in #machinery and reply with the hours, or press <b>Update</b> on the job on the shared link: Done, In progress, Waiting on parts, Needs approval or a note, with the time spent and the hour meter reading. Contractors need the site code. Updates post to #machinery straight away; the hourly run logs finished work and the item drops off.</p>
+      <p><b>Closing a job.</b> Tick the worklist card in #machinery and reply with the hours, or press <b>Update</b> on the job on the shared link: Done, In progress, Waiting on parts, Needs approval or a note, with the time spent and the hour meter reading. Updates post to #machinery straight away; the hourly run logs finished work and the item drops off.</p>
     </div>
   </div>
 </section>
@@ -789,7 +789,6 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   // ---------- job updates (shared link only: contractors and staff press Update; the hook posts to #machinery + Notion)
   var UPDURL = (window.MX_UPDATE && window.MX_UPDATE.url) || null;
   var SENT = {};
-  (function () { var m = /[?&#]k=(\d{4,6})\b/.exec((location.search || '') + (location.hash || '')); if (m) { try { window.localStorage.setItem('mx_upd_code', m[1]); } catch (e) {} window.__MXK = m[1]; } })();
   var USTAT = [['done', 'Done'], ['in_progress', 'In progress'], ['waiting_parts', 'Waiting on parts'], ['needs_approval', 'Needs approval'], ['note', 'Note only']];
   var UCLS = { 'Done': 'done', 'In progress': 'prog', 'Waiting on parts': 'wait', 'Needs approval': 'appr', 'Note': 'note' };
   function store(k, v) { try { if (v === undefined) return window.localStorage.getItem(k) || ''; window.localStorage.setItem(k, v); } catch (e) { return ''; } return ''; }
@@ -831,7 +830,6 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     var pt = field('Parts used or needed (optional)', 'input', { maxlength: '300', autocomplete: 'off' }); d.appendChild(pt[0]); UM._parts = pt[1];
     var two = el('div', 'two'); var nm = field('Your name', 'input', { maxlength: '60', autocomplete: 'name' }); var co = field('Company', 'input', { maxlength: '60', autocomplete: 'organization' });
     two.appendChild(nm[0]); two.appendChild(co[0]); d.appendChild(two); UM._name = nm[1]; UM._co = co[1];
-    var cd = field('Site code', 'input', { inputmode: 'numeric', maxlength: '6', autocomplete: 'off' }); d.appendChild(cd[0]); UM._code = cd[1]; UM._codeL = cd[0];
     UM._msg = el('p', 'mx-umsg'); UM._msg.setAttribute('role', 'status'); d.appendChild(UM._msg);
     var acts = el('div', 'acts'); var cx = el('button', null, 'Cancel'); cx.type = 'button'; var go = el('button', 'go', 'Send update'); go.type = 'button';
     acts.appendChild(cx); acts.appendChild(go); d.appendChild(acts); UM._go = go;
@@ -847,8 +845,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     UM._what.textContent = job.machine + (job.job ? ': ' + job.job : '');
     UM._sts.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); });
     UM._hours.value = ''; UM._time.value = ''; UM._note.value = ''; UM._parts.value = '';
-    UM._name.value = store('mx_upd_name'); UM._co.value = store('mx_upd_co'); UM._code.value = window.__MXK || store('mx_upd_code');
-    UM._codeL.hidden = !!window.__MXK;
+    UM._name.value = store('mx_upd_name'); UM._co.value = store('mx_upd_co');
     UM._msg.textContent = ''; UM._msg.className = 'mx-umsg'; UM._go.disabled = false; UM._go.classList.remove('busy');
     UM._tok = (UM._tok || 0) + 1; UM.hidden = false; UM._sts[0].focus();
   }
@@ -856,20 +853,19 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   function sendUpd() {
     var bad = function (t) { UM._msg.textContent = t; UM._msg.className = 'mx-umsg'; void UM._msg.offsetWidth; UM._msg.className = 'mx-umsg bad'; };
     if (!USEL) return bad('Pick Done, In progress, Waiting on parts, Needs approval or Note only.');
-    var name = UM._name.value.trim(), code = UM._code.value.trim(), note = UM._note.value.trim();
+    var name = UM._name.value.trim(), note = UM._note.value.trim();
     if (!name) return bad('Add your name.');
-    if (!/^\d{4,6}$/.test(code)) return bad('Enter the site code.');
     if (USEL !== 'done' && !note) return bad('Add a short note so the crew knows what is happening.');
     var h = UM._hours.value.trim(); if (h && !/^\d{1,6}([.,]\d{1,2})?$/.test(h)) return bad('Hour meter reading should be a number, e.g. 1234.5');
     var tm = UM._time.value.trim().replace(',', '.'); if (tm && (!/^\d{1,3}(\.\d{1,2})?$/.test(tm) || +tm <= 0 || +tm > 200)) return bad('Time spent should be in hours, e.g. 1.5');
     var body = new URLSearchParams();
     var put = function (k, v) { body.append(k, v == null ? '' : String(v)); };
-    put('code', code); put('status', USEL); put('kind', UJOB.kind); put('ref', UJOB.ref); put('machine', UJOB.machine); put('job', UJOB.job);
+    put('status', USEL); put('kind', UJOB.kind); put('ref', UJOB.ref); put('machine', UJOB.machine); put('job', UJOB.job);
     put('items', JSON.stringify(UJOB.items || [])); put('hours', h.replace(',', '.')); put('time', tm); put('note', note); put('parts', UM._parts.value.trim());
     put('name', name); put('company', UM._co.value.trim());
     UM._go.disabled = true; UM._go.classList.add('busy'); UM._msg.className = 'mx-umsg'; UM._msg.textContent = 'Sending…';
     fetch(UPDURL, { method: 'POST', mode: 'no-cors', body: body }).then(function () {
-      store('mx_upd_name', name); store('mx_upd_co', UM._co.value.trim()); store('mx_upd_code', code);
+      store('mx_upd_name', name); store('mx_upd_co', UM._co.value.trim());
       var lab = USTAT.filter(function (s) { return s[0] === USEL; })[0][1];
       SENT[UKEY] = lab; UM._go.classList.remove('busy'); UM._msg.className = 'mx-umsg ok'; UM._msg.textContent = 'Sent. Thanks.';
       setTimeout(function () { closeUpd(); FX.open(900); draw(); }, 900);
@@ -923,7 +919,6 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     var ev = el('div', 'two'); var eh = field('Every … engine hours', 'input', { inputmode: 'numeric', maxlength: '5', autocomplete: 'off' }); var em = field('or every … months', 'input', { inputmode: 'numeric', maxlength: '3', autocomplete: 'off' });
     ev.appendChild(eh[0]); ev.appendChild(em[0]); rb.appendChild(ev); LJ._eh = eh[1]; LJ._em = em[1];
     rb.appendChild(el('p', 'mx-note', 'Not sure how often? Leave these blank and we will set it from the maker\'s recommendation.')); d.appendChild(rb);
-    var cd = field('Site code *', 'input', { inputmode: 'numeric', maxlength: '6', autocomplete: 'off' }); d.appendChild(cd[0]); LJ._code = cd[1]; LJ._codeL = cd[0];
     LJ._msg = el('p', 'mx-umsg'); LJ._msg.setAttribute('role', 'status'); d.appendChild(LJ._msg);
     var acts = el('div', 'acts'); var cx = el('button', null, 'Cancel'); cx.type = 'button'; var go = el('button', 'go', 'Send job'); go.type = 'button';
     acts.appendChild(cx); acts.appendChild(go); d.appendChild(acts); LJ._go = go;
@@ -954,14 +949,14 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     var t = new Date(); LJ._date.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); LJ._date.max = LJ._date.value;
     [LJ._hours, LJ._job, LJ._note, LJ._cause, LJ._time, LJ._fu, LJ._svc, LJ._eh, LJ._em].forEach(function (i) { i.value = ''; });
     LJ._parts.replaceChildren(); ljPartRow();
-    LJ._name.value = store('mx_upd_name'); LJ._co.value = store('mx_upd_co'); LJ._code.value = window.__MXK || store('mx_upd_code'); LJ._codeL.hidden = !!window.__MXK;
+    LJ._name.value = store('mx_upd_name'); LJ._co.value = store('mx_upd_co');
     LJ._msg.textContent = ''; LJ._msg.className = 'mx-umsg'; LJ._go.disabled = false; LJ._go.classList.remove('busy');
     ljShow(); LJ._tok = (LJ._tok || 0) + 1; LJ.hidden = false; LJ._name.focus();
   }
   function closeLJ() { if (!LJ || LJ.hidden) return; var tok = (LJ._tok = (LJ._tok || 0) + 1); FX.shut(LJ, LJ.firstChild, function () { if (LJ._tok === tok) LJ.hidden = true; }); }
   function sendLJ() {
     var bad = function (t, f) { LJ._msg.textContent = t; LJ._msg.className = 'mx-umsg'; void LJ._msg.offsetWidth; LJ._msg.className = 'mx-umsg bad'; if (f && f.focus) f.focus(); };
-    var name = LJ._name.value.trim(), code = LJ._code.value.trim(), job = LJ._job.value.trim(), note = LJ._note.value.trim();
+    var name = LJ._name.value.trim(), job = LJ._job.value.trim(), note = LJ._note.value.trim();
     var mach = LJ._mach.value === '__other' ? LJ._other.value.trim() : LJ._mach.value;
     if (!name) return bad('Add your name.', LJ._name);
     if (!mach) return bad('Choose the machine (or name it if it is not in the list).', LJ._mach);
@@ -975,16 +970,15 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     var eh = LJ._eh.value.trim(), em = LJ._em.value.trim(), rep = LJR || 'no';
     if (eh && !/^\d{1,5}$/.test(eh)) return bad('Every … hours should be a whole number, e.g. 250', LJ._eh);
     if (em && !/^\d{1,3}$/.test(em)) return bad('Every … months should be a whole number, e.g. 6', LJ._em);
-    if (!/^\d{4,6}$/.test(code)) return bad('Enter the site code.', LJ._code);
     var parts = Array.prototype.map.call(LJ._parts.children, function (r) { var i = r.querySelectorAll('input'); var q = i[0].value.trim(), p = i[1].value.trim(); return p ? (q ? q + ' x ' : '') + p : ''; }).filter(Boolean).join('; ');
     var body = new URLSearchParams(); var put = function (k, v) { body.append(k, v == null ? '' : String(v)); };
-    put('code', code); put('status', 'done'); put('kind', 'job'); put('ref', ''); put('machine', mach); put('job', job); put('items', '[]');
+    put('status', 'done'); put('kind', 'job'); put('ref', ''); put('machine', mach); put('job', job); put('items', '[]');
     put('hours', h.replace(',', '.')); put('time', tm); put('note', note); put('parts', parts); put('name', name); put('company', LJ._co.value.trim());
     put('jobtype', LJT); put('workdate', LJ._date.value); put('mstate', LJS); put('cause', LJT === 'repair' ? LJ._cause.value.trim() : ''); put('followup', LJ._fu.value.trim());
     put('repeat', rep); if (rep !== 'no') { put('svcname', LJ._svc.value.trim() || job); put('every_h', eh); put('every_m', em); }
     LJ._go.disabled = true; LJ._go.classList.add('busy'); LJ._msg.className = 'mx-umsg'; LJ._msg.textContent = 'Sending…';
     fetch(UPDURL, { method: 'POST', mode: 'no-cors', body: body }).then(function () {
-      store('mx_upd_name', name); store('mx_upd_co', LJ._co.value.trim()); store('mx_upd_code', code);
+      store('mx_upd_name', name); store('mx_upd_co', LJ._co.value.trim());
       LJ._go.classList.remove('busy'); LJ._msg.className = 'mx-umsg ok'; LJ._msg.textContent = 'Sent. Thanks: it shows on the dashboard within the hour.';
       setTimeout(function () { closeLJ(); FX.open(900); }, 1400);
     }).catch(function () { LJ._go.disabled = false; LJ._go.classList.remove('busy'); bad('Could not send. Check your signal and try again.'); });
