@@ -422,7 +422,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   .x3{display:grid;grid-template-columns:minmax(0,1fr) 22rem;gap:var(--cds-gap-md);align-items:start;}
   @media (max-width:60rem){.x3{grid-template-columns:minmax(0,1fr);}}
   .x3-view{position:relative;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);overflow:hidden;background:var(--color-panel);}
-  .x3-stage{position:relative;height:clamp(22rem,62vh,44rem);}
+  .x3-stage{position:relative;overflow:hidden;height:clamp(22rem,62vh,44rem);}
   .x3-stage canvas{display:block;width:100%;height:100%;cursor:grab;}
   .x3-stage canvas:active{cursor:grabbing;}
   .x3-status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;color:var(--color-fg-muted);font-size:var(--cds-font-size-body);}
@@ -466,13 +466,24 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   .x3-lgh{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.15rem;}
   .x3-li{display:block;width:100%;text-align:left;appearance:none;border:0;background:none;font:inherit;font-size:var(--cds-font-size-body);padding:.28rem .45rem;border-radius:6px;color:var(--color-fg);cursor:pointer;}
   .x3-li:hover{background:color-mix(in srgb,var(--color-fg) 6%,transparent);} .x3-li.on{background:color-mix(in srgb,var(--color-warn) 16%,transparent);}
+  .x3-sep{width:1px;background:var(--color-border-line);margin:0 .2rem;}
+  .x3-photo{position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;}
+  .x3-stage:has(.x3-photo){background:radial-gradient(ellipse at 50% 45%,#ffffff 0%,#eceee9 70%,#e2e4de 100%);}
+  .x3-ph-base,.x3-ph-layer{position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat;}
+  .x3-ph-layer{cursor:pointer;will-change:transform;}
+  .x3-ph-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:60;overflow:visible;}
+  .x3-ph-svg polygon{fill:none;stroke:transparent;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;}
+  .x3-ph-svg polygon.hov{stroke:rgba(230,120,0,.75);fill:rgba(255,150,30,.08);}
+  .x3-ph-svg polygon.sel{stroke:#e06a00;stroke-width:2.5;fill:rgba(255,140,20,.14);}
+  .x3-ph-credit{position:absolute;right:.4rem;bottom:.2rem;font-size:.65rem;color:#8a8b85;z-index:61;}
+  .x3-labels{z-index:70;}
   .x3-models{display:flex;flex-wrap:wrap;gap:.4rem;margin:.55rem 0 .2rem;}
   .x3-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.45;}
   </style>
   <div class="mx-card">
     <div class="mx-row"><h3 class="x3-title">Reelmaster 5010-H in 3D</h3><span class="mx-note x3-sub">Fairway Mowers 1, 2 and 3 · model 03950</span></div>
-    <div class="x3-models" role="group" aria-label="Machine"><button class="x3-tg x3-model" data-model="5010h" aria-pressed="true">Reelmaster 5010-H</button><button class="x3-tg x3-model" data-model="3370" aria-pressed="false">Greensmaster eTriFlex 3370</button></div>
-    <p class="mx-note">Drag to turn, scroll or pinch to zoom, right-drag to pan. Click any part for its part numbers, price, what's on the shelf and where to order. Slide to blow the machine apart: halfway separates the assemblies, all the way strips the cutting units down to reel, bedknife, rollers and motor.</p>
+    <div class="x3-models" role="group" aria-label="Machine"><button class="x3-tg x3-model" data-model="5010h" aria-pressed="true">Reelmaster 5010-H</button><button class="x3-tg x3-model" data-model="3370" aria-pressed="false">Greensmaster eTriFlex 3370</button><span class="x3-sep"></span><button class="x3-tg x3-viewbtn" data-view="photo" hidden>Photo</button><button class="x3-tg x3-viewbtn" data-view="3d" hidden>3D</button></div>
+    <p class="mx-note x3-help">Drag to turn, scroll or pinch to zoom, right-drag to pan. Click any part for its part numbers, price, what's on the shelf and where to order. Slide to blow the machine apart: halfway separates the assemblies, all the way strips the cutting units down to reel, bedknife, rollers and motor.</p>
   </div>
   <div class="x3" id="x3">
     <div class="x3-view">
@@ -1311,6 +1322,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   });
 })();
 </script>
+
 <script>
 /* Ranfurlie machinery 3D parts explorer - Toro Reelmaster 5010-H (03950).
    Procedural model built from Toro's published dimensions (spec sheet / product page 03950):
@@ -1472,10 +1484,10 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   };
 
   var MODELS = {
-    '5010h': { id: '5010h', slug: 'toro_reelmaster_5010h', title: 'Reelmaster 5010-H in 3D', sub: 'Fairway Mowers 1, 2 and 3 · model 03950', COMP: COMP, SUB: SUB, EXTRA: EXTRA, SNAP: SNAP, STOCK: STOCK_EXTRA, LOOKUP: LOOKUP, OM: CAT_OM,
+    '5010h': { id: '5010h', slug: 'toro_reelmaster_5010h', title: 'Reelmaster 5010-H', sub: 'Fairway Mowers 1, 2 and 3 · model 03950', COMP: COMP, SUB: SUB, EXTRA: EXTRA, SNAP: SNAP, STOCK: STOCK_EXTRA, LOOKUP: LOOKUP, OM: CAT_OM,
       LBL: ['engine', 'hood', 'rops', 'seat', 'aircleaner', 'radiator', 'battery48', 'hydtank', 'fueltank', 'generator', 'cu1', 'cu2', 'cu3', 'cu4', 'cu5', 'tyreFR', 'console', 'lights', 'steering'], UNDER: ['engine', 'oilfilter', 'belt', 'generator', 'aircleaner', 'radiator', 'fuelsep', 'battery12'], xray: 'hood', xrayLabel: 'See through hood', cam: { r: 6.2, th: 0.85, ph: 1.12, t: [0, 0.75, 0] },
       note: "Model built from Toro's published 5010-H dimensions (2.82 m long, 1.52 m wheelbase, 2.54 m cut, 26.5x14-12 front and 20x12-10 rear tyres); shapes are simplified and some component positions are approximate. Part numbers come from parts books 3471-213 (Mowers 1 and 3), 3478-264 (Mower 2) and cutting-unit book 3451-988." },
-    '3370': { id: '3370', slug: 'toro_etriflex_3370', title: 'Greensmaster eTriFlex 3370 in 3D', sub: 'Toro Greens Mowers 1 and 2 · model 04591', COMP: G_COMP, SUB: G_SUB, EXTRA: G_EXTRA, SNAP: G_SNAP, STOCK: {}, LOOKUP: 'https://www.toro.com/en/parts/partdetails?id=58293', OM: G_OM,
+    '3370': { id: '3370', slug: 'toro_etriflex_3370', title: 'Greensmaster eTriFlex 3370', sub: 'Toro Greens Mowers 1 and 2 · model 04591', COMP: G_COMP, SUB: G_SUB, EXTRA: G_EXTRA, SNAP: G_SNAP, STOCK: {}, LOOKUP: 'https://www.toro.com/en/parts/partdetails?id=58293', OM: G_OM,
       LBL: ['body', 'batteries', 'rops', 'seat', 'steering', 'console', 'cu1', 'cu2', 'cu3', 'tyreFR', 'tyreR', 'lift', 'dcdc'], UNDER: ['batteries', 'dcdc'], xray: 'body', xrayLabel: 'See through body', cam: { r: 4.6, th: 0.85, ph: 1.12, t: [0, 0.6, 0] },
       note: "Model built from Toro's published eTriFlex 3370 dimensions (2.49 m long with baskets, 1.27 m wheelbase, 1.80 m wide, 2.05 m high, 19x10.5-8 tyres, 21 in units); shapes are simplified and some internal positions are approximate. Part numbers come from parts books 3471-256 (Mower 2) and 3461-607, and cutting-unit book 3443-444. Mower 1: check the model plate (04590 or 04591) before ordering battery or charger parts." }
   };
@@ -1523,13 +1535,87 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     var D = MODELS[root.dataset.model] || MODELS['5010h']; CUR = D;
     COMP = D.COMP; SUB = D.SUB; EXTRA = D.EXTRA; SNAP = D.SNAP; STOCK_EXTRA = D.STOCK; LOOKUP = D.LOOKUP; CAT_OM = D.OM;
     (function () { var host = root.closest('section') || root; var t = host.querySelector('.x3-title'), s2 = host.querySelector('.x3-sub'), n = root.querySelector('.x3-note'), xb0 = root.querySelector('.x3-xray');
-      if (t) t.textContent = D.title; if (s2) s2.textContent = D.sub; if (n) n.textContent = D.note + ' Prices are ex GST: club cost from workshop stock first, then AU retail, then an aftermarket equivalent. Stock counts update hourly.'; if (xb0) xb0.textContent = D.xrayLabel;
+      if (t) t.textContent = D.title; var hp = host.querySelector('.x3-help'); if (hp) hp.textContent = (window.MX3D_PHOTOS && window.MX3D_PHOTOS[D.id] && (root.dataset.view || 'photo') === 'photo') ? 'Hover over the photo to find a part, click it for part numbers, price, what is on the shelf and where to order. Slide to blow the machine apart; click a cutting unit and choose Blow up this unit to pull just that one out. Switch to 3D to turn it around.' : 'Drag to turn, scroll or pinch to zoom, right-drag to pan. Click any part for its part numbers, price, what is on the shelf and where to order. Slide to blow the machine apart: halfway separates the assemblies, all the way strips the cutting units down to reel, bedknife, rollers and motor.'; if (s2) s2.textContent = D.sub; if (n) n.textContent = D.note + ' Prices are ex GST: club cost from workshop stock first, then AU retail, then an aftermarket equivalent. Stock counts update hourly.'; if (xb0) xb0.textContent = D.xrayLabel;
       host.querySelectorAll('.x3-model').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.model === D.id);
         if (!b.__bound) { b.__bound = true; b.addEventListener('click', function () { if (root.dataset.model === b.dataset.model || (!root.dataset.model && b.dataset.model === '5010h')) return; root.dataset.model = b.dataset.model; if (root.__mx3d && root.__mx3d.destroy) root.__mx3d.destroy(); root.__mx3d = null; mount(root, opts); }); } }); })();
     var api = { resize: function () {} }; root.__mx3d = api;
     var stage = root.querySelector('.x3-stage'), panel = root.querySelector('.x3-panel'), tip = root.querySelector('.x3-tip'), labels = root.querySelector('.x3-labels');
     var status = root.querySelector('.x3-status');
     status.hidden = false; status.textContent = 'Loading 3D engine…'; panel.hidden = true; labels.replaceChildren();
+    // ---- photo mode: a real photo cut into parts that lift and slide apart
+    var PH = window.MX3D_PHOTOS && window.MX3D_PHOTOS[D.id];
+    var host0 = root.closest('section') || root;
+    var VIEW = PH ? (root.dataset.view || 'photo') : '3d';
+    host0.querySelectorAll('.x3-viewbtn').forEach(function (b) {
+      b.hidden = !PH; b.setAttribute('aria-pressed', b.dataset.view === VIEW);
+      if (!b.__bound) { b.__bound = true; b.addEventListener('click', function () { if ((root.dataset.view || 'photo') === b.dataset.view) return; root.dataset.view = b.dataset.view; if (root.__mx3d && root.__mx3d.destroy) root.__mx3d.destroy(); root.__mx3d = null; mount(root, opts); }); }
+    });
+    ['.x3-mow', '.x3-xray', '.x3-ground', '.x3-hq'].forEach(function (q) { var e = root.querySelector(q); if (e) e.hidden = VIEW === 'photo'; });
+    if (VIEW === 'photo') { buildPhoto(PH); return api; }
+    function buildPhoto(P) {
+      status.hidden = true; buildList();
+      var wrap = el('div', 'x3-photo'), base = el('div', 'x3-ph-base'), svgNS = 'http://www.w3.org/2000/svg';
+      base.style.backgroundImage = 'url(' + P.img + ')'; wrap.appendChild(base);
+      var svg = document.createElementNS(svgNS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + P.w + ' ' + P.h); svg.setAttribute('class', 'x3-ph-svg');
+      var L = P.parts.map(function (p, i) {
+        var d = el('div', 'x3-ph-layer'); d.style.backgroundImage = 'url(' + P.img + ')';
+        d.style.clipPath = 'polygon(' + p.poly.map(function (q) { return (q[0] / P.w * 100).toFixed(2) + '% ' + (q[1] / P.h * 100).toFixed(2) + '%'; }).join(',') + ')';
+        d.style.zIndex = 2 + i; wrap.appendChild(d);
+        var pg = document.createElementNS(svgNS, 'polygon'); pg.setAttribute('points', p.poly.map(function (q) { return q.join(','); }).join(' ')); svg.appendChild(pg);
+        var cx = 0, cy = 0; p.poly.forEach(function (q) { cx += q[0]; cy += q[1]; }); cx /= p.poly.length; cy /= p.poly.length;
+        var lb = el('button', 'x3-lbl', p.label); lb.hidden = true; labels.appendChild(lb);
+        var o = { p: p, d: d, pg: pg, lb: lb, cx: cx, cy: cy, key: p.pid + '|' + (p.sub || '') };
+        function pick(e) { e.stopPropagation(); sel(o); }
+        d.addEventListener('click', pick); lb.addEventListener('click', pick);
+        d.addEventListener('pointerenter', function (e) { hov(o, e); }); d.addEventListener('pointermove', function (e) { hov(o, e); }); d.addEventListener('pointerleave', function () { hov(null); });
+        return o;
+      });
+      wrap.appendChild(svg); stage.insertBefore(wrap, stage.firstChild);
+      wrap.addEventListener('click', function () { sel(null); });
+      var t = 0, goalT = 0, only = null, hovered = null, selected = null, raf = null;
+      function hov(o, e) {
+        hovered = o; L.forEach(function (x) { x.pg.classList.toggle('hov', !!o && x.p.pid === o.p.pid && (x.p.sub || '') === (o.p.sub || '')); });
+        if (o) { var r = stage.getBoundingClientRect(); tip.hidden = false; tip.textContent = o.p.sub ? (SUB[o.p.sub] ? SUB[o.p.sub].name : o.p.label) + ', ' + COMP[o.p.pid].name.replace(/^Cutting unit /, 'unit ') : COMP[o.p.pid].name; tip.style.left = (e.clientX - r.left + 14) + 'px'; tip.style.top = (e.clientY - r.top + 12) + 'px'; } else tip.hidden = true;
+      }
+      function sel(o, pid) {
+        selected = o ? o : null; var id = o ? o.p.pid : pid, sb = o ? (o.p.sub || null) : null;
+        L.forEach(function (x) { x.pg.classList.toggle('sel', !!id && x.p.pid === id && (!sb || x.p.sub === sb) && (sb || !x.p.sub || true)); });
+        if (!id) { panel.hidden = true; root.querySelectorAll('.x3-li').forEach(function (b) { b.classList.remove('on'); }); return; }
+        showPanel(id, sb);
+      }
+      selectFn = function (pid, sub) { sel(null, pid); if (pid) showPanel(pid, sub || null); };
+      var slider = root.querySelector('.x3-ex'), rb = root.querySelector('.x3-reset');
+      function onSlide() { goalT = slider.value / 100; only = null; kick(); }
+      if (slider) slider.addEventListener('input', onSlide);
+      function onReset() { goalT = 0; only = null; if (slider) slider.value = 0; sel(null); kick(); }
+      if (rb) rb.addEventListener('click', onReset);
+      api.blowUnit = function (pid) { only = pid; goalT = 1; if (slider) slider.value = 100; kick(); };
+      function frame() {
+        t += (goalT - t) * 0.16; if (Math.abs(goalT - t) < 0.002) t = goalT;
+        var e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, r = wrap.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+        wrap.style.transform = 'scale(' + (1 - 0.2 * (only ? 0 : e)).toFixed(3) + ')';
+        base.style.opacity = (1 - 0.7 * e).toFixed(3); base.style.filter = 'grayscale(' + e.toFixed(2) + ') blur(' + (e * 1.5).toFixed(2) + 'px)';
+        L.forEach(function (x) {
+          var f = only ? (x.p.pid === only ? e : 0) : e;
+          var dx = x.p.ex[0] / P.w * 100 * f * 1.15, dy = x.p.ex[1] / P.h * 100 * f * 1.15, s = 1 + 0.05 * f;
+          var tr = 'translate(' + dx.toFixed(2) + '%,' + dy.toFixed(2) + '%) scale(' + s.toFixed(3) + ')';
+          x.d.style.transform = tr; x.d.style.transformOrigin = (x.cx / P.w * 100) + '% ' + (x.cy / P.h * 100) + '%';
+          x.d.style.filter = f > 0.02 ? 'drop-shadow(0 ' + (10 * f).toFixed(1) + 'px ' + (14 * f).toFixed(1) + 'px rgba(0,0,0,' + (0.35 * f).toFixed(2) + '))' : 'none';
+          x.pg.setAttribute('transform', 'translate(' + (x.p.ex[0] * f * 1.15) + ',' + (x.p.ex[1] * f * 1.15) + ') translate(' + x.cx + ',' + x.cy + ') scale(' + s + ') translate(' + (-x.cx) + ',' + (-x.cy) + ')');
+          var show = f > 0.35; x.lb.hidden = !show;
+          if (show) { var px = r.left - sr.left + (x.cx + x.p.ex[0] * f * 1.15) / P.w * r.width, py = r.top - sr.top + (x.cy + x.p.ex[1] * f * 1.15) / P.h * r.height; x.lb.style.transform = 'translate(' + px.toFixed(0) + 'px,' + py.toFixed(0) + 'px) translate(-50%,-50%)'; x.lb.style.opacity = Math.min(1, (f - 0.35) * 3).toFixed(2); }
+        });
+        if (t !== goalT) raf = requestAnimationFrame(frame); else raf = null;
+      }
+      function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+      function fit() { var sz = Math.min(stage.clientWidth, stage.clientHeight) * 0.96; wrap.style.width = wrap.style.height = sz + 'px'; }
+      api.resize = function () { fit(); kick(); }; fit(); window.addEventListener('resize', api.resize);
+      api.destroy = function () { if (raf) cancelAnimationFrame(raf); window.removeEventListener('resize', api.resize); if (slider) slider.removeEventListener('input', onSlide); if (rb) rb.removeEventListener('click', onReset); wrap.remove(); labels.replaceChildren(); panel.hidden = true; tip.hidden = true; if (slider) slider.value = 0; };
+      api.pause = function () {}; api.renderNow = function () { t = goalT; frame(); };
+      api.select = function (pid, sub) { selectFn(pid, sub); }; api.explode = function (v) { goalT = v; if (slider) slider.value = v * 100; kick(); };
+      var credit = el('div', 'x3-ph-credit', P.credit || ''); wrap.appendChild(credit);
+      frame();
+    }
     var probe = document.createElement('canvas');
     if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) { status.textContent = 'This browser has WebGL turned off, so the 3D model cannot show. The parts list below still works.'; buildList(); return api; }
     import(TB + '+esm').then(function (THREE) { return Promise.all(ADDONS.map(function (p) { return import(TB + p + '/+esm').catch(function () { return {}; }); })).then(function (m) { var X = {}; m.forEach(function (o) { Object.keys(o).forEach(function (k) { X[k] = o[k]; }); }); build(THREE, X); }); }).catch(function (e) { status.textContent = 'Could not load the 3D engine (' + (e && e.message || e) + '). Check the connection and reload.'; buildList(); });
