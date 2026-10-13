@@ -403,9 +403,17 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
 <section class="mx-page" id="parts" role="tabpanel" aria-labelledby="tab-parts" hidden>
   <div class="mx-card" id="card-order">
     <div class="mx-row"><h3>Order list, next 30 days</h3><span class="mx-note">Parts for every service overdue or due within 30 days, less stock on the shelf</span></div>
-    <p class="mx-note">Prices: club average cost from the workshop stock list first, then what taskTracker recorded as paid (ex GST), then Australian retail. "equiv." = an aftermarket equivalent's price where no genuine price was found.</p>
+    <p class="mx-note">Prices (ex GST): the latest supplier invoice first, then the club average cost from the workshop stock list, then what taskTracker recorded as paid, then Australian retail. "equiv." = an aftermarket equivalent's price where no genuine price was found.</p>
     <div class="mx-tbox"><table class="mx-table" id="t-order" data-source="m_order" data-row-key="part_no"><thead><tr>
       <th data-field="part_no">Part no.</th><th data-field="name">Part</th><th data-field="qty" class="n">Need</th><th data-field="on_hand" class="n">On hand</th><th data-field="to_order" class="n">To order</th><th data-field="price" class="n">Each $</th><th data-field="line_aud" class="n">Line $</th><th data-field="first_due">First due</th><th data-field="machines" class="hn">For</th><th data-field="supplier" class="hn">Supplier</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="mx-card" id="card-prices">
+    <div class="mx-row"><h3>Prices paid</h3><span class="mx-note" id="pr-count"></span></div>
+    <p class="mx-note">The latest price the club paid for each part, ex GST, from supplier invoices (Toro, Brandt, Amacron, GA Power, Melbourne Tractors and the rest). "Before" is the previous invoice price.</p>
+    <div class="mx-ctl"><input class="mx-in" id="pr-q" type="search" placeholder="Search part, number or supplier" aria-label="Search prices"></div>
+    <div class="mx-tbox"><table class="mx-table" id="t-prices" data-source="m_prices" data-row-key="key"><thead><tr>
+      <th data-field="part_no">Part no.</th><th data-field="name">Part</th><th data-field="price" class="n">Each $</th><th data-field="date">Last bought</th><th data-field="supplier" class="hn">Supplier</th><th data-field="invoice_no" class="hn">Invoice</th><th data-field="prev" class="n hn">Before $</th><th data-field="buys" class="n hn">Buys</th><th data-field="on_hand" class="n hn">On hand</th>
     </tr></thead><tbody></tbody></table></div>
   </div>
   <div class="mx-card" id="card-fluids">
@@ -1342,6 +1350,16 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       supplier: function (r, td) { td.className = 'wrap hn'; return r.link ? link(r.link, r.supplier || 'link') : (r.supplier || ''); },
       name: function (r, td) { td.className = 'wrap'; return (r.name || '') + (r.verified === 'no' ? ' (number not confirmed)' : ''); }
     }, { numeric: ['line_aud', 'qty', 'to_order'], empty: 'Nothing to order in the next 30 days.' });
+    if (!failed($('#t-prices'), 'm_prices')) {
+      var pq = (state.prQ || '').toLowerCase();
+      var prows = R('m_prices').filter(function (r) { return r.key !== 'none' && (!pq || ((r.part_no || '') + ' ' + (r.name || '') + ' ' + (r.supplier || '')).toLowerCase().indexOf(pq) >= 0); });
+      $('#pr-count').textContent = prows.length + ' parts';
+      table('t-prices', prows, {
+        name: function (r, td) { td.className = 'wrap'; return r.name || ''; }, price: function (r) { return r.price != null ? f2(r.price) : ''; },
+        date: function (r) { return fmtDs(r.date); }, prev: function (r) { return r.prev != null ? f2(r.prev) : ''; }, buys: function (r) { return String(r.buys || ''); },
+        on_hand: function (r) { return r.on_hand ? String(r.on_hand) : ''; }
+      }, { numeric: ['price', 'prev', 'buys', 'on_hand'], empty: 'No invoice prices yet.' });
+    }
     table('t-fluids', R('m_fluids'), { spec: function (r, td) { td.className = 'wrap'; return r.spec; }, litres: function (r) { return f1(r.litres); } }, {});
     var all = R('m_catalog'); var sel = $('#cat-model');
     if (sel.options.length < 2 && all.length) Array.from(new Set(all.map(function (r) { return r.model; }))).sort().forEach(function (c) { sel.appendChild(new Option(c, c)); });
@@ -1359,6 +1377,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   $('#cat-model').addEventListener('change', function (e) { state.catModel = e.target.value; drawParts(); });
   $('#cat-kind').addEventListener('change', function (e) { state.catKind = e.target.value; drawParts(); });
   $('#cat-q').addEventListener('input', function (e) { state.catQ = e.target.value; drawParts(); });
+  $('#pr-q').addEventListener('input', function (e) { state.prQ = e.target.value; drawParts(); });
 
   // ---------- costs
   function drawCosts() {
