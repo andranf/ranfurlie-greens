@@ -179,6 +179,14 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 .mx-dlg .acts button{appearance:none;font:inherit;border-radius:999px;padding:.55rem 1.1rem;cursor:pointer;border:1px solid var(--color-border-line);background:var(--color-panel);color:var(--color-fg);}
 .mx-dlg .acts .go{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);font-weight:600;}
 .mx-dlg .acts button[disabled]{opacity:.5;cursor:default;}
+.mx-dlg select{font:inherit;font-size:16px;color:var(--color-fg);background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:8px;padding:.5rem .6rem;width:100%;}
+.mx-lj-l{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin-bottom:.3rem;}
+.mx-lj-parts{display:flex;flex-direction:column;gap:.4rem;}
+.mx-lj-pr{display:grid;grid-template-columns:4.2rem 1fr 2rem;gap:.4rem;align-items:center;}
+.mx-lj-x,.mx-lj-add{appearance:none;font:inherit;background:none;border:1px solid var(--color-border-line);color:var(--color-fg);border-radius:8px;cursor:pointer;}
+.mx-lj-x{height:2.2rem;} .mx-lj-add{margin-top:.4rem;padding:.35rem .7rem;font-size:var(--cds-font-size-caption);}
+.mx-lj-rep{display:flex;flex-direction:column;gap:.5rem;border-left:3px solid var(--color-border-line);padding-left:.7rem;}
+.mx-dlg [hidden]{display:none !important;}
 .mx-umsg{margin:0;font-size:var(--cds-font-size-caption);min-height:1.1em;} .mx-umsg.bad{color:var(--color-bad);} .mx-umsg.ok{color:var(--color-ok);}
 /* ---------- motion (all of it switches off for people who ask their device for reduced motion) */
 @keyframes mxPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--color-ok) 65%,transparent)}70%{box-shadow:0 0 0 .55rem transparent}100%{box-shadow:0 0 0 0 transparent}}
@@ -284,6 +292,11 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     <p class="mx-sec">Do first</p>
     <p class="mx-do-t" id="dofirst">—</p>
     <p class="mx-note" id="dofirst-why"></p>
+  </div>
+
+  <div class="mx-card" id="card-logjob">
+    <div class="mx-row"><h3>Log a job</h3><button class="mx-ubtn" id="logjob-btn" type="button">Log a job</button></div>
+    <p class="mx-note">Contractors and staff: record any work you did on a club machine that is not already on the list (services, repairs, inspections), with the parts used and the hour meter reading. A service that should be repeated goes on the service plan.</p>
   </div>
 
   <div class="mx-card" id="card-worklist">
@@ -867,6 +880,118 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         items: (c.items || []).map(function (i) { return { id: i.id, fleet: i.fleet || c.machine, label: i.label, interval_h: i.interval_h, kind: i.kind }; }) }; }
   function jobFromFault(f) { return { kind: 'fault', ref: f.id || '', machine: f.fleet || f.machine || '', job: f.job, items: [] }; }
   function jobFromItem(it) { return { kind: 'service', ref: it.id, machine: it.fleet, job: it.label, items: [{ id: it.id, fleet: it.fleet, label: it.label, interval_h: it.interval_h, kind: it.kind }] }; }
+
+  // ---------- log a job (shared link): contractors and staff record work that is not on the list
+  var LJ = null, LJT = null, LJS = null, LJR = null;
+  function ljPick(group, val, set) { group.forEach(function (x) { x.setAttribute('aria-pressed', x.dataset.v === val ? 'true' : 'false'); }); set(val); ljShow(); }
+  function ljBtns(lbl, opts, set) {
+    var w = el('div'); w.appendChild(el('div', 'mx-lj-l', lbl)); var g = el('div', 'mx-sts'); g.setAttribute('role', 'group'); g.setAttribute('aria-label', lbl);
+    var bs = opts.map(function (o) { var b = el('button', null, o[1]); b.type = 'button'; b.dataset.v = o[0]; b.setAttribute('aria-pressed', 'false'); g.appendChild(b); return b; });
+    bs.forEach(function (b) { b.addEventListener('click', function () { ljPick(bs, b.dataset.v, set); }); });
+    w.appendChild(g); w._b = bs; return w;
+  }
+  function ljPartRow() {
+    var r = el('div', 'mx-lj-pr'); var q = document.createElement('input'); q.setAttribute('inputmode', 'decimal'); q.setAttribute('maxlength', '5'); q.placeholder = 'Qty'; q.setAttribute('aria-label', 'Quantity');
+    var p = document.createElement('input'); p.setAttribute('maxlength', '90'); p.placeholder = 'Part number and description'; p.setAttribute('aria-label', 'Part');
+    var x = el('button', 'mx-lj-x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Remove part'); x.addEventListener('click', function () { r.remove(); });
+    r.appendChild(q); r.appendChild(p); r.appendChild(x); LJ._parts.appendChild(r); return p;
+  }
+  function buildLJ() {
+    LJ = el('div', 'mx-modal'); LJ.hidden = true; LJ.setAttribute('role', 'dialog'); LJ.setAttribute('aria-modal', 'true'); LJ.setAttribute('aria-labelledby', 'lj-t');
+    var d = el('div', 'mx-dlg'); LJ.appendChild(d);
+    var h = el('h3', null, 'Log a job'); h.id = 'lj-t'; d.appendChild(h);
+    d.appendChild(el('p', 'mx-note', 'Record work you did on a club machine. Fill in as much as you can: it goes into the machine\'s service history, the dashboard and #machinery.'));
+    var two = el('div', 'two'); var nm = field('Your name *', 'input', { maxlength: '60', autocomplete: 'name' }); var co = field('Company', 'input', { maxlength: '60', autocomplete: 'organization' });
+    two.appendChild(nm[0]); two.appendChild(co[0]); d.appendChild(two); LJ._name = nm[1]; LJ._co = co[1];
+    var ms = field('Machine *', 'select', {}); d.appendChild(ms[0]); LJ._mach = ms[1];
+    var mo = field('Machine not in the list? Name it here', 'input', { maxlength: '80', autocomplete: 'off' }); d.appendChild(mo[0]); LJ._other = mo[1]; LJ._otherL = mo[0];
+    LJ._mach.addEventListener('change', ljShow);
+    var dt2 = el('div', 'two'); var wd = field('Date of the work *', 'input', { type: 'date' }); var hr = field('Hour meter reading', 'input', { inputmode: 'decimal', maxlength: '9', autocomplete: 'off' });
+    dt2.appendChild(wd[0]); dt2.appendChild(hr[0]); d.appendChild(dt2); LJ._date = wd[1]; LJ._hours = hr[1];
+    LJ._type = ljBtns('Type of job *', [['service', 'Service / preventative'], ['repair', 'Repair'], ['inspection', 'Inspection / check']], function (v) { LJT = v; }); d.appendChild(LJ._type);
+    var jt = field('Job title * (e.g. 250 h service, Replaced lift cylinder seal)', 'input', { maxlength: '120', autocomplete: 'off' }); d.appendChild(jt[0]); LJ._job = jt[1];
+    var wk = field('What was done *', 'textarea', { maxlength: '1500', rows: '4' }); d.appendChild(wk[0]); LJ._note = wk[1];
+    var ca = field('What failed, and why (if you know)', 'textarea', { maxlength: '400', rows: '2' }); d.appendChild(ca[0]); LJ._cause = ca[1]; LJ._causeL = ca[0];
+    var pw = el('div'); pw.appendChild(el('div', 'mx-lj-l', 'Parts used')); LJ._parts = el('div', 'mx-lj-parts'); pw.appendChild(LJ._parts);
+    var ap = el('button', 'mx-lj-add', '+ Add a part'); ap.type = 'button'; ap.addEventListener('click', function () { if (LJ._parts.children.length < 12) ljPartRow().focus(); }); pw.appendChild(ap); d.appendChild(pw);
+    var tm = field('Time spent on the job (hours, e.g. 1.5)', 'input', { inputmode: 'decimal', maxlength: '6', autocomplete: 'off' }); d.appendChild(tm[0]); LJ._time = tm[1];
+    LJ._state = ljBtns('Machine left *', [['ok', 'Back in service'], ['care', 'Use with care'], ['out', 'Tagged out']], function (v) { LJS = v; }); d.appendChild(LJ._state);
+    var fu = field('Anything still to do, or parts to order?', 'textarea', { maxlength: '400', rows: '2' }); d.appendChild(fu[0]); LJ._fu = fu[1];
+    LJ._rep = ljBtns('Should this be done again on a schedule?', [['yes', 'Yes'], ['no', 'No'], ['unsure', 'Not sure']], function (v) { LJR = v; }); d.appendChild(LJ._rep);
+    var rb = el('div', 'mx-lj-rep'); LJ._repBox = rb;
+    var sn = field('Name for the service (e.g. Hydraulic oil and filter change)', 'input', { maxlength: '120', autocomplete: 'off' }); rb.appendChild(sn[0]); LJ._svc = sn[1];
+    var ev = el('div', 'two'); var eh = field('Every … engine hours', 'input', { inputmode: 'numeric', maxlength: '5', autocomplete: 'off' }); var em = field('or every … months', 'input', { inputmode: 'numeric', maxlength: '3', autocomplete: 'off' });
+    ev.appendChild(eh[0]); ev.appendChild(em[0]); rb.appendChild(ev); LJ._eh = eh[1]; LJ._em = em[1];
+    rb.appendChild(el('p', 'mx-note', 'Not sure how often? Leave these blank and we will set it from the maker\'s recommendation.')); d.appendChild(rb);
+    var cd = field('Site code *', 'input', { inputmode: 'numeric', maxlength: '6', autocomplete: 'off' }); d.appendChild(cd[0]); LJ._code = cd[1]; LJ._codeL = cd[0];
+    LJ._msg = el('p', 'mx-umsg'); LJ._msg.setAttribute('role', 'status'); d.appendChild(LJ._msg);
+    var acts = el('div', 'acts'); var cx = el('button', null, 'Cancel'); cx.type = 'button'; var go = el('button', 'go', 'Send job'); go.type = 'button';
+    acts.appendChild(cx); acts.appendChild(go); d.appendChild(acts); LJ._go = go;
+    cx.addEventListener('click', closeLJ); LJ.addEventListener('click', function (e) { if (e.target === LJ) closeLJ(); });
+    LJ.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLJ(); }); go.addEventListener('click', sendLJ);
+    document.querySelector('.mx').appendChild(LJ);
+  }
+  function ljShow() {
+    if (!LJ) return;
+    LJ._otherL.hidden = LJ._mach.value !== '__other';
+    LJ._causeL.hidden = LJT !== 'repair';
+    LJ._repBox.hidden = !(LJR === 'yes' || LJR === 'unsure');
+    if (!LJ._repBox.hidden && !LJ._svc.value && LJ._job.value) LJ._svc.value = LJ._job.value;
+  }
+  function ljMachines() {
+    var s = LJ._mach; s.replaceChildren(); var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Choose a machine'; s.appendChild(o0);
+    var rows = R('m_fleet').filter(function (r) { return r.status === 'Active'; }), g = {};
+    rows.forEach(function (r) { (g[r.cat || 'Other'] = g[r.cat || 'Other'] || []).push(r); });
+    Object.keys(g).sort().forEach(function (c) { var og = document.createElement('optgroup'); og.label = c;
+      g[c].sort(function (a, b) { return a.fleet.localeCompare(b.fleet, undefined, { numeric: true }); }).forEach(function (r) { var o = document.createElement('option'); o.value = r.fleet; o.textContent = r.fleet + (r.model ? ' (' + r.model + ')' : ''); og.appendChild(o); });
+      s.appendChild(og); });
+    var ot = document.createElement('option'); ot.value = '__other'; ot.textContent = 'Not in the list'; s.appendChild(ot);
+  }
+  function openLJ(machine) {
+    if (!LJ) buildLJ();
+    LJT = LJS = LJR = null; [LJ._type, LJ._state, LJ._rep].forEach(function (w) { w._b.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); });
+    ljMachines(); LJ._mach.value = machine || ''; LJ._other.value = '';
+    var t = new Date(); LJ._date.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); LJ._date.max = LJ._date.value;
+    [LJ._hours, LJ._job, LJ._note, LJ._cause, LJ._time, LJ._fu, LJ._svc, LJ._eh, LJ._em].forEach(function (i) { i.value = ''; });
+    LJ._parts.replaceChildren(); ljPartRow();
+    LJ._name.value = store('mx_upd_name'); LJ._co.value = store('mx_upd_co'); LJ._code.value = window.__MXK || store('mx_upd_code'); LJ._codeL.hidden = !!window.__MXK;
+    LJ._msg.textContent = ''; LJ._msg.className = 'mx-umsg'; LJ._go.disabled = false; LJ._go.classList.remove('busy');
+    ljShow(); LJ._tok = (LJ._tok || 0) + 1; LJ.hidden = false; LJ._name.focus();
+  }
+  function closeLJ() { if (!LJ || LJ.hidden) return; var tok = (LJ._tok = (LJ._tok || 0) + 1); FX.shut(LJ, LJ.firstChild, function () { if (LJ._tok === tok) LJ.hidden = true; }); }
+  function sendLJ() {
+    var bad = function (t, f) { LJ._msg.textContent = t; LJ._msg.className = 'mx-umsg'; void LJ._msg.offsetWidth; LJ._msg.className = 'mx-umsg bad'; if (f && f.focus) f.focus(); };
+    var name = LJ._name.value.trim(), code = LJ._code.value.trim(), job = LJ._job.value.trim(), note = LJ._note.value.trim();
+    var mach = LJ._mach.value === '__other' ? LJ._other.value.trim() : LJ._mach.value;
+    if (!name) return bad('Add your name.', LJ._name);
+    if (!mach) return bad('Choose the machine (or name it if it is not in the list).', LJ._mach);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(LJ._date.value)) return bad('Add the date of the work.', LJ._date);
+    if (!LJT) return bad('Pick the type of job: service, repair or inspection.');
+    if (!job) return bad('Give the job a short title.', LJ._job);
+    if (note.length < 10) return bad('Describe what was done (a sentence or two).', LJ._note);
+    if (!LJS) return bad('Say how the machine was left: back in service, use with care or tagged out.');
+    var h = LJ._hours.value.trim(); if (h && !/^\d{1,6}([.,]\d{1,2})?$/.test(h)) return bad('Hour meter reading should be a number, e.g. 1234.5', LJ._hours);
+    var tm = LJ._time.value.trim().replace(',', '.'); if (tm && (!/^\d{1,3}(\.\d{1,2})?$/.test(tm) || +tm <= 0 || +tm > 200)) return bad('Time spent should be in hours, e.g. 1.5', LJ._time);
+    var eh = LJ._eh.value.trim(), em = LJ._em.value.trim(), rep = LJR || 'no';
+    if (eh && !/^\d{1,5}$/.test(eh)) return bad('Every … hours should be a whole number, e.g. 250', LJ._eh);
+    if (em && !/^\d{1,3}$/.test(em)) return bad('Every … months should be a whole number, e.g. 6', LJ._em);
+    if (!/^\d{4,6}$/.test(code)) return bad('Enter the site code.', LJ._code);
+    var parts = Array.prototype.map.call(LJ._parts.children, function (r) { var i = r.querySelectorAll('input'); var q = i[0].value.trim(), p = i[1].value.trim(); return p ? (q ? q + ' x ' : '') + p : ''; }).filter(Boolean).join('; ');
+    var body = new URLSearchParams(); var put = function (k, v) { body.append(k, v == null ? '' : String(v)); };
+    put('code', code); put('status', 'done'); put('kind', 'job'); put('ref', ''); put('machine', mach); put('job', job); put('items', '[]');
+    put('hours', h.replace(',', '.')); put('time', tm); put('note', note); put('parts', parts); put('name', name); put('company', LJ._co.value.trim());
+    put('jobtype', LJT); put('workdate', LJ._date.value); put('mstate', LJS); put('cause', LJT === 'repair' ? LJ._cause.value.trim() : ''); put('followup', LJ._fu.value.trim());
+    put('repeat', rep); if (rep !== 'no') { put('svcname', LJ._svc.value.trim() || job); put('every_h', eh); put('every_m', em); }
+    LJ._go.disabled = true; LJ._go.classList.add('busy'); LJ._msg.className = 'mx-umsg'; LJ._msg.textContent = 'Sending…';
+    fetch(UPDURL, { method: 'POST', mode: 'no-cors', body: body }).then(function () {
+      store('mx_upd_name', name); store('mx_upd_co', LJ._co.value.trim()); store('mx_upd_code', code);
+      LJ._go.classList.remove('busy'); LJ._msg.className = 'mx-umsg ok'; LJ._msg.textContent = 'Sent. Thanks: it shows on the dashboard within the hour.';
+      setTimeout(function () { closeLJ(); FX.open(900); }, 1400);
+    }).catch(function () { LJ._go.disabled = false; LJ._go.classList.remove('busy'); bad('Could not send. Check your signal and try again.'); });
+  }
+  (function () { var b = document.getElementById('logjob-btn'); if (!b) return;
+    if (!UPDURL) { var a = el('a', 'mx-ubtn', 'Open the shared link to log a job'); a.href = 'https://andranf.github.io/ranfurlie-greens/machinery/'; a.target = '_blank'; a.rel = 'noopener'; b.replaceWith(a); return; }
+    b.addEventListener('click', function () { openLJ(state && state.machine ? state.machine : ''); }); })();
 
   // ---------- tabs
   var tabs = $$('.mx-tab');
