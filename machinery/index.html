@@ -1530,7 +1530,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       var bg = dark ? 0x161714 : 0xeef0ea;
       scene.background = new THREE.Color(bg);
       scene.fog = new THREE.Fog(bg, 9, 22);
-      var camera = new THREE.PerspectiveCamera(32, 1, 0.05, 80);
+      var camera = new THREE.PerspectiveCamera(32, 1, 0.05, 700);
 
       // ---- environment (studio + sky) for reflections
       (function () {
@@ -1622,7 +1622,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         black: dirt(new THREE.MeshStandardMaterial({ color: 0x171717, roughness: 0.55, roughnessMap: grimeRough, metalness: 0.25 }), DUSTY, 0.15, 0.5),
         moulded: dirt(new THREE.MeshPhysicalMaterial({ color: 0x151515, roughness: 0.6, roughnessMap: grimeRough, metalness: 0, clearcoat: 0.15, clearcoatRoughness: 0.6 }), [0.7, 0.68, 0.62], 0.62, 0.78),
         satin: new THREE.MeshStandardMaterial({ color: 0x2a2b2c, roughness: 0.42, metalness: 0.5 }),
-        steel: dirt(new THREE.MeshStandardMaterial({ color: 0xd6d9dc, roughness: 0.18, metalness: 1 }), GRASSY, 0.0, 0.1),
+        steel: dirt(new THREE.MeshStandardMaterial({ color: 0xe8ebee, roughness: 0.14, metalness: 1, envMapIntensity: 1.4 }), GRASSY, 0.0, 0.06),
         darksteel: dirt(new THREE.MeshStandardMaterial({ color: 0x3c3f42, roughness: 0.38, roughnessMap: grimeRough, metalness: 0.9 }), GRASSY, 0.0, 0.14),
         brushed: dirt(new THREE.MeshStandardMaterial({ color: 0xa4a8ad, roughness: 0.3, roughnessMap: grimeRough, metalness: 1 }), GRASSY, 0.0, 0.12),
         castAl: dirt(new THREE.MeshStandardMaterial({ color: 0xbfc2c4, roughness: 0.55, metalness: 0.75, bumpMap: castAl, bumpScale: 0.0015, roughnessMap: grimeRough }), GRASSY, 0.0, 0.16),
@@ -1632,7 +1632,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         engine: new THREE.MeshStandardMaterial({ color: 0x3a3d40, roughness: 0.5, roughnessMap: grimeRough, metalness: 0.55 }),
         alum: new THREE.MeshStandardMaterial({ color: 0xb0b3b5, roughness: 0.45, metalness: 0.8 }),
         plastic: new THREE.MeshStandardMaterial({ color: 0x121212, roughness: 0.7, metalness: 0 }),
-        seatGrey: new THREE.MeshStandardMaterial({ color: 0x8b8e93, roughness: 0.85, metalness: 0, bumpMap: fabric, bumpScale: 0.0015 }),
+        seatGrey: new THREE.MeshStandardMaterial({ color: 0x5f6266, roughness: 0.92, envMapIntensity: 0.5, metalness: 0, bumpMap: fabric, bumpScale: 0.003 }),
         seatBlack: new THREE.MeshStandardMaterial({ color: 0x1c1c1c, roughness: 0.62, metalness: 0 }),
         gripBlack: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.7, bumpMap: grip, bumpScale: 0.002 }),
         filterW: new THREE.MeshStandardMaterial({ color: 0xe8e6df, roughness: 0.4, metalness: 0.2 }),
@@ -1684,7 +1684,9 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       function slotPath(x0, y0, x1, y1, r) { var p = new THREE.Path(); var a = Math.atan2(y1 - y0, x1 - x0); p.absarc(x1, y1, r, a - Math.PI / 2, a + Math.PI / 2, false); p.absarc(x0, y0, r, a + Math.PI / 2, a + Math.PI * 1.5, false); p.closePath(); return p; }
       function cyl(r, l, seg, r2) { return new THREE.CylinderGeometry(r2 == null ? r : r2, r, l, seg || 32); }
       function knurl(r, l) { var p = []; for (var i = 0; i <= 24; i++) p.push(new THREE.Vector2(r * (i % 2 ? 0.92 : 1), -l / 2 + l * i / 24)); return new THREE.LatheGeometry(p, 24); }
-      function tube(pts, r, seg) { var c = new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); }), false, 'catmullrom', 0.3); return new THREE.TubeGeometry(c, seg || 48, r, 10, false); }
+      var FERRULES = [];
+      function hoseEnds(pts, r, parent) { if (r > 0.02) return; [[pts[0], pts[1]], [pts[pts.length - 1], pts[pts.length - 2]]].forEach(function (e) { var A = new THREE.Vector3(e[0][0], e[0][1], e[0][2]), B = new THREE.Vector3(e[1][0], e[1][1], e[1][2]), d = B.clone().sub(A).setLength(0.03); var f = mk(cyl(r * 1.45, 0.03, 6), M.zinc, parent); f.position.copy(A).addScaledVector(d, 0.5); f.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); }); }
+      function tube(pts, r, seg) { FERRULES.push([pts[0], pts[1], r], [pts[pts.length - 1], pts[pts.length - 2], r]); var c = new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); }), false, 'catmullrom', 0.3); return new THREE.TubeGeometry(c, seg || 48, r, 10, false); }
       function between(geo, mat, parent, a, b) { var A = new THREE.Vector3(a[0], a[1], a[2]), B = new THREE.Vector3(b[0], b[1], b[2]), d = B.clone().sub(A); var m = mk(geo(d.length()), mat, parent); m.position.copy(A).add(B).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); return m; }
       function rectPath(pts, w, d, rad) {
         var path = new THREE.CurvePath(); var V = pts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); });
@@ -1730,7 +1732,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       between(function (l) { return cyl(0.011, l, 12); }, M.chrome, frame, [-WB + 0.02, RR + 0.1, -0.2], [-WB - 0.03, RR + 0.08, -0.32]);
       mk(rbox(0.06, 0.05, 0.9, 0.01), M.black, frame, [-1.88, 0.6, 0]);
       mk(rbox(0.1, 0.06, 0.12, 0.01), M.black, frame, [-1.9, 0.6, 0]); // tow point
-      [-1, 1].forEach(function (s) { mk(tube([[0.42, 0.7, s * 0.25], [0.1, 0.56, s * 0.38], [-0.4, 0.55, s * 0.4], [-0.9, 0.6, s * 0.4], [-1.25, 0.62, s * 0.3]], 0.012), M.hose, frame); mk(tube([[0.4, 0.68, s * 0.22], [0.1, 0.54, s * 0.35], [-0.4, 0.53, s * 0.37], [-0.9, 0.58, s * 0.37], [-1.25, 0.6, s * 0.27]], 0.009), M.hose, frame); });
+      [-1, 1].forEach(function (s) { mk(tube([[0.42, 0.7, s * 0.25], [0.1, 0.56, s * 0.38], [-0.4, 0.55, s * 0.4], [-0.9, 0.6, s * 0.4], [-1.25, 0.62, s * 0.3]], 0.012), M.hose, frame); hoseEnds([[0.42, 0.7, s * 0.25], [0.1, 0.56, s * 0.38], [-0.4, 0.55, s * 0.4], [-0.9, 0.6, s * 0.4], [-1.25, 0.62, s * 0.3]], 0.012, frame); mk(tube([[0.4, 0.68, s * 0.22], [0.1, 0.54, s * 0.35], [-0.4, 0.53, s * 0.37], [-0.9, 0.58, s * 0.37], [-1.25, 0.6, s * 0.27]], 0.009), M.hose, frame); hoseEnds([[0.4, 0.68, s * 0.22], [0.1, 0.54, s * 0.35], [-0.4, 0.53, s * 0.37], [-0.9, 0.58, s * 0.37], [-1.25, 0.6, s * 0.27]], 0.009, frame); });
 
       // ---------- front pods (sculpted)
       function pod(pid, s, ex) {
@@ -1782,11 +1784,17 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       mk(rbox(0.36, 0.04, 0.4, 0.01), M.black, seat, [-0.33, 0.91, 0]);
       for (var bl = 0; bl < 6; bl++) mk(new THREE.TorusGeometry(0.155 - (bl % 2) * 0.012, 0.022, 10, 40), M.seatBlack, seat, [-0.33, 0.95 + bl * 0.03, 0], [Math.PI / 2, 0, 0]);
       mk(rbox(0.4, 0.04, 0.42, 0.01), M.black, seat, [-0.33, 1.12, 0]);
-      mk(rbox(0.5, 0.1, 0.5, 0.05, 5), M.seatBlack, seat, [-0.34, 1.18, 0]);
-      mk(deform(rbox(0.46, 0.08, 0.46, 0.035, 5), function (v) { var zn = v.z / 0.23; if (v.y > 0) v.y += 0.03 * Math.pow(Math.abs(zn), 4) - 0.008 * (1 - zn * zn); if (v.x > 0.16 && v.y > 0) v.y -= 0.02 * (v.x - 0.16) / 0.07; }), M.seatGrey, seat, [-0.33, 1.25, 0]);
-      var bk = new THREE.Group(); bk.position.set(-0.58, 1.22, 0); bk.rotation.z = 0.16; seat.add(bk);
-      mk(rbox(0.1, 0.54, 0.5, 0.05, 5), M.seatBlack, bk, [-0.04, 0.24, 0]);
-      mk(deform(rbox(0.1, 0.48, 0.46, 0.045, 5), function (v) { var zn = v.z / 0.23; if (v.x > 0) { v.x += 0.04 * Math.pow(Math.abs(zn), 4) + 0.015 * Math.exp(-Math.pow((v.y + 0.12) / 0.08, 2)) * (1 - zn * zn); } }), M.seatGrey, bk, [0.04, 0.25, 0]);
+      // cushion: side profile with a front waterfall, raised side bolsters
+      var cush = rshape([[-0.6, 1.13], [-0.08, 1.13], [-0.075, 1.2], [-0.12, 1.255], [-0.55, 1.265], [-0.6, 1.24]], [0.02, 0.03, 0.04, 0.05, 0.04, 0.02]);
+      mk(slab(rshape([[-0.61, 1.12], [-0.07, 1.12], [-0.07, 1.19], [-0.61, 1.19]], 0.025), 0.52, 0.03, 4), M.seatBlack, seat);
+      mk(deform(slab(cush, 0.48, 0.035, 6, 8), function (v) { var zn = Math.abs(v.z) / 0.24; if (v.y > 1.2) v.y += 0.035 * Math.pow(zn, 3) - 0.008 * (1 - zn * zn); }), M.seatGrey, seat);
+      [-1, 1].forEach(function (s2) { mk(rbox(0.46, 0.006, 0.006, 0.002), M.seatBlack, seat, [-0.33, 1.262, s2 * 0.15]); }); // seams
+      // back: lumbar curve, side wings, headrest
+      var bk = new THREE.Group(); bk.position.set(-0.58, 1.2, 0); bk.rotation.z = 0.17; seat.add(bk);
+      var bp = rshape([[-0.07, 0.0], [0.03, 0.0], [0.06, 0.12], [0.035, 0.3], [0.04, 0.5], [0.02, 0.6], [-0.07, 0.6]], [0.02, 0.04, 0.08, 0.1, 0.06, 0.03, 0.02]);
+      mk(deform(slab(bp, 0.47, 0.035, 6, 10), function (v) { var zn = Math.abs(v.z) / 0.235; if (v.x > -0.03) v.x += 0.045 * Math.pow(zn, 3) * (v.y < 0.48 ? 1 : 0.4); if (v.y > 0.47) { var f = 1 - 0.18 * Math.min(1, (v.y - 0.47) / 0.1); v.z *= f; } }), M.seatGrey, bk);
+      mk(deform(slab(rshape([[-0.11, -0.01], [-0.05, -0.01], [-0.04, 0.6], [-0.06, 0.62], [-0.11, 0.6]], 0.03), 0.5, 0.03, 5, 8), function (v) { if (v.y > 0.47) { v.z *= 1 - 0.16 * Math.min(1, (v.y - 0.47) / 0.12); } }), M.seatBlack, bk);
+      [0.2, 0.38].forEach(function (yy) { mk(rbox(0.006, 0.006, 0.36, 0.002), M.seatBlack, bk, [0.055, yy, 0]); });
       mk(rbox(0.07, 0.03, 0.08, 0.01), M.black, seat, [-0.22, 1.13, -0.27]);
       mk(rbox(0.3, 0.05, 0.07, 0.025), M.seatBlack, seat, [-0.38, 1.36, -0.3]);
       mk(rbox(0.04, 0.12, 0.04, 0.01), M.black, seat, [-0.48, 1.29, -0.3]);
@@ -1823,7 +1831,9 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         var rb = rshape([[HOOD_R + 0.01, 0.66], [HOOD_R + 0.01, 1.3], [-1.82, 1.22], [-1.85, 0.7]], [0.01, 0.03, 0.05, 0.03]);
         mk(slab(rb, HOOD_W - 0.06, 0.02, 4), M.moulded, hood);
         [1, -1].forEach(function (sd) { var gp = mk(new THREE.PlaneGeometry(0.17, 0.4), M.grille, hood, [-1.72, 0.97, sd * (HOOD_W / 2 - 0.028)], [0, sd > 0 ? 0 : Math.PI, 0], true); gp.userData.noMerge = true; });
-        var rg = mk(new THREE.PlaneGeometry(0.9, 0.42), M.grille, hood, [-1.856, 0.95, 0], [0, -Math.PI / 2, 0.06], true); rg.userData.noMerge = true;
+        var rg = mk(new THREE.PlaneGeometry(0.9, 0.42), M.grille, hood, [-1.848, 0.95, 0], [0, -Math.PI / 2, 0.06], true); rg.userData.noMerge = true;
+        for (var lv = 0; lv < 9; lv++) { var ly = 0.77 + lv * 0.044; mk(rbox(0.035, 0.008, 0.88, 0.003), M.moulded, hood, [-1.853 - 0.0025 * (ly - 0.95) / 0.21 * 0, ly, 0], [0, 0, -0.5]); }
+        [-0.45, 0.45].forEach(function (z) { mk(rbox(0.03, 0.44, 0.02, 0.006), M.moulded, hood, [-1.852, 0.95, z]); });
         [-0.42, 0.42].forEach(function (z) { mk(rbox(0.02, 0.07, 0.09, 0.01), M.tail, hood, [-1.855, 1.14, z]); });
         mk(cyl(0.025, 0.012, 16), M.black, hood, [-0.8, HOOD_TOP + 0.03, 0]); // hood stay pin
       })();
@@ -1847,7 +1857,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       mk(cyl(0.085, 0.03, 32), M.brushed, belt, [-0.96, 0.76, 0], [0, 0, Math.PI / 2]);
       mk(cyl(0.06, 0.03, 32), M.brushed, belt, [-0.96, 1.0, -0.16], [0, 0, Math.PI / 2]);
       mk(cyl(0.07, 0.03, 32), M.brushed, belt, [-0.96, 1.03, 0.08], [0, 0, Math.PI / 2]);
-      mk(tube([[-0.95, 0.68, 0], [-0.95, 0.84, -0.09], [-0.95, 0.99, -0.22], [-0.95, 1.07, -0.12], [-0.95, 1.1, 0.08], [-0.95, 0.98, 0.15], [-0.95, 0.76, 0.09], [-0.95, 0.68, 0]], 0.009, 96), M.hose, belt);
+      mk(tube([[-0.95, 0.68, 0], [-0.95, 0.84, -0.09], [-0.95, 0.99, -0.22], [-0.95, 1.07, -0.12], [-0.95, 1.1, 0.08], [-0.95, 0.98, 0.15], [-0.95, 0.76, 0.09], [-0.95, 0.68, 0]], 0.009, 96), M.hose, belt); hoseEnds([[-0.95, 0.68, 0], [-0.95, 0.84, -0.09], [-0.95, 0.99, -0.22], [-0.95, 1.07, -0.12], [-0.95, 1.1, 0.08], [-0.95, 0.98, 0.15], [-0.95, 0.76, 0.09], [-0.95, 0.68, 0]], 0.009, belt);
       mk(cyl(0.065, 0.13, 24), M.alum, belt, [-1.02, 1.0, -0.2], [0, 0, Math.PI / 2]);
       var gen = asm('generator', [0.0, 0.3, 0.55], engine);
       mk(cyl(0.15, 0.17, 40), M.satin, gen, [-1.5, 0.86, 0], [0, 0, Math.PI / 2]);
@@ -1859,7 +1869,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       mk(cyl(0.085, 0.05, 40), M.black, air, [-1.47, 1.2, -0.36], [0, 0, Math.PI / 2]);
       mk(cyl(0.03, 0.06, 16, 0.025), M.plastic, air, [-1.53, 1.16, -0.36], [0, 0, Math.PI / 2]);
       mk(cyl(0.012, 0.04, 12), new THREE.MeshStandardMaterial({ color: 0xff3020, roughness: 0.3 }), air, [-1.22, 1.29, -0.36]);
-      mk(tube([[-1.14, 1.2, -0.36], [-1.08, 1.18, -0.28], [-1.12, 1.1, -0.2]], 0.033), M.hose, air);
+      mk(tube([[-1.14, 1.2, -0.36], [-1.08, 1.18, -0.28], [-1.12, 1.1, -0.2]], 0.033), M.hose, air); hoseEnds([[-1.14, 1.2, -0.36], [-1.08, 1.18, -0.28], [-1.12, 1.1, -0.2]], 0.033, air);
       [-1.4, -1.2].forEach(function (x) { mk(new THREE.TorusGeometry(0.083, 0.006, 8, 40), M.zinc, air, [x, 1.2, -0.36], [0, Math.PI / 2, 0]); });
       var radiator = asm('radiator', [-0.65, 0.15, 0]);
       mk(rbox(0.07, 0.48, 0.8, 0.01), M.alum, radiator, [-1.72, 0.96, 0]);
@@ -1887,8 +1897,8 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       function rimGeo(r, w) { var p = [[0.03, w * 0.24], [r * 0.55, w * 0.24], [r * 0.7, w * 0.1], [r * 0.95, -w * 0.36], [r * 1.03, -w * 0.42], [r * 1.03, w * 0.4], [r * 0.95, w * 0.36], [r * 0.72, w * 0.33], [r * 0.6, w * 0.3], [0.03, w * 0.3]].map(function (q) { return new THREE.Vector2(q[0], q[1]); }); var g = new THREE.LatheGeometry(p, 72); g.rotateX(Math.PI / 2); return g; }
       var WHEELS = [];
       var TF = tyreProfile(FR, FW, 0.152), TRr = tyreProfile(RR, RW, 0.127);
-      var rubF = dirt(new THREE.MeshStandardMaterial({ color: 0x1b1b1b, roughness: 0.9, bumpMap: tyreTex(96, 7, TF.side, '26.5x14.00-12  TURF'), bumpScale: 0.035 }), [0.45, 0.42, 0.36], -0.4, 0.5);
-      var rubR = dirt(new THREE.MeshStandardMaterial({ color: 0x1b1b1b, roughness: 0.9, bumpMap: tyreTex(76, 5, TRr.side, '20x12.00-10  TURF'), bumpScale: 0.035 }), [0.45, 0.42, 0.36], -0.4, 0.5);
+      var rubF = dirt(new THREE.MeshStandardMaterial({ color: 0x1b1b1b, roughness: 0.9, bumpMap: tyreTex(96, 7, TF.side, '26.5x14.00-12  TURF'), bumpScale: 0.012 }), [0.45, 0.42, 0.36], -0.4, 0.5);
+      var rubR = dirt(new THREE.MeshStandardMaterial({ color: 0x1b1b1b, roughness: 0.9, bumpMap: tyreTex(76, 5, TRr.side, '20x12.00-10  TURF'), bumpScale: 0.012 }), [0.45, 0.42, 0.36], -0.4, 0.5);
       rubF.userData.key = 'rubF'; rubR.userData.key = 'rubR';
       function wheel(pid, x, z, r, w, rimR, T, rub, motor) {
         var g = asm(pid, [0, 0, z > 0 ? 0.55 : -0.55]);
@@ -1896,6 +1906,17 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         var spin = new THREE.Group(); wg.add(spin); WHEELS.push({ g: spin, r: r });
         var out = z > 0 ? 1 : -1;
         var t = mk(T.geo, rub, spin); t.scale.z = out; t.userData.noMerge = true;
+        (function () { // moulded tread blocks (instanced)
+          var cols = Math.round(r * 2 * Math.PI / 0.026), rows = r > 0.3 ? 6 : 5, span = w * 0.78, bw = span / rows * 0.78;
+          var lug = rbox(0.018, 0.014, bw, 0.003, 1); var mat = new THREE.MeshStandardMaterial({ color: 0x1c1c1c, roughness: 0.92 });
+          var im = new THREE.InstancedMesh(lug, mat, cols * rows), d = new THREE.Object3D(), k = 0;
+          for (var c = 0; c < cols; c++) for (var q = 0; q < rows; q++) {
+            var th = (c + (q % 2) * 0.5) / cols * Math.PI * 2, zz = -span / 2 + span * (q + 0.5) / rows;
+            var edge = Math.abs(zz) / (span / 2); var rr = r + 0.0005 - 0.008 * Math.pow(edge, 3);
+            d.position.set(Math.cos(th) * rr, Math.sin(th) * rr, zz); d.rotation.set(0, 0, th - Math.PI / 2); d.rotateY((q % 2 ? 1 : -1) * 0.18); d.updateMatrix(); im.setMatrixAt(k++, d.matrix);
+          }
+          im.castShadow = true; im.receiveShadow = true; im.userData.noMerge = true; spin.add(im);
+        })();
         var rimm = mk(rimGeo(rimR, w), M.rim, spin); rimm.scale.z = out; rimm.material.side = THREE.DoubleSide; rimm.userData.noMerge = true;
         for (var i = 0; i < 5; i++) { var a = i * Math.PI * 2 / 5; bolt(spin, [Math.cos(a) * rimR * 0.32, Math.sin(a) * rimR * 0.32, out * w * 0.31], 'z', 0.011); }
         mk(cyl(rimR * 0.2, 0.05, 24), M.darksteel, spin, [0, 0, out * w * 0.3], [Math.PI / 2, 0, 0]);
@@ -1939,7 +1960,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         });
         mk(rbox(0.05, 0.04, L + 0.05, 0.012), M.redFrame, fr, [-0.06, 0.2, 0]);
         mk(rbox(0.04, 0.03, L + 0.05, 0.01), M.darksteel, fr, [0.1, 0.17, 0]);
-        var sh = new THREE.Shape(); sh.absarc(0, 0, R + 0.03, 0.4, Math.PI * 0.92, false); sh.absarc(0, 0, R + 0.024, Math.PI * 0.92, 0.4, true);
+        var sh = new THREE.Shape(); sh.absarc(0, 0, R + 0.03, 1.25, Math.PI * 0.95, false); sh.absarc(0, 0, R + 0.024, Math.PI * 0.95, 1.25, true);
         var shg = new THREE.ExtrudeGeometry(sh, { depth: L, bevelEnabled: false, curveSegments: 24 }); shg.translate(0, 0, -L / 2); mk(shg, M.black, fr, [0, 0.085, 0]);
         // carrier yoke + pivot + lift lug
         mk(rectPath([[-0.09, 0.205, -L / 2 - 0.01], [-0.06, 0.29, -0.12], [-0.06, 0.29, 0.12], [-0.09, 0.205, L / 2 + 0.01]], 0.03, 0.03, 0.06), M.black, fr);
@@ -1974,7 +1995,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         mk(cyl(0.065, 0.012, 32), M.castAl, mo, [0, 0.085, mz - ms * 0.05], [Math.PI / 2, 0, 0]);
         for (var mb = 0; mb < 4; mb++) bolt(mo, [Math.cos(mb * 1.5708 + 0.78) * 0.055, 0.085 + Math.sin(mb * 1.5708 + 0.78) * 0.055, mz - ms * 0.058], 'z', 0.006);
         mk(rbox(0.05, 0.04, 0.05, 0.01), M.black, mo, [-0.02, 0.15, mz]);
-        mk(tube([[-0.02, 0.17, mz], [-0.06, 0.3, mz * 0.9], [-0.1, 0.4, mz * 0.5]], 0.009), M.hose, mo);
+        mk(tube([[-0.02, 0.17, mz], [-0.06, 0.3, mz * 0.9], [-0.1, 0.4, mz * 0.5]], 0.009), M.hose, mo); hoseEnds([[-0.02, 0.17, mz], [-0.06, 0.3, mz * 0.9], [-0.1, 0.4, mz * 0.5]], 0.009, mo);
         mk(rbox(0.08, 0.09, 0.05, 0.012), M.darksteel, fr, [0, 0.085, -ms * (L / 2 + 0.07)]);
         bolt(fr, [0.02, 0.1, -ms * (L / 2 + 0.096)], 'z', 0.008); bolt(fr, [-0.02, 0.07, -ms * (L / 2 + 0.096)], 'z', 0.008);
         CU[pid] = subs; return g;
@@ -1998,21 +2019,43 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         var top = [p[1] - 0.18, 0.74, p[0] * 0.55], bot = [p[1] - 0.02, 0.44, p[0]];
         between(function (l) { return cyl(0.024, l, 20); }, M.satin, lift, top, [(top[0] + bot[0]) / 2, (top[1] + bot[1]) / 2, (top[2] + bot[2]) / 2]);
         between(function (l) { return cyl(0.011, l, 14); }, M.chrome, lift, [(top[0] + bot[0]) / 2, (top[1] + bot[1]) / 2, (top[2] + bot[2]) / 2], bot);
-        mk(tube([[top[0] - 0.02, top[1] + 0.02, top[2]], [top[0] - 0.1, top[1] + 0.06, top[2] * 0.7], [0.3, 0.78, p[0] * 0.2]], 0.008), M.hose, lift);
+        mk(tube([[top[0] - 0.02, top[1] + 0.02, top[2]], [top[0] - 0.1, top[1] + 0.06, top[2] * 0.7], [0.3, 0.78, p[0] * 0.2]], 0.008), M.hose, lift); hoseEnds([[top[0] - 0.02, top[1] + 0.02, top[2]], [top[0] - 0.1, top[1] + 0.06, top[2] * 0.7], [0.3, 0.78, p[0] * 0.2]], 0.008, lift);
       });
-      [[-0.97, -1], [0, 1], [0.97, 1]].forEach(function (p) { var mz = p[0] + p[1] * (0.559 / 2 + 0.1); mk(tube([[0.45, 0.82, p[0] * 0.25], [0.6, 0.62, p[0] * 0.6 + p[1] * 0.1], [FX0 - 0.05, 0.42, mz * 0.95], [FX0 - 0.04, 0.27, mz]], 0.012, 60), M.hose, lift); });
+      [[-0.97, -1], [0, 1], [0.97, 1]].forEach(function (p) { var mz = p[0] + p[1] * (0.559 / 2 + 0.1); mk(tube([[0.45, 0.82, p[0] * 0.25], [0.6, 0.62, p[0] * 0.6 + p[1] * 0.1], [FX0 - 0.05, 0.42, mz * 0.95], [FX0 - 0.04, 0.27, mz]], 0.012, 60), M.hose, lift); hoseEnds([[0.45, 0.82, p[0] * 0.25], [0.6, 0.62, p[0] * 0.6 + p[1] * 0.1], [FX0 - 0.05, 0.42, mz * 0.95], [FX0 - 0.04, 0.27, mz]], 0.012, lift); });
       var liftR = asm('liftR', [-0.2, -0.05, 0]);
       [-0.485, 0.485].forEach(function (z) {
         boxArm(liftR, [[-0.5, 0.6, z * 0.6], [-0.7, 0.5, z * 0.9], [RX0 + 0.02, 0.4, z]]);
         mk(rbox(0.09, 0.05, 0.12, 0.015), M.redFrame, liftR, [RX0 + 0.02, 0.38, z]);
-        var mz = z + Math.sign(z) * (0.559 / 2 + 0.1); mk(tube([[-0.45, 0.62, z * 0.5], [-0.7, 0.5, z * 0.9], [RX0 - 0.02, 0.42, mz * 0.97], [RX0 - 0.03, 0.27, mz]], 0.012, 60), M.hose, liftR);
+        var mz = z + Math.sign(z) * (0.559 / 2 + 0.1); mk(tube([[-0.45, 0.62, z * 0.5], [-0.7, 0.5, z * 0.9], [RX0 - 0.02, 0.42, mz * 0.97], [RX0 - 0.03, 0.27, mz]], 0.012, 60), M.hose, liftR); hoseEnds([[-0.45, 0.62, z * 0.5], [-0.7, 0.5, z * 0.9], [RX0 - 0.02, 0.42, mz * 0.97], [RX0 - 0.03, 0.27, mz]], 0.012, liftR);
       });
 
+      // hose end fittings (only on thin hoses)
+      (function () { /* ferrules added per hose by hoseEnds() */ })();
       // ground
-      var ground = new THREE.Mesh(new THREE.CircleGeometry(12, 96), new THREE.MeshStandardMaterial({ map: grass, roughness: 0.95, metalness: 0 }));
+      var grassBump = canvasTex(THREE, 512, 512, function (g, w, h) { fbm(g, w, h, [16, 4, 1], [0.5, 0.5, 0.6]); }, false, [40, 40]);
+      grass.repeat.set(20, 20);
+      var ground = new THREE.Mesh(new THREE.CircleGeometry(220, 160), new THREE.MeshStandardMaterial({ map: grass, roughness: 0.95, metalness: 0, bumpMap: grassBump, bumpScale: 0.004 }));
+      var outdoor = new THREE.Group(); scene.add(outdoor);
+      var skyM = new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false, uniforms: {},
+        vertexShader: 'varying vec3 p; void main(){ p = normalize(position); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+        fragmentShader: 'varying vec3 p; void main(){ float y=max(p.y,0.); vec3 hor=vec3(0.84,0.87,0.86); vec3 top=vec3(0.42,0.6,0.82); vec3 c=mix(hor,top,pow(y,0.55)); float s=pow(max(dot(p,normalize(vec3(0.45,0.8,0.35))),0.),400.); gl_FragColor=vec4(c+s*vec3(1.,0.95,0.85),1.); }' });
+      outdoor.add(new THREE.Mesh(new THREE.SphereGeometry(300, 48, 24), skyM));
+      (function () { // tree line
+        var trunk = new THREE.CylinderGeometry(0.18, 0.25, 2.2, 6), crown = new THREE.SphereGeometry(1, 18, 12); crown = deform(crown, function (v) { var n = 1 + 0.12 * Math.sin(v.x * 7) * Math.sin(v.y * 5) * Math.sin(v.z * 6); v.multiplyScalar(n); });
+        var tm = new THREE.MeshStandardMaterial({ color: 0x3b2e22, roughness: 1 }), cm = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
+        var N = 170, it = new THREE.InstancedMesh(trunk, tm, N), ic = new THREE.InstancedMesh(crown, cm, N * 3), d = new THREE.Object3D(), k = 0, col = new THREE.Color();
+        for (var i = 0; i < N; i++) {
+          var a = i / N * Math.PI * 2 + Math.random() * 0.02, rr = 58 + Math.random() * 30, sc = 1.0 + Math.random() * 1.2;
+          var x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+          d.position.set(x, 1.1 * sc, z); d.rotation.set(0, Math.random() * 6, 0); d.scale.set(sc, sc, sc); d.updateMatrix(); it.setMatrixAt(i, d.matrix);
+          for (var j = 0; j < 3; j++) { var s3 = sc * (1.8 + Math.random() * 1.4); d.position.set(x + (Math.random() - 0.5) * 2.2, (2.6 + j * 1.3) * sc, z + (Math.random() - 0.5) * 2.2); d.scale.set(s3, s3 * (1.1 + Math.random() * 0.4), s3); d.updateMatrix(); ic.setMatrixAt(k, d.matrix); col.setHSL(0.25 + Math.random() * 0.07, 0.45, 0.13 + Math.random() * 0.09); ic.setColorAt(k, col); k++; }
+        }
+        outdoor.add(it); outdoor.add(ic);
+      })();
       ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
       var showGround = opts.ground !== false;
-      ground.visible = showGround;
+      ground.visible = showGround; outdoor.visible = showGround;
+      scene.fog = new THREE.FogExp2(0xd6dedb, 0.006);
       var contact = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 3.4), new THREE.ShadowMaterial({ opacity: dark ? 0.55 : 0.32 }));
       contact.rotation.x = -Math.PI / 2; contact.position.y = 0.001; contact.receiveShadow = true; contact.visible = !showGround; scene.add(contact);
 
@@ -2037,7 +2080,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       }
       function mergeAll(group) {
         var kids = group.children.slice(), buckets = {};
-        kids.forEach(function (c) { if (c.isMesh && !c.userData.noMerge && !c.material.transparent) { (buckets[c.userData.mkey] = buckets[c.userData.mkey] || []).push(c); } else if (!c.isMesh) mergeAll(c); });
+        kids.forEach(function (c) { if (c.isMesh && !c.isInstancedMesh && !c.userData.noMerge && !c.material.transparent) { (buckets[c.userData.mkey] = buckets[c.userData.mkey] || []).push(c); } else if (!c.isMesh) mergeAll(c); });
         Object.keys(buckets).forEach(function (k) {
           var list = buckets[k];
           var geos = list.map(function (m) { m.updateMatrix(); return prep(m.geometry, m, m.matrix); });
@@ -2046,7 +2089,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
           var nm = new THREE.Mesh(mg, list[0].material); nm.material.vertexColors = true; nm.castShadow = list.some(function (m) { return m.castShadow; }); nm.receiveShadow = true; nm.userData.mkey = k;
           list.forEach(function (m) { group.remove(m); }); group.add(nm);
         });
-        kids.forEach(function (c) { if (c.isMesh && (c.userData.noMerge || c.material.transparent) && !c.geometry.attributes.color) { c.geometry = prep(c.geometry, c, null); c.material.vertexColors = true; } });
+        kids.forEach(function (c) { if (c.isMesh && !c.isInstancedMesh && (c.userData.noMerge || c.material.transparent) && !c.geometry.attributes.color) { c.geometry = prep(c.geometry, c, null); c.material.vertexColors = true; } });
       }
       mergeAll(machine);
       Object.keys(ASM).forEach(function (k) { ASM[k].home = ASM[k].g.position.clone(); });
@@ -2110,7 +2153,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       if (slider) slider.addEventListener('input', function () { exGoal = slider.value / 100; blowOne = null; });
       setXray = function (v) { xray = v; if (xb) xb.setAttribute('aria-pressed', xray); pickables.forEach(function (m) { if (m.userData.pick === 'hood') { m.material.transparent = xray; m.material.opacity = xray ? 0.07 : 1; if (m.material.clearcoat != null) m.material.clearcoat = xray ? 0 : 1; m.material.depthWrite = !xray; m.castShadow = !xray; } }); };
       if (xb) xb.addEventListener('click', function () { setXray(!xray); });
-      if (gb) gb.addEventListener('click', function () { showGround = !showGround; ground.visible = showGround; contact.visible = !showGround; gb.setAttribute('aria-pressed', showGround); });
+      if (gb) gb.addEventListener('click', function () { showGround = !showGround; ground.visible = showGround; outdoor.visible = showGround; scene.fog = showGround ? new THREE.FogExp2(0xd6dedb, 0.006) : null; contact.visible = !showGround; gb.setAttribute('aria-pressed', showGround); });
       if (rb) rb.addEventListener('click', function () { goal.r = 6.2; goal.th = 0.85; goal.ph = 1.12; goal.t.set(0, 0.75, 0); exGoal = 0; blowOne = null; if (slider) slider.value = 0; select(null); });
       var mb = root.querySelector('.x3-mow'); if (mb) mb.addEventListener('click', function () { mowing = !mowing; mb.setAttribute('aria-pressed', mowing); if (mowing) { exGoal = 0; blowOne = null; if (slider) slider.value = 0; } });
       api.mow = function (v) { mowing = v; };
@@ -2151,7 +2194,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         Object.keys(ASM).forEach(function (id) { var A = ASM[id]; var f = blowOne ? (id === blowOne ? 0.6 : 0) : a1; A.g.position.copy(A.home).addScaledVector(A.ex, f); });
         Object.keys(CU).forEach(function (id) { var f = blowOne ? (id === blowOne ? a2 : 0) : a2; Object.keys(CU[id]).forEach(function (s) { var S = CU[id][s]; S.g.position.copy(S.home).addScaledVector(S.ex, f * 1.4); }); });
         var reelSpd = mowing ? 30 : (exT > 0.5 ? 1.2 : 0); REELS.forEach(function (r) { r.rotation.z += reelSpd * dt; });
-        if (mowing) { var v = 1.6; WHEELS.forEach(function (w) { w.g.rotation.z -= v / w.r * dt; }); grass.offset.x -= v * dt / 6; }
+        if (mowing) { var v = 1.6; WHEELS.forEach(function (w) { w.g.rotation.z -= v / w.r * dt; }); grass.offset.x -= v * dt / 6 * (20 / 4) / 5 * 1; grassBump.offset.x -= v * dt / 3; }
         if (selected) { var pulse = 0.5 + 0.5 * Math.sin(t * 4); glow(selected, selSub, new THREE.Color(0x8a3c00).multiplyScalar(0.55 + 0.7 * pulse).getHex()); }
         // labels
         var showL = exT > 0.25; var r = stage.getBoundingClientRect();
