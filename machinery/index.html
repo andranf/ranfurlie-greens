@@ -477,6 +477,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       <div class="x3-stage"><div class="x3-status">Loading…</div><div class="x3-labels"></div><div class="x3-tip" hidden></div></div>
       <div class="x3-bar">
         <label>Assembled <input class="x3-ex" type="range" min="0" max="100" value="0" aria-label="Exploded view"> Blown apart</label>
+        <button class="x3-tg x3-mow" aria-pressed="false">Mow</button>
         <button class="x3-tg x3-xray" aria-pressed="false">See through hood</button>
         <button class="x3-tg x3-ground" aria-pressed="true">Grass</button>
         <button class="x3-tg x3-reset">Reset view</button>
@@ -1373,9 +1374,9 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     generator: { name: 'Hybrid generator (PowerMatch)', sys: 'Hybrid drive', desc: 'Driven off the engine. Feeds the 48 V reel motors and tops up the battery pack; PowerMatch adds over 40 hp of peak power.', parts: ['139-8482'], cat: CAT_PC2 },
     aircleaner: { name: 'Air cleaner', sys: 'Engine', desc: 'Service only when the indicator shows red, or at 400 h. Early changes let dirt in.', parts: ['108-3810', '114-4057', '106-5277'], cat: CAT_PC2 },
     radiator: { name: 'Radiator and oil cooler', sys: 'Cooling', desc: 'Rear mounted, 6 fins per inch, 5.2 L coolant. Clean the screen and cores daily; change coolant and hoses every 2 years.', parts: [], cat: CAT_PC1 },
-    fueltank: { name: 'Fuel tank (53 L diesel)', sys: 'Fuel', desc: '14 US gal (53 L). Drain water from the fuel/water separator daily.', parts: [], cat: CAT_PC1 },
+    fueltank: { name: 'Left front pod (fuel tank, 53 L diesel)', sys: 'Fuel', desc: '14 US gal (53 L). Tank position shown is approximate: check the filler location on the machine. Drain water from the fuel/water separator daily.', parts: [], cat: CAT_PC1 },
     fuelsep: { name: 'Fuel/water separator and in-line filter', sys: 'Fuel', desc: 'Spin-on separator and in-line engine filter, both every 400 h. Drain the bowl daily.', parts: ['110-9049', '98-7612'], cat: CAT_PC2 },
-    hydtank: { name: 'Hydraulic tank and charge filter', sys: 'Hydraulics', desc: '41.6 L of Toro PX. Charge filter every 1,000 h, fluid every 2,000 h (800 h for both if any non-PX fluid goes in). Hoses every 2 years.', parts: ['75-1310', '93-2242', '133-8086', '145-2576'], cat: CAT_PC2 },
+    hydtank: { name: 'Right front pod (hydraulic tank) and charge filter', sys: 'Hydraulics', desc: '41.6 L of Toro PX. Tank and filter positions shown are approximate. Charge filter every 1,000 h, fluid every 2,000 h (800 h for both if any non-PX fluid goes in). Hoses every 2 years.', parts: ['75-1310', '93-2242', '133-8086', '145-2576'], cat: CAT_PC2 },
     battery48: { name: '48 V battery pack (4 x 12 V AGM)', sys: 'Hybrid drive', desc: 'Sealed, maintenance free. Buffers power for the electric reel motors. 48 V fuses are separate from the 12 V fuse block.', parts: ['136-3726', '139-8482'], cat: CAT_PC2 },
     battery12: { name: '12 V starting battery', sys: 'Electrical', desc: '570 CCA. Clean terminals and check charge at 50 h.', parts: ['132-8621'], cat: CAT_PC2 },
     seat: { name: 'Operator seat', sys: 'Operator station', desc: 'Deluxe high-back suspension seat with fore/aft, height and weight adjustment. Seat switch is an interlock.', parts: [], cat: CAT_PC1 },
@@ -1387,6 +1388,8 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     tyreRL: { name: 'Rear tyre and wheel, left', sys: 'Steering', desc: '20 x 12-10 turf tyre on the steer axle. 83-103 kPa (12-15 psi).', parts: [], cat: CAT_PC1 },
     tyreRR: { name: 'Rear tyre and wheel, right', sys: 'Steering', desc: '20 x 12-10 turf tyre on the steer axle. 83-103 kPa (12-15 psi).', parts: [], cat: CAT_PC1 },
     frame: { name: 'Main frame and footplate', sys: 'Chassis', desc: 'Grease all fittings after every wash (No. 2 lithium).', parts: ['108-1190'], cat: CAT_PC1 },
+    lights: { name: 'Front cowl and headlights', sys: 'Body', desc: 'Moulded front cowl with the two work lights and front indicators. Check lights before going out in low light.', parts: [], cat: CAT_PC1 },
+    liftR: { name: 'Rear lift arms', sys: 'Hydraulics', desc: 'Carry the two rear (mid-mount) cutting units. Grease the pivots after washing.', parts: ['108-1190'], cat: CAT_PC1 },
     liftF: { name: 'Front lift arms and cylinders', sys: 'Hydraulics', desc: 'Raise and lower the three front cutting units. Check hoses for wear daily.', parts: ['145-2576', '108-1190'], cat: CAT_PC1 }
   };
   var CU_POS = { cu4: 'front left', cu1: 'front centre', cu5: 'front right', cu2: 'rear left', cu3: 'rear right' };
@@ -1517,7 +1520,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: !!opts.capture });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.92;
       renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       stage.appendChild(renderer.domElement);
       var scene = new THREE.Scene();
@@ -1537,54 +1540,80 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         panelL(8, 3, 0, 9, 0, 3.2); panelL(6, 4, 10, 4, 4, 2.2); panelL(5, 3, -9, 3, -6, 1.6); panelL(3, 6, -4, 5, 10, 1.4);
         scene.environment = pm.fromScene(es, 0.02).texture; pm.dispose();
       })();
-      var sun = new THREE.DirectionalLight(0xfff4e6, 2.6); sun.position.set(4.5, 8, 3.5); sun.castShadow = true;
+      var sun = new THREE.DirectionalLight(0xfff4e6, 3.0); sun.position.set(4.5, 8, 3.5); sun.castShadow = true;
       sun.shadow.mapSize.set(2048, 2048); var sc = sun.shadow.camera; sc.left = -3.5; sc.right = 3.5; sc.top = 3.5; sc.bottom = -3.5; sc.near = 1; sc.far = 20; sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02; sun.shadow.radius = 4;
       scene.add(sun); scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x3a4a2a, 0.35));
 
       // ---- textures
-      var paintFlake = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); noise(g, w, h, 0, 0, 22); }, false, [6, 6]);
+      var paintFlake = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); noise(g, w, h, 0, 0, 18); }, false, [8, 8]);
       var grass = canvasTex(THREE, 1024, 1024, function (g, w, h) {
-        for (var s = 0; s < 8; s++) { g.fillStyle = s % 2 ? '#4f7a33' : '#5d8a3c'; g.fillRect(s * w / 8, 0, w / 8, h); }
-        for (var i = 0; i < 26000; i++) { var x = Math.random() * w, y = Math.random() * h; var l = 30 + Math.random() * 40; g.strokeStyle = 'hsla(' + (85 + Math.random() * 20) + ',45%,' + l + '%,0.35)'; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (Math.random() - 0.5) * 3, y - 2 - Math.random() * 4); g.stroke(); }
+        for (var s = 0; s < 8; s++) { g.fillStyle = s % 2 ? '#4c7a31' : '#5f8f3d'; g.fillRect(0, s * h / 8, w, h / 8); }
+        for (var i = 0; i < 30000; i++) { var x = Math.random() * w, y = Math.random() * h; var l = 28 + Math.random() * 42; g.strokeStyle = 'hsla(' + (85 + Math.random() * 22) + ',45%,' + l + '%,0.33)'; g.beginPath(); g.moveTo(x, y); g.lineTo(x - 2 - Math.random() * 4, y + (Math.random() - 0.5) * 3); g.stroke(); }
       }, true, [4, 4]);
-      var tread = canvasTex(THREE, 512, 128, function (g, w, h) {
-        g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
-        for (var i = 0; i < 64; i++) { var x = i * w / 64; g.fillStyle = '#fff'; g.fillRect(x + 1, h * 0.18, w / 64 * 0.55, h * 0.26); g.fillRect(x + w / 128, h * 0.56, w / 64 * 0.55, h * 0.26); }
-        g.filter = 'blur(1px)'; g.drawImage(g.canvas, 0, 0);
-      }, false, [1, 1]);
-      var fins = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#222'; g.fillRect(0, 0, w, h); g.strokeStyle = '#777'; g.lineWidth = 1; for (var x = 0; x < w; x += 4) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); } for (var y = 0; y < h; y += 32) { g.fillStyle = '#555'; g.fillRect(0, y, w, 3); } }, true, [3, 2]);
-      var diamond = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#7a7a7a'; g.fillRect(0, 0, w, h); g.fillStyle = '#d0d0d0'; for (var y = 0; y < h; y += 32) for (var x = 0; x < w; x += 32) { var o = (y / 32) % 2 ? 16 : 0; g.save(); g.translate(x + o + 8, y + 8); g.rotate(((x + y) / 32) % 2 ? 0.8 : -0.8); g.fillRect(-9, -2, 18, 4); g.restore(); } }, false, [5, 3]);
-      var vinyl = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#7f7f7f'; g.fillRect(0, 0, w, h); noise(g, w, h, 0, 0, 30); g.strokeStyle = '#3a3a3a'; g.lineWidth = 3; for (var y = 40; y < h; y += 64) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); } }, false, [1, 1]);
-      function decalTex(text, sub, color, bgc) {
-        return canvasTex(THREE, 1024, 256, function (g, w, h) {
-          g.clearRect(0, 0, w, h); if (bgc) { g.fillStyle = bgc; g.fillRect(0, 0, w, h); }
-          g.fillStyle = color; g.font = '700 120px "Inter Tight", Arial, sans-serif'; g.textBaseline = 'middle'; g.fillText(text, 24, sub ? 100 : 128);
-          if (sub) { g.font = '600 56px "Inter Tight", Arial, sans-serif'; g.fillText(sub, 28, 200); }
-        }, true, [1, 1]);
+      function treadTex(cols, rows) {
+        return canvasTex(THREE, 2048, 512, function (g, w, h) {
+          g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+          var y0 = h * 0.16, y1 = h * 0.84, rh = (y1 - y0) / rows, cw = w / cols;
+          for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+            var off = (r % 2) * cw * 0.5, x = c * cw + off, y = y0 + r * rh;
+            var grd = g.createLinearGradient(0, y, 0, y + rh); grd.addColorStop(0, '#9a9a9a'); grd.addColorStop(0.2, '#ffffff'); grd.addColorStop(0.8, '#ffffff'); grd.addColorStop(1, '#9a9a9a');
+            g.fillStyle = grd; g.fillRect(x + cw * 0.12, y + rh * 0.12, cw * 0.72, rh * 0.74);
+          }
+          var sg = g.createLinearGradient(0, 0, 0, y0); sg.addColorStop(0, '#000'); sg.addColorStop(1, '#333'); g.fillStyle = sg; g.fillRect(0, 0, w, y0 * 0.9);
+        }, false, [1, 1]);
       }
+      var treadF = treadTex(110, 9), treadR = treadTex(84, 7);
+      var mesh = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#2a2a2a'; g.fillRect(0, 0, w, h); g.fillStyle = '#050505'; for (var y = 4; y < h; y += 12) for (var x = 4; x < w; x += 12) { g.beginPath(); g.arc(x + ((y / 12) % 2) * 6, y, 4, 0, 7); g.fill(); } }, true, [6, 4]);
+      var fins = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#2b2b2b'; g.fillRect(0, 0, w, h); g.strokeStyle = '#8a8a8a'; for (var x = 0; x < w; x += 4) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); } for (var y = 0; y < h; y += 32) { g.fillStyle = '#555'; g.fillRect(0, y, w, 3); } }, true, [3, 2]);
+      var diamond = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#6a6a6a'; g.fillRect(0, 0, w, h); g.fillStyle = '#d8d8d8'; for (var y = 0; y < h; y += 32) for (var x = 0; x < w; x += 32) { var o = (y / 32) % 2 ? 16 : 0; g.save(); g.translate(x + o + 8, y + 8); g.rotate(((x + y) / 32) % 2 ? 0.8 : -0.8); g.fillRect(-9, -2, 18, 4); g.restore(); } }, false, [6, 3]);
+      var vinyl = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); noise(g, w, h, 0, 0, 34); g.strokeStyle = '#404040'; g.lineWidth = 4; for (var y = 48; y < h; y += 80) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); } }, false, [1, 1]);
+      var castAl = canvasTex(THREE, 256, 256, function (g, w, h) { g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); noise(g, w, h, 0, 0, 50); }, false, [3, 3]);
+      var sideDecal = canvasTex(THREE, 1400, 300, function (g, w, h) {
+        g.clearRect(0, 0, w, h);
+        // TORO badge
+        g.fillStyle = '#ffffff'; roundRect(g, 10, 60, 330, 170, 22); g.fill();
+        g.fillStyle = '#b5121b'; roundRect(g, 24, 74, 302, 142, 14); g.fill();
+        g.fillStyle = '#ffffff'; g.font = 'italic 900 108px Georgia, "Times New Roman", serif'; g.textBaseline = 'middle'; g.fillText('TORO', 40, 150);
+        g.fillStyle = '#111'; g.font = '700 96px "Arial Narrow", Arial, sans-serif'; g.fillText('REELMASTER', 380, 120);
+        g.font = '700 64px "Arial Narrow", Arial, sans-serif'; g.fillText('5010-H', 960, 210);
+        g.fillStyle = '#5aa33a'; g.font = '700 34px Arial, sans-serif'; g.fillText('HYBRID', 1210, 210);
+      }, true, [1, 1]);
+      var frontBadge = canvasTex(THREE, 512, 192, function (g, w, h) { g.fillStyle = '#ffffff'; roundRect(g, 4, 4, w - 8, h - 8, 26); g.fill(); g.fillStyle = '#b5121b'; roundRect(g, 18, 18, w - 36, h - 36, 18); g.fill(); g.fillStyle = '#fff'; g.font = 'italic 900 120px Georgia, serif'; g.textBaseline = 'middle'; g.textAlign = 'center'; g.fillText('TORO', w / 2, h / 2 + 4); }, true, [1, 1]);
       var screenTex = canvasTex(THREE, 256, 160, function (g, w, h) { g.fillStyle = '#0b1a10'; g.fillRect(0, 0, w, h); g.fillStyle = '#7dff9a'; g.font = '600 26px monospace'; g.fillText('RPM 3220', 14, 42); g.fillText('48V  51.2', 14, 82); g.fillText('REEL 7  6mm', 14, 122); g.fillRect(14, 136, 160, 8); }, true, [1, 1]);
+      function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 
       // ---- materials (each mesh gets its own clone so it can glow on hover)
       var M = {
-        red: new THREE.MeshPhysicalMaterial({ color: 0x9a0c15, roughness: 0.34, metalness: 0.05, clearcoat: 1, clearcoatRoughness: 0.12, bumpMap: paintFlake, bumpScale: 0.0015 }),
-        black: new THREE.MeshStandardMaterial({ color: 0x1b1b1b, roughness: 0.55, metalness: 0.25 }),
+        red: new THREE.MeshPhysicalMaterial({ color: 0xb0101a, roughness: 0.27, metalness: 0.0, clearcoat: 1, clearcoatRoughness: 0.08, bumpMap: paintFlake, bumpScale: 0.0008 }),
+        redFrame: new THREE.MeshPhysicalMaterial({ color: 0x9c0d15, roughness: 0.45, metalness: 0.1, clearcoat: 0.5, clearcoatRoughness: 0.3 }),
+        band: new THREE.MeshStandardMaterial({ color: 0x2c2f31, roughness: 0.5, metalness: 0.2 }),
+        black: new THREE.MeshStandardMaterial({ color: 0x161616, roughness: 0.55, metalness: 0.25 }),
+        moulded: new THREE.MeshPhysicalMaterial({ color: 0x141414, roughness: 0.62, metalness: 0, clearcoat: 0.2, clearcoatRoughness: 0.6 }),
         satin: new THREE.MeshStandardMaterial({ color: 0x2a2b2c, roughness: 0.42, metalness: 0.5 }),
-        steel: new THREE.MeshStandardMaterial({ color: 0xc9ccd0, roughness: 0.22, metalness: 1 }),
-        brushed: new THREE.MeshStandardMaterial({ color: 0x9da2a8, roughness: 0.35, metalness: 1 }),
+        steel: new THREE.MeshStandardMaterial({ color: 0xd2d5d9, roughness: 0.2, metalness: 1 }),
+        darksteel: new THREE.MeshStandardMaterial({ color: 0x3c3f42, roughness: 0.35, metalness: 0.9 }),
+        brushed: new THREE.MeshStandardMaterial({ color: 0xa4a8ad, roughness: 0.32, metalness: 1 }),
+        castAl: new THREE.MeshStandardMaterial({ color: 0xb9bcbe, roughness: 0.55, metalness: 0.75, bumpMap: castAl, bumpScale: 0.002 }),
         chrome: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.05, metalness: 1 }),
-        rim: new THREE.MeshStandardMaterial({ color: 0xb8bcc0, roughness: 0.32, metalness: 0.75 }),
-        rubber: new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.9, metalness: 0, bumpMap: tread, bumpScale: 0.012 }),
+        rim: new THREE.MeshPhysicalMaterial({ color: 0xebe8de, roughness: 0.4, metalness: 0.1, clearcoat: 0.6, clearcoatRoughness: 0.2 }),
+        rubberF: new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.88, metalness: 0, bumpMap: treadF, bumpScale: 0.03 }),
+        rubberR: new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.88, metalness: 0, bumpMap: treadR, bumpScale: 0.03 }),
         engine: new THREE.MeshStandardMaterial({ color: 0x3a3d40, roughness: 0.5, metalness: 0.55 }),
         alum: new THREE.MeshStandardMaterial({ color: 0xb0b3b5, roughness: 0.45, metalness: 0.8 }),
         plastic: new THREE.MeshStandardMaterial({ color: 0x121212, roughness: 0.7, metalness: 0 }),
-        seat: new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.62, metalness: 0, bumpMap: vinyl, bumpScale: 0.004 }),
+        seatGrey: new THREE.MeshStandardMaterial({ color: 0x8e9196, roughness: 0.72, metalness: 0, bumpMap: vinyl, bumpScale: 0.004 }),
+        seatBlack: new THREE.MeshStandardMaterial({ color: 0x1c1c1c, roughness: 0.6, metalness: 0 }),
         filterW: new THREE.MeshStandardMaterial({ color: 0xe8e6df, roughness: 0.4, metalness: 0.2 }),
         filterR: new THREE.MeshPhysicalMaterial({ color: 0x9c121a, roughness: 0.35, metalness: 0.3, clearcoat: 0.6 }),
         rad: new THREE.MeshStandardMaterial({ map: fins, roughness: 0.6, metalness: 0.6 }),
-        plate: new THREE.MeshStandardMaterial({ color: 0x8a8d90, roughness: 0.4, metalness: 0.85, bumpMap: diamond, bumpScale: 0.004 }),
-        hose: new THREE.MeshStandardMaterial({ color: 0x101010, roughness: 0.75 }),
+        grille: new THREE.MeshStandardMaterial({ map: mesh, roughness: 0.6, metalness: 0.3 }),
+        plate: new THREE.MeshStandardMaterial({ color: 0x3a3c3e, roughness: 0.45, metalness: 0.8, bumpMap: diamond, bumpScale: 0.004 }),
+        hose: new THREE.MeshStandardMaterial({ color: 0x0e0e0e, roughness: 0.7 }),
         battery: new THREE.MeshStandardMaterial({ color: 0x202224, roughness: 0.6 }),
-        yellow: new THREE.MeshStandardMaterial({ color: 0xe0b020, roughness: 0.5 }),
+        yellow: new THREE.MeshStandardMaterial({ color: 0xf0c020, roughness: 0.45 }),
+        lens: new THREE.MeshPhysicalMaterial({ color: 0xf4f6f8, roughness: 0.05, metalness: 0.2, emissive: 0x9aa4ae, emissiveIntensity: 0.25, clearcoat: 1 }),
+        tail: new THREE.MeshStandardMaterial({ color: 0xff2a1a, emissive: 0x660000, roughness: 0.2 }),
+        hv: new THREE.MeshStandardMaterial({ color: 0xe06a10, roughness: 0.6 }),
         screen: new THREE.MeshStandardMaterial({ map: screenTex, emissive: 0xffffff, emissiveMap: screenTex, emissiveIntensity: 0.9, roughness: 0.2 }),
         glass: new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.05, transmission: 0.6, transparent: true, opacity: 0.5 })
       };
@@ -1599,9 +1628,27 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         var g = new THREE.ExtrudeGeometry(s, { depth: d - 2 * r, bevelEnabled: true, bevelThickness: r, bevelSize: r, bevelSegments: seg || 4, curveSegments: 4 });
         g.translate(0, 0, -(d - 2 * r) / 2); g.computeVertexNormals(); return g;
       }
-      function cyl(r, l, seg, r2) { var g = new THREE.CylinderGeometry(r2 == null ? r : r2, r, l, seg || 32); return g; }
-      function tube(pts, r, seg) { var c = new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); }), false, 'catmullrom', 0.2); return new THREE.TubeGeometry(c, seg || 48, r, 16, false); }
-      function polyTube(pts, r, rad) { // straight segments with rounded corners
+      // extrude a side profile (array of [x,y] or shape) across z, centred, with rounded edges
+      function slab(pts, width, bevel, seg) {
+        var s = pts instanceof THREE.Shape ? pts : new THREE.Shape(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }));
+        var g = new THREE.ExtrudeGeometry(s, { depth: width - 2 * bevel, bevelEnabled: bevel > 0, bevelThickness: bevel, bevelSize: bevel, bevelSegments: seg || 5, curveSegments: 24 });
+        g.translate(0, 0, -(width - 2 * bevel) / 2); g.computeVertexNormals(); return g;
+      }
+      function rshape(pts, r) { // polygon with rounded corners (r per corner or one value)
+        var s = new THREE.Shape(), n = pts.length;
+        for (var i = 0; i < n; i++) {
+          var p = new THREE.Vector2(pts[i][0], pts[i][1]), a = new THREE.Vector2(pts[(i + n - 1) % n][0], pts[(i + n - 1) % n][1]), b = new THREE.Vector2(pts[(i + 1) % n][0], pts[(i + 1) % n][1]);
+          var rr = Array.isArray(r) ? r[i] : r; var da = a.clone().sub(p), db = b.clone().sub(p); rr = Math.min(rr, da.length() / 2, db.length() / 2);
+          var p1 = p.clone().add(da.setLength(rr)), p2 = p.clone().add(db.setLength(rr));
+          if (i === 0) s.moveTo(p1.x, p1.y); else s.lineTo(p1.x, p1.y);
+          s.quadraticCurveTo(p.x, p.y, p2.x, p2.y);
+        }
+        s.closePath(); return s;
+      }
+      function cyl(r, l, seg, r2) { return new THREE.CylinderGeometry(r2 == null ? r : r2, r, l, seg || 32); }
+      function tube(pts, r, seg) { var c = new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); }), false, 'catmullrom', 0.3); return new THREE.TubeGeometry(c, seg || 48, r, 12, false); }
+      function between(geo, mat, parent, a, b) { var A = new THREE.Vector3(a[0], a[1], a[2]), B = new THREE.Vector3(b[0], b[1], b[2]), d = B.clone().sub(A); var m = mk(geo(d.length()), mat, parent); m.position.copy(A).add(B).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); return m; }
+      function rectPath(pts, w, d, rad) { // square-section bar along a polyline with rounded corners
         var path = new THREE.CurvePath(); var V = pts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); });
         for (var i = 0; i < V.length - 1; i++) {
           var a = V[i], b = V[i + 1];
@@ -1610,230 +1657,273 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
           path.add(new THREE.LineCurve3(a2, b2));
           if (i < V.length - 2) { var c2 = b.clone().add(V[i + 2].clone().sub(b).setLength(rad)); path.add(new THREE.QuadraticBezierCurve3(b2, b, c2)); }
         }
-        return new THREE.TubeGeometry(path, 120, r, 16, false);
+        var sh = rshape([[-w / 2, -d / 2], [w / 2, -d / 2], [w / 2, d / 2], [-w / 2, d / 2]], Math.min(w, d) * 0.25);
+        return new THREE.ExtrudeGeometry(sh, { steps: 160, bevelEnabled: false, extrudePath: path });
       }
 
       // ---- assemblies
       var machine = new THREE.Group(); scene.add(machine);
       var ASM = {}; // pid -> {g, home, ex}
       function asm(pid, ex, parent) { var g = new THREE.Group(); g.userData.pid = pid; (parent || machine).add(g); ASM[pid] = { g: g, home: null, ex: new THREE.Vector3(ex[0], ex[1], ex[2]) }; return g; }
+      // Coordinates (metres): x forward, y up, z to the operator's right. Front axle at x = 0, rear axle at x = -1.524.
+      // Heights and stations measured off Toro's side-on studio photo, scaled by the 1524 mm wheelbase and 2172 mm ROPS height.
+      var FR = 0.3365, FW = 0.356, RR = 0.254, RW = 0.305, WB = 1.524, FT = 0.62, RT = 0.52;
+      var HOOD_F = -0.72, HOOD_R = -1.60, HOOD_TOP = 1.36, HOOD_W = 1.12;
 
-      // coordinates: x forward (front of machine +x), y up, z right. Front axle at x=0, rear axle x=-1.524.
-      var FR = 0.3365, FW = 0.356, RR = 0.254, RW = 0.305, WB = 1.524, FT = 0.66, RT = 0.53;
+      // ---------- frame (red lower frame + black floor + seat deck)
+      var frame = asm('frame', [0, -0.3, 0]);
+      mk(slab([[0.52, 0.66], [0.52, 0.86], [0.26, 0.88], [-0.05, 0.86], [-0.05, 0.66]], 0.66, 0.02), M.redFrame, frame); // front frame / steering support
+      mk(slab([[-0.62, 0.63], [-0.62, 0.78], [-1.66, 0.78], [-1.66, 0.63]], HOOD_W + 0.02, 0.02), M.redFrame, frame); // red skirt under hood
+      [-1, 1].forEach(function (s) {
+        mk(rbox(2.0, 0.12, 0.08, 0.015), M.redFrame, frame, [-0.7, 0.5, s * 0.34]); // side rails
+        mk(slab([[-0.02, 0.58], [-0.02, 0.84], [-0.66, 0.84], [-0.66, 0.58]], 0.025, 0.006), M.black, frame, [0, 0, s * 0.43]); // side covers under seat deck
+      });
+      mk(rbox(0.16, 0.16, 0.92, 0.03), M.redFrame, frame, [0.0, FR, 0]); // front axle / motor mounts
+      mk(rbox(0.42, 0.03, 0.74, 0.01), M.plate, frame, [0.1, 0.62, 0]); // floor plate
+      mk(rbox(0.7, 0.07, 1.06, 0.025), M.moulded, frame, [-0.36, 0.87, 0]); // seat deck
+      mk(rbox(0.12, 0.12, 0.84, 0.02), M.redFrame, frame, [-WB, RR + 0.04, 0]); // rear steer axle
+      mk(cyl(0.05, 0.16, 20), M.satin, frame, [-WB + 0.06, RR + 0.18, 0]); // steer cylinder pivot
+      mk(rbox(0.06, 0.05, 0.9, 0.01), M.black, frame, [-1.88, 0.6, 0]); // rear bumper
+      // hoses along the frame
+      [-1, 1].forEach(function (s) { mk(tube([[0.42, 0.7, s * 0.25], [0.1, 0.56, s * 0.38], [-0.4, 0.55, s * 0.4], [-0.9, 0.6, s * 0.4], [-1.25, 0.62, s * 0.3]], 0.012), M.hose, frame); });
 
-      // frame
-      var frame = asm('frame', [0, -0.25, 0]);
-      mk(rbox(1.95, 0.14, 0.12, 0.02), M.black, frame, [-0.62, 0.42, -0.36]);
-      mk(rbox(1.95, 0.14, 0.12, 0.02), M.black, frame, [-0.62, 0.42, 0.36]);
-      mk(rbox(0.16, 0.16, 1.0, 0.02), M.black, frame, [0.0, FR, 0]); // front axle housing
-      mk(rbox(0.65, 0.05, 1.05, 0.015), M.plate, frame, [0.08, 0.6, 0]); // footplate
-      mk(rbox(0.1, 0.14, 0.9, 0.03), M.black, frame, [0.40, 0.5, 0]); // front cross member
-      mk(rbox(0.12, 0.12, 0.8, 0.02), M.black, frame, [-WB, RR + 0.02, 0]); // rear axle
-      mk(rbox(0.9, 0.06, 1.2, 0.02), M.black, frame, [-0.45, 0.69, 0]); // seat deck
-      // hydraulic lines along the frame
-      [[-0.36, 1], [0.36, -1]].forEach(function (s) { mk(tube([[0.35, 0.52, s[0] * 0.9], [-0.2, 0.5, s[0] * 0.92], [-0.9, 0.46, s[0] * 0.95], [-1.3, 0.42, s[0] * 0.8]], 0.011), M.hose, frame); });
+      // ---------- front pods over the front wheels (fuel tank left, hydraulic tank right)
+      function pod(pid, s, ex) {
+        var g = asm(pid, ex);
+        var sh = rshape([[0.32, 0.70], [0.32, 0.86], [0.20, 0.92], [-0.18, 0.92], [-0.24, 0.86], [-0.24, 0.70]], [0.05, 0.08, 0.06, 0.06, 0.05, 0.03]);
+        mk(slab(sh, 0.37, 0.05, 6), M.moulded, g, [0, 0, s * (FT + 0.01)]);
+        return g;
+      }
+      var fuel = pod('fueltank', -1, [0.1, 0.35, -0.55]);
+      mk(cyl(0.05, 0.04, 28), M.black, fuel, [-0.08, 0.935, -FT + 0.06]); mk(cyl(0.035, 0.012, 24), M.yellow, fuel, [-0.08, 0.958, -FT + 0.06]);
+      var hyd = pod('hydtank', 1, [0.1, 0.35, 0.55]);
+      mk(cyl(0.045, 0.04, 28), M.black, hyd, [-0.1, 0.935, FT - 0.08]);
+      mk(cyl(0.05, 0.14, 32), M.filterR, hyd, [0.05, 0.62, FT - 0.26]); mk(rbox(0.12, 0.035, 0.12, 0.01), M.alum, hyd, [0.05, 0.71, FT - 0.26]); // charge filter under the pod
+      // front fender liners (black, under the pods)
+      [-1, 1].forEach(function (s) { var sh = new THREE.Shape(); sh.absarc(0, 0, FR + 0.045, 0.35, Math.PI - 0.55, false); sh.absarc(0, 0, FR + 0.025, Math.PI - 0.55, 0.35, true); var g = new THREE.ExtrudeGeometry(sh, { depth: FW + 0.02, bevelEnabled: false, curveSegments: 40 }); g.translate(0, 0, -(FW + 0.02) / 2); mk(g, M.moulded, frame, [0, FR, s * FT]); });
 
-      // operator platform & seat
-      var seat = asm('seat', [0.2, 0.6, 0]);
-      mk(rbox(0.5, 0.11, 0.5, 0.05, 6), M.seat, seat, [-0.42, 1.0, 0]);
-      var back = mk(rbox(0.12, 0.62, 0.5, 0.05, 6), M.seat, seat, [-0.68, 1.33, 0]); back.rotation.z = 0.12;
-      mk(rbox(0.28, 0.05, 0.07, 0.02), M.seat, seat, [-0.48, 1.16, -0.3]);
-      mk(rbox(0.22, 0.2, 0.36, 0.02), M.satin, seat, [-0.44, 0.83, 0]); // suspension
-      mk(rbox(0.08, 0.07, 0.02, 0.01), M.yellow, seat, [-0.2, 1.06, 0.2]); // seat adjust lever
+      // ---------- front nose: black cowl, TORO badge, headlights
+      var nose = asm('lights', [0.45, 0.15, 0]);
+      mk(slab(rshape([[0.56, 0.86], [0.55, 0.96], [0.42, 1.03], [0.20, 1.04], [0.20, 0.86]], [0.02, 0.05, 0.05, 0.02, 0.02]), 0.62, 0.04, 6), M.moulded, nose);
+      var fb = mk(new THREE.PlaneGeometry(0.15, 0.056), new THREE.MeshStandardMaterial({ map: frontBadge, roughness: 0.3, transparent: true }), nose, [0.585, 0.925, 0], [0, Math.PI / 2, 0], true);
+      [-0.19, 0.19].forEach(function (z) {
+        mk(rbox(0.04, 0.07, 0.1, 0.012), M.black, nose, [0.565, 0.925, z]);
+        mk(rbox(0.012, 0.055, 0.085, 0.01), M.lens, nose, [0.586, 0.925, z]);
+      });
+      mk(rbox(0.02, 0.03, 0.04, 0.005), new THREE.MeshStandardMaterial({ color: 0xf08a20, emissive: 0x402000 }), nose, [0.55, 0.99, -0.27]);
+      mk(rbox(0.02, 0.03, 0.04, 0.005), new THREE.MeshStandardMaterial({ color: 0xf08a20, emissive: 0x402000 }), nose, [0.55, 0.99, 0.27]);
 
-      var console_ = asm('console', [0.15, 0.35, 0.45]);
-      mk(rbox(0.5, 0.12, 0.16, 0.03), M.black, console_, [-0.32, 1.12, 0.36]);
-      mk(rbox(0.16, 0.05, 0.12, 0.02), M.black, console_, [-0.14, 1.2, 0.36]);
-      var scr = mk(new THREE.PlaneGeometry(0.11, 0.07), M.screen, console_, [-0.08, 1.235, 0.36], [-Math.PI / 2 + 0.5, 0, 0], true); scr.rotation.order = 'YXZ'; scr.rotation.y = Math.PI / 2;
-      for (var k = 0; k < 4; k++) mk(cyl(0.01, 0.02, 12), M.yellow, console_, [-0.24 - k * 0.05, 1.19, 0.4]);
-      mk(rbox(0.18, 0.04, 0.1, 0.015), M.satin, console_, [-0.36, 1.2, 0.33]); // joystick base
-      mk(cyl(0.012, 0.09, 12), M.black, console_, [-0.36, 1.25, 0.33]);
+      // ---------- steering column and wheel
+      var steer = asm('steering', [0.35, 0.5, 0]);
+      var c0 = new THREE.Vector3(0.28, 0.95, 0), c1 = new THREE.Vector3(0.205, 1.46, 0), cd = c1.clone().sub(c0);
+      var col = mk(cyl(0.028, cd.length(), 16), M.black, steer); col.position.copy(c0).add(c1).multiplyScalar(0.5); col.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), cd.clone().normalize());
+      for (var bi2 = 0; bi2 < 7; bi2++) { var tb = mk(new THREE.TorusGeometry(0.042 - bi2 * 0.002, 0.012, 8, 24), M.black, steer); tb.position.copy(c0).addScaledVector(cd, 0.03 + bi2 * 0.035); tb.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), cd.clone().normalize()); }
+      var wn = new THREE.Vector3(-0.42, 0.9, 0).normalize();
+      var wgp = new THREE.Group(); wgp.position.copy(c1).addScaledVector(wn, 0.03); wgp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), wn); steer.add(wgp);
+      mk(new THREE.TorusGeometry(0.17, 0.016, 14, 64), M.black, wgp);
+      mk(cyl(0.05, 0.045, 24), M.black, wgp, [0, 0, 0.01], [Math.PI / 2, 0, 0]);
+      for (var sp = 0; sp < 3; sp++) { var spk = mk(rbox(0.15, 0.03, 0.012, 0.006), M.black, wgp); var a = sp * Math.PI * 2 / 3 - Math.PI / 2; spk.position.set(Math.cos(a) * 0.09, Math.sin(a) * 0.09, 0); spk.rotation.z = a; }
+      mk(rbox(0.1, 0.02, 0.14, 0.008), M.black, steer, [0.18, 0.66, 0.16], [0, 0, 0.5]); // traction pedal
+      mk(rbox(0.07, 0.02, 0.08, 0.008), M.black, steer, [0.2, 0.66, -0.16], [0, 0, 0.5]); // brake pedal
+      mk(rbox(0.06, 0.02, 0.07, 0.008), M.black, steer, [0.2, 0.66, -0.05], [0, 0, 0.5]); // mow speed limiter
 
-      var steer = asm('steering', [0.35, 0.45, 0]);
-      mk(rbox(0.24, 0.42, 0.36, 0.05, 5), M.red, steer, [0.2, 0.82, 0]); // steering tower
-      mk(rbox(0.2, 0.04, 0.3, 0.02), M.black, steer, [0.2, 1.04, 0]);
-      var c0 = new THREE.Vector3(0.17, 1.02, 0), c1 = new THREE.Vector3(-0.08, 1.24, 0), cd = c1.clone().sub(c0);
-      var col = mk(cyl(0.032, cd.length(), 16), M.black, steer); col.position.copy(c0).add(c1).multiplyScalar(0.5); col.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), cd.clone().normalize());
-      var wgp = new THREE.Group(); wgp.position.copy(c1); wgp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), cd.clone().normalize()); steer.add(wgp);
-      mk(new THREE.TorusGeometry(0.19, 0.017, 14, 56), M.black, wgp);
-      mk(cyl(0.045, 0.05, 20), M.black, wgp, [0, 0, 0], [Math.PI / 2, 0, 0]);
-      for (var sp = 0; sp < 3; sp++) { var spk = mk(rbox(0.17, 0.022, 0.014, 0.006), M.black, wgp); var a = sp * Math.PI * 2 / 3 - Math.PI / 2; spk.position.set(Math.cos(a) * 0.1, Math.sin(a) * 0.1, 0); spk.rotation.z = a; }
-      mk(rbox(0.09, 0.02, 0.13, 0.008), M.black, steer, [0.0, 0.64, 0.2], [0, 0, 0.45]); // traction pedal
-      mk(rbox(0.07, 0.02, 0.08, 0.008), M.black, steer, [0.02, 0.64, -0.2], [0, 0, 0.45]); // brake / mow pedal
+      // ---------- seat (grey, high back, bellows suspension) + right armrest console
+      var seat = asm('seat', [0.15, 0.6, 0]);
+      mk(rbox(0.36, 0.04, 0.4, 0.01), M.black, seat, [-0.33, 0.91, 0]);
+      for (var bl = 0; bl < 6; bl++) mk(new THREE.TorusGeometry(0.155 - (bl % 2) * 0.012, 0.022, 10, 40), M.seatBlack, seat, [-0.33, 0.95 + bl * 0.03, 0], [Math.PI / 2, 0, 0]);
+      mk(rbox(0.4, 0.04, 0.42, 0.01), M.black, seat, [-0.33, 1.12, 0]);
+      mk(rbox(0.5, 0.11, 0.5, 0.05, 6), M.seatBlack, seat, [-0.34, 1.18, 0]); // cushion shell
+      mk(rbox(0.46, 0.08, 0.44, 0.035, 6), M.seatGrey, seat, [-0.33, 1.25, 0]); // cushion pad
+      var bk = new THREE.Group(); bk.position.set(-0.58, 1.22, 0); bk.rotation.z = 0.16; seat.add(bk);
+      mk(rbox(0.1, 0.52, 0.5, 0.05, 6), M.seatBlack, bk, [-0.04, 0.23, 0]);
+      mk(rbox(0.1, 0.46, 0.42, 0.045, 6), M.seatGrey, bk, [0.04, 0.24, 0]);
+      mk(rbox(0.12, 0.42, 0.06, 0.03, 6), M.seatGrey, bk, [0.05, 0.22, -0.22]); mk(rbox(0.12, 0.42, 0.06, 0.03, 6), M.seatGrey, bk, [0.05, 0.22, 0.22]);
+      mk(rbox(0.07, 0.03, 0.08, 0.01), M.black, seat, [-0.22, 1.13, -0.27]); // fore/aft lever
+      mk(rbox(0.3, 0.05, 0.07, 0.02), M.seatBlack, seat, [-0.38, 1.36, -0.3]); // left armrest
+      var console_ = asm('console', [0.1, 0.45, 0.5]);
+      mk(slab(rshape([[-0.62, 1.2], [-0.06, 1.24], [-0.04, 1.34], [-0.2, 1.38], [-0.62, 1.34]], 0.04), 0.13, 0.025), M.moulded, console_, [0, 0, 0.36]);
+      mk(rbox(0.25, 0.25, 0.06, 0.02), M.black, console_, [-0.4, 1.08, 0.36]);
+      var scrn = mk(new THREE.PlaneGeometry(0.1, 0.065), M.screen, console_, [-0.12, 1.37, 0.36], null, true); scrn.rotation.set(-Math.PI / 2, 0, -Math.PI / 2); scrn.rotateX(0.35);
+      mk(cyl(0.012, 0.08, 12), M.black, console_, [-0.3, 1.41, 0.37]); mk(new THREE.SphereGeometry(0.022, 16, 12), M.black, console_, [-0.3, 1.45, 0.37]); // joystick
+      mk(cyl(0.022, 0.03, 20), M.yellow, console_, [-0.2, 1.39, 0.38]); // key/throttle knob
+      for (var k = 0; k < 3; k++) mk(rbox(0.02, 0.008, 0.02, 0.003), new THREE.MeshStandardMaterial({ color: k === 0 ? 0xd02020 : 0x303030 }), console_, [-0.38 - k * 0.04, 1.37, 0.35]);
 
-      // ROPS
-      var rops = asm('rops', [0.1, 1.1, 0]);
-      mk(polyTube([[-0.82, 0.72, -0.56], [-0.86, 2.17 - 0.04, -0.52], [-0.86, 2.17 - 0.04, 0.52], [-0.82, 0.72, 0.56]], 0.04, 0.16), M.black, rops);
-      mk(rbox(0.12, 0.05, 0.16, 0.01), M.black, rops, [-0.82, 0.72, -0.56]); mk(rbox(0.12, 0.05, 0.16, 0.01), M.black, rops, [-0.82, 0.72, 0.56]);
-      mk(rbox(0.03, 0.05, 0.12, 0.01), M.black, rops, [-0.74, 1.5, -0.53]); // belt anchor
-      mk(rbox(0.004, 0.18, 0.06, 0.002), M.yellow, rops, [-0.81, 1.85, -0.56]); // label
+      // ---------- ROPS (flat-bar, 2 post)
+      var rops = asm('rops', [0.05, 1.15, 0]);
+      mk(rectPath([[-0.69, 0.80, -0.5], [-0.62, 2.13, -0.5], [-0.62, 2.13, 0.5], [-0.69, 0.80, 0.5]], 0.085, 0.05, 0.14), M.black, rops);
+      [-0.5, 0.5].forEach(function (z) { mk(rbox(0.14, 0.03, 0.12, 0.008), M.black, rops, [-0.69, 0.79, z]); for (var b = 0; b < 2; b++) mk(cyl(0.01, 0.02, 10), M.chrome, rops, [-0.72 + b * 0.06, 0.81, z]); });
+      mk(rbox(0.004, 0.16, 0.05, 0.002), M.yellow, rops, [-0.645, 1.6, 0.53]);
+      mk(rbox(0.04, 0.06, 0.06, 0.01), M.black, rops, [-0.66, 1.35, -0.46]); // seat belt retractor
 
-      // hood / rear body
-      var hood = asm('hood', [-0.6, 1.45, 0]);
+      // ---------- hood / rear body
+      var hood = asm('hood', [-0.55, 1.45, 0]);
       (function () {
-        var s = new THREE.Shape(); // side profile in x-y
-        s.moveTo(-0.78, 0.7); s.lineTo(-0.78, 1.0); s.quadraticCurveTo(-0.8, 1.22, -1.0, 1.24); s.lineTo(-1.82, 1.2); s.quadraticCurveTo(-2.02, 1.18, -2.04, 0.98); s.lineTo(-2.06, 0.55); s.lineTo(-1.82, 0.55);
-        s.absarc(-WB, 0.5, 0.31, 0.2, Math.PI - 0.2, false); s.lineTo(-1.15, 0.7); s.lineTo(-0.78, 0.7);
-        var g = new THREE.ExtrudeGeometry(s, { depth: 1.04, bevelEnabled: true, bevelThickness: 0.07, bevelSize: 0.06, bevelSegments: 8, curveSegments: 32 });
-        g.translate(0, 0, -0.52); g.computeVertexNormals();
-        var m = mk(g, M.red, hood); m.userData.hoodShell = true;
-        // decals on both sides
+        var top = rshape([[HOOD_F, 0.88], [HOOD_F, HOOD_TOP], [HOOD_R + 0.02, HOOD_TOP], [HOOD_R, 0.88]], [0.02, 0.07, 0.09, 0.02]);
+        var m = mk(slab(top, HOOD_W, 0.05, 8), M.red, hood); m.userData.hoodShell = true;
+        mk(slab([[HOOD_F + 0.01, 0.775], [HOOD_F + 0.01, 0.89], [HOOD_R + 0.01, 0.89], [HOOD_R + 0.01, 0.775]], HOOD_W + 0.005, 0.012), M.band, hood); // dark band
+        // side decals
         [1, -1].forEach(function (sd) {
-          var d1 = mk(new THREE.PlaneGeometry(0.62, 0.155), new THREE.MeshStandardMaterial({ map: decalTex('TORO', null, '#ffffff'), transparent: true, roughness: 0.3 }), hood, [-1.45, 1.03, sd * 0.596], [0, sd > 0 ? 0 : Math.PI, 0], true);
-          var d2 = mk(new THREE.PlaneGeometry(0.62, 0.155), new THREE.MeshStandardMaterial({ map: decalTex('REELMASTER', '5010-H HYBRID', '#f2f2f2'), transparent: true, roughness: 0.3 }), hood, [-1.5, 0.84, sd * 0.596], [0, sd > 0 ? 0 : Math.PI, 0], true);
-          d1.userData.decal = d2.userData.decal = true;
+          var d = mk(new THREE.PlaneGeometry(0.8, 0.171), new THREE.MeshStandardMaterial({ map: sideDecal, transparent: true, roughness: 0.25 }), hood, [-1.17, 1.08, sd * (HOOD_W / 2 + 0.002)], [0, sd > 0 ? 0 : Math.PI, 0], true);
+          d.userData.decal = true;
         });
-        // rear screen
-        var grill = mk(new THREE.PlaneGeometry(0.9, 0.36), M.rad, hood, [-2.105, 0.86, 0], [0, -Math.PI / 2, 0], true);
-        mk(rbox(0.04, 0.05, 1.0, 0.02), M.black, hood, [-2.1, 0.62, 0]);
-        // tail lights
-        [-0.45, 0.45].forEach(function (z) { mk(rbox(0.02, 0.06, 0.1, 0.01), new THREE.MeshStandardMaterial({ color: 0xff2a1a, emissive: 0x550000, roughness: 0.2 }), hood, [-2.1, 1.08, z]); });
-        // hood latch + fuel cap through the side
-        mk(cyl(0.045, 0.04, 24), M.black, hood, [-0.95, 1.21, -0.42]);
+        // rear screen / radiator housing (black, louvred)
+        var rb = rshape([[HOOD_R + 0.01, 0.66], [HOOD_R + 0.01, 1.3], [-1.82, 1.22], [-1.85, 0.7]], [0.01, 0.03, 0.05, 0.03]);
+        mk(slab(rb, HOOD_W - 0.06, 0.02, 4), M.moulded, hood);
+        [1, -1].forEach(function (sd) { var gp = mk(new THREE.PlaneGeometry(0.17, 0.4), M.grille, hood, [-1.72, 0.97, sd * (HOOD_W / 2 - 0.028)], [0, sd > 0 ? 0 : Math.PI, 0], true); });
+        var rg = mk(new THREE.PlaneGeometry(0.9, 0.42), M.grille, hood, [-1.856, 0.95, 0], [0, -Math.PI / 2, 0.06], true);
+        [-0.42, 0.42].forEach(function (z) { mk(rbox(0.02, 0.07, 0.09, 0.01), M.tail, hood, [-1.855, 1.14, z]); });
+        mk(cyl(0.045, 0.04, 24), M.black, hood, [-0.9, HOOD_TOP + 0.02, -0.42]); // latch
       })();
 
-      // engine bay
-      var engine = asm('engine', [-0.2, 0.5, 0]);
-      mk(rbox(0.46, 0.34, 0.42, 0.03), M.engine, engine, [-1.38, 0.82, 0]); // block
-      mk(rbox(0.44, 0.1, 0.36, 0.03), M.engine, engine, [-1.38, 1.04, 0]); // head
-      mk(rbox(0.42, 0.06, 0.3, 0.03), M.satin, engine, [-1.38, 1.12, 0]); // rocker cover
-      for (var gp = 0; gp < 3; gp++) mk(cyl(0.012, 0.05, 10), M.brushed, engine, [-1.5 + gp * 0.12, 1.14, 0.16]);
-      mk(rbox(0.3, 0.06, 0.14, 0.02), M.alum, engine, [-1.38, 0.98, -0.25]); // intake manifold
-      mk(tube([[-1.38, 0.96, 0.24], [-1.36, 0.9, 0.34], [-1.55, 0.82, 0.42], [-1.95, 0.75, 0.44]], 0.032), M.satin, engine); // exhaust
-      mk(cyl(0.08, 0.34, 24), M.satin, engine, [-1.9, 0.72, 0.38], [Math.PI / 2, 0, 0]); // muffler
-      mk(rbox(0.18, 0.12, 0.3, 0.03), M.engine, engine, [-1.38, 0.6, 0]); // sump
+      // ---------- engine bay (under the hood)
+      var engine = asm('engine', [-0.15, 0.55, 0]);
+      mk(rbox(0.46, 0.32, 0.4, 0.03), M.engine, engine, [-1.2, 0.86, 0]);
+      mk(rbox(0.44, 0.1, 0.34, 0.03), M.engine, engine, [-1.2, 1.07, 0]);
+      mk(rbox(0.4, 0.06, 0.28, 0.03), M.satin, engine, [-1.2, 1.15, 0]);
+      for (var gp2 = 0; gp2 < 3; gp2++) mk(cyl(0.012, 0.05, 10), M.brushed, engine, [-1.32 + gp2 * 0.12, 1.17, 0.15]);
+      mk(rbox(0.3, 0.06, 0.12, 0.02), M.alum, engine, [-1.2, 1.01, -0.24]);
+      mk(tube([[-1.2, 0.99, 0.23], [-1.25, 0.95, 0.34], [-1.45, 0.9, 0.42], [-1.62, 0.84, 0.44]], 0.03), M.satin, engine);
+      mk(cyl(0.075, 0.3, 24), M.satin, engine, [-1.5, 0.78, 0.36], [Math.PI / 2, 0, 0]);
+      mk(rbox(0.2, 0.12, 0.3, 0.03), M.engine, engine, [-1.2, 0.66, 0]);
       var oilf = asm('oilfilter', [0, 0, -0.45], engine);
-      mk(cyl(0.048, 0.11, 32), M.filterW, oilf, [-1.3, 0.78, -0.26], [Math.PI / 2, 0, 0]);
-      mk(cyl(0.05, 0.012, 32), M.black, oilf, [-1.3, 0.78, -0.32], [Math.PI / 2, 0, 0]);
-      var belt = asm('belt', [0.35, 0, 0], engine);
-      mk(cyl(0.085, 0.03, 32), M.brushed, belt, [-1.14, 0.72, 0], [0, 0, Math.PI / 2]); // crank pulley
-      mk(cyl(0.06, 0.03, 32), M.brushed, belt, [-1.14, 0.98, -0.16], [0, 0, Math.PI / 2]); // alternator pulley
-      mk(cyl(0.07, 0.03, 32), M.brushed, belt, [-1.14, 1.0, 0.08], [0, 0, Math.PI / 2]); // fan/water pump pulley
-      mk(tube([[-1.13, 0.64, 0], [-1.13, 0.8, -0.09], [-1.13, 0.96, -0.22], [-1.13, 1.05, -0.12], [-1.13, 1.07, 0.08], [-1.13, 0.95, 0.15], [-1.13, 0.72, 0.09], [-1.13, 0.64, 0]], 0.009, 96), M.hose, belt);
-      mk(cyl(0.065, 0.13, 24), M.alum, belt, [-1.2, 0.98, -0.2], [0, 0, Math.PI / 2]); // alternator
-      var gen = asm('generator', [0.0, 0.35, 0.55], engine);
-      mk(cyl(0.16, 0.18, 40), M.satin, gen, [-1.66, 0.8, 0], [0, 0, Math.PI / 2]);
-      mk(cyl(0.165, 0.03, 40), M.alum, gen, [-1.58, 0.8, 0], [0, 0, Math.PI / 2]);
-      for (var fn = 0; fn < 10; fn++) mk(rbox(0.16, 0.012, 0.02, 0.004), M.alum, gen, [-1.68, 0.8 + Math.cos(fn * 0.628) * 0.165, Math.sin(fn * 0.628) * 0.165], [fn * 0.628, 0, 0]);
-      mk(tube([[-1.66, 0.97, 0.06], [-1.5, 1.1, 0.3], [-1.0, 0.9, 0.42], [-0.7, 0.72, 0.3]], 0.016), new THREE.MeshStandardMaterial({ color: 0xe06a10, roughness: 0.6 }), gen); // HV orange cable
-      var air = asm('aircleaner', [0, 0.7, -0.45]);
-      mk(cyl(0.085, 0.32, 40), M.black, air, [-1.5, 1.12, -0.38], [0, 0, Math.PI / 2]);
-      mk(cyl(0.09, 0.05, 40), M.black, air, [-1.68, 1.12, -0.38], [0, 0, Math.PI / 2]);
-      mk(cyl(0.03, 0.06, 16, 0.025), M.plastic, air, [-1.74, 1.08, -0.38], [0, 0, Math.PI / 2]); // vacuator valve
-      mk(cyl(0.012, 0.04, 12), new THREE.MeshStandardMaterial({ color: 0xff3020, roughness: 0.3 }), air, [-1.42, 1.22, -0.38]); // service indicator
-      mk(tube([[-1.33, 1.12, -0.38], [-1.25, 1.1, -0.3], [-1.3, 1.02, -0.22]], 0.035), M.hose, air);
-      var radiator = asm('radiator', [-0.6, 0.2, 0]);
-      mk(rbox(0.08, 0.42, 0.78, 0.01), M.alum, radiator, [-1.98, 0.87, 0]);
-      mk(new THREE.PlaneGeometry(0.72, 0.36), M.rad, radiator, [-2.025, 0.87, 0], [0, -Math.PI / 2, 0], true);
-      mk(new THREE.PlaneGeometry(0.72, 0.36), M.rad, radiator, [-1.935, 0.87, 0], [0, Math.PI / 2, 0], true);
-      mk(cyl(0.05, 0.12, 24), M.black, radiator, [-1.9, 0.87, 0.34], [Math.PI / 2, 0, 0]); // expansion tank
-      mk(cyl(0.2, 0.03, 6), M.plastic, radiator, [-1.86, 0.87, 0], [0, 0, Math.PI / 2]); // fan
-
-      // fuel + hydraulics + batteries
-      var fuel = asm('fueltank', [0, 0.15, -0.7]);
-      mk(rbox(0.46, 0.3, 0.22, 0.06, 6), M.plastic, fuel, [-0.98, 0.88, -0.4]);
-      mk(cyl(0.045, 0.05, 24), M.yellow, fuel, [-0.98, 1.05, -0.4]);
-      var fsep = asm('fuelsep', [0.25, 0.25, -0.75]);
-      mk(cyl(0.045, 0.1, 32), M.filterW, fsep, [-1.08, 0.64, -0.3]);
-      mk(cyl(0.04, 0.05, 24), M.glass, fsep, [-1.08, 0.565, -0.3]);
-      mk(rbox(0.1, 0.03, 0.1, 0.01), M.alum, fsep, [-1.08, 0.705, -0.3]);
-      mk(cyl(0.018, 0.08, 16), new THREE.MeshStandardMaterial({ color: 0xf2f2f2, roughness: 0.3, transparent: true, opacity: 0.7 }), fsep, [-1.22, 0.66, -0.3], [0, 0, Math.PI / 2]); // in-line filter
-      var hyd = asm('hydtank', [0, 0.15, 0.7]);
-      mk(rbox(0.44, 0.3, 0.22, 0.05, 6), M.black, hyd, [-0.98, 0.88, 0.4]);
-      mk(cyl(0.04, 0.05, 24), M.black, hyd, [-0.98, 1.05, 0.4]);
-      mk(cyl(0.05, 0.14, 32), M.filterR, hyd, [-1.0, 0.62, 0.22]); // charge filter
-      mk(rbox(0.12, 0.04, 0.12, 0.01), M.alum, hyd, [-1.0, 0.71, 0.22]);
-      var b48 = asm('battery48', [0.55, -0.3, 0]);
+      mk(cyl(0.048, 0.11, 32), M.filterW, oilf, [-1.12, 0.82, -0.25], [Math.PI / 2, 0, 0]);
+      mk(cyl(0.05, 0.012, 32), M.black, oilf, [-1.12, 0.82, -0.31], [Math.PI / 2, 0, 0]);
+      var belt = asm('belt', [0.3, 0, 0], engine);
+      mk(cyl(0.085, 0.03, 32), M.brushed, belt, [-0.96, 0.76, 0], [0, 0, Math.PI / 2]);
+      mk(cyl(0.06, 0.03, 32), M.brushed, belt, [-0.96, 1.0, -0.16], [0, 0, Math.PI / 2]);
+      mk(cyl(0.07, 0.03, 32), M.brushed, belt, [-0.96, 1.03, 0.08], [0, 0, Math.PI / 2]);
+      mk(tube([[-0.95, 0.68, 0], [-0.95, 0.84, -0.09], [-0.95, 0.99, -0.22], [-0.95, 1.07, -0.12], [-0.95, 1.1, 0.08], [-0.95, 0.98, 0.15], [-0.95, 0.76, 0.09], [-0.95, 0.68, 0]], 0.009, 96), M.hose, belt);
+      mk(cyl(0.065, 0.13, 24), M.alum, belt, [-1.02, 1.0, -0.2], [0, 0, Math.PI / 2]);
+      var gen = asm('generator', [0.0, 0.3, 0.55], engine);
+      mk(cyl(0.15, 0.17, 40), M.satin, gen, [-1.5, 0.86, 0], [0, 0, Math.PI / 2]);
+      mk(cyl(0.155, 0.03, 40), M.alum, gen, [-1.42, 0.86, 0], [0, 0, Math.PI / 2]);
+      for (var fn = 0; fn < 10; fn++) mk(rbox(0.15, 0.012, 0.02, 0.004), M.alum, gen, [-1.52, 0.86 + Math.cos(fn * 0.628) * 0.155, Math.sin(fn * 0.628) * 0.155], [fn * 0.628, 0, 0]);
+      mk(tube([[-1.5, 1.02, 0.06], [-1.35, 1.12, 0.3], [-0.9, 0.95, 0.42], [-0.62, 0.8, 0.3]], 0.016), M.hv, gen);
+      var air = asm('aircleaner', [0, 0.6, -0.45]);
+      mk(cyl(0.08, 0.3, 40), M.black, air, [-1.3, 1.2, -0.36], [0, 0, Math.PI / 2]);
+      mk(cyl(0.085, 0.05, 40), M.black, air, [-1.47, 1.2, -0.36], [0, 0, Math.PI / 2]);
+      mk(cyl(0.03, 0.06, 16, 0.025), M.plastic, air, [-1.53, 1.16, -0.36], [0, 0, Math.PI / 2]);
+      mk(cyl(0.012, 0.04, 12), new THREE.MeshStandardMaterial({ color: 0xff3020, roughness: 0.3 }), air, [-1.22, 1.29, -0.36]);
+      mk(tube([[-1.14, 1.2, -0.36], [-1.08, 1.18, -0.28], [-1.12, 1.1, -0.2]], 0.033), M.hose, air);
+      var radiator = asm('radiator', [-0.65, 0.15, 0]);
+      mk(rbox(0.07, 0.48, 0.8, 0.01), M.alum, radiator, [-1.72, 0.96, 0]);
+      mk(new THREE.PlaneGeometry(0.74, 0.42), M.rad, radiator, [-1.757, 0.96, 0], [0, -Math.PI / 2, 0], true);
+      mk(new THREE.PlaneGeometry(0.74, 0.42), M.rad, radiator, [-1.683, 0.96, 0], [0, Math.PI / 2, 0], true);
+      mk(cyl(0.045, 0.12, 24), M.black, radiator, [-1.66, 1.12, 0.32], [Math.PI / 2, 0, 0]);
+      mk(cyl(0.19, 0.03, 6), M.plastic, radiator, [-1.64, 0.96, 0], [0, 0, Math.PI / 2]);
+      var fsep = asm('fuelsep', [0.2, 0.25, -0.7]);
+      mk(cyl(0.045, 0.1, 32), M.filterW, fsep, [-0.86, 0.76, -0.4]);
+      mk(cyl(0.04, 0.05, 24), M.glass, fsep, [-0.86, 0.685, -0.4]);
+      mk(rbox(0.1, 0.03, 0.1, 0.01), M.alum, fsep, [-0.86, 0.825, -0.4]);
+      mk(cyl(0.018, 0.08, 16), new THREE.MeshStandardMaterial({ color: 0xf2f2f2, roughness: 0.3, transparent: true, opacity: 0.7 }), fsep, [-0.98, 0.8, -0.32], [0, 0, Math.PI / 2]);
+      var b48 = asm('battery48', [0.55, -0.35, 0]);
       for (var bi = 0; bi < 4; bi++) {
-        var bx = -0.58 + (bi % 2) * 0.27, bz = bi < 2 ? -0.16 : 0.16;
-        mk(rbox(0.25, 0.2, 0.17, 0.01), M.battery, b48, [bx, 0.53, bz]);
-        mk(cyl(0.012, 0.02, 12), new THREE.MeshStandardMaterial({ color: 0xc02020 }), b48, [bx + 0.08, 0.64, bz]);
-        mk(cyl(0.012, 0.02, 12), M.black, b48, [bx - 0.08, 0.64, bz]);
+        var bx = -0.5 + (bi % 2) * 0.26, bz = bi < 2 ? -0.16 : 0.16;
+        mk(rbox(0.24, 0.18, 0.16, 0.01), M.battery, b48, [bx, 0.71, bz]);
+        mk(cyl(0.012, 0.02, 12), new THREE.MeshStandardMaterial({ color: 0xc02020 }), b48, [bx + 0.08, 0.81, bz]);
+        mk(cyl(0.012, 0.02, 12), M.black, b48, [bx - 0.08, 0.81, bz]);
       }
-      mk(rbox(0.6, 0.02, 0.4, 0.005), M.black, b48, [-0.45, 0.42, 0]);
-      var b12 = asm('battery12', [0, 0.25, -0.7]);
-      mk(rbox(0.22, 0.18, 0.15, 0.01), M.battery, b12, [-0.95, 0.62, 0.02]);
-      mk(cyl(0.012, 0.02, 12), new THREE.MeshStandardMaterial({ color: 0xc02020 }), b12, [-0.88, 0.72, 0.02]);
+      mk(rbox(0.56, 0.02, 0.4, 0.005), M.black, b48, [-0.37, 0.61, 0]);
+      var b12 = asm('battery12', [0, 0.3, 0.7]);
+      mk(rbox(0.22, 0.17, 0.15, 0.01), M.battery, b12, [-0.88, 0.76, 0.36]);
+      mk(cyl(0.012, 0.02, 12), new THREE.MeshStandardMaterial({ color: 0xc02020 }), b12, [-0.81, 0.855, 0.36]);
 
-      // tyres + wheels
+      // ---------- wheels
       function tyreGeo(r, w, ri) {
-        var pts = [], n = 28;
-        for (var i = 0; i <= n; i++) { var t = i / n, a = -Math.PI / 2 + t * Math.PI; var bulge = Math.cos(a); pts.push(new THREE.Vector2(ri + (r - ri) * (0.55 + 0.45 * bulge), (w / 2) * Math.sin(a) * (0.96 + 0.04 * bulge))); }
-        var g = new THREE.LatheGeometry(pts, 96); g.rotateX(Math.PI / 2); return g;
+        var pts = [], n = 40;
+        for (var i = 0; i <= n; i++) { var t = i / n, a = -Math.PI / 2 + t * Math.PI; var c = Math.cos(a), s = Math.sin(a);
+          var sq = Math.sign(c) * Math.pow(Math.abs(c), 0.35); // squarer turf profile
+          pts.push(new THREE.Vector2(ri + (r - ri) * (0.5 + 0.5 * sq), (w / 2) * Math.sign(s) * Math.pow(Math.abs(s), 0.6))); }
+        var g = new THREE.LatheGeometry(pts, 128); g.rotateX(Math.PI / 2); return g;
       }
-      function rimGeo(r, w) { var p = [[0.02, -w * 0.15], [r * 0.45, -w * 0.15], [r * 0.5, -w * 0.38], [r * 0.95, -w * 0.42], [r, -w * 0.48], [r, w * 0.48], [r * 0.95, w * 0.42], [r * 0.6, w * 0.4], [r * 0.55, w * 0.1], [0.02, w * 0.1]].map(function (q) { return new THREE.Vector2(q[0], q[1]); }); var g = new THREE.LatheGeometry(p, 64); g.rotateX(Math.PI / 2); return g; }
-      function wheel(pid, x, z, r, w, rimR, motor) {
+      function rimGeo(r, w) { var p = [[0.03, w * 0.24], [r * 0.55, w * 0.24], [r * 0.7, w * 0.1], [r * 0.95, -w * 0.36], [r * 1.03, -w * 0.42], [r * 1.03, w * 0.4], [r * 0.95, w * 0.36], [r * 0.72, w * 0.33], [r * 0.6, w * 0.3], [0.03, w * 0.3]].map(function (q) { return new THREE.Vector2(q[0], q[1]); }); var g = new THREE.LatheGeometry(p, 72); g.rotateX(Math.PI / 2); return g; }
+      var WHEELS = [];
+      function wheel(pid, x, z, r, w, rimR, rub, motor) {
         var g = asm(pid, [0, 0, z > 0 ? 0.55 : -0.55]);
         var wg = new THREE.Group(); wg.position.set(x, r, z); g.add(wg);
-        var tm = M.rubber.clone(); tm.bumpMap = tread.clone(); tm.bumpMap.needsUpdate = true; tm.bumpMap.repeat.set(1, 1);
-        var t = new THREE.Mesh(tyreGeo(r, w, rimR), tm); t.castShadow = t.receiveShadow = true; wg.add(t);
-        var rimm = mk(rimGeo(rimR, w), M.rim, wg); rimm.material.side = THREE.DoubleSide;
-        for (var i = 0; i < 6; i++) { var a = i * Math.PI / 3; mk(cyl(0.012, 0.03, 12), M.chrome, wg, [Math.cos(a) * rimR * 0.3, Math.sin(a) * rimR * 0.3, (z > 0 ? 1 : -1) * w * 0.12], [Math.PI / 2, 0, 0]); }
-        mk(cyl(rimR * 0.18, 0.04, 24), M.satin, wg, [0, 0, (z > 0 ? 1 : -1) * w * 0.12], [Math.PI / 2, 0, 0]);
-        if (motor) mk(cyl(0.11, 0.16, 32), M.satin, wg, [0, 0, -(z > 0 ? 1 : -1) * (w / 2 + 0.06)], [Math.PI / 2, 0, 0]);
-        wg.userData.spin = true; return g;
+        var spin = new THREE.Group(); wg.add(spin); WHEELS.push({ g: spin, r: r });
+        mk(tyreGeo(r, w, rimR), rub, spin);
+        var out = z > 0 ? 1 : -1;
+        var rimm = mk(rimGeo(rimR, w), M.rim, spin); rimm.scale.z = out; rimm.material.side = THREE.DoubleSide;
+        for (var i = 0; i < 5; i++) { var a = i * Math.PI * 2 / 5; mk(cyl(0.011, 0.025, 6), M.chrome, spin, [Math.cos(a) * rimR * 0.32, Math.sin(a) * rimR * 0.32, out * w * 0.31], [Math.PI / 2, 0, 0]); }
+        mk(cyl(rimR * 0.2, 0.05, 24), M.darksteel, spin, [0, 0, out * w * 0.3], [Math.PI / 2, 0, 0]);
+        if (motor) { mk(cyl(0.11, 0.16, 32), M.satin, wg, [0, 0, -out * (w / 2 + 0.06)], [Math.PI / 2, 0, 0]); mk(cyl(0.14, 0.05, 32), M.darksteel, wg, [0, 0, -out * (w / 2 + 0.005)], [Math.PI / 2, 0, 0]); }
+        return g;
       }
-      wheel('tyreFL', 0, -FT, FR, FW, 0.152, true); wheel('tyreFR', 0, FT, FR, FW, 0.152, true);
-      wheel('tyreRL', -WB, -RT, RR, RW, 0.127, false); wheel('tyreRR', -WB, RT, RR, RW, 0.127, false);
-      // front fenders (part of the frame)
-      [-FT, FT].forEach(function (z) { var s = new THREE.Shape(); s.absarc(0, 0, FR + 0.06, 0.25, Math.PI - 0.15, false); s.absarc(0, 0, FR + 0.035, Math.PI - 0.15, 0.25, true); var g = new THREE.ExtrudeGeometry(s, { depth: FW + 0.06, bevelEnabled: false, curveSegments: 40 }); g.translate(0, 0, -(FW + 0.06) / 2); mk(g, M.black, frame, [0, FR, z]); });
+      wheel('tyreFL', 0, -FT, FR, FW, 0.152, M.rubberF, true); wheel('tyreFR', 0, FT, FR, FW, 0.152, M.rubberF, true);
+      wheel('tyreRL', -WB, -RT, RR, RW, 0.127, M.rubberR, false); wheel('tyreRR', -WB, RT, RR, RW, 0.127, M.rubberR, false);
 
-      // cutting units
+      // ---------- cutting units (5 in DPA, electric reel drive)
       function reelGeo(R, L, blades, sweep) {
-        var pos = [], idx = [], nL = 40, nW = 3;
+        var pos = [], idx = [], nL = 48, nW = 3;
         for (var b = 0; b < blades; b++) {
           var a0 = b * Math.PI * 2 / blades, base = pos.length / 3;
           for (var i = 0; i <= nL; i++) { var t = i / nL, z = -L / 2 + t * L, a = a0 + sweep * t;
-            for (var j = 0; j <= nW; j++) { var rr = R - 0.016 + 0.016 * j / nW, aa = a + 0.06 * (1 - j / nW); pos.push(Math.cos(aa) * rr, Math.sin(aa) * rr, z); } }
+            for (var j = 0; j <= nW; j++) { var rr = R - 0.018 + 0.018 * j / nW, aa = a + 0.07 * (1 - j / nW); pos.push(Math.cos(aa) * rr, Math.sin(aa) * rr, z); } }
           for (var i2 = 0; i2 < nL; i2++) for (var j2 = 0; j2 < nW; j2++) { var p = base + i2 * (nW + 1) + j2, q = p + nW + 1; idx.push(p, q, p + 1, q, q + 1, p + 1); }
         }
         var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
       }
-      function wiehle(r, L) { var p = [], n = 56; for (var i = 0; i <= n; i++) { var z = -L / 2 + L * i / n; var rr = (i % 2) ? r * 0.82 : r; if (i === 0 || i === n) rr = r * 0.7; p.push(new THREE.Vector2(rr, z)); } var g = new THREE.LatheGeometry(p, 40); g.rotateX(Math.PI / 2); return g; }
-      var CU = {};
-      function cuttingUnit(pid, x, z, ex) {
+      function wiehle(r, L) { var p = [], n = 90; for (var i = 0; i <= n; i++) { var z = -L / 2 + L * i / n; var rr = (i % 3 === 0) ? r * 0.84 : r; if (i === 0 || i === n) rr = r * 0.6; p.push(new THREE.Vector2(rr, z)); } var g = new THREE.LatheGeometry(p, 40); g.rotateX(Math.PI / 2); return g; }
+      var CU = {}, REELS = [];
+      function cuttingUnit(pid, x, z, ex, motorSide) {
         var g = asm(pid, ex); var u = new THREE.Group(); u.position.set(x, 0, z); g.add(u);
-        var L = 0.559, R = 0.0635, subs = {};
+        var L = 0.559, R = 0.0635, subs = {}, ms = motorSide;
         function sub(name, sx) { var s = new THREE.Group(); s.userData.sub = name; u.add(s); subs[name] = { g: s, ex: new THREE.Vector3(sx[0], sx[1], sx[2]) }; return s; }
-        var fr = sub('cuframe', [0, 0.32, 0]);
-        [-1, 1].forEach(function (s) { mk(rbox(0.36, 0.2, 0.014, 0.01), M.red, fr, [0, 0.13, s * (L / 2 + 0.03)]); mk(cyl(0.022, 0.03, 16), M.chrome, fr, [0.1, 0.18, s * (L / 2 + 0.045)], [Math.PI / 2, 0, 0]); });
-        mk(rbox(0.06, 0.05, L + 0.08, 0.015), M.red, fr, [-0.05, 0.24, 0]);
-        var sh = new THREE.Shape(); sh.absarc(0, 0, R + 0.03, 0.3, Math.PI * 0.95, false); sh.absarc(0, 0, R + 0.022, Math.PI * 0.95, 0.3, true);
-        var shg = new THREE.ExtrudeGeometry(sh, { depth: L + 0.04, bevelEnabled: false, curveSegments: 24 }); shg.translate(0, 0, -(L + 0.04) / 2); mk(shg, M.red, fr, [0, 0.13, 0]); // shield
-        mk(rbox(0.12, 0.05, 0.16, 0.015), M.black, fr, [0.0, 0.29, 0]); // carrier frame
-        var reel = sub('reel', [0, 0.14, 0]);
-        var rg = reelGeo(R, L - 0.02, 11, 0.55); var rm = mk(rg, M.steel, reel, [0, 0.13, 0]); rm.material.side = THREE.DoubleSide; rm.userData.spinReel = true;
-        mk(cyl(0.012, L + 0.04, 16), M.brushed, reel, [0, 0.13, 0], [Math.PI / 2, 0, 0]);
-        for (var sp2 = -2; sp2 <= 2; sp2++) mk(cyl(R - 0.004, 0.004, 24), M.brushed, reel, [0, 0.13, sp2 * (L / 4.6)], [Math.PI / 2, 0, 0]);
-        var bk = sub('bedknife', [0.05, -0.12, 0]);
-        mk(rbox(0.07, 0.02, L, 0.004), M.satin, bk, [0.005, 0.06, 0], [0, 0, -0.18]);
-        mk(rbox(0.05, 0.004, L - 0.01, 0.001), M.chrome, bk, [0.035, 0.068, 0], [0, 0, -0.18]);
-        for (var sc2 = 0; sc2 < 8; sc2++) mk(cyl(0.006, 0.006, 8), M.chrome, bk, [-0.005, 0.072, -L / 2 + 0.035 + sc2 * (L - 0.07) / 7]);
-        var fro = sub('froller', [0.2, -0.04, 0]);
-        mk(wiehle(0.032, L), M.brushed, fro, [0.16, 0.032, 0]);
-        var rro = sub('rroller', [-0.2, -0.04, 0]);
-        mk(cyl(0.032, L, 32), M.brushed, rro, [-0.16, 0.032, 0], [Math.PI / 2, 0, 0]);
-        [[0.16], [-0.16]].forEach(function (p) { [-1, 1].forEach(function (s) { mk(rbox(0.06, 0.08, 0.012, 0.006), M.red, p[0] > 0 ? fro : rro, [p[0] * 0.8, 0.07, s * (L / 2 + 0.02)]); }); });
-        var mo = sub('motor', [0, 0, z >= 0 ? 0.22 : -0.22]);
-        var mz = (z >= 0 ? 1 : -1) * (L / 2 + 0.09);
-        mk(cyl(0.055, 0.12, 32), M.satin, mo, [0, 0.13, mz], [Math.PI / 2, 0, 0]);
-        mk(cyl(0.057, 0.015, 32), M.red, mo, [0, 0.13, mz + (z >= 0 ? 0.06 : -0.06)], [Math.PI / 2, 0, 0]);
-        mk(tube([[0, 0.18, mz], [-0.04, 0.3, mz * 0.9], [-0.1, 0.36, mz * 0.6]], 0.008), new THREE.MeshStandardMaterial({ color: 0xe06a10, roughness: 0.6 }), mo);
+        var fr = sub('cuframe', [0, 0.3, 0]);
+        var side = rshape([[-0.2, 0.02], [0.22, 0.02], [0.22, 0.1], [0.08, 0.2], [-0.12, 0.2], [-0.2, 0.12]], [0.03, 0.04, 0.05, 0.04, 0.04, 0.03]);
+        [-1, 1].forEach(function (s) { mk(slab(side, 0.028, 0.008, 3), M.castAl, fr, [0, 0, s * (L / 2 + 0.024)]); mk(cyl(0.016, 0.03, 12), M.chrome, fr, [0.13, 0.15, s * (L / 2 + 0.045)], [Math.PI / 2, 0, 0]); mk(cyl(0.016, 0.03, 12), M.chrome, fr, [-0.1, 0.12, s * (L / 2 + 0.045)], [Math.PI / 2, 0, 0]); });
+        mk(rbox(0.05, 0.04, L + 0.05, 0.012), M.redFrame, fr, [-0.06, 0.2, 0]); // rear cross tube
+        mk(rbox(0.04, 0.03, L + 0.05, 0.01), M.darksteel, fr, [0.1, 0.17, 0]); // front cross tube
+        var sh = new THREE.Shape(); sh.absarc(0, 0, R + 0.03, 0.4, Math.PI * 0.92, false); sh.absarc(0, 0, R + 0.024, Math.PI * 0.92, 0.4, true);
+        var shg = new THREE.ExtrudeGeometry(sh, { depth: L, bevelEnabled: false, curveSegments: 24 }); shg.translate(0, 0, -L / 2); mk(shg, M.black, fr, [0, 0.085, 0]); // shield
+        // carrier frame (yoke) and pivot
+        mk(slab(rshape([[-0.12, 0.23], [0.1, 0.23], [0.06, 0.29], [-0.08, 0.29]], 0.02), 0.34, 0.012), M.black, fr);
+        mk(cyl(0.03, 0.08, 20), M.satin, fr, [-0.02, 0.32, 0]);
+        mk(rbox(0.06, 0.012, 0.04, 0.004), M.yellow, fr, [0.0, 0.295, 0.12]);
+        var reel = sub('reel', [0, 0.16, 0]);
+        var rm = mk(reelGeo(R, L - 0.02, 11, 0.6), M.steel, reel, [0, 0.085, 0]); rm.material.side = THREE.DoubleSide; REELS.push(rm);
+        mk(cyl(0.012, L + 0.04, 16), M.brushed, reel, [0, 0.085, 0], [Math.PI / 2, 0, 0]);
+        for (var sp2 = -2; sp2 <= 2; sp2++) mk(cyl(R - 0.006, 0.004, 24), M.darksteel, reel, [0, 0.085, sp2 * (L / 4.6)], [Math.PI / 2, 0, 0]);
+        var bkf = sub('bedknife', [0.06, -0.14, 0]);
+        mk(rbox(0.08, 0.025, L, 0.004), M.darksteel, bkf, [0.01, 0.025, 0], [0, 0, -0.15]);
+        mk(rbox(0.05, 0.004, L - 0.01, 0.001), M.chrome, bkf, [0.04, 0.036, 0], [0, 0, -0.15]);
+        for (var sc2 = 0; sc2 < 8; sc2++) mk(cyl(0.005, 0.006, 8), M.chrome, bkf, [0.0, 0.04, -L / 2 + 0.035 + sc2 * (L - 0.07) / 7]);
+        var fro = sub('froller', [0.22, -0.03, 0]);
+        mk(wiehle(0.038, L + 0.02), M.black, fro, [0.17, 0.038, 0]);
+        var rro = sub('rroller', [-0.22, -0.03, 0]);
+        mk(cyl(0.038, L + 0.02, 40), M.brushed, rro, [-0.16, 0.038, 0], [Math.PI / 2, 0, 0]);
+        [[0.17, fro], [-0.16, rro]].forEach(function (p) { [-1, 1].forEach(function (s) { mk(rbox(0.07, 0.07, 0.014, 0.008), M.castAl, p[1], [p[0], 0.06, s * (L / 2 + 0.045)]); }); });
+        var mo = sub('motor', [0, 0, ms * 0.22]);
+        var mz = ms * (L / 2 + 0.1);
+        mk(cyl(0.06, 0.1, 40), M.castAl, mo, [0, 0.085, mz], [Math.PI / 2, 0, 0]);
+        for (var f = 0; f < 12; f++) { var fa = f * Math.PI / 6; mk(rbox(0.012, 0.012, 0.09, 0.003), M.castAl, mo, [Math.cos(fa) * 0.064, 0.085 + Math.sin(fa) * 0.064, mz]); }
+        mk(cyl(0.05, 0.02, 32), M.black, mo, [0, 0.085, mz + ms * 0.06], [Math.PI / 2, 0, 0]);
+        mk(rbox(0.05, 0.04, 0.05, 0.01), M.black, mo, [-0.02, 0.15, mz]);
+        mk(tube([[-0.02, 0.17, mz], [-0.06, 0.3, mz * 0.9], [-0.1, 0.4, mz * 0.5]], 0.009), M.hose, mo);
+        mk(rbox(0.08, 0.08, 0.05, 0.01), M.darksteel, fr, [0, 0.085, -ms * (L / 2 + 0.07)]); // counterweight
         CU[pid] = subs; return g;
       }
-      var FX0 = 0.62, RX0 = -0.62;
-      cuttingUnit('cu4', FX0, -0.97, [0.35, 0.1, -0.35]);
-      cuttingUnit('cu1', FX0 + 0.06, 0, [0.6, 0.1, 0]);
-      cuttingUnit('cu5', FX0, 0.97, [0.35, 0.1, 0.35]);
-      cuttingUnit('cu2', RX0, -0.485, [0, -0.05, -0.75]);
-      cuttingUnit('cu3', RX0, 0.485, [0, -0.05, 0.75]);
-      // lift arms (front) and rear arms
+      var FX0 = 0.66, RX0 = -0.9;
+      cuttingUnit('cu4', FX0, -0.97, [0.4, 0.1, -0.35], -1);
+      cuttingUnit('cu1', FX0 + 0.04, 0, [0.65, 0.1, 0], 1);
+      cuttingUnit('cu5', FX0, 0.97, [0.4, 0.1, 0.35], 1);
+      cuttingUnit('cu2', RX0, -0.485, [0, -0.05, -0.8], -1);
+      cuttingUnit('cu3', RX0, 0.485, [0, -0.05, 0.8], 1);
+
+      // ---------- lift arms (red), cylinders, cables
       var lift = asm('liftF', [0.3, 0.2, 0]);
-      [[-0.97, -0.62], [0, 0], [0.97, 0.62]].forEach(function (p) {
-        mk(tube([[0.38, 0.55, p[1] * 0.55], [0.5, 0.52, p[1] * 0.8], [FX0 + (p[0] === 0 ? 0.06 : 0), 0.4, p[0]]], 0.025), M.black, lift);
+      function arm(a, b, w) { between(function (l) { return rbox(w || 0.045, l, 0.045, 0.012); }, M.redFrame, lift, a, b); }
+      arm([0.4, 0.72, -0.28], [FX0 - 0.02, 0.36, -0.97]); arm([0.4, 0.72, 0.28], [FX0 - 0.02, 0.36, 0.97]); arm([0.5, 0.74, 0], [FX0 + 0.02, 0.36, 0]);
+      [-0.97, 0, 0.97].forEach(function (zz) { mk(rbox(0.08, 0.05, 0.12, 0.015), M.redFrame, lift, [FX0 - 0.02 + (zz === 0 ? 0.04 : 0), 0.36, zz]); });
+      [-0.22, 0.22].forEach(function (z) { between(function (l) { return cyl(0.028, l, 20); }, M.satin, lift, [0.3, 0.84, z], [0.48, 0.66, z * 1.6]); between(function (l) { return cyl(0.013, l, 16); }, M.chrome, lift, [0.45, 0.69, z * 1.5], [0.56, 0.6, z * 1.9]); });
+      [[-0.97, -1], [0, 1], [0.97, 1]].forEach(function (p) { var mz = p[0] + p[1] * (0.559 / 2 + 0.1); mk(tube([[0.45, 0.82, p[0] * 0.25], [0.6, 0.62, p[0] * 0.6 + p[1] * 0.1], [FX0 - 0.05, 0.4, mz * 0.95], [FX0 - 0.04, 0.27, mz]], 0.012, 60), M.hose, lift); });
+      var liftR = asm('liftR', [-0.2, -0.05, 0]);
+      [-0.485, 0.485].forEach(function (z) {
+        between(function (l) { return rbox(0.045, l, 0.045, 0.012); }, M.redFrame, liftR, [-0.5, 0.6, z * 0.6], [RX0 + 0.02, 0.36, z]);
+        mk(rbox(0.08, 0.05, 0.12, 0.015), M.redFrame, liftR, [RX0 + 0.02, 0.36, z]);
+        var mz = z + Math.sign(z) * (0.559 / 2 + 0.1); mk(tube([[-0.45, 0.62, z * 0.5], [-0.7, 0.5, z * 0.9], [RX0 - 0.02, 0.4, mz * 0.97], [RX0 - 0.03, 0.27, mz]], 0.012, 60), M.hose, liftR);
       });
-      [-0.3, 0.3].forEach(function (z) { mk(cyl(0.03, 0.26, 24), M.satin, lift, [0.36, 0.62, z], [0, 0, 1.1]); mk(cyl(0.014, 0.16, 16), M.chrome, lift, [0.47, 0.57, z], [0, 0, 1.1]); });
-      [-0.485, 0.485].forEach(function (z) { mk(tube([[-0.2, 0.42, z * 0.5], [-0.4, 0.42, z * 0.9], [RX0, 0.38, z]], 0.022), M.black, frame); });
 
       // ground
       var ground = new THREE.Mesh(new THREE.CircleGeometry(12, 96), new THREE.MeshStandardMaterial({ map: grass, roughness: 0.95, metalness: 0 }));
@@ -1843,8 +1933,8 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       var contact = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 3.4), new THREE.ShadowMaterial({ opacity: dark ? 0.55 : 0.32 }));
       contact.rotation.x = -Math.PI / 2; contact.position.y = 0.001; contact.receiveShadow = true; contact.visible = !showGround; scene.add(contact);
 
-      // centre machine on its footprint
-      machine.position.x = (2.819 / 2) - (FX0 + 0.06 + 0.2);
+      // centre machine on its footprint (front of front units +0.98, rear bumper -1.91)
+      machine.position.x = -(0.98 - 1.91) / 2;
       Object.keys(ASM).forEach(function (k) { ASM[k].home = ASM[k].g.position.clone(); });
       Object.keys(CU).forEach(function (k) { Object.keys(CU[k]).forEach(function (s) { CU[k][s].home = CU[k][s].g.position.clone(); }); });
 
@@ -1873,8 +1963,8 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       cv.addEventListener('pointerleave', function () { setHover(null); });
 
       // ---- picking
-      var exT = 0, exGoal = 0, xray = false, blowOne = null, setXray = function () {};
-      var UNDER_HOOD = ['engine', 'oilfilter', 'belt', 'generator', 'aircleaner', 'radiator', 'fueltank', 'fuelsep', 'hydtank', 'battery12'];
+      var exT = 0, exGoal = 0, xray = false, blowOne = null, mowing = false, setXray = function () {};
+      var UNDER_HOOD = ['engine', 'oilfilter', 'belt', 'generator', 'aircleaner', 'radiator', 'fuelsep', 'battery12'];
       var ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hovered = null, selected = null, selSub = null;
       function pickAt(e) { var r = cv.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera);
         var hits = ray.intersectObjects(pickables, false).filter(function (h) { return h.object.visible && !(xray && h.object.userData.pick === 'hood'); }); return hits[0] ? hits[0].object : null; }
@@ -1908,8 +1998,10 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       if (xb) xb.addEventListener('click', function () { setXray(!xray); });
       if (gb) gb.addEventListener('click', function () { showGround = !showGround; ground.visible = showGround; contact.visible = !showGround; gb.setAttribute('aria-pressed', showGround); });
       if (rb) rb.addEventListener('click', function () { goal.r = 6.2; goal.th = 0.85; goal.ph = 1.12; goal.t.set(0, 0.75, 0); exGoal = 0; blowOne = null; if (slider) slider.value = 0; select(null); });
+      var mb = root.querySelector('.x3-mow'); if (mb) mb.addEventListener('click', function () { mowing = !mowing; mb.setAttribute('aria-pressed', mowing); if (mowing) { exGoal = 0; blowOne = null; if (slider) slider.value = 0; } });
+      api.mow = function (v) { mowing = v; };
       api.blowUnit = function (pid) { blowOne = pid; exGoal = 1; if (slider) slider.value = 100; select(pid, null, true); };
-      var LBL = ['engine', 'hood', 'rops', 'seat', 'aircleaner', 'radiator', 'battery48', 'hydtank', 'fueltank', 'generator', 'cu1', 'cu2', 'cu3', 'cu4', 'cu5', 'tyreFR', 'console'];
+      var LBL = ['engine', 'hood', 'rops', 'seat', 'aircleaner', 'radiator', 'battery48', 'hydtank', 'fueltank', 'generator', 'cu1', 'cu2', 'cu3', 'cu4', 'cu5', 'tyreFR', 'console', 'lights', 'steering'];
       var lblEls = {};
       LBL.forEach(function (k) { var d = el('button', 'x3-lbl', COMP[k].name.replace(/^Cutting unit, /, 'CU ').replace(/:.*$/, '').replace(/ \(.*\)$/, '')); d.addEventListener('click', function () { select(k, null, true); }); labels.appendChild(d); lblEls[k] = d; });
       var tmpV = new THREE.Vector3();
@@ -1932,7 +2024,8 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         var a1 = ease(Math.min(1, exT * 2)), a2 = ease(Math.max(0, exT * 2 - 1));
         Object.keys(ASM).forEach(function (id) { var A = ASM[id]; var f = blowOne ? (id === blowOne ? 0.6 : 0) : a1; A.g.position.copy(A.home).addScaledVector(A.ex, f); });
         Object.keys(CU).forEach(function (id) { var f = blowOne ? (id === blowOne ? a2 : 0) : a2; Object.keys(CU[id]).forEach(function (s) { var S = CU[id][s]; S.g.position.copy(S.home).addScaledVector(S.ex, f * 1.4); }); });
-        machine.traverse(function (o) { if (o.userData && o.userData.spinReel) o.rotation.z = t * (exT > 0.5 ? 1.2 : 0); });
+        var reelSpd = mowing ? 30 : (exT > 0.5 ? 1.2 : 0); REELS.forEach(function (r) { r.rotation.z += reelSpd * dt; });
+        if (mowing) { var v = 1.6; WHEELS.forEach(function (w) { w.g.rotation.z -= v / w.r * dt; }); grass.offset.x -= v * dt / 6; }
         if (selected) { var pulse = 0.5 + 0.5 * Math.sin(t * 4); glow(selected, selSub, new THREE.Color(0x8a3c00).multiplyScalar(0.55 + 0.7 * pulse).getHex()); }
         // labels
         var showL = exT > 0.25; var r = stage.getBoundingClientRect();
