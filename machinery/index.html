@@ -482,7 +482,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   </style>
   <div class="mx-card">
     <div class="mx-row"><h3 class="x3-title">Greensmaster eTriFlex 3370</h3><span class="mx-note x3-sub">Toro Greens Mowers 1 and 2 · model 04591</span></div>
-    <div class="x3-models" role="group" aria-label="Machine"><button class="x3-tg x3-model" data-model="3370" aria-pressed="true">Greensmaster eTriFlex 3370</button><button class="x3-tg x3-model" data-model="5010h" aria-pressed="false">Reelmaster 5010-H</button></div>
+    <div class="x3-models" role="group" aria-label="Machine"><button class="x3-tg x3-model" data-model="3370" aria-pressed="true">Greensmaster eTriFlex 3370</button><button class="x3-tg x3-model" data-model="5010h" aria-pressed="false">Reelmaster 5010-H</button><button class="x3-tg x3-model" data-model="flex2120" aria-pressed="false">Greensmaster Flex 2120</button><button class="x3-tg x3-model" data-model="mdx" aria-pressed="false">Workman MDX</button><button class="x3-tg x3-model" data-model="gtx" aria-pressed="false">Workman GTX Electric</button><button class="x3-tg x3-model" data-model="jd2550" aria-pressed="false">JD 2550 PrecisionCut</button><button class="x3-tg x3-model" data-model="gm4300" aria-pressed="false">Groundsmaster 4300-D</button><button class="x3-tg x3-model" data-model="mp5800" aria-pressed="false">Multi Pro 5800-D</button></div>
     <p class="mx-note x3-help">Hover over the photo to find a part, click it for part numbers, price, what is on the shelf and where to order. Slide to blow the machine apart.</p>
   </div>
   <div class="x3" id="x3">
@@ -1318,9 +1318,11 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   });
 })();
 </script>
-<script>(function () { var gh = /github\.io$/.test(location.hostname); window.MX3D_PHOTO_SRC = { '3370': gh ? 'photo3370.json' : '/_blob/8edfff7ebbdcaa973a36649b9db59a50', '5010h': gh ? 'photo5010h.json' : '/_blob/fe02e64818e5bf74769105604e3e414f' }; })();</script>
+<script>(function () { var gh = /github\.io$/.test(location.hostname); window.MX3D_PHOTO_SRC = { '3370': gh ? 'photo3370.json' : '/_blob/8edfff7ebbdcaa973a36649b9db59a50', '5010h': gh ? 'photo5010h.json' : '/_blob/fe02e64818e5bf74769105604e3e414f', 'flex2120': gh ? 'photoflex2120.json' : '/_blob/17d11da7fb05cdcaa194f05d7d19bec4', 'mdx': gh ? 'photomdx.json' : '/_blob/39193cd144726dd04d615e6c505094d7', 'gtx': gh ? 'photogtx.json' : '/_blob/7fede5609076305bbf377d7ed9566fda', 'jd2550': gh ? 'photojd2550.json' : '/_blob/ad7f04c5934d2c5525c8f9b02a898ec8', 'gm4300': gh ? 'photogm4300.json' : '/_blob/5988cca4e6ec0c0ac79fead011838aa2', 'mp5800': gh ? 'photomp5800.json' : '/_blob/6ad6a475a1ccad1f8e680f393faa1725' }; })();</script>
 <script>
 /* Ranfurlie machinery 3D parts explorer - Toro Reelmaster 5010-H (03950).
+14 Oct 2026: photo explorer for Flex 2120, Workman MDX, Workman GTX, JD 2550, Groundsmaster 4300-D, Multi Pro 5800-D.
+Those six are 'lazy': their parts data is inside machinery/photo<id>.json (key 'model'), masters in machinery/photos/.
 Procedural model built from Toro's published dimensions (spec sheet / product page 03950):
 length 2819 mm, wheelbase 1524 mm, transport width 2337 mm, width of cut 2540 mm, ROPS 2172 mm, seat 1600 mm,
 front tyres 26.5x14-12, rear 20x12-10, five 22 in (559 mm) 5 in DPA cutting units. Shapes are simplified.
@@ -1328,7 +1330,6 @@ Part numbers: machinery bible (models/toro_reelmaster_5010h.json, parts catalogs
 Live price / on-hand come from the dashboard's m_catalog dataset when present. */
 (function () {
 'use strict';
-
 // ------------------------------------------------------------------ parts data
 var CAT_PC1 = 'https://www.toro.com/getpub/253209';   // Parts catalog 3471-213 (Mowers 1 and 3)
 var CAT_PC2 = 'https://www.toro.com/getpub/270027';   // Parts catalog 3478-264 (Mower 2)
@@ -1374,7 +1375,6 @@ var SNAP = {
 '137-8427': ['Reel assy 5in 11-blade (22in)', null, null, 0, 'Toro dealer', null, '']
 };
 var STOCK_EXTRA = { '108-3841': [24.0, 1], '93-2242': [233.33, 1] };
-
 // Pickable components: id -> description + part numbers
 var COMP = {
 hood: { name: 'Hood and rear body panels', sys: 'Body', desc: 'Lift the hood for the engine, air cleaner and radiator. Blow debris off the rear screen and radiator daily.', parts: [], cat: CAT_PC1 },
@@ -1414,7 +1414,6 @@ rroller: { name: 'Rear roller', desc: 'Greasable. Same rebuild kit as the front 
 motor: { name: 'Reel motor (48 V electric)', desc: 'Direct electric drive, nine reel speed settings plus onboard backlap. Fused on the 48 V circuit.', parts: ['139-8482'] },
 cuframe: { name: 'Cutting unit frame and side plates', desc: 'DPA (dual precision adjustment) at each end sets reel-to-bedknife contact.', parts: ['03623'] }
 };
-
 // ------------------------------------------------------------------ Greensmaster eTriFlex 3370 data
 var G_PC = 'https://www.toro.com/getpub/283322';   // Parts catalog 3471-256 (Mower 2, s/n 418200000+)
 var G_PC1 = 'https://www.toro.com/getpub/283333';  // Parts catalog 3461-607 (Mower 1 if 04591)
@@ -1476,22 +1475,25 @@ var G_SNAP = {
 '138-8905': ['Reel motor, electric', null, null, 0, 'Toro Australia dealer', null, ''],
 '139-8565': ['Wheel motor assy RH / LH (with gearbox)', null, null, 0, 'Toro Australia dealer', null, '']
 };
-
 var MODELS = {
 '5010h': { id: '5010h', slug: 'toro_reelmaster_5010h', title: 'Reelmaster 5010-H', sub: 'Fairway Mowers 1, 2 and 3 · model 03950', COMP: COMP, SUB: SUB, EXTRA: EXTRA, SNAP: SNAP, STOCK: STOCK_EXTRA, LOOKUP: LOOKUP, OM: CAT_OM,
 LBL: ['engine', 'hood', 'rops', 'seat', 'aircleaner', 'radiator', 'battery48', 'hydtank', 'fueltank', 'generator', 'cu1', 'cu2', 'cu3', 'cu4', 'cu5', 'tyreFR', 'console', 'lights', 'steering'], UNDER: ['engine', 'oilfilter', 'belt', 'generator', 'aircleaner', 'radiator', 'fuelsep', 'battery12'], xray: 'hood', xrayLabel: 'See through hood', cam: { r: 6.2, th: 0.85, ph: 1.12, t: [0, 0.75, 0] },
 note: "Part outlines on the photo are drawn by hand and approximate; the engine, generator, batteries and filters sit under the hood and are in the parts list. Part numbers come from parts books 3471-213 (Mowers 1 and 3), 3478-264 (Mower 2) and cutting-unit book 3451-988." },
 '3370': { id: '3370', slug: 'toro_etriflex_3370', title: 'Greensmaster eTriFlex 3370', sub: 'Toro Greens Mowers 1 and 2 · model 04591', COMP: G_COMP, SUB: G_SUB, EXTRA: G_EXTRA, SNAP: G_SNAP, STOCK: {}, LOOKUP: 'https://www.toro.com/en/parts/partdetails?id=58293', OM: G_OM,
 LBL: ['body', 'batteries', 'rops', 'seat', 'steering', 'console', 'cu1', 'cu2', 'cu3', 'tyreFR', 'tyreR', 'lift', 'dcdc'], UNDER: ['batteries', 'dcdc'], xray: 'body', xrayLabel: 'See through body', cam: { r: 4.6, th: 0.85, ph: 1.12, t: [0, 0.6, 0] },
-note: "Part outlines on the photo are drawn by hand and approximate. Part numbers come from parts books 3471-256 (Mower 2) and 3461-607, and cutting-unit book 3443-444. Mower 1: check the model plate (04590 or 04591) before ordering battery or charger parts." }
+note: "Part outlines on the photo are drawn by hand and approximate. Part numbers come from parts books 3471-256 (Mower 2) and 3461-607, and cutting-unit book 3443-444. Mower 1: check the model plate (04590 or 04591) before ordering battery or charger parts." },
+'flex2120': { id: 'flex2120', lazy: true, slug: 'toro_flex_2120', title: "Greensmaster Flex 2120", sub: "Greens Mower - Walk Behind 2 · model 04044", note: '' },
+'mdx': { id: 'mdx', lazy: true, slug: 'toro_workman_mdx', title: "Workman MDX", sub: "Workman MDX 1 to 5 · model 07235TC", note: '' },
+'gtx': { id: 'gtx', lazy: true, slug: 'toro_workman_gtx', title: "Workman GTX Electric", sub: "Workman GTX 1 and 2 (07043 lead-acid), 3 and 4 (07433TC lithium)", note: '' },
+'jd2550': { id: 'jd2550', lazy: true, slug: 'jd_2550_precisioncut', title: "John Deere 2550 PrecisionCut", sub: "JD Greens Mower 1", note: '' },
+'gm4300': { id: 'gm4300', lazy: true, slug: 'toro_groundsmaster_4300d', title: "Groundsmaster 4300-D", sub: "Groundsmaster 4300 1 · model 30864", note: '' },
+'mp5800': { id: 'mp5800', lazy: true, slug: 'toro_multipro_5800', title: "Multi Pro 5800-D", sub: "5800 1 · model 41393", note: '' }
 };
 var CUR = MODELS['5010h'];
-
 // ------------------------------------------------------------------ helpers
 function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
 function money(v) { return v == null ? null : '$' + (v < 10 ? v.toFixed(2) : v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')); }
 function norm(p) { return String(p || '').replace(/^toro\s*/i, '').replace(/[\s-]/g, '').toUpperCase(); }
-
 function partInfo(no) {
 var live = null;
 try {
@@ -1509,7 +1511,6 @@ var x = EXTRA[no] || { name: no, note: '' };
 var st = STOCK_EXTRA[no];
 return { no: no, name: x.name, price: st ? st[0] : null, kind: st ? 'genuine' : null, onHand: st ? st[1] : 0, supplier: 'Toro dealer', url: null, every: '', note: x.note };
 }
-
 // ------------------------------------------------------------------ canvas textures
 function canvasTex(THREE, w, h, draw, srgb, rep) {
 var c = document.createElement('canvas'); c.width = w; c.height = h; var g = c.getContext('2d'); draw(g, w, h);
@@ -1521,13 +1522,15 @@ var id = g.getImageData(0, 0, w, h), d = id.data;
 for (var i = 0; i < d.length; i += 4) { var n = (Math.random() - 0.5) * amt; d[i] = Math.max(0, Math.min(255, d[i] + n)); d[i + 1] = Math.max(0, Math.min(255, d[i + 1] + n)); d[i + 2] = Math.max(0, Math.min(255, d[i + 2] + n)); }
 g.putImageData(id, 0, 0);
 }
-
 // ------------------------------------------------------------------ mount
 function mount(root, opts) {
 opts = opts || {};
 if (root.__mx3d) { root.__mx3d.resize(); return root.__mx3d; }
 var D = MODELS[root.dataset.model] || MODELS['3370']; CUR = D;
-COMP = D.COMP; SUB = D.SUB; EXTRA = D.EXTRA; SNAP = D.SNAP; STOCK_EXTRA = D.STOCK; LOOKUP = D.LOOKUP; CAT_OM = D.OM;
+// lazy models: parts data ships inside the photo file (keeps the page small)
+var PL = D.lazy && window.MX3D_PHOTOS && window.MX3D_PHOTOS[D.id];
+if (PL && PL.model) { for (var mk in PL.model) D[mk] = PL.model[mk]; D.lazy = false; }
+COMP = D.COMP || {}; SUB = D.SUB || {}; EXTRA = D.EXTRA || {}; SNAP = D.SNAP || {}; STOCK_EXTRA = D.STOCK || {}; LOOKUP = D.LOOKUP; CAT_OM = D.OM;
 (function () { var host = root.closest('section') || root; var t = host.querySelector('.x3-title'), s2 = host.querySelector('.x3-sub'), n = root.querySelector('.x3-note'), xb0 = root.querySelector('.x3-xray');
 if (t) t.textContent = D.title; if (s2) s2.textContent = D.sub; if (n) n.textContent = D.note + ' Prices are ex GST: club cost from workshop stock first, then AU retail, then an aftermarket equivalent. Stock counts update hourly.'; var hp = host.querySelector('.x3-help'); if (hp) hp.textContent = 'Hover over the photo to find a part, click it for part numbers, price, what is on the shelf and where to order. Slide to blow the machine apart; click a cutting unit and choose Blow up this unit to pull just that one out.';
 host.querySelectorAll('.x3-model').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.model === D.id);
@@ -1613,7 +1616,6 @@ frame();
 status.hidden = false; status.textContent = 'Photo for this machine coming soon. The parts list on the right works now: click any component for part numbers, price and stock.';
 buildList();
 return api;
-
 var selectFn = null;
 function buildList() {
 var list = root.querySelector('.x3-list'); list.replaceChildren();
@@ -1659,14 +1661,14 @@ add('Note', p.note);
 body.appendChild(dl);
 var acts = el('div', 'x3-acts');
 if (p.url) { var a = el('a', 'x3-btn pri', /amacron/.test(p.url) ? 'Order from Amacron' : (/tines/.test(p.url) ? 'Order from Turftines' : (/ebay/.test(p.url) ? 'View on eBay' : 'Order online'))); a.href = p.url; a.target = '_blank'; a.rel = 'noopener'; acts.appendChild(a); }
-var tl2 = el('a', 'x3-btn', 'Toro parts lookup'); tl2.href = LOOKUP; tl2.target = '_blank'; tl2.rel = 'noopener'; acts.appendChild(tl2);
+var tl2 = el('a', 'x3-btn', CUR.lookupLabel || 'Toro parts lookup'); tl2.href = LOOKUP; tl2.target = '_blank'; tl2.rel = 'noopener'; acts.appendChild(tl2);
 var cp = el('button', 'x3-btn', 'Copy part no.'); cp.addEventListener('click', function () { try { navigator.clipboard.writeText(no); cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy part no.'; }, 1200); } catch (e) {} }); acts.appendChild(cp);
 body.appendChild(acts); row.appendChild(body); tl.appendChild(row);
 });
 panel.appendChild(tl);
 } else panel.appendChild(el('p', 'x3-pn', 'No service or wear parts listed for this component. Use the parts book for structural parts.'));
 var foot = el('div', 'x3-pf');
-var cl = el('a', null, 'Parts book (PDF)'); cl.href = c.cat || CAT_PC1; cl.target = '_blank'; cl.rel = 'noopener'; foot.appendChild(cl);
+var cl = el('a', null, CUR.catLabel || 'Parts book (PDF)'); cl.href = c.cat || CAT_PC1; cl.target = '_blank'; cl.rel = 'noopener'; foot.appendChild(cl);
 foot.appendChild(document.createTextNode(' · '));
 var om = el('a', null, "Operator's manual"); om.href = CAT_OM; om.target = '_blank'; om.rel = 'noopener'; foot.appendChild(om);
 if (/^cu/.test(pid) && !sub) { foot.appendChild(document.createTextNode(' · ')); var bx = el('button', 'x3-link', 'Blow up this unit'); bx.addEventListener('click', function () { if (api.blowUnit) api.blowUnit(pid); }); foot.appendChild(bx); }
@@ -1676,7 +1678,6 @@ root.querySelectorAll('.x3-li').forEach(function (b) { b.classList.toggle('on', 
 api.showPanel = showPanel;
 return api;
 }
-
 window.MX3D = { mount: mount, MODELS: MODELS };
 })();
 
