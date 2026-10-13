@@ -263,7 +263,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   <button class="mx-tab" role="tab" id="tab-usage" data-page="usage" aria-selected="false">Usage</button>
   <button class="mx-tab" role="tab" id="tab-cutting" data-page="cutting" aria-selected="false">Cutting units</button>
   <button class="mx-tab" role="tab" id="tab-parts" data-page="parts" aria-selected="false">Parts</button>
-  
+  <button class="mx-tab" role="tab" id="tab-explore" data-page="explore" aria-selected="false">Parts explorer</button>
   <button class="mx-tab" role="tab" id="tab-costs" data-page="costs" aria-selected="false">Costs</button>
   <button class="mx-tab" role="tab" id="tab-history" data-page="history" aria-selected="false">History</button>
   <button class="mx-tab" role="tab" id="tab-checks" data-page="checks" aria-selected="false">Checks &amp; sources</button>
@@ -415,6 +415,91 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   </div>
 </section>
 
+<!-- 3D EXPLORER --><!-- parts explorer (photo) -->
+<section class="mx-page" id="explore" role="tabpanel" aria-labelledby="tab-explore" hidden>
+  <style>
+  .x3 [hidden]{display:none!important;}
+  .x3{display:grid;grid-template-columns:minmax(0,1fr) 22rem;gap:var(--cds-gap-md);align-items:start;}
+  @media (max-width:60rem){.x3{grid-template-columns:minmax(0,1fr);}}
+  .x3-view{position:relative;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);overflow:hidden;background:var(--color-panel);}
+  .x3-stage{position:relative;overflow:hidden;height:clamp(22rem,62vh,44rem);}
+  .x3-stage canvas{display:block;width:100%;height:100%;cursor:grab;}
+  .x3-stage canvas:active{cursor:grabbing;}
+  .x3-status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;color:var(--color-fg-muted);font-size:var(--cds-font-size-body);}
+  .x3-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);box-shadow:var(--cds-shadow-popover);border-radius:8px;padding:.3rem .55rem;font-size:var(--cds-font-size-caption);white-space:nowrap;z-index:3;}
+  .x3-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+  .x3-lbl{position:absolute;left:0;top:0;pointer-events:auto;appearance:none;font:inherit;font-size:.7rem;line-height:1.2;padding:.18rem .45rem;border-radius:999px;border:1px solid var(--cds-border);background:color-mix(in srgb,var(--cds-surface-popover) 88%,transparent);color:var(--color-fg);cursor:pointer;white-space:nowrap;backdrop-filter:blur(4px);}
+  .x3-lbl:hover{border-color:var(--color-fg);}
+  .x3-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .9rem;padding:.6rem .8rem;border-top:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-bar label{display:flex;align-items:center;gap:.5rem;flex:1 1 14rem;}
+  .x3-ex{flex:1;accent-color:var(--color-fg);}
+  .x3-tg{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);padding:.3rem .65rem;border:1px solid var(--color-border-line);border-radius:999px;background:none;color:var(--color-fg);cursor:pointer;}
+  .x3-tg[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);}
+  .x3-hint{width:100%;}
+  .x3-side{display:flex;flex-direction:column;gap:var(--cds-gap-md);min-width:0;}
+  .x3-panel,.x3-listbox{border:1px solid var(--color-border-line);border-radius:var(--cds-radius);background:var(--color-panel);padding:var(--cds-pad-md);}
+  .x3-ph{display:flex;justify-content:space-between;gap:.5rem;align-items:flex-start;}
+  .x3-psys{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);text-transform:uppercase;letter-spacing:.05em;}
+  .x3-pt{margin:.15rem 0 0;font-family:var(--font-anthropic-serif);font-weight:400;font-size:1.3rem;line-height:1.2;}
+  .x3-x{appearance:none;border:0;background:none;font-size:1.4rem;line-height:1;color:var(--color-fg-muted);cursor:pointer;padding:0 .2rem;}
+  .x3-pd{font-size:var(--cds-font-size-body);line-height:1.45;margin:.6rem 0;}
+  .x3-pn{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-plist{display:flex;flex-direction:column;border-top:1px solid var(--color-border-line);}
+  .x3-pr{border-bottom:1px solid var(--color-border-line);}
+  .x3-pr summary{list-style:none;display:flex;justify-content:space-between;gap:.6rem;padding:.55rem 0;cursor:pointer;}
+  .x3-pr summary::-webkit-details-marker{display:none;}
+  .x3-prl{min-width:0;} .x3-prn{font-size:var(--cds-font-size-body);line-height:1.3;}
+  .x3-prno{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-prr{text-align:right;flex:none;font-variant-numeric:tabular-nums;}
+  .x3-prp{font-size:var(--cds-font-size-body);font-weight:500;}
+  .x3-pro{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);} .x3-pro.ok{color:var(--color-ok);}
+  .x3-prb{padding:0 0 .7rem;}
+  .x3-prb dl{display:grid;grid-template-columns:auto 1fr;gap:.25rem .7rem;margin:0 0 .6rem;font-size:var(--cds-font-size-caption);}
+  .x3-prb dt{color:var(--color-fg-muted);} .x3-prb dd{margin:0;overflow-wrap:anywhere;}
+  .x3-acts{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .x3-btn{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);padding:.35rem .7rem;border-radius:8px;border:1px solid var(--color-border-line);background:none;color:var(--color-fg);text-decoration:none;cursor:pointer;}
+  .x3-btn.pri{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);}
+  .x3-pf{margin-top:.7rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-pf a,.x3-link{color:var(--color-fg);} .x3-link{appearance:none;border:0;background:none;font:inherit;padding:0;text-decoration:underline;cursor:pointer;}
+  .x3-listbox h3{margin:0 0 .5rem;font-size:var(--cds-font-size-heading);font-weight:500;}
+  .x3-list{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;}
+  .x3-lgh{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.15rem;}
+  .x3-li{display:block;width:100%;text-align:left;appearance:none;border:0;background:none;font:inherit;font-size:var(--cds-font-size-body);padding:.28rem .45rem;border-radius:6px;color:var(--color-fg);cursor:pointer;}
+  .x3-li:hover{background:color-mix(in srgb,var(--color-fg) 6%,transparent);} .x3-li.on{background:color-mix(in srgb,var(--color-warn) 16%,transparent);}
+  .x3-sep{width:1px;background:var(--color-border-line);margin:0 .2rem;}
+  .x3-photo{position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;}
+  .x3-stage:has(.x3-photo){background:radial-gradient(ellipse at 50% 45%,#ffffff 0%,#eceee9 70%,#e2e4de 100%);}
+  .x3-ph-base,.x3-ph-layer{position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat;}
+  .x3-ph-layer{cursor:pointer;will-change:transform;}
+  .x3-ph-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:60;overflow:visible;}
+  .x3-ph-svg polygon{fill:none;stroke:transparent;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;}
+  .x3-ph-svg polygon.hov{stroke:rgba(230,120,0,.75);fill:rgba(255,150,30,.08);}
+  .x3-ph-svg polygon.sel{stroke:#e06a00;stroke-width:2.5;fill:rgba(255,140,20,.14);}
+  .x3-ph-credit{position:absolute;right:.4rem;bottom:.2rem;font-size:.65rem;color:#8a8b85;z-index:61;}
+  .x3-labels{z-index:70;}
+  .x3-models{display:flex;flex-wrap:wrap;gap:.4rem;margin:.55rem 0 .2rem;}
+  .x3-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.45;}
+  </style>
+  <div class="mx-card">
+    <div class="mx-row"><h3 class="x3-title">Greensmaster eTriFlex 3370</h3><span class="mx-note x3-sub">Toro Greens Mowers 1 and 2 · model 04591</span></div>
+    <div class="x3-models" role="group" aria-label="Machine"><button class="x3-tg x3-model" data-model="3370" aria-pressed="true">Greensmaster eTriFlex 3370</button><button class="x3-tg x3-model" data-model="5010h" aria-pressed="false">Reelmaster 5010-H</button></div>
+    <p class="mx-note x3-help">Hover over the photo to find a part, click it for part numbers, price, what is on the shelf and where to order. Slide to blow the machine apart.</p>
+  </div>
+  <div class="x3" id="x3">
+    <div class="x3-view">
+      <div class="x3-stage"><div class="x3-status">Loading…</div><div class="x3-labels"></div><div class="x3-tip" hidden></div></div>
+      <div class="x3-bar">
+        <label>Assembled <input class="x3-ex" type="range" min="0" max="100" value="0" aria-label="Exploded view"> Blown apart</label>
+        <button class="x3-tg x3-reset">Reset view</button>
+      </div>
+    </div>
+    <div class="x3-side">
+      <div class="x3-panel" hidden></div>
+      <div class="x3-listbox"><h3>Components</h3><div class="x3-list"></div></div>
+      <p class="x3-note"></p>
+    </div>
+  </div>
+</section>
 
 <!-- COSTS -->
 <section class="mx-page" id="costs" role="tabpanel" aria-labelledby="tab-costs" hidden>
@@ -1233,7 +1318,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   });
 })();
 </script>
-
+<script>window.MX3D_PHOTO_SRC = { '3370': /github\.io$/.test(location.hostname) ? 'photo3370.json' : '/_blob/8edfff7ebbdcaa973a36649b9db59a50' };</script>
 <script>
 /* Ranfurlie machinery 3D parts explorer - Toro Reelmaster 5010-H (03950).
 Procedural model built from Toro's published dimensions (spec sheet / product page 03950):
