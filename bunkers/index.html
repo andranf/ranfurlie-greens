@@ -49,7 +49,8 @@
 :root[data-theme="dark"]{color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;margin:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;margin:0;overflow-x:hidden}
 .wrap{max-width:1440px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:18px 48px;display:flex;flex-direction:column;gap:18px}
 h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:.01em;margin:0;text-wrap:balance}
 .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -310,6 +311,12 @@ footer{font-size:14px}
 #stockTbl th{white-space:nowrap}
 #stockTbl td.n{font-size:14px}
 #stockTbl td.n{white-space:normal}
+}
+/* older iPhones (iOS before 16.2) can't do color-mix: give the map overlays a solid background so they never look see-through */
+@supports not (background:color-mix(in srgb,red 50%,blue)){
+.map-l,.map-hint,.dock button,.zoomc button,.ticker .tag{background:var(--panel)}
+.fchip[aria-pressed="true"],.hc.on{background:var(--panel2)}
+.chip.p-High{background:transparent}
 }
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -798,16 +805,21 @@ function map2() {
     .on('click', (e, d) => select(d.job))
     .on('keydown', (e, d) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(d.job); } });
   // scr = map units per screen pixel (about 1 on a desktop, 2.5-3 on a phone) so labels stay readable on small screens
-  scr = Math.max(1, W / (svg.node().clientWidth || W));
-  const labels = () => { const s = Math.max(1, zk), f = Math.max(1, scr * .8), thr = 1.9 * Math.max(1, scr * .7);
+  const bb = svg.node().getBoundingClientRect(); scr = Math.max(1, W / (bb.width || W));
+  const labels = () => { const s = Math.max(1, zk), f = Math.max(1, scr * 1.05), thr = 1.9 * Math.max(1, scr * .7);
     mapG.selectAll('.bkn').attr('font-size', 10 * f / s).attr('stroke-width', 2.4 * f / s).attr('opacity', b => s >= thr || (focusHole != null && b.h === focusHole && s > 1.4) ? 1 : 0);
     mapG.selectAll('.hole-n').style('font-size', (13 * Math.max(1, scr * .85) / Math.sqrt(s)) + 'px');
     mapG.selectAll('.bk').attr('stroke-width', .8 / Math.sqrt(s));
     const n = svg.node(); n.style.touchAction = zk > 1.01 ? 'none' : 'pan-y';
     $('#zOut').disabled = zk <= 1.01; $('#zIn').disabled = zk >= 8.9; };
   // one finger on the map scrolls the page until you zoom in; two fingers pinch the map
-  const nd = svg.node(), Hv = nd.clientWidth ? W * nd.clientHeight / nd.clientWidth : H, ey = Math.max(0, (Hv - H) / 2) + 60;
-  zoomer = d3.zoom().scaleExtent([1, 9]).translateExtent([[-60, -ey], [W + 60, H + ey]])
+  const Hv = bb.width ? W * bb.height / bb.width : H, ey = Math.max(0, (Hv - H) / 2);
+  // whole course fits at 1x; once zoomed in, allow panning a bit past the edge so holes near the boundary can sit in the middle
+  const constrain = (tr, ext) => { const k = tr.k, px = Math.min(1, k - 1) * W * .35, py = Math.min(1, k - 1) * H * .35 + ey;
+    const x0 = ext[0][0], y0 = ext[0][1], x1 = ext[1][0], y1 = ext[1][1];
+    const dx0 = tr.invertX(x0) - (-px), dx1 = tr.invertX(x1) - (W + px), dy0 = tr.invertY(y0) - (-py), dy1 = tr.invertY(y1) - (H + py);
+    return tr.translate(dx1 > dx0 ? (dx0 + dx1) / 2 : Math.min(0, dx0) || Math.max(0, dx1), dy1 > dy0 ? (dy0 + dy1) / 2 : Math.min(0, dy0) || Math.max(0, dy1)); };
+  zoomer = d3.zoom().scaleExtent([1, 9]).constrain(constrain)
     .filter(e => e.type.startsWith('touch') ? (e.touches.length > 1 || zk > 1.01) : (!e.ctrlKey || e.type === 'wheel') && !e.button)
     .on('zoom', e => { zk = e.transform.k; mapG.attr('transform', e.transform); labels(); });
   svg.call(zoomer).on('dblclick.zoom', null);
@@ -835,7 +847,7 @@ function fitHole(h) {
   const v = h === 0 ? (D.chip ? { g: D.chip } : null) : D.holes[h]; if (v) pts.push(v.g);
   if (!pts.length) return;
   const P = pts.map(p => proj(p[0], p[1])), xs = P.map(p => p[0]), ys = P.map(p => p[1]);
-  const [, , W, H] = svg.attr('viewBox').split(' ').map(Number), n = svg.node(), Hv = n.clientWidth ? W * n.clientHeight / n.clientWidth : H;
+  const [, , W, H] = svg.attr('viewBox').split(' ').map(Number), r = svg.node().getBoundingClientRect(), Hv = r.width ? W * r.height / r.width : H;
   const bw = Math.max(60, d3.max(xs) - d3.min(xs)) + 70, bh = Math.max(60, d3.max(ys) - d3.min(ys)) + 70;
   const s = Math.max(1.5, Math.min(9, W / bw, Hv / bh)), cx = (d3.min(xs) + d3.max(xs)) / 2, cy = (d3.min(ys) + d3.max(ys)) / 2;
   svg.transition().duration(RM ? 0 : 800).call(zoomer.transform, d3.zoomIdentity.translate(W / 2 - cx * s, H / 2 - cy * s).scale(s));
