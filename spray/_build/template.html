@@ -730,7 +730,7 @@ function todayCard(){
 }
 function windowCard(){
   var sw=(DATA.spray_window||[]).filter(function(x){return x.date>=TODAY});
-  var days=[];sw.forEach(function(x){if(days.indexOf(x.date)<0)days.push(x.date)});days=days.slice(0,4);
+  var days=[];sw.forEach(function(x){if(x.daylight&&days.indexOf(x.date)<0)days.push(x.date)});days=days.slice(0,4);
   if(!days.length)return '<section class="card dcard span2"><h2>Spray window</h2><p class="loading">No forecast hours from today in the course data yet.</p></section>';
   var hrs=[];sw.forEach(function(x){if(x.daylight&&hrs.indexOf(x.hour)<0)hrs.push(x.hour)});hrs.sort(function(a,b){return a-b});
   var h0=hrs[0],h1=hrs[hrs.length-1],cols=[];for(var hh=h0;hh<=h1;hh++)cols.push(hh);
