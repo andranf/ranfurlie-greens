@@ -19,7 +19,7 @@
   --sand:#a8925f; --sandhi:#d8c38e; --rake:#5a4a2c; --lip:#0d120c;
   --bad:#ff6b5b; --warn:#f5b841; --low:#93a9d6; --ok:#5bd68a; --info:#8fa9ff;
   --c1:#3fae6a; --c2:#9cc95a; --c3:#f2b63d; --c4:#ee8a3c; --c5:#e5534b;
-  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --display:"Barlow Condensed","Avenir Next Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
   --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
   --r:14px;
@@ -260,6 +260,13 @@ body{font-size:16px}
 .wrap{gap:14px;padding-block:14px 40px}
 .eyebrow{font-size:12px;letter-spacing:.08em}
 .brand h1{font-size:30px}
+/* header on phones: logo + title on one row, pills on their own row (v1.2) */
+.top{display:grid;grid-template-columns:46px minmax(0,1fr);column-gap:12px;row-gap:10px;align-items:start}
+.brand h1{font-size:28px;line-height:1.08;letter-spacing:.01em;overflow-wrap:break-word;text-wrap:wrap}
+.brand p{font-size:13.5px;line-height:1.35;margin-top:4px}
+.sync{grid-column:1/-1;gap:8px}
+.pill{font-size:13px;padding:6px 10px}
+.dot{animation:none}
 .kpis{grid-template-columns:1fr 1fr;gap:8px}
 .kpi{padding:11px 12px 10px}
 .kpi .v{font-size:36px;margin-top:4px}
@@ -301,7 +308,6 @@ footer{font-size:14px}
 .kpi .v{font-size:30px}
 .kpi .v small{font-size:17px}
 .kpi .s{font-size:12.5px}
-.brand p{font-size:14px}
 .mark{width:46px;height:46px;border-radius:12px}
 .howto{grid-template-columns:1fr;margin:0 12px 12px}
 .howto .ic{display:none}
