@@ -1,0 +1,33 @@
+{
+  "_about": "Shared settings for every spray page. webhook = Zapier 'Spray sign-offs' catch hook (workflow 01a13bd8-9e9a-7918-98bd-740588f5c438). data_url = the greens dashboard data the spraying dashboard reads. crew = names in the sign-off picker, with Slack IDs so reminders can tag them. post_checks = the post-application checklist; a recipe can add or replace items by id.",
+  "webhook": "https://hooks.zapier.com/hooks/catch/18429017/W9qCDw7MkvuzL8et/",
+  "page_url": "https://andranf.github.io/ranfurlie-greens/spray/",
+  "data_url": "https://andranf.github.io/ranfurlie-greens/data.json",
+  "crew": [
+    ["Andy Anderson", "U06BCCG4HT9"],
+    ["Ben Hartley", "U06NBNSR9LG"],
+    ["Neil Harper", "U06FJ0J1RH8"],
+    ["Kyle Craig", "U06FWK6ND5X"],
+    ["Nathan Drew", "U06FJ0J5DS6"],
+    ["Nathan Ferguson", "U06H9J0LBEC"],
+    ["Brodie Macdonald", "U0839HLQA8G"],
+    ["Nicholas Debrincat", "U07QSB7MDK5"],
+    ["Flynn Sinclair", "U08C1SVFSFR"],
+    ["James King", "U08D57N6JSC"],
+    ["Joshua Cope", "U08ENB28AQZ"],
+    ["Mitch Mahoney", "U08K55E3QJU"],
+    ["Samuel Cope", "U09LN1Q8QH2"],
+    ["Tremayne Gallagher", "U09V6AVPUDP"]
+  ],
+  "post_checks": [
+    ["out", "Whole tank sprayed out", "No mix left standing in the sprayer"],
+    ["flush", "Sprayer flushed through the boom", "Clean water"],
+    ["rinsate", "Rinse water sprayed back over the treated area", "Not down a drain or onto hard surfaces"],
+    ["nozzles", "Filters and nozzles checked and clean", ""],
+    ["drums", "Empty drums triple rinsed, caps off, set aside for drumMUSTER", ""],
+    ["ppe", "Gloves, goggles and face shield washed, overalls in the wash", ""],
+    ["signs", "Spray signs stay out until the turf is dry", ""],
+    ["gk", "Application entered in GreenKeeper", "Batch numbers, start and finish times, weather"],
+    ["turfdog", "Job ticked off in TurfDog", ""]
+  ]
+}

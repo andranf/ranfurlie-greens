@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a Ranfurlie tank-mix page from a recipe and the product library.
+"""Build a Ranfurlie spraying page from a recipe, the product library and config.json.
 
   python3 spray/_build/build.py spray/_build/recipes/<slug>.json [--latest] [--fragment OUT]
 
@@ -7,10 +7,14 @@ Writes spray/<slug>/index.html. --latest also writes spray/index.html (the crew'
 bookmark, always the newest spray). --fragment writes the page without its
 doctype wrapper (for publishing as a Claude artifact).
 
+The page has two views: the mixing guide (front and centre on the spray day until
+the mix is signed) and the spraying dashboard (reads the greens data.json).
+Sign-offs post to the Zapier "Spray sign-offs" hook in config.json.
+
 Every product id in the recipe must already be in products.json, read off its
 current AU label and SDS. The build stops if one is missing rather than guessing.
 """
-import argparse, html, json, os, sys
+import argparse, html, json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPRAY = os.path.dirname(HERE)
@@ -22,6 +26,18 @@ def shown(amt_l, unit):
     return (f"{amt_l:.2f}" if amt_l < 10 else f"{amt_l:.1f}"), "L"
 
 
+def merge_checks(base, extra):
+    out = [list(c) for c in base]
+    ids = [c[0] for c in out]
+    for c in extra or []:
+        if c[0] in ids:
+            out[ids.index(c[0])] = list(c)
+        else:
+            out.append(list(c))
+            ids.append(c[0])
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("recipe")
@@ -31,6 +47,15 @@ def main():
 
     R = json.load(open(a.recipe, encoding="utf-8"))
     lib = json.load(open(os.path.join(HERE, "products.json"), encoding="utf-8"))
+    cfg = json.load(open(os.path.join(HERE, "config.json"), encoding="utf-8"))
+
+    if not R.get("date_iso"):
+        m = re.match(r"(\d{4}-\d{2}-\d{2})", R["slug"])
+        if not m:
+            sys.exit("Add date_iso (YYYY-MM-DD) to the recipe.")
+        R["date_iso"] = m.group(1)
+    if not re.fullmatch(r"[a-z0-9-]{6,80}", R["slug"]):
+        sys.exit("slug must be lower-case letters, numbers and dashes.")
 
     prods = []
     for e in R["products"]:
@@ -53,6 +78,11 @@ def main():
     if R["fill_l"] + prod_l > R["mix_l"]:
         sys.exit("First fill plus products is more than the mix volume. Lower fill_l.")
 
+    R["webhook"] = cfg.get("webhook", "")
+    R["data_url"] = cfg.get("data_url", "")
+    R["crew"] = cfg.get("crew", [])
+    R["post_checks"] = merge_checks(cfg.get("post_checks", []), R.get("post_checks"))
+
     facts = "".join(
         f'<span class="fact">{html.escape(x)}</span>'
         for x in [f'{R["area_ha"]:.2f} ha', f'{R["rate_lha"]} L/ha', f'{R["mix_l"]} L mix',
@@ -64,9 +94,12 @@ def main():
     page = (tpl.replace("{{WHEN}}", html.escape(f'{R["sprayer"]} · {R["date"]}'))
                .replace("{{TITLE}}", html.escape(R["title"]))
                .replace("{{FACTS}}", facts).replace("{{DEMO}}", demo)
-               .replace("{{NSTEPS}}", str(3 + len(prods) + 4))
+               .replace("{{NSTEPS}}", str(3 + len(prods) + 2))
                .replace("{{CAP}}", f'{R["tank_cap_l"]:,}').replace("{{MIX}}", str(R["mix_l"]))
                .replace("{{RECIPE}}", data))
+    left = re.findall(r"\{\{[A-Z]+\}\}", page)
+    if left:
+        sys.exit(f"Template placeholders not filled: {left}")
     full = ('<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
             + page + '\n</html>\n')
@@ -88,6 +121,7 @@ def main():
         lvl += p["amt"]
         print(f'  {i}. {p["name"]:<20} {p["show"]:>6} {p["u"]:<2}  sheet {p["sheet"]}  -> {lvl:6.1f} L')
     print(f'Top up {R["mix_l"] - lvl:.1f} L to {R["mix_l"]} L')
+    print(f'Post-application checks: {len(R["post_checks"])} · crew {len(R["crew"])} · date {R["date_iso"]}')
 
 
 if __name__ == "__main__":

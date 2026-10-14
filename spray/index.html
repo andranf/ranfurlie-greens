@@ -8,20 +8,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
-/* Ranfurlie Tank Mix template v1.4 (15 Oct 2026). Built by spray/_build/build.py from a recipe + products.json. Glass: frosted, rim-lit panels floating over a soft water-and-turf sky.
-   The memorable thing is still the tank, now a glass vessel. Blur only on the big surfaces (status bar, cards) to keep phones smooth.
-   Layout: sticky glass status bar, one step card at a time, recipe + label checks beside it on wide screens, below on phones. */
+/* Ranfurlie Tank Mix template v1.5 (15 Oct 2026). Built by spray/_build/build.py from a recipe + products.json + config.json.
+   Two views: the mixing guide (front and centre on a spray day until the mix is signed) and the spraying dashboard
+   (default once signed). Sign-offs and the post-application checklist post to the Zapier "Spray sign-offs" hook.
+   Glass: frosted, rim-lit panels over a soft water-and-turf sky. The tank is the one memorable element. */
 :root{
   color-scheme:light;
   --bg:#e4f1f7;
   --sky1:#7fd3ff; --sky2:#86e8b4; --sky3:#ffe08a; --sky4:#b9c8ff;
-  --glass:rgba(255,255,255,.58); --glass-hi:rgba(255,255,255,.78); --glass-lo:rgba(255,255,255,.34);
+  --glass:rgba(255,255,255,.58); --glass-hi:rgba(255,255,255,.78); --glass-lo:rgba(255,255,255,.34); --glass-solid:rgba(246,251,253,.94); --sheet:#f3f9fb;
   --rim:rgba(255,255,255,.9); --rim2:rgba(255,255,255,.35); --edge:rgba(16,52,72,.10);
   --shadow:0 18px 40px -18px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
   --fg:#0b2231; --muted:#3f5d6e; --faint:#6f8a99; --line:rgba(16,52,72,.12);
   --go:#13a356; --go2:#2fd27a; --go-ink:#ffffff; --go-soft:rgba(47,210,122,.18);
   --tank:#0aa6dc; --tank-deep:#0573a8; --tank-soft:rgba(10,166,220,.14);
   --poison:#e0313b; --poison-bg:rgba(224,49,59,.13); --caution:#a86000; --caution-bg:rgba(255,176,32,.2); --ok:#13a356;
+  --scrim:rgba(8,30,44,.38);
   --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
   --r:26px; --r2:18px; --ease:cubic-bezier(.2,.8,.2,1);
@@ -31,25 +33,27 @@
   color-scheme:dark;
   --bg:#06121b;
   --sky1:#0a6fa8; --sky2:#0d7a4c; --sky3:#5a4a12; --sky4:#2a2f7a;
-  --glass:rgba(18,40,56,.52); --glass-hi:rgba(28,58,78,.66); --glass-lo:rgba(18,40,56,.32);
+  --glass:rgba(18,40,56,.52); --glass-hi:rgba(28,58,78,.66); --glass-lo:rgba(18,40,56,.32); --glass-solid:rgba(14,34,48,.96); --sheet:#0f2433;
   --rim:rgba(255,255,255,.22); --rim2:rgba(255,255,255,.06); --edge:rgba(0,0,0,.35);
   --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
   --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.1);
   --go:#2fd27a; --go2:#6ff0a6; --go-ink:#03210f; --go-soft:rgba(47,210,122,.18);
   --tank:#38c6ff; --tank-deep:#1490cc; --tank-soft:rgba(56,198,255,.14);
   --poison:#ff5c5c; --poison-bg:rgba(255,92,92,.16); --caution:#ffbc45; --caution-bg:rgba(255,188,69,.16); --ok:#2fd27a;
+  --scrim:rgba(0,0,0,.55);
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
   --bg:#06121b;
   --sky1:#0a6fa8; --sky2:#0d7a4c; --sky3:#5a4a12; --sky4:#2a2f7a;
-  --glass:rgba(18,40,56,.52); --glass-hi:rgba(28,58,78,.66); --glass-lo:rgba(18,40,56,.32);
+  --glass:rgba(18,40,56,.52); --glass-hi:rgba(28,58,78,.66); --glass-lo:rgba(18,40,56,.32); --glass-solid:rgba(14,34,48,.96); --sheet:#0f2433;
   --rim:rgba(255,255,255,.22); --rim2:rgba(255,255,255,.06); --edge:rgba(0,0,0,.35);
   --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
   --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.1);
   --go:#2fd27a; --go2:#6ff0a6; --go-ink:#03210f; --go-soft:rgba(47,210,122,.18);
   --tank:#38c6ff; --tank-deep:#1490cc; --tank-soft:rgba(56,198,255,.14);
   --poison:#ff5c5c; --poison-bg:rgba(255,92,92,.16); --caution:#ffbc45; --caution-bg:rgba(255,188,69,.16); --ok:#2fd27a;
+  --scrim:rgba(0,0,0,.55);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -57,9 +61,9 @@ html,body{margin:0}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
 .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:1180px;margin:0 auto}
-h1,h2{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;line-height:1.02}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;line-height:1.02}
 a{color:var(--tank-deep)}
-button{font:inherit;color:inherit}
+button,select,textarea,input{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--tank);outline-offset:2px;border-radius:12px}
 
 /* the sky behind the glass */
@@ -73,11 +77,12 @@ button{font:inherit;color:inherit}
 @keyframes drift2{to{transform:translate(-7vmax,-5vmax) scale(1.1)}}
 
 /* glass recipe: translucent fill, top-lit rim, soft drop */
-.glass,.card,.status .wrap,.btn.ghost,.toast{
+.card,.status .wrap,.btn.ghost,.toast,.fab,.postbar{
   background:linear-gradient(180deg,var(--glass-hi),var(--glass) 38%,var(--glass));
   -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
   box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
 }
+.inset{box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 
 /* header floats on the sky */
 .top .wrap{padding-block:18px 10px;display:grid;gap:9px}
@@ -104,22 +109,26 @@ button{font:inherit;color:inherit}
 .prog i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--tank),var(--go2));transition:width .5s var(--ease)}
 
 /* layout */
-.main .wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding-block:16px 40px}
-@media (min-width:920px){.main .wrap{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start}.side{position:sticky;top:96px}}
+.main .wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding-block:16px 110px}
+@media (min-width:920px){.main.mix .wrap{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start}.side{position:sticky;top:96px}}
 .card{border-radius:var(--r)}
 .stage{padding:20px;display:grid;gap:16px;min-width:0;overflow:hidden}
 @media (min-width:600px){.stage{padding:26px}}
 .in-f{animation:inF .36s var(--ease) both}.in-b{animation:inB .36s var(--ease) both}
 @keyframes inF{from{opacity:0;transform:translateX(26px) scale(.985)}to{opacity:1;transform:none}}
 @keyframes inB{from{opacity:0;transform:translateX(-26px) scale(.985)}to{opacity:1;transform:none}}
+.viewin{animation:viewin .45s var(--ease) both}
+@keyframes viewin{from{opacity:0;transform:translateY(14px) scale(.99)}to{opacity:1;transform:none}}
 
-/* inner surfaces: tinted glass without blur */
-.inner{box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
+/* step content */
 .kicker{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .ordn{font-family:var(--display);font-weight:700;font-size:16px;background:var(--fg);color:var(--bg);border-radius:999px;padding:2px 12px}
 .chip{font-family:var(--display);font-weight:700;font-size:16px;border-radius:999px;padding:2px 12px;background:var(--glass-lo);color:var(--muted);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 .chip.poison{background:var(--poison);color:#fff;letter-spacing:.06em;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 4px 12px -4px var(--poison)}
 .chip.caution{background:var(--caution-bg);color:var(--caution);letter-spacing:.06em}
+.chip.ok{background:var(--go-soft);color:var(--go)}
+.chip.warn{background:var(--caution-bg);color:var(--caution)}
+.chip.bad{background:var(--poison-bg);color:var(--poison)}
 .pname{font-size:clamp(34px,9vw,50px)}
 
 .amount{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:end;padding:16px 16px 14px 20px;border-radius:var(--r2);background:linear-gradient(160deg,color-mix(in srgb,var(--tank) 20%,transparent),var(--tank-soft));box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
@@ -165,9 +174,13 @@ button{font:inherit;color:inherit}
 .how li::before{counter-increment:h;content:counter(h);font-family:var(--display);font-weight:700;font-size:17px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--tank-soft);color:var(--tank-deep);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 .batch{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .batch label,.field label{font-size:14.5px;color:var(--muted);font-weight:500}
-.batch input,.field input{font:inherit;font-weight:600;font-size:18px;padding:9px 14px;border-radius:14px;border:0;background:var(--glass-lo);color:var(--fg);width:190px;max-width:100%;box-shadow:inset 0 1px 2px var(--edge),inset 0 0 0 1px var(--rim2)}
-.batch input:focus,.field input:focus{box-shadow:inset 0 0 0 2px var(--tank)}
+.batch input,.field input,.field select,.field textarea{font-weight:600;font-size:18px;padding:9px 14px;border-radius:14px;border:0;background:var(--glass-lo);color:var(--fg);width:190px;max-width:100%;box-shadow:inset 0 1px 2px var(--edge),inset 0 0 0 1px var(--rim2)}
+.field select{width:100%;max-width:340px;appearance:auto}
+.field textarea{width:100%;max-width:none;min-height:80px;font-weight:500;font-size:16px;resize:vertical}
+.batch input:focus,.field input:focus,.field select:focus,.field textarea:focus{box-shadow:inset 0 0 0 2px var(--tank)}
 .field{display:grid;gap:6px}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.fields .field input,.fields .field select{width:100%}
 details.more{border-top:1px solid var(--line);padding-top:10px}
 details.more summary{cursor:pointer;color:var(--tank-deep);font-weight:600;font-size:15.5px;list-style:none;display:flex;align-items:center;gap:8px;padding:4px 0}
 details.more summary::-webkit-details-marker{display:none}
@@ -181,6 +194,7 @@ details.more[open] .morebody{animation:open .3s var(--ease)}
 .morebody dd{margin:0;min-width:0}
 .src{font-size:13px;color:var(--faint)}
 .src a{color:var(--muted)}
+.decl{margin:0;font-size:16px;font-weight:500;padding:10px 14px;border-radius:var(--r2);background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 
 /* checklists */
 .checks{display:grid;gap:8px}
@@ -205,6 +219,14 @@ details.more[open] .morebody{animation:open .3s var(--ease)}
 .sos{font-size:15px;color:var(--muted)}
 .sos b{color:var(--fg)}
 
+/* signature */
+.sig{display:grid;gap:6px}
+.sig-head{display:flex;justify-content:space-between;align-items:center;font-size:14.5px;color:var(--muted);font-weight:500}
+.sigpad{display:block;width:100%;height:170px;border-radius:var(--r2);background:var(--glass-hi);box-shadow:inset 0 1px 2px var(--edge),inset 0 0 0 1.5px var(--rim2);touch-action:none;cursor:crosshair}
+.sig-wrap{position:relative}
+.sig-wrap::after{content:"";position:absolute;left:18px;right:18px;bottom:34px;border-top:1.5px dashed var(--faint);opacity:.6;pointer-events:none}
+.sig-wrap .hint{position:absolute;left:20px;bottom:10px;font-size:13px;color:var(--faint);pointer-events:none}
+
 /* buttons */
 .actions{display:grid;grid-template-columns:auto 1fr;gap:10px}
 .btn{border:0;border-radius:999px;padding:12px 22px;font-family:var(--display);font-weight:700;font-size:21px;cursor:pointer;min-height:58px;transition:transform .15s var(--ease),opacity .2s,box-shadow .2s}
@@ -216,15 +238,18 @@ details.more[open] .morebody{animation:open .3s var(--ease)}
 .btn.go .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:ripple .6s ease-out forwards;pointer-events:none}
 @keyframes ripple{to{transform:scale(4);opacity:0}}
 .btn.stop{background:var(--poison-bg);color:var(--poison);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
+.btn.soft{background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 .btn.sm{min-height:40px;font-size:16px;padding:6px 14px}
+.btn.md{min-height:50px;font-size:19px;padding:8px 18px}
 .btn:active{transform:scale(.97)}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
 .small{font-size:14.5px;color:var(--muted)}
 .stopmsg{padding:12px 14px;border-radius:var(--r2);background:var(--poison-bg);font-weight:600;animation:inF .3s var(--ease);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 .stopmsg b{color:var(--poison)}
 .phok{padding:10px 14px;border-radius:var(--r2);background:var(--go-soft);font-weight:600}
 .phok b{color:var(--go);font-family:var(--display);font-size:18px}
 
-/* side */
+/* side (mixing guide) */
 .side{display:grid;gap:18px;min-width:0}
 .panel{padding:20px 18px 14px}
 .panel h2{font-size:26px;margin-bottom:8px}
@@ -242,37 +267,119 @@ details.more[open] .morebody{animation:open .3s var(--ease)}
 .flags{display:grid;gap:8px}
 .flag{padding:10px 12px;border-radius:16px;background:var(--caution-bg);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 .flag.red{background:var(--poison-bg)}
+.flag.info{background:var(--tank-soft)}
 .flag summary{cursor:pointer;font-weight:600;font-size:15.5px;list-style:none;line-height:1.3;display:flex;gap:8px;align-items:flex-start}
 .flag summary::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;margin-top:6px;background:var(--caution)}
 .flag.red summary::before{background:var(--poison)}
+.flag.info summary::before{background:var(--tank)}
 .flag summary::-webkit-details-marker{display:none}
 .flag[open] p{animation:open .3s var(--ease)}
 .flag p{margin:6px 0 2px 17px;font-size:14.5px}
 .flag .s{display:block;font-size:13px;color:var(--faint);margin-left:17px}
-.records{width:100%;border-collapse:collapse;font-size:15px}
-.records th,.records td{text-align:left;padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}
-.records th{font-family:var(--display);font-weight:700;font-size:15px;color:var(--muted)}
-.records td:first-child{white-space:nowrap;font-weight:600}
-.tablewrap{overflow-x:auto}
-.donemark{width:64px;height:64px}
-.donemark circle{fill:var(--go-soft);stroke:var(--go);stroke-width:3}
-.donemark path{fill:none;stroke:var(--go);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40;animation:draw .5s var(--ease) .2s forwards}
-@keyframes draw{to{stroke-dashoffset:0}}
+
+/* dashboard */
+.dgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:900px){.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.span2{grid-column:1/-1}}
+.dcard{padding:18px 18px 16px;display:grid;gap:12px;min-width:0;align-content:start}
+@media (min-width:600px){.dcard{padding:22px}}
+.dcard h2{font-size:24px}
+.dhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dhead .small{font-size:13.5px}
+.today h2{font-size:clamp(28px,7vw,38px)}
+.statusline{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rules{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.rules li{display:flex;gap:10px;align-items:baseline;font-weight:500}
+.rules li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--tank);transform:translateY(-2px)}
+.sw{display:grid;gap:8px}
+.sw-hours{display:grid;grid-template-columns:62px 1fr;gap:8px}
+.sw-hours .hrs{display:flex;gap:3px}
+.sw-hours .hrs span{flex:1;min-width:0;font-size:11px;color:var(--faint);text-align:center;font-variant-numeric:tabular-nums}
+.sw-day{display:grid;grid-template-columns:62px 1fr;gap:8px;align-items:center}
+.sw-day .dl{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.05}
+.sw-day .dl small{display:block;font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
+.sw-cells{display:flex;gap:3px}
+.sw-c{flex:1;min-width:0;height:30px;border-radius:7px;border:0;padding:0;cursor:pointer;transition:transform .15s}
+.sw-c.good{background:linear-gradient(180deg,var(--go2),var(--go))}
+.sw-c.marginal{background:color-mix(in srgb,var(--caution) 70%,var(--glass))}
+.sw-c.no{background:color-mix(in srgb,var(--poison) 38%,var(--glass-lo))}
+.sw-c.gap{background:transparent;cursor:default}
+.sw-c.now{box-shadow:0 0 0 2px var(--fg)}
+.sw-c.sel{transform:scaleY(1.15)}
+.sw-detail{font-size:14.5px;min-height:1.4em;color:var(--muted)}
+.sw-detail b{color:var(--fg)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-1px}
+.clock{display:grid;gap:6px}
+.clock .ct{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:baseline}
+.clock .ct b{font-family:var(--display);font-size:18px}
+.clock .cv{font-family:var(--display);font-weight:800;font-size:22px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.clock .cv small{font-size:14px;font-weight:600;color:var(--muted)}
+.bar{position:relative;height:10px;border-radius:99px;background:var(--glass-lo);box-shadow:inset 0 1px 2px var(--edge)}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,var(--tank),var(--go2));transition:width .8s var(--ease)}
+.bar i.warn{background:linear-gradient(90deg,var(--tank),var(--caution))}
+.bar i.bad{background:linear-gradient(90deg,var(--caution),var(--poison))}
+.bar .mk{position:absolute;top:-3px;bottom:-3px;width:2px;border-radius:2px;background:var(--fg);opacity:.45}
+.clock .cs{font-size:13.5px;color:var(--muted)}
+.gvx{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.gvx div{padding:10px 8px;border-radius:16px;background:var(--glass-lo);text-align:center;box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
+.gvx b{display:block;font-family:var(--display);font-weight:800;font-size:28px;font-variant-numeric:tabular-nums;line-height:1}
+.gvx span{font-size:12.5px;color:var(--muted)}
+.spark{width:100%;height:64px;display:block}
+.spark .ln{fill:none;stroke:var(--tank-deep);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.spark .ar{fill:var(--tank-soft)}
+.spark .pt{fill:var(--tank-deep)}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.list li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:7px 4px;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.list .d{font-family:var(--display);font-weight:700;font-size:15px;color:var(--muted);white-space:nowrap}
+.list .t{font-weight:600;min-width:0}
+.list .t small{display:block;font-weight:500;font-size:13.5px;color:var(--muted)}
+.list .v{font-family:var(--display);font-weight:700;white-space:nowrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--faint);margin-right:6px;vertical-align:1px}
+.dot.ok{background:var(--go)}.dot.warn{background:var(--caution)}.dot.bad{background:var(--poison)}.dot.info{background:var(--tank)}.dot.plan{background:var(--tank-deep)}
+.zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.zones div{padding:10px 12px;border-radius:16px;background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
+.zones b{display:block;font-family:var(--display);font-size:17px;text-transform:capitalize}
+.zones span{font-size:13.5px;color:var(--muted)}
+.loading{color:var(--muted);font-size:15px}
+
+/* floating button, post-app bar, sheet */
+.fab{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px),calc((100vw - 1180px)/2 + 16px));z-index:6;display:flex;align-items:center;gap:7px;padding:8px 15px 8px 12px;min-height:40px;border-radius:999px;border:0;font-family:var(--display);font-weight:700;font-size:16px;cursor:pointer;transition:transform .15s}
+.fab svg{width:20px;height:20px;stroke:var(--tank-deep);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fab:active{transform:scale(.96)}
+.top .when{min-height:40px;display:flex;align-items:center;padding-right:160px}
+.btn.wide{width:100%;max-width:460px}
+.postbar{position:fixed;left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:7;border-radius:22px;padding:10px 10px 10px 16px;display:flex;align-items:center;gap:12px;max-width:760px;margin:0 auto;animation:barin .5s var(--ease) both}
+.postbar::after{content:"";position:absolute;inset:-2px;border-radius:24px;box-shadow:0 0 0 2px var(--caution);opacity:.0;animation:ring 2.4s ease-out infinite;pointer-events:none}
+@keyframes ring{0%{opacity:.7;transform:scale(1)}80%,100%{opacity:0;transform:scale(1.04)}}
+@keyframes barin{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.postbar .pt{flex:1;min-width:0;line-height:1.2}
+.postbar .pt b{display:block;font-family:var(--display);font-size:18px}
+.postbar .pt span{font-size:13.5px;color:var(--muted)}
+.postbar .btn{min-height:48px;font-size:19px;padding:8px 18px;flex:none}
+.sheet{position:fixed;inset:0;z-index:10;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;animation:fadein .25s ease both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.sheet-card{width:min(680px,100%);max-height:94vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:28px 28px 0 0;padding:14px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));background:var(--sheet);box-shadow:inset 0 1px 0 var(--rim),0 -20px 50px -20px rgba(0,0,0,.4);display:grid;gap:14px;animation:sheetup .42s var(--ease) both}
+@keyframes sheetup{from{transform:translateY(60px);opacity:.4}to{transform:none;opacity:1}}
+.grab{width:44px;height:5px;border-radius:99px;background:var(--faint);opacity:.5;margin:0 auto 2px}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.sheet-head h2{font-size:30px}
+
 .foot{color:var(--muted);font-size:13.5px}
-.foot .wrap{padding-block:0 32px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.foot .wrap{padding-block:0 100px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;color:var(--fg);padding:11px 18px;border-radius:999px;font-weight:600;transition:.3s var(--ease);pointer-events:none;z-index:9;max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%) translateY(-20px);opacity:0;color:var(--fg);padding:11px 18px;border-radius:999px;font-weight:600;transition:.3s var(--ease);pointer-events:none;z-index:12;max-width:calc(100% - 32px)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-.load .top .wrap>*,.load .demo,.load .status,.load .stage,.load .side>*{animation:rise .55s var(--ease) both}
+.load .top .wrap>*,.load .demo,.load .status,.load .stage,.load .side>*,.load .dcard{animation:rise .55s var(--ease) both}
 .load .top .wrap>*:nth-child(2){animation-delay:.05s}.load .top .wrap>*:nth-child(3){animation-delay:.1s}
 .load .demo{animation-delay:.12s}.load .status{animation-delay:.14s}.load .stage{animation-delay:.2s}.load .side>*:nth-child(1){animation-delay:.28s}.load .side>*:nth-child(2){animation-delay:.34s}
 @keyframes rise{from{opacity:0;transform:translateY(12px) scale(.99)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
-.flag.info{background:var(--tank-soft)}
-.flag.info summary::before{background:var(--tank)}
 </style>
 
 <div class="sky" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+<div id="mixView">
 <header class="top">
   <div class="wrap gut">
     <div class="when">Toro 5800 · Thu 15 Oct</div>
@@ -283,13 +390,12 @@ details.more[open] .morebody{animation:open .3s var(--ease)}
 
 <div class="status" id="status">
   <div class="wrap gut">
-    <div class="stepline"><span class="stepno" id="stepNo">1 of 13</span><span class="stepname" id="stepName">Sprayer check</span></div>
+    <div class="stepline"><span class="stepno" id="stepNo">1 of 11</span><span class="stepname" id="stepName">Sprayer check</span></div>
     <div class="tankread" aria-live="polite" title="Tank holds 1,200 L"><span class="mini"><i id="water"></i></span><span id="litres">0</span><small>/ 750 L</small></div>
     <div class="prog"><i id="prog"></i></div>
   </div>
 </div>
-
-<main class="main">
+<main class="main mix">
   <div class="wrap gut">
     <section class="card stage" id="stage" aria-live="polite"></section>
     <aside class="side">
@@ -305,13 +411,32 @@ details.more[open] .morebody{animation:open .3s var(--ease)}
     </aside>
   </div>
 </main>
+</div>
+
+<div id="dashView" hidden>
+<header class="top">
+  <div class="wrap gut">
+    <div class="when" id="dWhen">Ranfurlie</div>
+    <h1>Spraying</h1>
+    <div class="small" id="dAsOf"></div>
+  </div>
+</header>
+<main class="main">
+  <div class="wrap gut dgrid" id="dash"></div>
+</main>
+</div>
+
 <footer class="foot"><div class="wrap gut">
-  <span>Progress stays on this phone. The label is the legal document.</span>
+  <span>Progress stays on this phone. Sign-offs go to #spraying and the Spray Records in Notion. The label is the legal document.</span>
   <span class="confirm" id="resetBox"></span>
 </div></footer>
+
+<button class="fab" id="fab" type="button" data-act="fab"></button>
+<div class="postbar" id="postbar" hidden></div>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
 <div class="toast" id="toast" role="status"></div>
 
-<script id="recipe-data" type="application/json">{"slug": "2026-10-15-approaches-surrounds", "title": "Fert + PGR, Approaches & Surrounds", "sheet_name": "5800 - 300L/Ha - Fert + PGR to Approaches and Surrounds", "sprayer": "Toro 5800", "date": "Thu 15 Oct", "date_long": "Thu 15 Oct 2026", "area_ha": 2.5, "rate_lha": 300, "mix_l": 750, "tank_cap_l": 1200, "fill_l": 500, "nozzles": "Red AIC", "speed": "6.9 km/h", "pressure": "4 bar", "last_load": "Fert + PGR to Greens & Surrounds, Wed 14 Oct", "site_check": "Spray signs out on approaches and surrounds", "weather": "Delta T 2–8 · wind under 15 km/h · gusts under 30 · no rain for 8 h", "ph_max": 4.5, "products": [{"name": "Companion", "gk_name": "Companion", "sig": "CAUTION", "sigc": "caution", "form": "Adjuvant", "what": "Acidifying and penetrating surfactant (soya phospholipids + propionic acid)", "haz": "Damages eyes. Irritates skin.", "hazFull": "Will damage eyes. Will irritate the skin. Avoid contact with eyes and skin. Label: DO NOT use with copper products.", "ppe": ["overalls", "gloves", "shield"], "how": ["Measure {amt}", "Pour in before anything else"], "why": "The label says Companion goes in first, before the other products. It holds the tank pH down for the ethephon.", "src": "Label APVMA 51664 (Apr 2023) · <a href=\"https://elabels.apvma.gov.au/51664ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "companion", "rate": "300 mL/ha", "sheet": 1, "amt": 0.75, "show": "750", "u": "mL"}, {"name": "Shadow Ultra", "gk_name": "Shadow Ultra (AU)", "sig": "CAUTION", "sigc": "caution", "form": "Micro-emulsion (ME)", "what": "Trinexapac-ethyl 120 g/L growth regulator", "haz": "Harmful if breathed in.", "hazFull": "Harmful if inhaled (SDS). Avoid contact with eyes and skin. Don't breathe spray mist. No rain or irrigation within 1 h of spraying. No entry without protective clothing until the spray has dried.", "ppe": ["overalls", "gloves"], "how": ["Measure {amt} in a jug", "Pour straight in, no pre-mix", "Rinse the jug into the tank"], "why": "The label says add it to a tank at least two-thirds full of water. You're at {before} L.", "src": "Label APVMA 88267 · <a href=\"https://elabels.apvma.gov.au/88267ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "shadow", "rate": "1.0 L/ha", "sheet": 2, "amt": 2.5, "show": "2.50", "u": "L"}, {"name": "Pro Kelp", "gk_name": "Pro Kelp (0-0-0)", "sig": "Alkaline", "sigc": "", "form": "Liquid kelp extract", "what": "Grass Roots Pro Kelp 25: Tasmanian bull kelp extracted with caustic potash, pH 10-12.5", "haz": "Strongly alkaline. Keep it apart from the iron and GreenMaxx neat.", "soft": true, "hazFull": "Not classified as hazardous (SDS Nov 2025). pH above 10, contains potassium hydroxide under 5%. Impervious gloves, safety glasses with side shields, cotton overalls; apron for large volumes. Label: 20-50 L/ha in 700 L water/ha; check compatibility before tank mixing.", "ppe": ["overalls", "gloves", "goggles"], "how": ["Agitate the drums", "Pour {amt} into the tank water", "Rinse the drums into the tank"], "why": "It's strongly alkaline (pH 10–12.5, caustic potash). Going in early, into plain water, means it never meets the acidic iron or GreenMaxx neat, and it's well spread before the ethephon goes in.", "src": "Oasis Turf label + SDS Nov 2025 · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2021/09/OT_GR_PRO_KELP_25_BACK_LABEL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2026/01/Pro-Kelp-SDS-Nov-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS<\/a>", "id": "prokelp", "rate": "20 L/ha", "sheet": 5, "note": "Goes in before the iron (sheet had it 5th).", "amt": 50.0, "show": "50.0", "u": "L"}, {"name": "Grass Roots Iron", "gk_name": "Grass Roots Iron (0-0-0)", "sig": "Eye irritant", "sigc": "", "form": "Liquid nutrient", "what": "Oasis Turf liquid iron, 6% Fe, pH about 2", "haz": "Eye irritant. Strongly acidic.", "soft": true, "hazFull": "SDS signal word WARNING: eye irritation. Safety glasses, PVC gloves, overalls, apron and safety boots; eyewash nearby. Label rate 10-20 L/ha.", "ppe": ["overalls", "gloves", "goggles", "apron", "boots"], "how": ["Agitate the drums", "Pour {amt}"], "why": "Acidic (pH about 2). Goes in once the kelp is spread through the tank, and starts bringing the pH back down.", "src": "Label + SDS May 2025 (Oasis Turf) · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2024/03/OT-Iron.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2025/05/IRON-SDS-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS<\/a>", "id": "iron", "rate": "30 L/ha", "sheet": 4, "amt": 75.0, "show": "75.0", "u": "L"}, {"name": "GreenMaxx 20-0-0", "gk_name": "Liquimaxx Greenmaxx 20-0-0 AU (20-0-0)", "sig": "Irritant", "sigc": "", "form": "Liquid fertiliser", "what": "LiquiMaxx GreenMaxx: stabilised urea N 20%, with 6% Fe and 1% Mg as sulphates, pH 2-3", "haz": "Irritates skin and eyes.", "soft": true, "hazFull": "SDS signal word WARNING: harmful if swallowed, skin and eye irritant, may irritate airways. PVC gloves, overalls and apron, safety glasses or goggles; eyewash nearby. Strong bases listed as incompatible. May settle in the IBC, so stir before drawing. Label rate 20-50 L/ha.", "ppe": ["overalls", "gloves", "goggles", "apron"], "how": ["Stir the IBC first", "Draw {amt}", "Pour with the agitator running"], "why": "Acidic (pH 2–3), like the iron. Its SDS lists strong bases as incompatible, so it goes in after the kelp is well diluted.", "src": "SDS Dec 2024 (Indigo / Greenway) · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/AAC-Liquimaxx-GreenMaxx-SDS-2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS<\/a> · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/GTS-Greenmaxx-Brochure.pdf\" target=\"_blank\" rel=\"noopener\">brochure<\/a>", "id": "greenmaxx", "rate": "35 L/ha", "sheet": 6, "amt": 87.5, "show": "87.5", "u": "L"}, {"name": "Promote Plus 900", "gk_name": "Promote Plus 900", "sig": "POISON", "sigc": "poison", "form": "Soluble liquid (SL)", "what": "Ethephon 900 g/L growth regulator", "haz": "Corrosive. Burns skin and eyes.", "hazFull": "Corrosive (SDS: causes severe skin burns and eye damage). Splash in the eye: flush with water for at least 15 minutes and get medical help. Don't use alkaline water. Don't let the mix stand in metal for more than 2 hours. No rain expected within 8 hours.", "ppe": ["overalls", "gloves", "goggles", "shield", "apron"], "how": ["Measure {amt}", "Pour slowly, low to the opening", "Rinse the jug and drums into the tank"], "why": "Goes in last, once the iron and GreenMaxx have brought the pH back down after the kelp, so the ethephon never sits in alkaline water. The label says don't use alkaline water.", "src": "Label APVMA 69487 · SDS ADAMA Jun 2023 · <a href=\"https://elabels.apvma.gov.au/69487ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a> · <a href=\"https://www.adama.com/australia/en/media/2596/download?attachment\" target=\"_blank\" rel=\"noopener\">SDS<\/a>", "id": "promote", "rate": "3.5 L/ha", "sheet": 3, "note": "Goes in last (sheet had it 3rd).", "amt": 8.75, "show": "8.75", "u": "L"}], "ppe_note": "Promote Plus 900 is corrosive, so mix in the full kit.", "spray_ppe": ["overalls", "gloves", "goggles"], "spray_rules": ["Spray out straight away", "No irrigation for 24 h. Don’t water in", "No mowing until fully dry", "Keep people off until dry"], "spray_more": "Spraying PPE is from the Shadow Ultra and Promote Plus 900 labels: cotton overalls, elbow-length chemical-resistant gloves, goggles or a face shield. Promote Plus 900: don’t spray if rain is expected within 8 h, and don’t leave the mix standing in metal for more than 2 h. Shadow Ultra: no rain or irrigation within 1 h, and no entry without protective clothing until the spray has dried.", "flags": [{"c": "red", "t": "Pro Kelp is caustic in an ethephon tank", "d": "Pro Kelp is pH 10–12.5 (caustic potash). Promote Plus 900’s label says don’t use alkaline water, and the GreenMaxx SDS lists strong bases as incompatible. This page puts the kelp in early and the Promote Plus last, then checks the tank is under pH 4.5. Jar test per 1 L of mix, in page order: 700 mL water, 1 mL Companion, 3 mL Shadow Ultra, 67 mL Pro Kelp, 100 mL iron, 117 mL GreenMaxx, 12 mL Promote Plus. Look for sludge or flecks after 10 minutes.", "s": "Pro Kelp SDS Nov 2025 · GreenMaxx SDS Dec 2024 · APVMA 69487 eLabel"}, {"c": "", "t": "Shadow Ultra 1.0 L/ha on the couch", "d": "The label has no approach row. Bentgrass greens are 1–2 L/ha, hybrid couch fairways 0.15–0.6 L/ha, common couch 0.8–1.6 L/ha. Where the approach couch is a hybrid, 1.0 is above its row. Label also notes cool conditions or low growth may cause discolouration.", "s": "APVMA 88267 eLabel"}, {"c": "", "t": "Grass Roots Iron: sheet 30 L/ha, label 10–20 L/ha", "d": "At 20 L/ha this tank takes 50 L, not 75 L. GreenMaxx carries 6% Fe as well, so the tank puts on about 4–5 kg Fe/ha in total.", "s": "Oasis Turf label · GreenMaxx SDS Dec 2024"}, {"c": "", "t": "Water volume is under two labels", "d": "300 L/ha is under Pro Kelp’s label volume (700 L/ha) and Shadow Ultra’s golf course range (350–500 L/ha).", "s": "Pro Kelp label · APVMA 88267 eLabel"}, {"c": "info", "t": "Nitrogen: about 9 kg N/ha", "d": "GreenMaxx at 35 L/ha is about 9 kg N/ha (SG 1.31, 20% w/w) as stabilised urea, plus 1% Mg. Label range 20–50 L/ha. If its 20% is w/v, it’s 7 kg N/ha.", "s": "GreenMaxx SDS Dec 2024 · Greenway brochure"}, {"c": "info", "t": "Order changed from the sheet", "d": "Pro Kelp moves up from 5th to 3rd, Promote Plus 900 moves from 3rd to last. Everything else keeps its place.", "s": "Reasoning on each product card"}]}</script>
+<script id="recipe-data" type="application/json">{"slug": "2026-10-15-approaches-surrounds", "title": "Fert + PGR, Approaches & Surrounds", "sheet_name": "5800 - 300L/Ha - Fert + PGR to Approaches and Surrounds", "sprayer": "Toro 5800", "date": "Thu 15 Oct", "date_long": "Thu 15 Oct 2026", "date_iso": "2026-10-15", "area_ha": 2.5, "rate_lha": 300, "mix_l": 750, "tank_cap_l": 1200, "fill_l": 500, "nozzles": "Red AIC", "speed": "6.9 km/h", "pressure": "4 bar", "last_load": "Fert + PGR to Greens & Surrounds, Wed 14 Oct", "site_check": "Spray signs out on approaches and surrounds", "weather": "Delta T 2–8 · wind under 15 km/h · gusts under 30 · no rain for 8 h", "ph_max": 4.5, "products": [{"name": "Companion", "gk_name": "Companion", "sig": "CAUTION", "sigc": "caution", "form": "Adjuvant", "what": "Acidifying and penetrating surfactant (soya phospholipids + propionic acid)", "haz": "Damages eyes. Irritates skin.", "hazFull": "Will damage eyes. Will irritate the skin. Avoid contact with eyes and skin. Label: DO NOT use with copper products.", "ppe": ["overalls", "gloves", "shield"], "how": ["Measure {amt}", "Pour in before anything else"], "why": "The label says Companion goes in first, before the other products. It holds the tank pH down for the ethephon.", "src": "Label APVMA 51664 (Apr 2023) · <a href=\"https://elabels.apvma.gov.au/51664ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "companion", "rate": "300 mL/ha", "sheet": 1, "amt": 0.75, "show": "750", "u": "mL"}, {"name": "Shadow Ultra", "gk_name": "Shadow Ultra (AU)", "sig": "CAUTION", "sigc": "caution", "form": "Micro-emulsion (ME)", "what": "Trinexapac-ethyl 120 g/L growth regulator", "haz": "Harmful if breathed in.", "hazFull": "Harmful if inhaled (SDS). Avoid contact with eyes and skin. Don't breathe spray mist. No rain or irrigation within 1 h of spraying. No entry without protective clothing until the spray has dried.", "ppe": ["overalls", "gloves"], "how": ["Measure {amt} in a jug", "Pour straight in, no pre-mix", "Rinse the jug into the tank"], "why": "The label says add it to a tank at least two-thirds full of water. You're at {before} L.", "src": "Label APVMA 88267 · <a href=\"https://elabels.apvma.gov.au/88267ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "shadow", "rate": "1.0 L/ha", "sheet": 2, "amt": 2.5, "show": "2.50", "u": "L"}, {"name": "Pro Kelp", "gk_name": "Pro Kelp (0-0-0)", "sig": "Alkaline", "sigc": "", "form": "Liquid kelp extract", "what": "Grass Roots Pro Kelp 25: Tasmanian bull kelp extracted with caustic potash, pH 10-12.5", "haz": "Strongly alkaline. Keep it apart from the iron and GreenMaxx neat.", "soft": true, "hazFull": "Not classified as hazardous (SDS Nov 2025). pH above 10, contains potassium hydroxide under 5%. Impervious gloves, safety glasses with side shields, cotton overalls; apron for large volumes. Label: 20-50 L/ha in 700 L water/ha; check compatibility before tank mixing.", "ppe": ["overalls", "gloves", "goggles"], "how": ["Agitate the drums", "Pour {amt} into the tank water", "Rinse the drums into the tank"], "why": "It's strongly alkaline (pH 10–12.5, caustic potash). Going in early, into plain water, means it never meets the acidic iron or GreenMaxx neat, and it's well spread before the ethephon goes in.", "src": "Oasis Turf label + SDS Nov 2025 · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2021/09/OT_GR_PRO_KELP_25_BACK_LABEL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2026/01/Pro-Kelp-SDS-Nov-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS<\/a>", "id": "prokelp", "rate": "20 L/ha", "sheet": 5, "note": "Goes in before the iron (sheet had it 5th).", "amt": 50.0, "show": "50.0", "u": "L"}, {"name": "Grass Roots Iron", "gk_name": "Grass Roots Iron (0-0-0)", "sig": "Eye irritant", "sigc": "", "form": "Liquid nutrient", "what": "Oasis Turf liquid iron, 6% Fe, pH about 2", "haz": "Eye irritant. Strongly acidic.", "soft": true, "hazFull": "SDS signal word WARNING: eye irritation. Safety glasses, PVC gloves, overalls, apron and safety boots; eyewash nearby. Label rate 10-20 L/ha.", "ppe": ["overalls", "gloves", "goggles", "apron", "boots"], "how": ["Agitate the drums", "Pour {amt}"], "why": "Acidic (pH about 2). Goes in once the kelp is spread through the tank, and starts bringing the pH back down.", "src": "Label + SDS May 2025 (Oasis Turf) · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2024/03/OT-Iron.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2025/05/IRON-SDS-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS<\/a>", "id": "iron", "rate": "30 L/ha", "sheet": 4, "amt": 75.0, "show": "75.0", "u": "L"}, {"name": "GreenMaxx 20-0-0", "gk_name": "Liquimaxx Greenmaxx 20-0-0 AU (20-0-0)", "sig": "Irritant", "sigc": "", "form": "Liquid fertiliser", "what": "LiquiMaxx GreenMaxx: stabilised urea N 20%, with 6% Fe and 1% Mg as sulphates, pH 2-3", "haz": "Irritates skin and eyes.", "soft": true, "hazFull": "SDS signal word WARNING: harmful if swallowed, skin and eye irritant, may irritate airways. PVC gloves, overalls and apron, safety glasses or goggles; eyewash nearby. Strong bases listed as incompatible. May settle in the IBC, so stir before drawing. Label rate 20-50 L/ha.", "ppe": ["overalls", "gloves", "goggles", "apron"], "how": ["Stir the IBC first", "Draw {amt}", "Pour with the agitator running"], "why": "Acidic (pH 2–3), like the iron. Its SDS lists strong bases as incompatible, so it goes in after the kelp is well diluted.", "src": "SDS Dec 2024 (Indigo / Greenway) · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/AAC-Liquimaxx-GreenMaxx-SDS-2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS<\/a> · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/GTS-Greenmaxx-Brochure.pdf\" target=\"_blank\" rel=\"noopener\">brochure<\/a>", "id": "greenmaxx", "rate": "35 L/ha", "sheet": 6, "amt": 87.5, "show": "87.5", "u": "L"}, {"name": "Promote Plus 900", "gk_name": "Promote Plus 900", "sig": "POISON", "sigc": "poison", "form": "Soluble liquid (SL)", "what": "Ethephon 900 g/L growth regulator", "haz": "Corrosive. Burns skin and eyes.", "hazFull": "Corrosive (SDS: causes severe skin burns and eye damage). Splash in the eye: flush with water for at least 15 minutes and get medical help. Don't use alkaline water. Don't let the mix stand in metal for more than 2 hours. No rain expected within 8 hours.", "ppe": ["overalls", "gloves", "goggles", "shield", "apron"], "how": ["Measure {amt}", "Pour slowly, low to the opening", "Rinse the jug and drums into the tank"], "why": "Goes in last, once the iron and GreenMaxx have brought the pH back down after the kelp, so the ethephon never sits in alkaline water. The label says don't use alkaline water.", "src": "Label APVMA 69487 · SDS ADAMA Jun 2023 · <a href=\"https://elabels.apvma.gov.au/69487ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a> · <a href=\"https://www.adama.com/australia/en/media/2596/download?attachment\" target=\"_blank\" rel=\"noopener\">SDS<\/a>", "id": "promote", "rate": "3.5 L/ha", "sheet": 3, "note": "Goes in last (sheet had it 3rd).", "amt": 8.75, "show": "8.75", "u": "L"}], "ppe_note": "Promote Plus 900 is corrosive, so mix in the full kit.", "spray_ppe": ["overalls", "gloves", "goggles"], "spray_rules": ["Spray out straight away", "No irrigation for 24 h. Don’t water in", "No mowing until fully dry", "Keep people off until dry"], "spray_more": "Spraying PPE is from the Shadow Ultra and Promote Plus 900 labels: cotton overalls, elbow-length chemical-resistant gloves, goggles or a face shield. Promote Plus 900: don’t spray if rain is expected within 8 h, and don’t leave the mix standing in metal for more than 2 h. Shadow Ultra: no rain or irrigation within 1 h, and no entry without protective clothing until the spray has dried.", "flags": [{"c": "red", "t": "Pro Kelp is caustic in an ethephon tank", "d": "Pro Kelp is pH 10–12.5 (caustic potash). Promote Plus 900’s label says don’t use alkaline water, and the GreenMaxx SDS lists strong bases as incompatible. This page puts the kelp in early and the Promote Plus last, then checks the tank is under pH 4.5. Jar test per 1 L of mix, in page order: 700 mL water, 1 mL Companion, 3 mL Shadow Ultra, 67 mL Pro Kelp, 100 mL iron, 117 mL GreenMaxx, 12 mL Promote Plus. Look for sludge or flecks after 10 minutes.", "s": "Pro Kelp SDS Nov 2025 · GreenMaxx SDS Dec 2024 · APVMA 69487 eLabel"}, {"c": "", "t": "Shadow Ultra 1.0 L/ha on the couch", "d": "The label has no approach row. Bentgrass greens are 1–2 L/ha, hybrid couch fairways 0.15–0.6 L/ha, common couch 0.8–1.6 L/ha. Where the approach couch is a hybrid, 1.0 is above its row. Label also notes cool conditions or low growth may cause discolouration.", "s": "APVMA 88267 eLabel"}, {"c": "", "t": "Grass Roots Iron: sheet 30 L/ha, label 10–20 L/ha", "d": "At 20 L/ha this tank takes 50 L, not 75 L. GreenMaxx carries 6% Fe as well, so the tank puts on about 4–5 kg Fe/ha in total.", "s": "Oasis Turf label · GreenMaxx SDS Dec 2024"}, {"c": "", "t": "Water volume is under two labels", "d": "300 L/ha is under Pro Kelp’s label volume (700 L/ha) and Shadow Ultra’s golf course range (350–500 L/ha).", "s": "Pro Kelp label · APVMA 88267 eLabel"}, {"c": "info", "t": "Nitrogen: about 9 kg N/ha", "d": "GreenMaxx at 35 L/ha is about 9 kg N/ha (SG 1.31, 20% w/w) as stabilised urea, plus 1% Mg. Label range 20–50 L/ha. If its 20% is w/v, it’s 7 kg N/ha.", "s": "GreenMaxx SDS Dec 2024 · Greenway brochure"}, {"c": "info", "t": "Order changed from the sheet", "d": "Pro Kelp moves up from 5th to 3rd, Promote Plus 900 moves from 3rd to last. Everything else keeps its place.", "s": "Reasoning on each product card"}], "post_checks": [["out", "Whole tank sprayed out", "No mix left standing in the sprayer"], ["flush", "Sprayer flushed through the boom", "Clean water"], ["rinsate", "Rinse water sprayed back over the treated area", "Not down a drain or onto hard surfaces"], ["nozzles", "Filters and nozzles checked and clean", ""], ["drums", "Empty drums triple rinsed, caps off, set aside for drumMUSTER", ""], ["ppe", "Gloves, goggles and face shield washed, overalls in the wash", ""], ["signs", "Spray signs stay out until the turf is dry", ""], ["gk", "Application entered in GreenKeeper", "Batch numbers, start and finish times, weather"], ["turfdog", "Job ticked off in TurfDog", ""], ["irrig", "Irrigation off on approaches and surrounds for 24 h", ""], ["mow", "Mowers told: no mowing until it's dry", ""]], "webhook": "https://hooks.zapier.com/hooks/catch/18429017/W9qCDw7MkvuzL8et/", "data_url": "https://andranf.github.io/ranfurlie-greens/data.json", "crew": [["Andy Anderson", "U06BCCG4HT9"], ["Ben Hartley", "U06NBNSR9LG"], ["Neil Harper", "U06FJ0J1RH8"], ["Kyle Craig", "U06FWK6ND5X"], ["Nathan Drew", "U06FJ0J5DS6"], ["Nathan Ferguson", "U06H9J0LBEC"], ["Brodie Macdonald", "U0839HLQA8G"], ["Nicholas Debrincat", "U07QSB7MDK5"], ["Flynn Sinclair", "U08C1SVFSFR"], ["James King", "U08D57N6JSC"], ["Joshua Cope", "U08ENB28AQZ"], ["Mitch Mahoney", "U08K55E3QJU"], ["Samuel Cope", "U09LN1Q8QH2"], ["Tremayne Gallagher", "U09V6AVPUDP"]]}</script>
 <script>
 (function(){
 "use strict";
@@ -319,6 +444,8 @@ document.body.classList.add("load");
 setTimeout(function(){document.body.classList.remove("load")},1200);
 var RM=false;try{RM=matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
 var R=JSON.parse(document.getElementById("recipe-data").textContent);
+var PREVIEW=!/github\.io$/.test(location.hostname);
+var TESTMODE=/[?&]test=1(&|$)/.test(location.search);
 
 var ICON={
   overalls:'<path d="M8 2.5v5.5H6.5V21h5v-7h1v7h5V8H16V2.5"/><path d="M8 8h8M8 2.5h2M14 2.5h2"/>',
@@ -330,17 +457,28 @@ var ICON={
   apron:'<path d="M9 3h6v3.5l3.5 2.5V21h-13V9L9 6.5z"/><path d="M5.5 11 3 12.5M18.5 11 21 12.5"/>',
   boots:'<path d="M7.5 3h6v10l6 3.2V21h-16v-4l4-3z"/><path d="M3.5 18h16"/>'
 };
+var UI={
+  dash:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7.5" height="9" rx="2"/><rect x="13.5" y="3" width="7.5" height="5.5" rx="2"/><rect x="3" y="15" width="7.5" height="6" rx="2"/><rect x="13.5" y="11.5" width="7.5" height="9.5" rx="2"/></svg>',
+  mix:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6.5L4.8 18.2A2 2 0 0 0 6.5 21h11a2 2 0 0 0 1.7-2.8L14 9.5V3"/><path d="M7.5 15h9"/></svg>'
+};
 function ic(k,cls){return '<svg class="'+(cls||"")+'" viewBox="0 0 24 24" aria-hidden="true">'+ICON[k]+'</svg>'}
 var SHORT={overalls:"Overalls",hat:"Hat",gloves:"Elbow gloves",goggles:"Goggles",shield:"Face shield",mask:"Mist mask",apron:"Apron",boots:"Boots"};
 var FULL={overalls:"Cotton overalls, buttoned neck and wrist",hat:"Washable hat",gloves:"Elbow-length PVC gloves",goggles:"Goggles",shield:"Face shield",mask:"Disposable mist mask over mouth and nose",apron:"Chemical apron",boots:"Safety boots"};
 var PPE_ORDER=["overalls","hat","gloves","goggles","shield","mask","apron","boots"];
 var TICK='<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>';
 var WARN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>';
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+function melbParts(d){try{var f=new Intl.DateTimeFormat("en-CA",{timeZone:"Australia/Melbourne",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",hour12:false}).formatToParts(d),o={};f.forEach(function(p){o[p.type]=p.value});return {date:o.year+"-"+o.month+"-"+o.day,hour:+o.hour%24}}catch(e){return {date:d.toISOString().slice(0,10),hour:d.getHours()}}}
+var NOWP=melbParts(new Date()),TODAY=NOWP.date;
+function dObj(iso){var p=iso.split("-");return new Date(Date.UTC(+p[0],+p[1]-1,+p[2]))}
+function dLabel(iso){var d=dObj(iso);return DOW[d.getUTCDay()]+" "+d.getUTCDate()+" "+MON[d.getUTCMonth()]}
+function dShort(iso){var d=dObj(iso);return d.getUTCDate()+" "+MON[d.getUTCMonth()]}
+function daysBetween(a,b){return Math.round((dObj(b)-dObj(a))/864e5)}
 
 var SHEET={area:R.area_ha,total:R.mix_l,cap:R.tank_cap_l,startFill:R.fill_l};
 var AREA=R.area_ha.toFixed(2)+" ha";
-var P=R.products;
-var N=P.length;
+var P=R.products, N=P.length, CREW=R.crew||[];
 var CHECKS=[
  ["pre","Pre-start done in TurfDog",""],
  ["rinse","Tank rinsed since last load",R.last_load?"Last load: "+R.last_load:""],
@@ -355,27 +493,22 @@ var CHECKS=[
  ["site",R.site_check||"Spray signs out",""],
  ["wx","Weather in the window",R.weather||"Delta T 2–8 · wind under 15 km/h · gusts under 30"]
 ].concat(R.extra_checks||[]);
+var POSTC=(R.post_checks||[]);
 var TANK_PPE=PPE_ORDER.filter(function(k){return P.some(function(p){return p.ppe.indexOf(k)>=0})});
-var SPRAY_PPE=R.spray_ppe||["overalls","gloves","goggles"];
-var CLOSE=[
- ["out","Whole tank sprayed out",""],
- ["flush","Sprayer flushed through the boom",""],
- ["drums","Drums rinsed, caps off, for drumMUSTER",""],
- ["wash","Gloves, goggles, shield, overalls washed",""],
- ["signs","Signs stay out until turf is dry",""],
- ["gk","Batch nos, times, weather into GreenKeeper","Tick the job off in TurfDog"]
-];
 var FLAGS=R.flags||[];
 
 var S=[{k:"check",n:"Sprayer check"},{k:"ppe",n:"PPE on"},{k:"fill",n:"Fill"}];
 P.forEach(function(p,i){S.push({k:"prod",n:p.name,p:p,i:i})});
-S.push({k:"topup",n:R.ph_max?"Top up + pH":"Top up"},{k:"spray",n:"Spray"},{k:"close",n:"Close out"},{k:"record",n:"Mix record"});
+S.push({k:"topup",n:R.ph_max?"Top up + pH":"Top up"},{k:"sign",n:"Sign off"});
 
-var KEY="ranfurlie-tankmix-"+R.slug;
+var TK=TESTMODE?"-test":"";
+var KEY="ranfurlie-tankmix-"+R.slug+TK, MEKEY="ranfurlie-spray-me"+TK, OUTKEY="ranfurlie-spray-outbox"+TK;
 var st=load()||fresh();
-function fresh(){return {i:0,checks:{},ppe:{},close:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixer:"",sprayAt:null,doneAt:null}}
-function load(){try{var s=localStorage.getItem(KEY);return s?JSON.parse(s):null}catch(e){return null}}
+function fresh(){return {i:0,checks:{},ppe:{},post:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixSig:null,postSig:null,postDue:false,pd:{}}}
+function load(){try{var s=localStorage.getItem(KEY);if(!s)return null;var o=JSON.parse(s);var f=fresh();for(var k in f)if(!(k in o))o[k]=f[k];if(o.i>=S.length)o.i=S.length-1;return o}catch(e){return null}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+function getMe(){try{return JSON.parse(localStorage.getItem(MEKEY)||"null")}catch(e){return null}}
+function saveMe(w){try{localStorage.setItem(MEKEY,JSON.stringify(w))}catch(e){}}
 
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
@@ -389,6 +522,7 @@ function fmt(v,d){d=d==null?1:d;return (Math.round(v*Math.pow(10,d))/Math.pow(10
 function pct(v){return Math.min(100,v/SHEET.cap*100)}
 function amtText(p){return p.show+" "+p.u}
 function fill(s,p){return String(s).replace(/\{amt\}/g,amtText(p)).replace(/\{before\}/g,fmt(beforeAdd(p),0))}
+function tankText(){return SHEET.total+" L · "+AREA+" · "+R.rate_lha+" L/ha"}
 function ppeRow(keys,req){return '<div class="ppe'+(req?' req':'')+'">'+keys.map(function(k){return '<div class="p" title="'+FULL[k]+'">'+ic(k)+'<span>'+SHORT[k]+'</span></div>'}).join("")+'</div>'}
 function checkBtn(group,id,lbl,sub){var on=!!st[group][id];return '<button class="check" type="button" data-g="'+group+'" data-id="'+id+'" aria-pressed="'+on+'"><span class="box">'+TICK+'</span><span class="lbl">'+lbl+(sub?'<span class="sub">'+sub+'</span>':'')+'</span></button>'}
 function tileBtn(k){var on=!!st.ppe[k];return '<button class="tile" type="button" data-g="ppe" data-id="'+k+'" aria-pressed="'+on+'" title="'+FULL[k]+'"><span class="box">'+TICK+'</span>'+ic(k,"i")+'<span>'+SHORT[k]+'</span></button>'}
@@ -405,6 +539,62 @@ function tank(from,to,done){
 }
 function phBox(){var ph=parseFloat(st.ph);if(isNaN(ph))return"";return ph<R.ph_max?'<div class="phok"><b>pH OK</b> &nbsp;'+ph+' is under '+R.ph_max+'</div>':'<div class="haz">'+WARN+'<span>pH '+ph+' is '+R.ph_max+' or above. Don’t spray. Call Ben or Andy.</span></div>'}
 
+/* ---------- who + signature ---------- */
+function whoField(id,preset){
+  var me=preset||getMe()||{};
+  var isOther=me.name&&!me.slack;
+  return '<div class="field"><label for="who-'+id+'">Your name</label><select id="who-'+id+'" data-who="'+id+'"><option value="">Choose your name</option>'+
+    CREW.map(function(c){return '<option value="'+c[1]+'"'+(me.slack===c[1]?' selected':'')+'>'+esc(c[0])+'</option>'}).join("")+
+    '<option value="other"'+(isOther?' selected':'')+'>Someone else</option></select>'+
+    '<input id="whoOther-'+id+'" autocomplete="name" placeholder="Type your name" value="'+esc(isOther?me.name:"")+'"'+(isOther?'':' hidden')+'></div>';
+}
+function readWho(id){
+  var sel=$("who-"+id);if(!sel)return {name:"",slack:""};
+  if(sel.value==="other"){var t=($("whoOther-"+id).value||"").trim();return {name:t,slack:""}}
+  if(!sel.value)return {name:"",slack:""};
+  var c=CREW.filter(function(c){return c[1]===sel.value})[0];return {name:c?c[0]:"",slack:sel.value};
+}
+var PADS={};
+function sigPad(id){return '<div class="sig"><div class="sig-head"><span>Sign in the box</span><button type="button" class="btn soft sm" data-act="sig-clear" data-pad="'+id+'">Clear</button></div><div class="sig-wrap"><canvas class="sigpad" id="pad-'+id+'" data-pad="'+id+'"></canvas><span class="hint">Sign with your finger</span></div></div>'}
+function initPad(id,onChange){
+  var c=$("pad-"+id);if(!c)return;
+  var pad=PADS[id]||(PADS[id]={strokes:[]});
+  var dpr=Math.max(1,window.devicePixelRatio||1);
+  function size(){c.width=Math.round(c.clientWidth*dpr);c.height=Math.round(c.clientHeight*dpr);redraw()}
+  function ctx(){var x=c.getContext("2d");x.setTransform(dpr,0,0,dpr,0,0);x.lineWidth=2.6;x.lineCap="round";x.lineJoin="round";x.strokeStyle=getComputedStyle(document.body).color;return x}
+  function redraw(){var x=ctx();x.clearRect(0,0,c.width,c.height);pad.strokes.forEach(function(s){x.beginPath();s.forEach(function(p,i){if(i)x.lineTo(p[0],p[1]);else x.moveTo(p[0],p[1])});if(s.length===1)x.lineTo(s[0][0]+.1,s[0][1]+.1);x.stroke()})}
+  function pt(e){var r=c.getBoundingClientRect();return [Math.round((e.clientX-r.left)*10)/10,Math.round((e.clientY-r.top)*10)/10]}
+  var cur=null;
+  c.onpointerdown=function(e){e.preventDefault();try{c.setPointerCapture(e.pointerId)}catch(_){}cur=[pt(e)];pad.strokes.push(cur);var hint=c.parentNode.querySelector(".hint");if(hint)hint.hidden=true};
+  c.onpointermove=function(e){if(!cur)return;e.preventDefault();var p=pt(e),l=cur[cur.length-1];if(Math.abs(p[0]-l[0])+Math.abs(p[1]-l[1])<1.2)return;cur.push(p);var x=ctx();x.beginPath();x.moveTo(l[0],l[1]);x.lineTo(p[0],p[1]);x.stroke()};
+  c.onpointerup=c.onpointercancel=function(){if(cur){cur=null;if(onChange)onChange()}};
+  pad.redraw=redraw;pad.el=c;size();
+  if(pad.strokes.length){var hint=c.parentNode.querySelector(".hint");if(hint)hint.hidden=true}
+}
+function padHas(id){return !!(PADS[id]&&PADS[id].strokes.length)}
+function padPath(id){
+  var pad=PADS[id];if(!pad||!pad.el)return"";
+  var d=pad.strokes.map(function(s){var out=[],l=null;s.forEach(function(p,i){if(l&&i<s.length-1&&Math.abs(p[0]-l[0])+Math.abs(p[1]-l[1])<2.5)return;out.push((out.length?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1));l=p});return out.join("")}).join("");
+  return Math.round(pad.el.clientWidth)+"x"+Math.round(pad.el.clientHeight)+"|"+d;
+}
+function clearPad(id){var pad=PADS[id];if(!pad)return;pad.strokes=[];if(pad.redraw)pad.redraw();var h=pad.el&&pad.el.parentNode.querySelector(".hint");if(h)h.hidden=false}
+function sigSvg(path,cls){if(!path)return"";var m=path.split("|");var wh=m[0].split("x");return '<svg class="'+(cls||"")+'" viewBox="0 0 '+wh[0]+' '+wh[1]+'" style="width:100%;max-width:260px;height:auto"><path d="'+m[1]+'" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
+
+/* ---------- sending ---------- */
+function outbox(){try{return JSON.parse(localStorage.getItem(OUTKEY)||"[]")}catch(e){return []}}
+function setOutbox(a){try{localStorage.setItem(OUTKEY,JSON.stringify(a))}catch(e){}}
+function send(payload){if(PREVIEW||!R.webhook)return;payload.sent_at=new Date().toISOString();if(TESTMODE){payload.__test="1";payload.__quiet="1"}var a=outbox();a.push(payload);setOutbox(a);flush()}
+var flushing=false;
+function flush(){
+  if(flushing||PREVIEW||!R.webhook)return;var a=outbox();if(!a.length)return;flushing=true;var item=a[0];
+  var body=new URLSearchParams();Object.keys(item).forEach(function(k){body.append(k,item[k]==null?"":String(item[k]))});
+  fetch(R.webhook,{method:"POST",mode:"no-cors",body:body}).then(function(){var b=outbox();b.shift();setOutbox(b);flushing=false;markSent(item);flush()},function(){flushing=false;if(VIEW==="dash")renderDash()});
+}
+function markSent(item){if(item.slug!==R.slug)return;if(item.kind==="mix"&&st.mixSig)st.mixSig.sent=true;if(item.kind==="post"&&st.postSig)st.postSig.sent=true;save();if(VIEW==="dash")renderDash()}
+window.addEventListener("online",flush);setInterval(flush,30000);
+function pendingCount(){return outbox().length}
+
+/* ---------- mixing guide ---------- */
 var lastI=null, shownL=0;
 function render(){
   var s=S[st.i], h="";
@@ -452,40 +642,32 @@ function render(){
       (R.ph_max?'<div class="field"><label for="ph">Tank pH (needs to be under '+R.ph_max+')</label><input id="ph" inputmode="decimal" autocomplete="off" value="'+esc(st.ph)+'" placeholder="e.g. 4.2"></div><div id="phMsg">'+phBox()+'</div>':'')+
       '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="topup">'+(st.topAt?"At "+SHEET.total+" L · Next":"At "+SHEET.total+" L")+'</button></div>';
   }
-  else if(s.k==="spray"){
-    h='<h2 class="pname">Spray it</h2>'+
-      '<div class="facts"><span class="fact">'+R.nozzles+'</span><span class="fact">'+R.speed+'</span><span class="fact">'+R.pressure+'</span><span class="fact">'+R.rate_lha+' L/ha</span></div>'+
-      ppeRow(SPRAY_PPE,true)+
-      '<ol class="how">'+(R.spray_rules||[]).map(function(x){return '<li>'+x+'</li>'}).join("")+'</ol>'+
-      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="spray">Tank sprayed out</button></div>'+
-      (R.spray_more?'<details class="more"><summary>Label detail</summary><div class="morebody"><p style="margin:0">'+R.spray_more+'</p></div></details>':'');
-  }
-  else if(s.k==="close"){
-    h='<h2 class="pname">Close out</h2>'+
-      '<div class="checks">'+CLOSE.map(function(r){return checkBtn("close",r[0],r[1],r[2])}).join("")+'</div>'+
-      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="close" '+(allOn("close",CLOSE)?"":"disabled")+'>Job done</button></div>';
-  }
-  else if(s.k==="record"){
-    var rows='<tr><td>'+hm(st.fillAt)+'</td><td>Water '+SHEET.startFill+' L</td><td></td></tr>'+
-      P.map(function(p){return '<tr><td>'+hm(st.added[p.id])+'</td><td>'+p.name+' <b>'+amtText(p)+'</b></td><td>'+esc(st.batch[p.id]||"")+'</td></tr>'}).join("")+
-      '<tr><td>'+hm(st.topAt)+'</td><td>Topped up to '+SHEET.total+' L'+(st.ph?' · pH <b>'+esc(st.ph)+'</b>':'')+'</td><td></td></tr>'+
-      '<tr><td>'+hm(st.sprayAt)+'</td><td>Sprayed out</td><td></td></tr>';
-    h='<div style="display:flex;gap:14px;align-items:center">'+(st.doneAt?'<svg class="donemark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29"/><path d="M19 33l9 9 18-19"/></svg>':'')+'<h2 class="pname">Mix record</h2></div>'+
-      '<div class="field"><label for="mixer">Mixed by</label><input id="mixer" autocomplete="off" value="'+esc(st.mixer)+'" placeholder="Name"></div>'+
-      '<div class="tablewrap"><table class="records"><thead><tr><th>Time</th><th>Step</th><th>Batch</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
-      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="copy">Copy record</button></div>'+
-      '<textarea id="copyTxt" hidden readonly style="width:100%;min-height:160px;font:14px/1.4 var(--body);background:var(--glass-lo);color:var(--fg);border:0;border-radius:14px;padding:10px"></textarea>';
+  else if(s.k==="sign"){
+    var miss=[];if(!st.fillAt)miss.push("water fill");P.forEach(function(p){if(!st.added[p.id])miss.push(p.name)});if(!st.topAt)miss.push("top up");
+    var phv=parseFloat(st.ph),phBad=!!R.ph_max&&(isNaN(phv)||phv>=R.ph_max);
+    h='<h2 class="pname">Sign off the mix</h2>'+
+      '<div class="facts"><span class="fact">'+SHEET.total+' L mixed</span><span class="fact">'+N+' products</span>'+(R.ph_max&&st.ph?'<span class="fact">pH '+esc(st.ph)+'</span>':'')+'</div>'+
+      (miss.length?'<div class="haz soft">'+WARN+'<span>Not ticked yet: '+esc(miss.join(", "))+'. Go back and tick them first.</span></div>':'')+
+      (phBad?'<div class="haz">'+WARN+'<span>'+(isNaN(phv)?'Enter the tank pH on the top-up step first.':'pH '+phv+' is '+R.ph_max+' or above. Call Ben or Andy before signing.')+'</span></div>':'')+
+      whoField("mix")+
+      '<p class="decl">I mixed this tank to the recipe, wore the PPE listed and checked the pH.</p>'+
+      sigPad("mix")+
+      (PREVIEW?'<div class="small">Preview copy: sign-offs only send from the crew link.</div>':'')+
+      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="sign-mix" id="signMixBtn" disabled>Sign and send</button></div>';
   }
   var stage=$("stage");stage.innerHTML=h;
   if(lastI!==null&&lastI!==st.i&&!RM){stage.classList.remove("in-f","in-b");void stage.offsetWidth;stage.classList.add(st.i>lastI?"in-f":"in-b")}
   var isNew=lastI!==st.i; lastI=st.i;
   if(isNew&&!RM){var c=stage.querySelector(".cnt");if(c)countUp(c,0,parseFloat(c.getAttribute("data-to")),+c.getAttribute("data-dec"),520)}
+  if(s.k==="sign"){initPad("mix",refreshSignMix);refreshSignMix()}
   $("stepNo").textContent=(st.i+1)+" of "+S.length;
   $("stepName").textContent=s.n;
   $("prog").style.width=(st.i/(S.length-1)*100)+"%";
   setLitres(litres());
   renderRecipe();
 }
+function mixReady(){var phv=parseFloat(st.ph);if(R.ph_max&&(isNaN(phv)||phv>=R.ph_max))return false;if(!st.fillAt||!st.topAt)return false;return P.every(function(p){return st.added[p.id]})}
+function refreshSignMix(){var b=$("signMixBtn");if(!b)return;var was=b.disabled;b.disabled=!(mixReady()&&readWho("mix").name&&padHas("mix"));if(was&&!b.disabled&&!RM){b.classList.remove("ready");void b.offsetWidth;b.classList.add("ready")}}
 function countUp(el,from,to,d,dur){
   var t0=null;function f(t){if(!t0)t0=t;var k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=(from+(to-from)*e).toFixed(d);if(k<1)requestAnimationFrame(f);else el.textContent=to.toFixed(d)}
   requestAnimationFrame(f);
@@ -496,7 +678,6 @@ function setLitres(L){
   var from=shownL;shownL=L;var t0=null;
   (function f(t){if(!t0)t0=t;var k=Math.min(1,(t-t0)/800),e=1-Math.pow(1-k,3);el.textContent=fmt(from+(L-from)*e);if(k<1)requestAnimationFrame(f)})(performance.now());
 }
-
 function renderRecipe(){
   var cur=S[st.i];
   var h='<li class="'+(st.fillAt?"done":(cur.k==="fill"?"now":""))+'"><span class="o">'+(st.fillAt?"✓":"W")+'</span><span class="nm">Water</span><span class="q">'+SHEET.startFill+'<u>L</u></span></li>';
@@ -510,10 +691,214 @@ function renderRecipe(){
 function renderFlags(){
   $("flags").innerHTML=FLAGS.map(function(f){return '<details class="flag '+(f.c||"")+'"><summary>'+f.t+'</summary><p>'+f.d+'</p><span class="s">'+f.s+'</span></details>'}).join("");
 }
-function renderReset(){$("resetBox").innerHTML='<button class="btn ghost sm" type="button" data-act="ask-reset">Start again</button>'}
+function recordText(signer){
+  var out=["Tank mix record · "+R.sprayer+" · "+R.title+" · "+R.date_long,"Tank: "+tankText(),"Mixed by: "+(signer||"-"),"Water "+SHEET.startFill+" L: "+(hm(st.fillAt)||"-")];
+  P.forEach(function(p){out.push(p.name+" "+amtText(p)+": "+(hm(st.added[p.id])||"-")+(st.batch[p.id]?" · batch "+st.batch[p.id]:""))});
+  out.push("Topped up to "+SHEET.total+" L: "+(hm(st.topAt)||"-")+(st.ph?" · pH "+st.ph:""));
+  return out.join("\n");
+}
+
+/* ---------- dashboard ---------- */
+var DATA=null, DATAERR=false, SWSEL=null;
+function loadData(){
+  if(!R.data_url){DATAERR=true;renderDash();return}
+  fetch(R.data_url+(R.data_url.indexOf("?")<0?"?v=":"&v=")+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){DATA=d;DATAERR=false;renderDash()},function(){DATAERR=true;renderDash()});
+}
+function statusChips(){
+  if(st.postSig)return '<span class="chip ok">Post-app done · '+esc(st.postSig.name)+' '+hm(st.postSig.at)+'</span>';
+  if(st.mixSig)return '<span class="chip ok">Mixed · '+esc(st.mixSig.name)+' '+hm(st.mixSig.at)+'</span><span class="chip warn">Post-app checklist due</span>';
+  var started=st.fillAt||Object.keys(st.checks).length;
+  return started?'<span class="chip warn">Mixing · step '+(st.i+1)+' of '+S.length+'</span>':'<span class="chip">Not mixed on this phone</span>';
+}
+function todayCard(){
+  var rel=R.date_iso===TODAY?"Today":(R.date_iso<TODAY?"Last tank · "+dLabel(R.date_iso):"Next tank · "+dLabel(R.date_iso));
+  var pend=pendingCount();
+  var showRules=st.mixSig&&!st.postSig;
+  var postBtn=!st.postSig&&(st.mixSig||st.postDue||R.date_iso===TODAY);
+  return '<section class="card dcard today span2">'+
+    '<div class="dhead"><span class="small">'+rel+' · '+esc(R.sprayer)+'</span>'+(pend?'<span class="chip warn">'+pend+' sign-off waiting for signal</span>':'')+'</div>'+
+    '<h2>'+esc(R.title)+'</h2>'+
+    '<div class="statusline">'+statusChips()+'</div>'+
+    '<div class="facts"><span class="fact">'+R.mix_l+' L</span><span class="fact">'+AREA+'</span><span class="fact">'+R.rate_lha+' L/ha</span><span class="fact">'+esc(R.nozzles)+'</span><span class="fact">'+esc(R.speed)+'</span><span class="fact">'+esc(R.pressure)+'</span></div>'+
+    (showRules?'<ul class="rules">'+(R.spray_rules||[]).map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>':'')+
+    (postBtn&&(st.mixSig||st.postDue)?'<button class="btn go md wide" type="button" data-act="open-post">Post-application checklist</button>':
+      (R.date_iso===TODAY&&!st.mixSig?'<button class="btn go md wide" type="button" data-act="to-mix">Open mixing guide</button>':''))+
+    (st.mixSig||(postBtn&&!st.postDue)?'<div class="btnrow">'+
+      (postBtn&&!st.mixSig&&!st.postDue?'<button class="btn soft sm" type="button" data-act="open-post">Post-application checklist</button>':'')+
+      (st.mixSig?'<button class="btn soft sm" type="button" data-act="copy">Copy mix record</button>':'')+
+    '</div>':'')+
+    (!showRules&&R.spray_rules?'<details class="more"><summary>Spraying rules for this tank</summary><div class="morebody"><ul class="rules">'+R.spray_rules.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>'+(R.spray_more?'<p class="small" style="margin:0">'+R.spray_more+'</p>':'')+'</div></details>':'')+
+    (FLAGS.length?'<details class="more"><summary>Label checks on this sheet ('+FLAGS.length+')</summary><div class="morebody flags">'+FLAGS.map(function(f){return '<details class="flag '+(f.c||"")+'"><summary>'+f.t+'</summary><p>'+f.d+'</p><span class="s">'+f.s+'</span></details>'}).join("")+'</div></details>':'')+
+    (st.mixSig&&st.mixSig.sig?'<details class="more"><summary>Signatures</summary><div class="morebody"><div class="small">Mix: '+esc(st.mixSig.name)+', '+hm(st.mixSig.at)+(st.mixSig.sent?' · sent':'')+'</div>'+sigSvg(st.mixSig.sig)+(st.postSig&&st.postSig.sig?'<div class="small">Post-application: '+esc(st.postSig.name)+', '+hm(st.postSig.at)+(st.postSig.sent?' · sent':'')+'</div>'+sigSvg(st.postSig.sig):'')+'</div></details>':'')+
+  '</section>';
+}
+function windowCard(){
+  var sw=(DATA.spray_window||[]).filter(function(x){return x.date>=TODAY});
+  var days=[];sw.forEach(function(x){if(days.indexOf(x.date)<0)days.push(x.date)});days=days.slice(0,4);
+  if(!days.length)return '<section class="card dcard span2"><h2>Spray window</h2><p class="loading">No forecast hours from today in the course data yet.</p></section>';
+  var hrs=[];sw.forEach(function(x){if(x.daylight&&hrs.indexOf(x.hour)<0)hrs.push(x.hour)});hrs.sort(function(a,b){return a-b});
+  var h0=hrs[0],h1=hrs[hrs.length-1],cols=[];for(var hh=h0;hh<=h1;hh++)cols.push(hh);
+  var idx={};sw.forEach(function(x,i){idx[x.date+"|"+x.hour]=i});
+  var rows=days.map(function(dt){
+    var best=null,run=null;
+    var cells=cols.map(function(hh){var i=idx[dt+"|"+hh];var x=i==null?null:sw[i];
+      if(x&&x.daylight&&x.rating==="good"){if(!run)run={a:hh,b:hh};else run.b=hh;if(!best||run.b-run.a>best.b-best.a)best={a:run.a,b:run.b}}else run=null;
+      if(!x||!x.daylight)return '<span class="sw-c gap"></span>';
+      var now=dt===TODAY&&hh===NOWP.hour;
+      return '<button type="button" class="sw-c '+x.rating+(now?' now':'')+(SWSEL===i?' sel':'')+'" data-act="sw" data-i="'+i+'" aria-label="'+dShort(dt)+' '+hh+':00 '+x.rating+'"></button>'});
+    var bl=best?(best.a+":00–"+(best.b+1)+":00"):"no clean hours";
+    return '<div class="sw-day"><div class="dl">'+(dt===TODAY?"Today":DOW[dObj(dt).getUTCDay()])+'<small>'+bl+'</small></div><div class="sw-cells">'+cells.join("")+'</div></div>';
+  }).join("");
+  var lab=cols.map(function(hh){return '<span>'+(hh%3===0?hh:"")+'</span>'}).join("");
+  var det="Tap an hour for the detail.";
+  if(SWSEL!=null&&sw[SWSEL]){var x=sw[SWSEL];det='<b>'+dLabel(x.date)+' '+x.hour+':00</b> · '+x.rating+' · ΔT '+x.delta_t+' · wind '+Math.round(x.wind_kmh)+' gust '+Math.round(x.gust_kmh)+' km/h · '+x.temp_c+' °C · rain '+x.rain_mm+' mm'+(x.why?' · '+esc(x.why):'')}
+  var src=(sw[0]&&sw[0].src)||"";
+  return '<section class="card dcard span2"><div class="dhead"><h2>Spray window</h2><span class="small">'+esc(src)+'</span></div>'+
+    '<div class="sw"><div class="sw-hours"><span></span><div class="hrs">'+lab+'</div></div>'+rows+'</div>'+
+    '<div class="sw-detail" id="swDetail">'+det+'</div>'+
+    '<div class="legend"><span><i style="background:var(--go)"></i>Good</span><span><i style="background:var(--caution)"></i>Marginal</span><span><i style="background:color-mix(in srgb,var(--poison) 50%,transparent)"></i>No</span></div>'+
+    '<p class="small" style="margin:0">Confirm Delta T and wind at the 6th-green station before you spray.</p></section>';
+}
+function clocksCard(){
+  var cl=DATA.clocks||[];
+  var rows=cl.map(function(c){
+    var last=c.last_app;var days=last?daysBetween(last,TODAY):null;
+    if(c.clock==="Ethephon"){
+      var o=c.window_open_day||14,b=c.best_day||21,z=c.window_close_day||28;var d=days==null?0:days;
+      var cls=d<o?"":(d<=z?"warn":"bad");var state=d<o?"Too soon · window opens "+dShort(addDays(last,o)):(d<=z?"Window open · best "+dShort(addDays(last,b))+" · shuts "+dShort(addDays(last,z)):"Past the 28-day window");
+      return '<div class="clock"><div class="ct"><b>Ethephon · '+esc(c.area)+'</b><span class="cv">day '+d+' <small>of '+o+'–'+z+'</small></span></div>'+
+        '<div class="bar"><i class="'+cls+'" style="width:'+Math.min(100,d/z*100)+'%"></i><span class="mk" style="left:'+(o/z*100)+'%"></span><span class="mk" style="left:'+(b/z*100)+'%"></span></div>'+
+        '<div class="cs">'+esc(c.product)+' '+c.rate_l_ha+' L/ha on '+dShort(last)+' · '+state+'</div></div>';
+    }
+    var tgt=c.target_gdd||200,g=c.gdd||0,gl="GDD (base "+(c.base_c||0)+" °C)";
+    if(c.days_since===0)return '<div class="clock"><div class="ct"><b>'+esc(c.clock)+' · '+esc(c.area)+'</b><span class="cv">reset <small>'+dShort(last)+'</small></span></div><div class="bar"><i style="width:2%"></i><span class="mk" style="left:100%"></span></div><div class="cs">'+esc(c.product)+' '+c.rate_l_ha+' L/ha on '+dShort(last)+' · counts to '+tgt+' '+gl+' from here</div></div>';
+    var r=g/tgt,cls2=r<.85?"":(r<1?"warn":"bad");
+    return '<div class="clock"><div class="ct"><b>'+esc(c.clock)+' · '+esc(c.area)+'</b><span class="cv">'+Math.round(g)+' <small>/ '+tgt+'</small></span></div>'+
+      '<div class="bar"><i class="'+cls2+'" style="width:'+Math.min(100,r*100)+'%"></i><span class="mk" style="left:100%"></span></div>'+
+      '<div class="cs">'+esc(c.product)+' '+c.rate_l_ha+' L/ha on '+dShort(last)+' · '+gl+' · '+(r>=1?'due now':r>=.85?'due soon':'regulating')+'</div></div>';
+  }).join("");
+  return '<section class="card dcard"><div class="dhead"><h2>PGR clocks</h2><span class="small">GDD as of '+esc(DATA._built||"")+'</span></div>'+rows+'</section>';
+}
+function addDays(iso,n){var d=dObj(iso);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+function gvxCard(){
+  var dly=(DATA.daily||[]).filter(function(x){return x.gvx21!=null});if(!dly.length)return "";
+  var L=dly[dly.length-1],tail=dly.slice(-30);
+  var vals=tail.map(function(x){return x.gvx21}),mx=Math.max.apply(null,vals.concat([10]))*1.1,W=300,H=64;
+  var pts=tail.map(function(x,i){return [i/(tail.length-1||1)*W,H-4-(x.gvx21/mx)*(H-10)]});
+  var line=pts.map(function(p,i){return (i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)}).join("");
+  var area=line+"L"+W+" "+H+"L0 "+H+"Z",lp=pts[pts.length-1];
+  function f(v){return v==null?"–":Math.round(v)}
+  return '<section class="card dcard"><div class="dhead"><h2>Growth (GvX)</h2><span class="small">greens · to '+dShort(L.date)+'</span></div>'+
+    '<div class="gvx"><div><b>'+f(L.gvx7)+'</b><span>7-day</span></div><div><b>'+f(L.gvx14)+'</b><span>14-day</span></div><div><b>'+f(L.gvx21)+'</b><span>21-day</span></div><div><b>'+f(L.gvx28)+'</b><span>28-day</span></div></div>'+
+    '<svg class="spark" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-label="21-day GvX, last 30 days"><path class="ar" d="'+area+'"/><path class="ln" d="'+line+'"/><circle class="pt" cx="'+lp[0].toFixed(1)+'" cy="'+lp[1].toFixed(1)+'" r="3.5"/></svg>'+
+    '<div class="small">21-day GvX, last 30 days · Ranfurlie house scale · growth potential '+(L.gp14!=null?Math.round(L.gp14*100)+'%':'–')+' (14-day)</div></section>';
+}
+function lvl(l){return l==="high"?"bad":l==="moderate"?"warn":l==="low"?"ok":""}
+function diseaseCard(){
+  var all=DATA.disease_watch||[],dw=all.filter(function(x){return x.level_today!=="none"||x.level_peak!=="none"}),quiet=all.length-dw.length;
+  var rows=dw.map(function(x){return '<li><span class="d"><span class="dot '+lvl(x.level_today)+'"></span></span><span class="t">'+esc(x.label)+'<small>'+esc(x.note_today||"")+'</small></span><span class="v">'+esc(x.level_today)+(x.level_peak&&x.level_peak!==x.level_today?' → '+esc(x.level_peak):'')+'</span></li>'}).join("");
+  return '<section class="card dcard"><div class="dhead"><h2>Disease risk</h2><span class="small">greens · today → peak this week</span></div><ul class="list">'+rows+'</ul>'+(quiet?'<div class="small">'+quiet+' more at no risk</div>':'')+'</section>';
+}
+function coverCard(){
+  var cv=(DATA.coverage||[]).filter(function(x){return x.in_season});
+  var zones={};cv.forEach(function(x){var z=zones[x.zone]||(zones[x.zone]={c:0,g:0});if(x.status==="covered")z.c++;else if(x.status==="gap")z.g++});
+  var zh=Object.keys(zones).map(function(z){return '<div><b>'+esc(z)+'</b><span>'+zones[z].c+' covered · '+zones[z].g+' gaps</span></div>'}).join("");
+  var soon=cv.filter(function(x){return x.status==="covered"&&x.covered_until}).sort(function(a,b){return a.covered_until<b.covered_until?-1:1}).slice(0,5);
+  var sl=soon.map(function(x){var d=daysBetween(TODAY,x.covered_until);return '<li><span class="d">'+dShort(x.covered_until)+'</span><span class="t">'+esc(x.disease)+'<small>'+esc(x.zone)+(x.by?' · '+esc(x.by):'')+'</small></span><span class="v">'+(d<0?'lapsed':d+' d')+'</span></li>'}).join("");
+  var prov=cv.some(function(x){return x.provisional});
+  return '<section class="card dcard"><div class="dhead"><h2>Disease cover</h2><span class="small">AU label claims</span></div><div class="zones">'+zh+'</div>'+(sl?'<div class="small">Cover lapsing next</div><ul class="list">'+sl+'</ul>':'')+(prov?'<p class="small" style="margin:0">Gaps are provisional while products sit on the verify list.</p>':'')+'</section>';
+}
+function aheadCard(){
+  var wa=(DATA.week_ahead||[]).filter(function(x){return x.date>=TODAY}).slice(0,10);
+  var tone={plan:"plan",warn:"warn",bad:"bad",ok:"ok",info:"info",rain:"info"};
+  var rows=wa.map(function(x){return '<li><span class="d">'+dShort(x.date)+'</span><span class="t"><span class="dot '+(tone[x.tone]||"")+'"></span>'+esc(x.label)+'<small>'+esc(x.detail||"")+'</small></span><span class="v small">'+esc(x.cat)+'</span></li>'}).join("");
+  return '<section class="card dcard"><div class="dhead"><h2>Coming up</h2><span class="small">from GreenKeeper and the forecast</span></div><ul class="list">'+(rows||'<li><span></span><span class="t">Nothing booked</span><span></span></li>')+'</ul></section>';
+}
+function appsCard(){
+  var pa=(DATA.pgr_apps||[]).slice(0,6);
+  var rows=pa.map(function(x){return '<li><span class="d">'+dShort(x.date)+'</span><span class="t">'+esc(x.product)+'<small>'+esc(x.area)+' · '+esc(x.active_ingredient||"")+'</small></span><span class="v">'+x.rate_l_ha+' L/ha</span></li>'}).join("");
+  var n=DATA.nitrogen||[],nl=n[n.length-1];
+  var wa=(DATA.wetting_agent||[]).filter(function(x){return x.zone==="greens"})[0];
+  return '<section class="card dcard"><div class="dhead"><h2>Recent PGR</h2><span class="small">all areas</span></div><ul class="list">'+rows+'</ul>'+
+    (nl?'<div class="zones"><div><b>Greens N</b><span>'+nl.n_kg_ha+' kg/ha on '+dShort(nl.date)+' · '+Math.round(nl.season_to_date_kg_ha)+' kg/ha this season</span></div>'+(wa&&wa.effectiveness!=null?'<div><b>Wetting agent</b><span>'+Math.round(wa.effectiveness*100)+'% · '+esc(wa.product)+' · due '+dShort(wa.due_date)+'</span></div>':'')+'</div>':'')+
+  '</section>';
+}
+function watchCard(){
+  var w=(DATA.watch||[]).filter(function(x){return x.state!=="ok"});if(!w.length)return "";
+  var rows=w.map(function(x){return '<li><span class="d"><span class="dot '+(x.state==="bad"?"bad":"warn")+'"></span></span><span class="t">'+esc(x.item)+'<small>'+esc(x.detail||"")+'</small></span><span class="v">'+esc(x.value)+'</span></li>'}).join("");
+  return '<section class="card dcard span2"><div class="dhead"><h2>Watch</h2><span class="small">from the greens dashboard</span></div><ul class="list">'+rows+'</ul></section>';
+}
+function renderDash(){
+  $("dWhen").textContent="Ranfurlie · "+dLabel(TODAY);
+  var h=todayCard();
+  if(DATA){
+    $("dAsOf").textContent="Course data built "+(DATA._built||"");
+    [windowCard,clocksCard,gvxCard,diseaseCard,coverCard,aheadCard,appsCard,watchCard].forEach(function(fn){try{h+=fn()}catch(e){}});
+  } else if(DATAERR){
+    h+='<section class="card dcard span2"><p class="loading">Course data didn’t load. Check your signal and pull to refresh.</p></section>';
+  } else {
+    h+='<section class="card dcard span2"><p class="loading">Loading spray window, PGR clocks and GvX…</p></section>';
+  }
+  $("dash").innerHTML=h;
+  renderPostbar();
+}
+
+/* ---------- post-application checklist ---------- */
+function renderPostbar(){
+  var due=VIEW==="dash"&&(st.mixSig||st.postDue)&&!st.postSig&&$("sheet").hidden;
+  var b=$("postbar");
+  if(due){b.innerHTML='<div class="pt"><b>Post-app checklist due</b><span>'+(st.mixSig?'Mixed by '+esc(st.mixSig.name)+' · '+hm(st.mixSig.at):esc(R.title))+'</span></div><button class="btn go" type="button" data-act="open-post">Complete</button>';b.hidden=false;document.body.classList.add("has-postbar")}
+  else{b.hidden=true;document.body.classList.remove("has-postbar")}
+}
+function nowHM(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
+function openPost(){
+  var pd=st.pd||(st.pd={});if(!pd.finish)pd.finish=nowHM();
+  var preset=st.mixSig?{name:st.mixSig.name,slack:st.mixSig.slack}:null;
+  var dirs=["","N","NE","E","SE","S","SW","W","NW"];
+  $("sheet").innerHTML='<div class="sheet-card"><div class="grab"></div>'+
+    '<div class="sheet-head"><div><div class="small">'+esc(R.title)+'</div><h2 id="sheetTitle">Post-application checklist</h2></div><button class="btn soft sm" type="button" data-act="sheet-close">Close</button></div>'+
+    '<div class="checks">'+POSTC.map(function(r){return checkBtn("post",r[0],r[1],r[2])}).join("")+'</div>'+
+    '<div class="fields">'+
+      '<div class="field"><label for="pdFinish">Finish time</label><input id="pdFinish" type="time" value="'+esc(pd.finish)+'"></div>'+
+      '<div class="field"><label for="pdWind">Wind (km/h)</label><input id="pdWind" inputmode="decimal" value="'+esc(pd.wind||"")+'" placeholder="e.g. 8"></div>'+
+      '<div class="field"><label for="pdDir">Wind from</label><select id="pdDir">'+dirs.map(function(d){return '<option'+(pd.dir===d?' selected':'')+' value="'+d+'">'+(d||"–")+'</option>'}).join("")+'</select></div>'+
+      '<div class="field"><label for="pdTemp">Temp (°C)</label><input id="pdTemp" inputmode="decimal" value="'+esc(pd.temp||"")+'" placeholder="e.g. 18"></div>'+
+    '</div>'+
+    '<div class="field"><label for="pdIssues">Anything to report? (optional)</label><textarea id="pdIssues" placeholder="Drift, blocked nozzles, mix left over, areas missed">'+esc(pd.issues||"")+'</textarea></div>'+
+    whoField("post",preset)+
+    '<p class="decl">I sprayed this tank out, cleaned up as above and recorded the application.</p>'+
+    sigPad("post")+
+    (PREVIEW?'<div class="small">Preview copy: sign-offs only send from the crew link.</div>':'')+
+    '<button class="btn go" type="button" data-act="sign-post" id="signPostBtn" disabled>Sign and send</button>'+
+  '</div>';
+  $("sheet").hidden=false;renderPostbar();$("fab").hidden=true;
+  document.documentElement.style.overflow="hidden";
+  initPad("post",refreshSignPost);refreshSignPost();
+}
+function closePost(){$("sheet").hidden=true;document.documentElement.style.overflow="";renderFab();renderPostbar()}
+function refreshSignPost(){var b=$("signPostBtn");if(!b)return;var was=b.disabled;b.disabled=!(allOn("post",POSTC)&&readWho("post").name&&padHas("post"));if(was&&!b.disabled&&!RM){b.classList.remove("ready");void b.offsetWidth;b.classList.add("ready")}}
+function finishText(){var pd=st.pd||{};var parts=[];if(pd.finish)parts.push(pd.finish);if(pd.wind)parts.push("wind "+pd.wind+" km/h"+(pd.dir?" from "+pd.dir:""));if(pd.temp)parts.push(pd.temp+" °C");return parts.join(" · ")}
+
+/* ---------- views + fab ---------- */
+var VIEW="mix";
+function setView(v,anim){
+  VIEW=v;$("mixView").hidden=v!=="mix";$("dashView").hidden=v!=="dash";
+  if(v==="dash"){renderDash();if(!DATA&&!DATAERR)loadData()}else{render()}
+  renderFab();renderPostbar();
+  try{window.scrollTo({top:0,behavior:"auto"})}catch(e){window.scrollTo(0,0)}
+  if(anim&&!RM){var el=$(v+"View");el.classList.remove("viewin");void el.offsetWidth;el.classList.add("viewin")}
+}
+function renderFab(){
+  var f=$("fab");
+  if(!$("sheet").hidden){f.hidden=true;return}
+  f.hidden=false;
+  f.innerHTML=VIEW==="mix"?UI.dash+'<span>Dashboard</span>':UI.mix+'<span>Mixing guide</span>';
+}
+function defaultView(){if(location.hash==="#mix")return "mix";if(location.hash==="#dash"||location.hash==="#post")return "dash";return (R.date_iso===TODAY&&!st.mixSig)?"mix":"dash"}
+function fromSlack(){if(location.hash!=="#post")return;if(!st.postSig){st.postDue=true;save();openPost()}try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}
 
 function go(n){st.i=Math.max(0,Math.min(S.length-1,n));save();render();try{window.scrollTo({top:0,behavior:RM?"auto":"smooth"})}catch(e){window.scrollTo(0,0)}}
-function toast(t){var el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(function(){el.classList.remove("on")},1600)}
+function toast(t){var el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(function(){el.classList.remove("on")},2200)}
 function buzz(){try{navigator.vibrate&&navigator.vibrate(35)}catch(e){}}
 function ripple(btn,e){if(RM)return;var r=btn.getBoundingClientRect(),d=Math.max(r.width,r.height),s=document.createElement("span");s.className="ripple";s.style.width=s.style.height=d+"px";
   var x=(e&&e.clientX?e.clientX:r.left+r.width/2)-r.left-d/2,y=(e&&e.clientY?e.clientY:r.top+r.height/2)-r.top-d/2;s.style.left=x+"px";s.style.top=y+"px";btn.appendChild(s);setTimeout(function(){s.remove()},650)}
@@ -526,12 +911,26 @@ function pour(to,label,next){
   if(tk&&label){var pl=document.createElement("span");pl.className="plus";pl.textContent=label;tk.parentNode.appendChild(pl)}
   setTimeout(next,900);
 }
-function recordText(){
-  var out=["Tank mix record · "+R.sprayer+" · "+R.title+" · "+R.date_long,"Mixed by: "+(st.mixer||"-"),"Water "+SHEET.startFill+" L: "+(hm(st.fillAt)||"-")];
-  P.forEach(function(p){out.push(p.name+" "+amtText(p)+": "+(hm(st.added[p.id])||"-")+(st.batch[p.id]?" · batch "+st.batch[p.id]:""))});
-  out.push("Topped up to "+SHEET.total+" L: "+(hm(st.topAt)||"-")+(st.ph?" · pH "+st.ph:""));
-  out.push("Sprayed out: "+(hm(st.sprayAt)||"-"));
-  return out.join("\n");
+function copyText(t){
+  var done=function(){toast("Copied")},fallback=function(){var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Copied")}catch(e){toast("Couldn’t copy")}ta.remove()};
+  try{navigator.clipboard.writeText(t).then(done,fallback)}catch(e){fallback()}
+}
+
+function signMix(){
+  var who=readWho("mix");if(!who.name||!padHas("mix")||!mixReady())return;
+  saveMe(who);var sig=padPath("mix");
+  st.mixSig={at:Date.now(),name:who.name,slack:who.slack,sig:sig,sent:false};save();
+  send({kind:"mix",slug:R.slug,title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,ph:st.ph||"",record:recordText(who.name),sig:sig});
+  buzz();toast(PREVIEW?"Signed (preview copy, not sent)":"Mix signed. Sent to #spraying");
+  setTimeout(function(){setView("dash",true)},350);
+}
+function signPost(){
+  var who=readWho("post");if(!who.name||!padHas("post")||!allOn("post",POSTC))return;
+  saveMe(who);var sig=padPath("post");
+  st.postSig={at:Date.now(),name:who.name,slack:who.slack,sig:sig,sent:false};save();
+  var checks=POSTC.map(function(r){return "✓ "+r[1]}).join("\n");
+  send({kind:"post",slug:R.slug,title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,checks:checks,finish:finishText(),issues:(st.pd&&st.pd.issues)||"",sig:sig});
+  buzz();closePost();renderDash();toast(PREVIEW?"Checklist done (preview copy, not sent)":"Checklist done. Sent to #spraying");
 }
 
 var busy=false;
@@ -540,10 +939,12 @@ document.addEventListener("click",function(e){
   if(c){var g=c.getAttribute("data-g"),id=c.getAttribute("data-id");st[g][id]=!st[g][id];save();
     c.setAttribute("aria-pressed",String(!!st[g][id]));buzz();
     c.classList.remove("pop");void c.offsetWidth;if(st[g][id])c.classList.add("pop");
-    var s=S[st.i],btn=document.querySelector('#stage [data-act="next"],#stage [data-act="close"]');
-    if(btn){var was=btn.disabled;btn.disabled=!(s.k==="check"?allOn("checks",CHECKS):s.k==="ppe"?allOn("ppe",TANK_PPE):allOn("close",CLOSE));
+    if(g==="post"){refreshSignPost();return}
+    var s=S[st.i],btn=document.querySelector('#stage [data-act="next"]');
+    if(btn){var was=btn.disabled;btn.disabled=!(s.k==="check"?allOn("checks",CHECKS):allOn("ppe",TANK_PPE));
       if(was&&!btn.disabled&&!RM){btn.classList.remove("ready");void btn.offsetWidth;btn.classList.add("ready")}}
     return}
+  if(e.target===$("sheet")){closePost();return}
   var b=e.target.closest("[data-act]");if(!b||busy)return;
   var a=b.getAttribute("data-act"),s=S[st.i],now=Date.now();
   if(b.classList.contains("go"))ripple(b,e);
@@ -554,28 +955,45 @@ document.addEventListener("click",function(e){
   else if(a==="add"){buzz();if(st.added[s.p.id]){go(st.i+1);return}st.added[s.p.id]=now;save();busy=true;b.textContent="Added ✓";
     pour(afterAdd(s.p),"+"+amtText(s.p),function(){busy=false;go(st.i+1)})}
   else if(a==="topup"){buzz();if(st.topAt){go(st.i+1);return}st.topAt=now;save();busy=true;b.textContent=SHEET.total+" L ✓";pour(SHEET.total,"+"+fmt(SHEET.total-ALL)+" L",function(){busy=false;go(st.i+1)})}
-  else if(a==="spray"){if(!st.sprayAt)st.sprayAt=now;buzz();go(st.i+1)}
-  else if(a==="close"){st.doneAt=now;buzz();go(st.i+1)}
-  else if(a==="copy"){var t=recordText(),ta=$("copyTxt");
-    var fallback=function(){ta.hidden=false;ta.value=t;ta.focus();ta.select();toast("Select all and copy")};
-    try{navigator.clipboard.writeText(t).then(function(){toast("Record copied")},fallback)}catch(err){fallback()}}
-  else if(a==="ask-reset"){$("resetBox").innerHTML='<span class="small">Clear this phone’s progress?</span><button class="btn stop sm" type="button" data-act="reset">Clear</button><button class="btn ghost sm" type="button" data-act="keep">Keep</button>'}
-  else if(a==="reset"){st=fresh();save();renderReset();go(0);toast("Started again")}
+  else if(a==="sign-mix")signMix();
+  else if(a==="sig-clear"){var pid=b.getAttribute("data-pad");clearPad(pid);if(pid==="mix")refreshSignMix();else refreshSignPost()}
+  else if(a==="fab")setView(VIEW==="mix"?"dash":"mix",true);
+  else if(a==="to-mix")setView("mix",true);
+  else if(a==="open-post")openPost();
+  else if(a==="sheet-close")closePost();
+  else if(a==="sign-post")signPost();
+  else if(a==="copy")copyText(recordText(st.mixSig?st.mixSig.name:""));
+  else if(a==="sw"){SWSEL=+b.getAttribute("data-i");renderDash()}
+  else if(a==="ask-reset"){$("resetBox").innerHTML='<span class="small">Clear this phone’s progress on this tank?</span><button class="btn stop sm" type="button" data-act="reset">Clear</button><button class="btn ghost sm" type="button" data-act="keep">Keep</button>'}
+  else if(a==="reset"){st=fresh();save();PADS={};renderReset();setView("mix",true);toast("Started again")}
   else if(a==="keep"){renderReset()}
 });
 document.addEventListener("input",function(e){
   var t=e.target;
   if(t.hasAttribute("data-batch")){st.batch[t.getAttribute("data-batch")]=t.value;save()}
   else if(t.id==="ph"){st.ph=t.value.trim();save();$("phMsg").innerHTML=phBox()}
-  else if(t.id==="mixer"){st.mixer=t.value;save()}
+  else if(t.id==="pdFinish"||t.id==="pdWind"||t.id==="pdTemp"||t.id==="pdIssues"||t.id==="pdDir"){var k={pdFinish:"finish",pdWind:"wind",pdTemp:"temp",pdIssues:"issues",pdDir:"dir"}[t.id];st.pd=st.pd||{};st.pd[k]=t.value;save()}
+  else if(t.id&&t.id.indexOf("whoOther-")===0){var id=t.id.slice(9);if(id==="mix")refreshSignMix();else refreshSignPost()}
 });
+document.addEventListener("change",function(e){
+  var t=e.target;
+  if(t.hasAttribute&&t.hasAttribute("data-who")){var id=t.getAttribute("data-who");var o=$("whoOther-"+id);if(o){o.hidden=t.value!=="other";if(!o.hidden)o.focus()}if(id==="mix")refreshSignMix();else refreshSignPost()}
+  else if(t.id==="pdDir"){st.pd=st.pd||{};st.pd.dir=t.value;save()}
+});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("sheet").hidden)closePost()});
+window.addEventListener("hashchange",function(){if(location.hash==="#mix"||location.hash==="#dash")setView(location.hash.slice(1),true);else if(location.hash==="#post"){setView("dash",false);fromSlack()}});
+var rsz;window.addEventListener("resize",function(){clearTimeout(rsz);rsz=setTimeout(function(){Object.keys(PADS).forEach(function(k){var p=PADS[k];if(p.el&&document.body.contains(p.el)){initPad(k,k==="mix"?refreshSignMix:refreshSignPost)}})},200)});
+function renderReset(){$("resetBox").innerHTML='<button class="btn ghost sm" type="button" data-act="ask-reset">Start again</button>'}
 
 function wake(){try{if(navigator.wakeLock&&document.visibilityState==="visible"){navigator.wakeLock.request("screen").then(function(){},function(){})}}catch(e){}}
-document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")wake()});
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"){wake();flush()}});
 wake();
 
 shownL=litres();
-renderFlags();renderReset();render();
+renderFlags();renderReset();
+setView(defaultView(),false);
+fromSlack();
+flush();
 })();
 </script>
 
