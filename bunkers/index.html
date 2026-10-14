@@ -136,6 +136,17 @@ a.pill:hover{border-color:var(--acc);color:var(--fg)}
 .tip{position:absolute;pointer-events:none;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;font-size:13px;max-width:260px;box-shadow:0 10px 30px rgba(0,0,0,.35);transform:translate(-50%,calc(-100% - 14px));opacity:0;transition:opacity .15s;z-index:3}
 .tip b{font-family:var(--mono);color:var(--acc)}
 .mapnote{margin:-4px 16px 14px;font-size:12.5px;color:var(--faint)}
+/* mobile v1.1 (15 Oct 2026): jump-to-hole bar and zoom buttons so the map works without pinching */
+.holebar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:0 12px 12px;align-items:center}
+.holebar::-webkit-scrollbar{display:none}
+.holebar .lbl{flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-right:2px}
+.holebar button{flex:none;min-width:38px;height:36px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);color:var(--fg);font-family:var(--display);font-weight:700;font-size:17px;cursor:pointer;position:relative}
+.holebar button.w{font-family:var(--body);font-weight:600;font-size:13px}
+.holebar button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--bg)}
+.holebar button.hw::after{content:"";position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--warn)}
+.zoomc{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.zoomc button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 90%,transparent);color:var(--fg);font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+.zoomc button:disabled{opacity:.4;cursor:default}
 
 /* detail */
 .detail{padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -280,6 +291,25 @@ table{font-size:15px}
 .holes{grid-template-columns:1fr 1fr;padding:0 12px 12px}
 footer{font-size:14px}
 .map-l .xl{display:none}
+.mapbox{aspect-ratio:1/1!important}
+.map-l{font-size:12px;padding:5px 8px}
+.holebar{padding:0 8px 10px}
+.kpis{gap:6px}
+.kpi{padding:9px 11px 8px}
+.kpi .eyebrow{font-size:10.5px;letter-spacing:.06em}
+.kpi .v{font-size:30px}
+.kpi .v small{font-size:17px}
+.kpi .s{font-size:12.5px}
+.brand p{font-size:14px}
+.mark{width:46px;height:46px;border-radius:12px}
+.howto{grid-template-columns:1fr;margin:0 12px 12px}
+.howto .ic{display:none}
+.howto code{white-space:normal;overflow-wrap:anywhere}
+.tbl{padding:0 12px 12px}
+#stockTbl td{white-space:normal;overflow-wrap:break-word}
+#stockTbl th{white-space:nowrap}
+#stockTbl td.n{font-size:14px}
+#stockTbl td.n{white-space:normal}
 }
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -327,7 +357,9 @@ footer{font-size:14px}
         <div class="map-l" id="mapLeg"></div>
         <div class="map-hint" id="mapHint">Tap a bunker · zoom in for bunker numbers</div>
         <div class="dock" id="dock"></div>
+        <div class="zoomc" id="zoomc"><button type="button" id="zIn" aria-label="Zoom in">+</button><button type="button" id="zOut" aria-label="Zoom out">−</button></div>
       </div>
+      <div class="holebar" id="holebar" aria-label="Jump to a hole"></div>
       <p class="mapnote" id="mapNote"></p>
     </div>
 
@@ -674,8 +706,7 @@ function holesBk() {
 function flyHole(h) {
   const v = h === 0 ? (D.chip ? { g: D.chip } : null) : D.holes[h]; if (!v) return;
   $('#mapPanel').scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'center' });
-  if (three && !$('#m3').hidden) { three.look(v.g[0], v.g[1]); return; }
-  zoomTo(v.g[0], v.g[1], 2.6);
+  fitHole(h);
 }
 
 /* ---------- flow chart ---------- */
@@ -703,7 +734,7 @@ function flow() {
 }
 
 /* ---------- 2D map ---------- */
-let zoomer, mapG, proj, zk = 1;
+let zoomer, mapG, proj, zk = 1, focusHole = null, scr = 1;
 function pinsShown() { return D.pins.filter(p => (showAll || p.live) && D.byId[p.job]); }
 function legend() {
   const L = $('#mapLeg'); L.replaceChildren();
@@ -766,15 +797,50 @@ function map2() {
     .on('pointerleave', () => tip.style.opacity = 0)
     .on('click', (e, d) => select(d.job))
     .on('keydown', (e, d) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(d.job); } });
-  const labels = () => { const s = Math.max(1, zk); mapG.selectAll('.bkn').attr('font-size', 10 / s).attr('stroke-width', 2.4 / s).attr('opacity', s >= 1.9 ? 1 : 0); mapG.selectAll('.bk').attr('stroke-width', .8 / Math.sqrt(s)); };
-  zoomer = d3.zoom().scaleExtent([1, 9]).translateExtent([[0, 0], [W, H]]).on('zoom', e => { zk = e.transform.k; mapG.attr('transform', e.transform); labels(); });
+  // scr = map units per screen pixel (about 1 on a desktop, 2.5-3 on a phone) so labels stay readable on small screens
+  scr = Math.max(1, W / (svg.node().clientWidth || W));
+  const labels = () => { const s = Math.max(1, zk), f = Math.max(1, scr * .8), thr = 1.9 * Math.max(1, scr * .7);
+    mapG.selectAll('.bkn').attr('font-size', 10 * f / s).attr('stroke-width', 2.4 * f / s).attr('opacity', b => s >= thr || (focusHole != null && b.h === focusHole && s > 1.4) ? 1 : 0);
+    mapG.selectAll('.hole-n').style('font-size', (13 * Math.max(1, scr * .85) / Math.sqrt(s)) + 'px');
+    mapG.selectAll('.bk').attr('stroke-width', .8 / Math.sqrt(s));
+    const n = svg.node(); n.style.touchAction = zk > 1.01 ? 'none' : 'pan-y';
+    $('#zOut').disabled = zk <= 1.01; $('#zIn').disabled = zk >= 8.9; };
+  // one finger on the map scrolls the page until you zoom in; two fingers pinch the map
+  const nd = svg.node(), Hv = nd.clientWidth ? W * nd.clientHeight / nd.clientWidth : H, ey = Math.max(0, (Hv - H) / 2) + 60;
+  zoomer = d3.zoom().scaleExtent([1, 9]).translateExtent([[-60, -ey], [W + 60, H + ey]])
+    .filter(e => e.type.startsWith('touch') ? (e.touches.length > 1 || zk > 1.01) : (!e.ctrlKey || e.type === 'wheel') && !e.button)
+    .on('zoom', e => { zk = e.transform.k; mapG.attr('transform', e.transform); labels(); });
   svg.call(zoomer).on('dblclick.zoom', null);
+  $('#zIn').onclick = () => svg.transition().duration(RM ? 0 : 350).call(zoomer.scaleBy, 1.8);
+  $('#zOut').onclick = () => { if (zk / 1.8 <= 1.05) { focusHole = null; holebar(); } svg.transition().duration(RM ? 0 : 350).call(zoomer.scaleBy, 1 / 1.8); };
+  holebar();
   zk = 1; labels(); recolor(); legend(); markSel();
   const dock = $('#dock'); dock.replaceChildren();
   const groups = d3.groups(D.jobs.filter(j => !D.pins.some(p => p.job === j.id) && (showAll || LIVE.includes(j.status))), j => j.dock || 'Other');
   groups.forEach(([k, js]) => dock.append(el('button', { type: 'button', onclick: () => { setFilter(k === 'To confirm' ? 'Needs confirming' : 'live'); select(sorted(js)[0].id); } }, el('b', { text: js.length }), ' ' + k)));
 }
-function zoomTo(x, y, s) { if (!zoomer) return; const [px, py] = proj(x, y), svg = d3.select('#m2'), [, , W, H] = svg.attr('viewBox').split(' ').map(Number); svg.transition().duration(RM ? 0 : 900).call(zoomer.transform, d3.zoomIdentity.translate(W / 2 - px * s, H / 2 - py * s).scale(s)); }
+function holebar() {
+  const hb = $('#holebar'); if (!hb) return; hb.replaceChildren(el('span', { class: 'lbl', text: 'Hole' }));
+  const mk = (h, t) => { const open = h != null && D.jobs.some(j => ACT(j) && (j.bks.some(n => D.bk[n].h === h) || (!j.bks.length && +j.hole === h && h)));
+    const b = el('button', { type: 'button', class: (h == null || h === 0 ? 'w' : '') + (open ? ' hw' : ''), 'aria-pressed': String(focusHole === h), 'aria-label': h == null ? 'Whole course' : h === 0 ? 'Chipping green' : 'Hole ' + h + (open ? ', open work' : ''), text: t });
+    b.onclick = () => fitHole(h); return b; };
+  hb.append(mk(null, 'All'), ...Array.from({ length: 18 }, (_, i) => mk(i + 1, String(i + 1))), mk(0, 'Chip'));
+}
+function fitHole(h) {
+  focusHole = h; holebar();
+  if (three && !$('#m3').hidden) { const v = h == null ? null : h === 0 ? (D.chip ? { g: D.chip } : null) : D.holes[h]; if (v) three.look(v.g[0], v.g[1]); return; }
+  const svg = d3.select('#m2'); if (!zoomer) return;
+  if (h == null) { svg.transition().duration(RM ? 0 : 700).call(zoomer.transform, d3.zoomIdentity); return; }
+  const pts = D.bunkers.filter(b => b.h === h).map(b => b.c);
+  const v = h === 0 ? (D.chip ? { g: D.chip } : null) : D.holes[h]; if (v) pts.push(v.g);
+  if (!pts.length) return;
+  const P = pts.map(p => proj(p[0], p[1])), xs = P.map(p => p[0]), ys = P.map(p => p[1]);
+  const [, , W, H] = svg.attr('viewBox').split(' ').map(Number), n = svg.node(), Hv = n.clientWidth ? W * n.clientHeight / n.clientWidth : H;
+  const bw = Math.max(60, d3.max(xs) - d3.min(xs)) + 70, bh = Math.max(60, d3.max(ys) - d3.min(ys)) + 70;
+  const s = Math.max(1.5, Math.min(9, W / bw, Hv / bh)), cx = (d3.min(xs) + d3.max(xs)) / 2, cy = (d3.min(ys) + d3.max(ys)) / 2;
+  svg.transition().duration(RM ? 0 : 800).call(zoomer.transform, d3.zoomIdentity.translate(W / 2 - cx * s, H / 2 - cy * s).scale(s));
+}
+function zoomTo(x, y, s) { s = Math.min(9, s * Math.max(1, scr * .55)); if (!zoomer) return; const [px, py] = proj(x, y), svg = d3.select('#m2'), [, , W, H] = svg.attr('viewBox').split(' ').map(Number); svg.transition().duration(RM ? 0 : 900).call(zoomer.transform, d3.zoomIdentity.translate(W / 2 - px * s, H / 2 - py * s).scale(s)); }
 function flyTo(id) {
   if (three && !$('#m3').hidden) { three.pick(id); return; }
   const p = D.pins.find(p => p.job === id); if (!p) return; zoomTo(p.x, p.y, 3.4);
