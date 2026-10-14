@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ranfurlie Tank Mix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Ranfurlie Tank Mix v1 (14 Oct 2026). Same type and colour family as the bunkers/drainage/irrigation pages.
+   Layout: sticky status bar (step + tank sight gauge), one big step card at a time, recipe + label checks beside it on wide screens, stacked on phones. */
+:root{
+  color-scheme:dark;
+  --bg:#10140f; --bg2:#151b14; --panel:#192118; --panel2:#1e281d; --line:#2b3829; --line2:#3b4b38;
+  --fg:#eef0e4; --muted:#a6ae98; --faint:#717b68;
+  --acc:#e3bf72; --acc-ink:#1b1608;
+  --tank:#4fb8d0; --tank2:#1d4a55;
+  --poison:#ff6b5b; --poison-bg:#3a1714; --caution:#f5b841; --caution-bg:#3a2c0f; --ok:#5bd68a; --ok-bg:#12321f; --info:#8fa9ff;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:14px;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --bg:#f3f1e9; --bg2:#ebe8dc; --panel:#ffffff; --panel2:#f8f6ef; --line:#ddd8c6; --line2:#c9c1a6;
+  --fg:#1f2619; --muted:#5b6450; --faint:#878f7a;
+  --acc:#9a6f14; --acc-ink:#ffffff;
+  --tank:#1f8aa3; --tank2:#cfe7ec;
+  --poison:#c93a2b; --poison-bg:#fbe3df; --caution:#9a6400; --caution-bg:#fbefd2; --ok:#1f8a4c; --ok-bg:#dcf1e3; --info:#4b63d6;
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f3f1e9; --bg2:#ebe8dc; --panel:#ffffff; --panel2:#f8f6ef; --line:#ddd8c6; --line2:#c9c1a6;
+  --fg:#1f2619; --muted:#5b6450; --faint:#878f7a;
+  --acc:#9a6f14; --acc-ink:#ffffff;
+  --tank:#1f8aa3; --tank2:#cfe7ec;
+  --poison:#c93a2b; --poison-bg:#fbe3df; --caution:#9a6400; --caution-bg:#fbefd2; --ok:#1f8a4c; --ok-bg:#dcf1e3; --info:#4b63d6;
+}
+:root[data-theme="dark"]{color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.01em;margin:0;text-wrap:balance;line-height:1.05}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:13px;color:var(--muted)}
+a{color:var(--info)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:6px}
+
+/* header */
+.top{border-bottom:1px solid var(--line);background:var(--bg2)}
+.top .wrap{padding-block:16px 14px;display:flex;flex-wrap:wrap;gap:10px 24px;align-items:flex-end;justify-content:space-between}
+.top h1{font-size:clamp(28px,6vw,40px)}
+.top .sheet{color:var(--muted);font-size:14px;margin-top:4px;min-width:0}
+.facts{display:flex;flex-wrap:wrap;gap:6px}
+.fact{border:1px solid var(--line2);border-radius:999px;padding:3px 10px;font-size:13px;color:var(--muted);white-space:nowrap}
+.fact b{color:var(--fg);font-family:var(--mono);font-weight:600;font-size:12.5px}
+.demo{background:var(--caution-bg);color:var(--fg);border-bottom:1px solid var(--line)}
+.demo .wrap{padding-block:9px;font-size:14px;display:flex;gap:10px;align-items:center}
+.demo strong{color:var(--caution)}
+
+/* sticky status */
+.status{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.status .wrap{padding-block:10px;display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:center}
+.stepline{display:flex;gap:10px;align-items:baseline;min-width:0}
+.stepline .eyebrow{white-space:nowrap}
+.stepname{font-family:var(--display);font-weight:600;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.prog{grid-column:1/-1;height:6px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--acc);width:0;transition:width .35s ease}
+.gauge{display:flex;align-items:center;gap:10px}
+.gauge .lit{font-family:var(--mono);font-size:14px;white-space:nowrap}
+.gauge .lit b{font-size:17px}
+.glass{position:relative;width:132px;height:16px;border:1.5px solid var(--line2);border-radius:5px;background:var(--panel);overflow:hidden}
+.glass .water{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,var(--tank2),var(--tank));transition:width .5s ease}
+.glass .mark{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--acc)}
+
+/* layout */
+.main .wrap{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;padding-block:20px 48px}
+@media (min-width:920px){.main .wrap{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start}.side{position:sticky;top:84px}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.stage{padding:20px;display:grid;gap:18px;min-width:0}
+@media (min-width:600px){.stage{padding:26px}}
+
+/* step content */
+.kicker{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ordn{font-family:var(--mono);font-weight:600;font-size:13px;background:var(--acc);color:var(--acc-ink);border-radius:6px;padding:2px 8px}
+.chip{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:13px;border-radius:6px;padding:2px 8px;border:1px solid var(--line2);color:var(--muted)}
+.chip.poison{background:var(--poison-bg);color:var(--poison);border-color:color-mix(in srgb,var(--poison) 45%,transparent)}
+.chip.caution{background:var(--caution-bg);color:var(--caution);border-color:color-mix(in srgb,var(--caution) 45%,transparent)}
+.chip.sds{background:var(--panel2)}
+.pname{font-size:clamp(34px,8vw,52px)}
+.pdesc{color:var(--muted);margin-top:4px}
+.amount{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;padding:14px 16px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+.amount .big{font-family:var(--mono);font-weight:600;font-size:clamp(44px,12vw,64px);line-height:1;font-variant-numeric:tabular-nums}
+.amount .calc{color:var(--muted);font-size:14px;font-family:var(--mono)}
+.amount .after{width:100%;font-size:14px;color:var(--muted)}
+.amount .after b{color:var(--tank);font-family:var(--mono)}
+.how{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:h}
+.how li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:17px}
+.how li::before{counter-increment:h;content:counter(h);font-family:var(--mono);font-size:13px;font-weight:600;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line2);color:var(--muted);margin-top:1px}
+.callout{border-radius:10px;padding:12px 14px;display:grid;gap:4px;font-size:15px}
+.callout .t{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:13px}
+.callout.warn{background:var(--poison-bg);border:1px solid color-mix(in srgb,var(--poison) 40%,transparent)}
+.callout.warn .t{color:var(--poison)}
+.callout.note{background:var(--caution-bg);border:1px solid color-mix(in srgb,var(--caution) 40%,transparent)}
+.callout.note .t{color:var(--caution)}
+.callout.why{background:var(--panel2);border:1px solid var(--line)}
+.callout.why .t{color:var(--muted)}
+.ppe{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.ppe .p{display:grid;justify-items:center;text-align:center;gap:6px;padding:10px 6px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:13px;line-height:1.2}
+.ppe .p svg{width:34px;height:34px;stroke:var(--fg);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ppe.req .p{border-color:color-mix(in srgb,var(--poison) 55%,var(--line))}
+.ppe.req .p svg{stroke:var(--poison)}
+.src{font-size:13px;color:var(--faint)}
+.src a{color:var(--muted)}
+.field{display:grid;gap:6px}
+.field label{font-size:14px;color:var(--muted)}
+.field input{font:inherit;font-family:var(--mono);font-size:18px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line2);background:var(--panel2);color:var(--fg);width:100%;max-width:280px}
+
+/* checklists */
+.checks{display:grid;gap:8px}
+.check{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--panel2);cursor:pointer;text-align:left;width:100%}
+.check .box{width:28px;height:28px;border-radius:8px;border:2px solid var(--line2);display:grid;place-items:center;margin-top:1px;transition:background .15s,border-color .15s}
+.check .box svg{width:18px;height:18px;stroke:var(--acc-ink);stroke-width:3;fill:none;opacity:0}
+.check[aria-pressed="true"]{border-color:color-mix(in srgb,var(--ok) 60%,var(--line))}
+.check[aria-pressed="true"] .box{background:var(--ok);border-color:var(--ok)}
+.check[aria-pressed="true"] .box svg{opacity:1;stroke:var(--bg)}
+.check .lbl{font-size:17px;font-weight:500}
+.check .sub{display:block;font-size:14px;color:var(--muted);font-weight:400;margin-top:2px}
+
+/* buttons */
+.actions{display:grid;grid-template-columns:auto 1fr;gap:10px}
+.btn{border:1.5px solid var(--line2);background:var(--panel2);border-radius:12px;padding:14px 18px;font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:.03em;cursor:pointer;min-height:58px}
+.btn.go{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-size:22px;min-height:68px}
+.btn.go:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent}
+.btn.stop{background:var(--poison-bg);color:var(--poison);border-color:color-mix(in srgb,var(--poison) 50%,transparent)}
+.btn:active{transform:translateY(1px)}
+.small{font-size:14px;color:var(--muted)}
+
+/* side */
+.side{display:grid;gap:20px;min-width:0}
+.panel{padding:18px 18px 16px}
+.panel h2{font-size:24px;margin-bottom:10px}
+.recipe{list-style:none;margin:0;padding:0;display:grid}
+.recipe li{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:9px 6px;border-top:1px solid var(--line);font-size:15px}
+.recipe li:first-child{border-top:0}
+.recipe .o{font-family:var(--mono);font-size:12px;color:var(--faint);text-align:center}
+.recipe .nm{min-width:0}
+.recipe .nm small{display:block;color:var(--faint);font-size:12.5px}
+.recipe .q{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.recipe li.now{background:var(--panel2);border-radius:8px}
+.recipe li.now .o{color:var(--acc);font-weight:600}
+.recipe li.done .nm,.recipe li.done .q{color:var(--muted)}
+.recipe li.done .o{color:var(--ok)}
+.recipe .tot{font-weight:600}
+.flags{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.flags li{border-left:3px solid var(--caution);padding:2px 0 2px 12px;font-size:14.5px}
+.flags li.red{border-left-color:var(--poison)}
+.flags li b{display:block;font-size:15px}
+.flags li .s{display:block;font-size:12.5px;color:var(--faint);margin-top:3px}
+.records{width:100%;border-collapse:collapse;font-size:14px}
+.records th,.records td{text-align:left;padding:7px 6px;border-top:1px solid var(--line);vertical-align:top}
+.records th{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12.5px;color:var(--muted)}
+.records td.num{white-space:nowrap}
+.tablewrap{overflow-x:auto}
+.foot{color:var(--faint);font-size:13px}
+.foot .wrap{padding-block:0 32px}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;transition:.25s;pointer-events:none;z-index:9;max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.enter{animation:enter .28s ease both}
+@keyframes enter{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.enter{animation:none}.prog i,.glass .water{transition:none}}
+@media (max-width:520px){.gauge .glass{width:84px}.status .wrap{grid-template-columns:1fr}.gauge{justify-content:space-between}}
+</style>
+
+<header class="top">
+  <div class="wrap gut">
+    <div style="min-width:0">
+      <div class="eyebrow">Tank mix · Toro 5800</div>
+      <h1>Fert + PGR to Greens &amp; Surrounds</h1>
+      <div class="sheet">GreenKeeper sheet "5800 - 300L/Ha - Fert + PGR to Greens and Surrounds" · Wed 14 Oct 2026</div>
+    </div>
+    <div class="facts" aria-label="Sprayer setup">
+      <span class="fact">Area <b>3.00 ha</b></span>
+      <span class="fact">Rate <b>300 L/ha</b></span>
+      <span class="fact">Mix <b>900 L</b> (0.75 tank)</span>
+      <span class="fact">Nozzles <b>Red AIC</b></span>
+      <span class="fact"><b>6.9 km/h</b> · <b>4 bar</b></span>
+    </div>
+  </div>
+</header>
+<div class="demo"><div class="wrap gut"><strong>Demo.</strong> <span>Built from today's sheet. This tank already went out (11:00am–2:00pm). Don't mix from this page.</span></div></div>
+
+<div class="status" id="status">
+  <div class="wrap gut">
+    <div class="stepline"><span class="eyebrow" id="stepNo">Step 1 of 15</span><span class="stepname" id="stepName">Sprayer check</span></div>
+    <div class="gauge" aria-live="polite">
+      <div class="glass" title="Tank: 1,200 L. Gold line = 900 L mix"><i class="water" id="water"></i><i class="mark" style="left:75%"></i></div>
+      <span class="lit"><b id="litres">0</b> / 900 L</span>
+    </div>
+    <div class="prog"><i id="prog"></i></div>
+  </div>
+</div>
+
+<main class="main">
+  <div class="wrap gut">
+    <section class="card stage enter" id="stage" aria-live="polite"></section>
+    <aside class="side">
+      <section class="card panel">
+        <h2>Recipe</h2>
+        <ol class="recipe" id="recipe"></ol>
+      </section>
+      <section class="card panel" id="flagsPanel">
+        <h2>Label checks on this sheet</h2>
+        <p class="small" style="margin:0 0 12px">For Andy and Ben. Read against the current APVMA labels and maker SDSs on 14 Oct 2026. Settle these before the next sheet like this goes to the crew.</p>
+        <ul class="flags" id="flags"></ul>
+      </section>
+    </aside>
+  </div>
+</main>
+<footer class="foot"><div class="wrap gut"><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
+  <span>Progress is kept on this phone only. The label is the legal document; this page points to it.</span>
+  <span class="confirm" id="resetBox"><button class="btn ghost" style="min-height:40px;font-size:15px;padding:6px 12px" id="resetBtn">Start again</button></span>
+</div></div></footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+
+var ICON = {
+  overalls:'<svg viewBox="0 0 24 24"><path d="M8 2.5v5.5H6.5V21h5v-7h1v7h5V8H16V2.5"/><path d="M8 8h8M8 2.5h2M14 2.5h2"/></svg>',
+  hat:'<svg viewBox="0 0 24 24"><path d="M2.5 17.5h19"/><path d="M5.5 17.5c0-6 2.5-9.5 6.5-9.5s6.5 3.5 6.5 9.5"/><path d="M8 13h8"/></svg>',
+  gloves:'<svg viewBox="0 0 24 24"><path d="M8 22v-7l-2.6-3.4a1.6 1.6 0 0 1 2.5-2L9 11V4.5a1.5 1.5 0 0 1 3 0V10V3.5a1.5 1.5 0 0 1 3 0V10V5a1.5 1.5 0 0 1 3 0v9.5c0 3-1.5 5.5-3.5 7.5"/></svg>',
+  goggles:'<svg viewBox="0 0 24 24"><path d="M3 9.5h18v5a2 2 0 0 1-2 2h-4.2l-1.8-2h-2l-1.8 2H5a2 2 0 0 1-2-2z"/><path d="M3 12H1M21 12h2"/></svg>',
+  shield:'<svg viewBox="0 0 24 24"><path d="M5 4h14"/><path d="M5.5 4.5S4.5 14 12 21c7.5-7 6.5-16.5 6.5-16.5"/><path d="M8.5 9.5h7"/></svg>',
+  mask:'<svg viewBox="0 0 24 24"><path d="M5 9c3.5-2.5 10.5-2.5 14 0v4c0 3.5-3 6.5-7 6.5S5 16.5 5 13z"/><path d="M5 10 2 8M19 10l3-2M5 13.5 2 15M19 13.5l3 1.5M9 12h6"/></svg>',
+  apron:'<svg viewBox="0 0 24 24"><path d="M9 3h6v3.5l3.5 2.5V21h-13V9L9 6.5z"/><path d="M5.5 11 3 12.5M18.5 11 21 12.5"/></svg>',
+  boots:'<svg viewBox="0 0 24 24"><path d="M7.5 3h6v10l6 3.2V21h-16v-4l4-3z"/><path d="M3.5 18h16"/></svg>'
+};
+var PPE = {
+  overalls:"Cotton overalls, buttoned neck &amp; wrist",
+  hat:"Washable hat",
+  gloves:"Elbow-length PVC gloves",
+  goggles:"Goggles",
+  shield:"Face shield",
+  mask:"Disposable mist mask",
+  apron:"Chemical apron",
+  boots:"Safety boots"
+};
+var TICK='<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>';
+
+var SHEET={area:3.0, total:900, cap:1200, startFill:600};
+
+/* Products in the order they go in. sheet = order on the GreenKeeper sheet. */
+var P=[
+ {id:"companion",name:"Companion",sheet:1,rate:"300 mL/ha",amt:0.9,unit:"mL",show:"900",showUnit:"mL",
+  what:"Acidifying and penetrating surfactant (soya phospholipids + propionic acid)",form:"Adjuvant",sig:"CAUTION",sigc:"caution",
+  how:["Measure 900 mL.","Pour into the moving water before anything else goes in."],
+  why:"Drops the water pH before the ethephon goes in. Label: Companion first, then the other products.",
+  warn:"Will damage eyes. Will irritate skin.",
+  ppe:["overalls","gloves","shield"],
+  src:'Label APVMA 51664 (Apr 2023) · <a href="https://elabels.apvma.gov.au/51664ELBL.pdf" target="_blank" rel="noopener">label</a>'},
+ {id:"chloro",name:"Chlorostick 720 SC",sheet:2,rate:"20 L/ha",amt:60,unit:"L",show:"60.0",showUnit:"L",
+  what:"Chlorothalonil 720 g/L fungicide · Group M5",form:"Suspension (SC)",sig:"POISON",sigc:"poison",
+  how:["Shake and turn each drum over several times before opening.","Pour 60.0 L with the agitator running.","Rinse each empty drum 3 times into the tank."],
+  why:"Suspension concentrate. Goes in early so it spreads through plenty of moving water.",
+  warn:"Attacks eyes and skin. Don't breathe the mist. If clothing gets product or spray on it, take it off straight away.",
+  ppe:["overalls","hat","gloves","goggles","mask"],
+  src:'Label APVMA 69652 · SDS Feb 2025 · <a href="https://elabels.apvma.gov.au/69652ELBL.pdf" target="_blank" rel="noopener">label</a> · <a href="https://www.oasisturf.com.au/wp-content/uploads/2026/04/CHLOROSTICK-720-SC-FUNGICIDE_2025_SDS.pdf" target="_blank" rel="noopener">SDS</a>'},
+ {id:"shadow",name:"Shadow Ultra",sheet:3,rate:"1.0 L/ha",amt:3,unit:"L",show:"3.00",showUnit:"L",
+  what:"Trinexapac-ethyl 120 g/L growth regulator",form:"Micro-emulsion (ME)",sig:"CAUTION",sigc:"caution",
+  how:["Measure 3.00 L in a jug.","Pour straight in. No pre-mix.","Rinse the jug into the tank."],
+  why:"Label: add to a tank at least two-thirds full of water. You're at 660 L.",
+  warn:"Harmful if breathed in. Keep off eyes and skin.",
+  ppe:["overalls","gloves"],
+  src:'Label APVMA 88267 · <a href="https://elabels.apvma.gov.au/88267ELBL.pdf" target="_blank" rel="noopener">label</a>'},
+ {id:"promote",name:"Promote Plus 900",sheet:4,rate:"3.5 L/ha",amt:10.5,unit:"L",show:"10.5",showUnit:"L",
+  what:"Ethephon 900 g/L growth regulator",form:"Soluble liquid (SL)",sig:"POISON",sigc:"poison",
+  how:["Measure 10.5 L. Pour slowly, low to the opening, agitator running.","Rinse the jug and each empty drum into the tank straight away."],
+  why:"Goes in after Companion so it lands in acidified water. Label: don't use alkaline water.",
+  warn:"Corrosive. Burns skin and eyes. Splash in the eye: flush with water for at least 15 minutes and get medical help.",
+  ppe:["overalls","gloves","goggles","shield","apron"],
+  src:'Label APVMA 69487 · SDS ADAMA Jun 2023 · <a href="https://elabels.apvma.gov.au/69487ELBL.pdf" target="_blank" rel="noopener">label</a> · <a href="https://www.adama.com/australia/en/media/2596/download?attachment" target="_blank" rel="noopener">SDS</a>'},
+ {id:"astron",name:"ASTRON",sheet:5,rate:"10 L/ha",amt:30,unit:"L",show:"30.0",showUnit:"L",
+  what:"Floratine foliar biostimulant (Ca, Mg, Fe, Zn, Cu, B)",form:"Liquid nutrient",sig:"SDS: DANGER",sigc:"sds",
+  how:["Shake the drums hard. It's high in solids.","Lift the basket strainer out of the fill opening.","Pour 30.0 L."],
+  why:"Floratine's mixing order: ASTRON, then Perk Up, then GlycoFuze.",
+  warn:"Causes serious eye damage.",
+  ppe:["overalls","gloves","goggles"],
+  src:'Floratine info sheet + SDS Apr 2024 (Turfcare Australia) · <a href="https://turfcareaus.com.au/wp-content/uploads/2026/03/Astron_SDS_2024.pdf" target="_blank" rel="noopener">SDS</a>'},
+ {id:"perkup",name:"Perk Up",sheet:7,rate:"6.08 L/ha",amt:18.23,unit:"L",show:"18.2",showUnit:"L",
+  what:"Floratine calcium (8% Ca) + carbohydrates",form:"Liquid nutrient",sig:"SDS: DANGER",sigc:"sds",
+  how:["Shake well.","Strainer still out. Pour 18.2 L.","Put the basket strainer back in."],
+  why:"Floratine's order puts Perk Up before GlycoFuze.",
+  note:"Order changed from the sheet: Perk Up goes in before GlycoFuze (sheet had it 7th).",
+  warn:"Causes serious eye damage.",
+  ppe:["overalls","gloves","goggles"],
+  src:'Floratine info sheet + SDS Apr 2024 · <a href="https://turfcareaus.com.au/wp-content/uploads/2026/03/Perk-Up_SDS_2024.pdf" target="_blank" rel="noopener">SDS</a>'},
+ {id:"glyco",name:"GlycoFuze 2-1-2",sheet:6,rate:"10 L/ha",amt:30,unit:"L",show:"30.0",showUnit:"L",
+  what:"Floratine carbohydrate + N-P-K",form:"Liquid nutrient",sig:"Not hazardous",sigc:"sds",
+  how:["Pour 30.0 L."],
+  why:"Last of the Floratine products, by their order.",
+  ppe:["gloves","goggles"],
+  src:'Floratine info sheet + SDS Apr 2024 · <a href="https://turfcareaus.com.au/wp-content/uploads/2026/03/GlycoFuze_SDS_2024.pdf" target="_blank" rel="noopener">SDS</a>'},
+ {id:"iron",name:"Grass Roots Iron",sheet:8,rate:"30 L/ha",amt:90,unit:"L",show:"90.0",showUnit:"L",
+  what:"Oasis Turf liquid iron, 6% Fe. Strongly acidic (pH about 2)",form:"Liquid nutrient",sig:"SDS: WARNING",sigc:"sds",
+  how:["Agitate the drums before use.","Pour 90.0 L. Last product in."],
+  why:"Big volume and no mixing issues on its label, so it goes in last.",
+  warn:"Eye irritant. Keep the eyewash handy.",
+  ppe:["overalls","gloves","goggles","apron","boots"],
+  src:'Label + SDS May 2025 (Oasis Turf) · <a href="https://www.oasisturf.com.au/wp-content/uploads/2025/05/IRON-SDS-2025.pdf" target="_blank" rel="noopener">SDS</a>'}
+];
+
+var CHECKS=[
+ ["pre","Machine pre-start done in TurfDog",""],
+ ["rinse","Tank rinsed since its last load","Last load in this sprayer: Remediator + Companion, Tue 13 Oct"],
+ ["filters","Suction and line filters washed, refitted, lids tight",""],
+ ["nozzles","Red AIC nozzles across the boom","None blocked, worn or odd ones out"],
+ ["leaks","No leaks at hoses, fittings or boom",""],
+ ["agit","Agitator running, pressure holds 4 bar",""],
+ ["rate","Rate controller set: 300 L/ha at 6.9 km/h",""],
+ ["fill","Fill hose stays above the water line","No back-siphon into the water supply"],
+ ["kit","Spill kit, clean wash water and eyewash on board",""],
+ ["sds","Labels and SDSs for all 8 products at the shed",""],
+ ["site","Greens boxed out, spray signs out","Rollers go ahead of the sprayer"],
+ ["wx","Weather at the station is in the window","Delta T 2–8, wind under 15 km/h, gusts under 30, no rain expected for 8 h"]
+];
+var TANK_PPE=["overalls","hat","gloves","goggles","shield","mask","apron","boots"];
+var SPRAY_PPE=["overalls","hat","gloves","goggles","mask"];
+var CLOSE=[
+ ["out","Whole tank sprayed out","Don't leave mixed spray standing in the sprayer"],
+ ["flush","Sprayer flushed with clean water through the boom",""],
+ ["drums","Empty drums rinsed, caps off, put aside for drumMUSTER",""],
+ ["wash","Gloves, goggles, face shield and overalls washed",""],
+ ["signs","Signs stay out until the turf is dry",""],
+ ["gk","Batch numbers, times and weather entered in GreenKeeper","Tick the job off in TurfDog"]
+];
+var FLAGS=[
+ {c:"red",t:"Companion is registered as a surfactant; Chlorostick says no wetting agents",
+  d:"APVMA lists it as “Companion Surfactant – acidifying and penetrating surfactant”. The Chlorostick label says not to mix spraying oils or wetting agents with it. Worth a call to Oasis or Agrion on whether that covers Companion.",
+  s:"APVMA 51664 and 69652 eLabels"},
+ {c:"red",t:"Companion: do not use with copper products. ASTRON contains copper",
+  d:"ASTRON carries 0.15% Cu (its SDS lists a copper salt). Neither maker says whether that small amount triggers the restraint.",
+  s:"APVMA 51664 eLabel · ASTRON SDS Apr 2024"},
+ {c:"",t:"Grass Roots Iron: sheet 30 L/ha, label 10–20 L/ha",
+  d:"At 20 L/ha this tank would take 60 L, not 90 L.",
+  s:"Oasis Turf label"},
+ {c:"",t:"Chlorostick water volume",
+  d:"Turf row is 130–200 mL/100 m² in 20–60 L water, so 13–20 L/ha in 2,000–6,000 L/ha. 20 L/ha is the top of the label; 300 L/ha carrier is under its turf water volume.",
+  s:"APVMA 69652 eLabel"},
+ {c:"",t:"Shadow Ultra on greens",
+  d:"Label ideal is 350–500 L/ha with 11004/11005 nozzles, and at least 6 h between mowing and spraying.",
+  s:"APVMA 88267 eLabel"},
+ {c:"",t:"Promote Plus 900 handling",
+  d:"No rain expected within 8 h. Don't let the mix stand in metal for more than 2 h; flush the gear after use.",
+  s:"APVMA 69487 eLabel"},
+ {c:"",t:"Mixing order changed",
+  d:"Floratine's order is ASTRON, Perk Up, GlycoFuze. The sheet had Perk Up last; this page puts it before GlycoFuze. ASTRON and Perk Up also need the fill strainer out.",
+  s:"Floratine 2026 catalogue + info sheets"},
+ {c:"",t:"GreenKeeper zone",
+  d:"The sheet's primary zone is Approach (30,000 m²) though it's named Greens and Surrounds.",
+  s:"GreenKeeper record"}
+];
+
+/* steps */
+var S=[{k:"check",n:"Sprayer check"},{k:"ppe",n:"PPE on"},{k:"fill",n:"Fill and agitate"}];
+P.forEach(function(p,i){S.push({k:"prod",n:p.name,p:p,i:i})});
+S.push({k:"topup",n:"Top up and pH"},{k:"spray",n:"Ready to spray"},{k:"close",n:"Close out"},{k:"record",n:"Mix record"});
+
+var KEY="ranfurlie-tankmix-demo-2026-10-14";
+var st=load()||fresh();
+function fresh(){return {i:0,checks:{},ppe:{},close:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixer:"",sprayAt:null,doneAt:null}}
+function load(){try{var s=localStorage.getItem(KEY);return s?JSON.parse(s):null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function hm(t){if(!t)return"";var d=new Date(t);return d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}
+function litres(){
+  if(st.topAt)return SHEET.total;
+  if(!st.fillAt)return 0;
+  var v=SHEET.startFill;P.forEach(function(p){if(st.added[p.id])v+=p.amt});return v;
+}
+function afterAdd(p){var v=SHEET.startFill;for(var j=0;j<P.length;j++){v+=P[j].amt;if(P[j]===p)break}return v}
+function fmt(v){return (Math.round(v*10)/10).toLocaleString(undefined,{maximumFractionDigits:1})}
+function ppeRow(keys,req){return '<div class="ppe'+(req?' req':'')+'">'+keys.map(function(k){return '<div class="p">'+ICON[k]+'<span>'+PPE[k]+'</span></div>'}).join("")+'</div>'}
+function checkBtn(group,id,lbl,sub){var on=!!st[group][id];return '<button class="check" type="button" data-g="'+group+'" data-id="'+id+'" aria-pressed="'+on+'"><span class="box">'+TICK+'</span><span class="lbl">'+lbl+(sub?'<span class="sub">'+sub+'</span>':'')+'</span></button>'}
+function allOn(group,list){return list.every(function(r){return st[group][r[0]]})}
+function back(){return st.i>0?'<button class="btn ghost" type="button" data-act="back" aria-label="Back one step">Back</button>':'<span></span>'}
+
+function render(){
+  var s=S[st.i], h="";
+  if(s.k==="check"){
+    h='<div><div class="eyebrow">Before any chemical</div><h2 class="pname">Sprayer check</h2><p class="pdesc">Tick each one. The chemical steps open when they’re all done.</p></div>'+
+      '<div class="checks">'+CHECKS.map(function(r){return checkBtn("checks",r[0],r[1],r[2])}).join("")+'</div>'+
+      '<div id="stopMsg" hidden class="callout warn"><span class="t">Stop</span><span>Don’t add chemical. Post the fault in #machinery and tell Ben or Andy.</span></div>'+
+      '<div class="actions"><button class="btn stop" type="button" data-act="problem">Problem</button><button class="btn go" type="button" data-act="next" '+(allOn("checks",CHECKS)?"":"disabled")+'>All checked</button></div>';
+  }
+  else if(s.k==="ppe"){
+    h='<div><div class="eyebrow">Before opening any container</div><h2 class="pname">PPE on</h2><p class="pdesc">Everything the 8 labels and SDSs ask for while mixing this tank.</p></div>'+
+      ppeRow(TANK_PPE,true)+
+      '<div class="checks">'+TANK_PPE.map(function(k){return checkBtn("ppe",k,PPE[k],"")}).join("")+'</div>'+
+      '<div class="callout why"><span class="t">If it goes wrong</span><span>Eyes: flush with clean water for 15 minutes. Skin: off with the clothing, wash with soap and water. Poisons Information Centre <b class="mono">13 11 26</b>. Emergency <b class="mono">000</b>.</span></div>'+
+      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="next" '+(TANK_PPE.every(function(k){return st.ppe[k]})?"":"disabled")+'>I’m wearing it all</button></div>';
+  }
+  else if(s.k==="fill"){
+    h='<div><div class="eyebrow">Water first</div><h2 class="pname">Fill and agitate</h2></div>'+
+      '<div class="amount"><span class="big">600</span><span class="calc">L clean water</span><span class="after">Two-thirds of the 900 L mix. Products add about 243 L, then you top up to 900 L.</span></div>'+
+      '<ol class="how"><li>Fill to 600 L on the sight gauge.</li><li>Agitator on. Leave it running until the tank is sprayed out.</li><li>Rinse every empty drum 3 times into the tank as you go.</li></ol>'+
+      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="fill">600 L in, agitator on</button></div>';
+  }
+  else if(s.k==="prod"){
+    var p=s.p, done=st.added[p.id];
+    h='<div class="kicker"><span class="ordn">'+(s.i+1)+' of 8</span><span class="chip '+p.sigc+'">'+p.sig+'</span><span class="chip">'+p.form+'</span></div>'+
+      '<div><h2 class="pname">'+p.name+'</h2><div class="pdesc">'+p.what+'</div></div>'+
+      '<div class="amount"><span class="big">'+p.show+'</span><span class="calc">'+p.showUnit+' &nbsp;·&nbsp; '+p.rate+' × 3.00 ha</span><span class="after">Tank after this: <b>'+fmt(afterAdd(p))+' L</b></span></div>'+
+      (p.note?'<div class="callout note"><span class="t">Order change</span><span>'+p.note+'</span></div>':'')+
+      '<ol class="how">'+p.how.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ol>'+
+      (p.warn?'<div class="callout warn"><span class="t">'+(p.sigc==="poison"?"Poison":"Hazard")+'</span><span>'+p.warn+'</span></div>':'')+
+      '<div><div class="eyebrow" style="margin-bottom:8px">Wear for this one</div>'+ppeRow(p.ppe,p.sigc==="poison")+'</div>'+
+      '<div class="callout why"><span class="t">Why it goes in here</span><span>'+p.why+'</span></div>'+
+      '<div class="field"><label for="batch-'+p.id+'">Batch number (from the drum)</label><input id="batch-'+p.id+'" data-batch="'+p.id+'" autocomplete="off" inputmode="text" value="'+esc(st.batch[p.id]||"")+'" placeholder="Optional"></div>'+
+      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="add">'+(done?"Added at "+hm(done)+" · Next":"Added to tank")+'</button></div>'+
+      '<div class="src">'+p.src+'</div>';
+  }
+  else if(s.k==="topup"){
+    var ph=parseFloat(st.ph), phMsg="";
+    if(!isNaN(ph))phMsg=ph<4.5?'<div class="callout why" style="border-color:var(--ok)"><span class="t" style="color:var(--ok)">pH OK</span><span>'+ph+' is under 4.5.</span></div>':'<div class="callout warn"><span class="t">pH too high</span><span>'+ph+' is 4.5 or above. Don’t spray. Call Ben or Andy.</span></div>';
+    h='<div><div class="eyebrow">All 8 products in</div><h2 class="pname">Top up and pH</h2></div>'+
+      '<div class="amount"><span class="big">900</span><span class="calc">L on the sight gauge</span><span class="after">Top up with about <b>'+fmt(SHEET.total-afterAdd(P[P.length-1]))+' L</b> water. Agitator stays on.</span></div>'+
+      '<div class="field"><label for="ph">Tank pH (ethephon tank: under 4.5)</label><input id="ph" inputmode="decimal" autocomplete="off" value="'+esc(st.ph)+'" placeholder="e.g. 4.2"></div>'+
+      '<div id="phMsg">'+phMsg+'</div>'+
+      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="topup">Topped up to 900 L</button></div>';
+  }
+  else if(s.k==="spray"){
+    h='<div><div class="eyebrow">Mixed</div><h2 class="pname">Ready to spray</h2></div>'+
+      '<div class="facts"><span class="fact">Nozzles <b>Red AIC</b></span><span class="fact"><b>6.9 km/h</b></span><span class="fact"><b>4 bar</b></span><span class="fact"><b>300 L/ha</b></span><span class="fact">Foliar pass</span></div>'+
+      '<div><div class="eyebrow" style="margin-bottom:8px">Wear while spraying</div>'+ppeRow(SPRAY_PPE,true)+'</div>'+
+      '<ol class="how"><li>Spray it out straight away. Don’t leave the mix sitting in the sprayer.</li><li>Don’t water in. No irrigation for at least 24 h.</li><li>No mowing or watering until the turf is fully dry. Keep people off until it’s dry.</li><li>Stop if rain looks like coming inside 8 h.</li></ol>'+
+      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="spray">Tank sprayed out</button></div>';
+  }
+  else if(s.k==="close"){
+    h='<div><div class="eyebrow">Finish</div><h2 class="pname">Close out</h2></div>'+
+      '<div class="checks">'+CLOSE.map(function(r){return checkBtn("close",r[0],r[1],r[2])}).join("")+'</div>'+
+      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="close" '+(allOn("close",CLOSE)?"":"disabled")+'>Job done</button></div>';
+  }
+  else if(s.k==="record"){
+    var rows='<tr><td class="num">'+hm(st.fillAt)+'</td><td>Water 600 L, agitator on</td><td></td></tr>'+
+      P.map(function(p){return '<tr><td class="num">'+hm(st.added[p.id])+'</td><td>'+p.name+' <span class="mono">'+p.show+' '+p.showUnit+'</span></td><td class="mono">'+esc(st.batch[p.id]||"")+'</td></tr>'}).join("")+
+      '<tr><td class="num">'+hm(st.topAt)+'</td><td>Topped up to 900 L'+(st.ph?' · pH <span class="mono">'+esc(st.ph)+'</span>':'')+'</td><td></td></tr>'+
+      '<tr><td class="num">'+hm(st.sprayAt)+'</td><td>Tank sprayed out</td><td></td></tr>';
+    h='<div><div class="eyebrow">For GreenKeeper</div><h2 class="pname">Mix record</h2><p class="pdesc">Times are when each step was ticked on this phone.</p></div>'+
+      '<div class="field"><label for="mixer">Mixed by</label><input id="mixer" autocomplete="off" value="'+esc(st.mixer)+'" placeholder="Name"></div>'+
+      '<div class="tablewrap"><table class="records"><thead><tr><th>Time</th><th>Step</th><th>Batch</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="copy">Copy record</button></div>'+
+      '<textarea id="copyTxt" hidden readonly style="width:100%;min-height:160px;font-family:var(--mono);font-size:13px;background:var(--panel2);color:var(--fg);border:1px solid var(--line2);border-radius:10px;padding:10px"></textarea>';
+  }
+  var stage=$("stage");stage.innerHTML=h;
+  stage.classList.remove("enter");void stage.offsetWidth;stage.classList.add("enter");
+  $("stepNo").textContent="Step "+(st.i+1)+" of "+S.length;
+  $("stepName").textContent=s.n;
+  $("prog").style.width=(st.i/(S.length-1)*100)+"%";
+  var L=litres();$("litres").textContent=fmt(L);$("water").style.width=(L/SHEET.cap*100)+"%";
+  renderRecipe();
+}
+
+function renderRecipe(){
+  var cur=S[st.i];
+  var h='<li class="'+(st.fillAt?"done":(cur.k==="fill"?"now":""))+'"><span class="o">'+(st.fillAt?"✓":"W")+'</span><span class="nm">Water<small>Fill first, agitator on</small></span><span class="q">600 L</span></li>';
+  P.forEach(function(p,i){
+    var cls=st.added[p.id]?"done":(cur.p===p?"now":"");
+    h+='<li class="'+cls+'"><span class="o">'+(st.added[p.id]?"✓":(i+1))+'</span><span class="nm">'+p.name+'<small>'+p.rate+(p.sheet!==i+1?' · sheet order '+p.sheet:'')+'</small></span><span class="q">'+p.show+' '+p.showUnit+'</span></li>';
+  });
+  h+='<li class="'+(st.topAt?"done":(cur.k==="topup"?"now":""))+'"><span class="o">'+(st.topAt?"✓":"W")+'</span><span class="nm">Top up<small>Water to the 900 L mark</small></span><span class="q">≈'+fmt(SHEET.total-afterAdd(P[P.length-1]))+' L</span></li>';
+  h+='<li><span class="o"></span><span class="nm tot">Total mix</span><span class="q tot">900 L</span></li>';
+  $("recipe").innerHTML=h;
+}
+function renderFlags(){
+  $("flags").innerHTML=FLAGS.map(function(f){return '<li class="'+f.c+'"><b>'+f.t+'</b>'+f.d+'<span class="s">'+f.s+'</span></li>'}).join("");
+}
+
+function go(n){st.i=Math.max(0,Math.min(S.length-1,n));save();render();try{window.scrollTo({top:0,behavior:"smooth"})}catch(e){window.scrollTo(0,0)}}
+function toast(t){var el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(function(){el.classList.remove("on")},1800)}
+function buzz(){try{navigator.vibrate&&navigator.vibrate(40)}catch(e){}}
+function recordText(){
+  var out=["Tank mix record · 5800 · Fert + PGR to Greens & Surrounds · Wed 14 Oct 2026","Mixed by: "+(st.mixer||"-"),"Water 600 L, agitator on: "+(hm(st.fillAt)||"-")];
+  P.forEach(function(p){out.push(p.name+" "+p.show+" "+p.showUnit+": "+(hm(st.added[p.id])||"-")+(st.batch[p.id]?" · batch "+st.batch[p.id]:""))});
+  out.push("Topped up to 900 L: "+(hm(st.topAt)||"-")+(st.ph?" · pH "+st.ph:""));
+  out.push("Sprayed out: "+(hm(st.sprayAt)||"-"));
+  return out.join("\n");
+}
+
+document.addEventListener("click",function(e){
+  var c=e.target.closest(".check");
+  if(c){var g=c.getAttribute("data-g"),id=c.getAttribute("data-id");st[g][id]=!st[g][id];save();
+    c.setAttribute("aria-pressed",String(!!st[g][id]));buzz();
+    var s=S[st.i],btn=document.querySelector('[data-act="next"],[data-act="close"]');
+    if(btn){var ok=s.k==="check"?allOn("checks",CHECKS):s.k==="ppe"?TANK_PPE.every(function(k){return st.ppe[k]}):allOn("close",CLOSE);btn.disabled=!ok}
+    return}
+  var b=e.target.closest("[data-act]");if(!b)return;
+  var a=b.getAttribute("data-act"),s=S[st.i],now=Date.now();
+  if(a==="back")go(st.i-1);
+  else if(a==="next")go(st.i+1);
+  else if(a==="problem"){$("stopMsg").hidden=false;$("stopMsg").scrollIntoView({block:"center"})}
+  else if(a==="fill"){if(!st.fillAt)st.fillAt=now;buzz();go(st.i+1)}
+  else if(a==="add"){if(!st.added[s.p.id]){st.added[s.p.id]=now;toast(s.p.name+" added · "+fmt(afterAdd(s.p))+" L")}buzz();go(st.i+1)}
+  else if(a==="topup"){if(!st.topAt)st.topAt=now;buzz();go(st.i+1)}
+  else if(a==="spray"){if(!st.sprayAt)st.sprayAt=now;buzz();go(st.i+1)}
+  else if(a==="close"){st.doneAt=now;buzz();go(st.i+1)}
+  else if(a==="copy"){var t=recordText(),ta=$("copyTxt");
+    var fallback=function(){ta.hidden=false;ta.value=t;ta.focus();ta.select();toast("Select all and copy")};
+    try{navigator.clipboard.writeText(t).then(function(){toast("Record copied")},fallback)}catch(err){fallback()}}
+  else if(a==="reset"){st=fresh();save();renderReset();go(0);toast("Started again")}
+  else if(a==="keep"){renderReset()}
+});
+document.addEventListener("input",function(e){
+  var t=e.target;
+  if(t.hasAttribute("data-batch")){st.batch[t.getAttribute("data-batch")]=t.value;save()}
+  else if(t.id==="ph"){st.ph=t.value.trim();save();var ph=parseFloat(st.ph),m=$("phMsg");
+    m.innerHTML=isNaN(ph)?"":(ph<4.5?'<div class="callout why" style="border-color:var(--ok)"><span class="t" style="color:var(--ok)">pH OK</span><span>'+ph+' is under 4.5.</span></div>':'<div class="callout warn"><span class="t">pH too high</span><span>'+ph+' is 4.5 or above. Don’t spray. Call Ben or Andy.</span></div>')}
+  else if(t.id==="mixer"){st.mixer=t.value;save()}
+});
+function renderReset(){$("resetBox").innerHTML='<button class="btn ghost" style="min-height:40px;font-size:15px;padding:6px 12px" id="resetBtn" type="button">Start again</button>'}
+document.addEventListener("click",function(e){
+  if(e.target&&e.target.id==="resetBtn"){$("resetBox").innerHTML='<span class="small">Clear this phone’s progress?</span><button class="btn stop" style="min-height:40px;font-size:15px;padding:6px 12px" type="button" data-act="reset">Clear</button><button class="btn ghost" style="min-height:40px;font-size:15px;padding:6px 12px" type="button" data-act="keep">Keep</button>'}
+});
+
+/* keep the screen on while mixing */
+var lock=null;
+function wake(){try{if(navigator.wakeLock&&document.visibilityState==="visible"){navigator.wakeLock.request("screen").then(function(l){lock=l},function(){})}}catch(e){}}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")wake()});
+wake();
+
+renderFlags();render();
+})();
+</script>
+
+</html>
