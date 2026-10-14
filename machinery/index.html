@@ -403,9 +403,9 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
 <section class="mx-page" id="parts" role="tabpanel" aria-labelledby="tab-parts" hidden>
   <div class="mx-card" id="card-order">
     <div class="mx-row"><h3>Order list, next 30 days</h3><span class="mx-note">Parts for every service overdue or due within 30 days, less stock on the shelf</span></div>
-    <p class="mx-note">Prices (ex GST): the latest supplier invoice first, then the club average cost from the workshop stock list, then what taskTracker recorded as paid, then Australian retail. "equiv." = an aftermarket equivalent's price where no genuine price was found.</p>
+    <p class="mx-note">Prices are ex GST. Genuine: the latest supplier invoice first, then the club average cost from the workshop stock list, then what taskTracker recorded as paid, then Australian retail. Aftermarket: the cheapest credible equivalent (Courser, Turftines, JRM, R&amp;R, Ryco, Wesfil and others); every option is listed in the Parts catalogue and the parts explorer.</p>
     <div class="mx-tbox"><table class="mx-table" id="t-order" data-source="m_order" data-row-key="part_no"><thead><tr>
-      <th data-field="part_no">Part no.</th><th data-field="name">Part</th><th data-field="qty" class="n">Need</th><th data-field="on_hand" class="n">On hand</th><th data-field="to_order" class="n">To order</th><th data-field="price" class="n">Each $</th><th data-field="line_aud" class="n">Line $</th><th data-field="first_due">First due</th><th data-field="machines" class="hn">For</th><th data-field="supplier" class="hn">Supplier</th>
+      <th data-field="part_no">Part no.</th><th data-field="name">Part</th><th data-field="qty" class="n">Need</th><th data-field="on_hand" class="n">On hand</th><th data-field="to_order" class="n">To order</th><th data-field="g_price" class="n">Genuine $</th><th data-field="am_price" class="n">Aftermarket $</th><th data-field="am_best" class="hn">Cheapest aftermarket</th><th data-field="line_g" class="n hn">Line genuine $</th><th data-field="line_am" class="n hn">Line aftermarket $</th><th data-field="first_due">First due</th><th data-field="machines" class="hn">For</th><th data-field="supplier" class="hn">Supplier</th>
     </tr></thead><tbody></tbody></table></div>
   </div>
   <div class="mx-card" id="card-prices">
@@ -431,7 +431,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       <input class="mx-in" id="cat-q" type="search" placeholder="Search part name or number" aria-label="Search parts">
     </div>
     <div class="mx-tbox"><table class="mx-table" id="t-catalog" data-source="m_catalog" data-row-key="key"><thead><tr>
-      <th data-field="model">Model</th><th data-field="name">Part</th><th data-field="part_no">Part no.</th><th data-field="intervals" class="hn">Every (h)</th><th data-field="price" class="n">Each $</th><th data-field="equiv" class="hn">Equivalent</th><th data-field="supplier" class="hn">Supplier</th><th data-field="verified">Checked</th><th data-field="on_hand" class="n hn">On hand</th>
+      <th data-field="model">Model</th><th data-field="name">Part</th><th data-field="part_no">Part no.</th><th data-field="intervals" class="hn">Every (h)</th><th data-field="g_price" class="n">Genuine $</th><th data-field="am_price" class="n">Aftermarket $</th><th data-field="aftermarket" class="hn">Aftermarket options</th><th data-field="supplier" class="hn">Supplier</th><th data-field="verified">Checked</th><th data-field="on_hand" class="n hn">On hand</th>
     </tr></thead><tbody></tbody></table></div>
   </div>
 </section>
@@ -1133,7 +1133,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     parent.appendChild(dl);
     if (r.note) parent.appendChild(el('p', 'mx-note', r.note));
     if (r.tasks && r.tasks.length) { parent.appendChild(el('p', 'mx-sub', 'Tasks')); var ul = el('ul', 'mx-list'); r.tasks.forEach(function (t) { ul.appendChild(el('li', null, t)); }); parent.appendChild(ul); }
-    if (r.parts && r.parts.length) { parent.appendChild(el('p', 'mx-sub', 'Parts')); var ul2 = el('ul', 'mx-list'); r.parts.forEach(function (p) { var li = el('li', null, (p.name || '') + ' · ' + p.part_no + (p.qty && p.qty !== 1 ? ' × ' + p.qty : '') + (p.price ? ' · $' + f2(p.price) + (p.price_kind === 'equivalent' ? ' (equiv.)' : '') : '') + (p.on_hand ? ' · ' + p.on_hand + ' on hand' : '') + (p.verified === 'no' ? ' · number not confirmed' : '')); if (p.link) { li.appendChild(document.createTextNode(' · ')); li.appendChild(link(p.link, 'buy / look up')); } ul2.appendChild(li); }); parent.appendChild(ul2); }
+    if (r.parts && r.parts.length) { parent.appendChild(el('p', 'mx-sub', 'Parts')); var ul2 = el('ul', 'mx-list'); r.parts.forEach(function (p) { var li = el('li', null, (p.name || '') + ' · ' + p.part_no + (p.qty && p.qty !== 1 ? ' × ' + p.qty : '') + (p.g_price != null ? ' · genuine $' + f2(p.g_price) : (p.am_price != null ? ' · genuine: quote' : '')) + (p.am_price != null ? ' · aftermarket from $' + f2(p.am_price) + (p.am_best ? ' (' + p.am_best + ')' : '') : '') + (p.g_price == null && p.am_price == null && p.price ? ' · $' + f2(p.price) : '') + (p.on_hand ? ' · ' + p.on_hand + ' on hand' : '') + (p.verified === 'no' ? ' · number not confirmed' : '')); if (p.link) { li.appendChild(document.createTextNode(' · ')); li.appendChild(link(p.link, 'buy / look up')); } ul2.appendChild(li); }); parent.appendChild(ul2); }
     if (r.fluids && r.fluids.length) { parent.appendChild(el('p', 'mx-sub', 'Fluids')); var ul3 = el('ul', 'mx-list'); r.fluids.forEach(function (f) { ul3.appendChild(el('li', null, (f.what || '') + ': ' + (f.spec || '') + (f.qty_l ? ' · ' + f.qty_l + ' L' : ''))); }); parent.appendChild(ul3); }
   }
   function drawItem() {
@@ -1345,11 +1345,13 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   function drawParts() {
     var pr = function (r) { return r.price ? f2(r.price) + (r.price_kind === 'equivalent' ? ' equiv.' : '') : ''; };
     table('t-order', R('m_order'), {
+      g_price: function (r) { return r.g_price != null ? f2(r.g_price) : 'quote'; }, am_price: function (r) { return r.am_price != null ? f2(r.am_price) : ''; },
+      am_best: function (r, td) { td.className = 'wrap hn'; return r.am_best || ''; }, line_g: function (r) { return r.line_g != null ? f2(r.line_g) : ''; }, line_am: function (r) { return r.line_am != null ? f2(r.line_am) : ''; },
       price: pr, line_aud: function (r) { return r.line_aud ? f2(r.line_aud) : ''; }, first_due: function (r) { return fmtDs(r.first_due); },
       machines: function (r, td) { td.className = 'wrap hn'; return (r.machines || []).join(', '); }, qty: function (r) { return String(r.qty); },
       supplier: function (r, td) { td.className = 'wrap hn'; return r.link ? link(r.link, r.supplier || 'link') : (r.supplier || ''); },
       name: function (r, td) { td.className = 'wrap'; return (r.name || '') + (r.verified === 'no' ? ' (number not confirmed)' : ''); }
-    }, { numeric: ['line_aud', 'qty', 'to_order'], empty: 'Nothing to order in the next 30 days.' });
+    }, { numeric: ['line_aud', 'qty', 'to_order', 'g_price', 'am_price', 'line_g', 'line_am'], empty: 'Nothing to order in the next 30 days.' });
     if (!failed($('#t-prices'), 'm_prices')) {
       var pq = (state.prQ || '').toLowerCase();
       var prows = R('m_prices').filter(function (r) { return r.key !== 'none' && (!pq || ((r.part_no || '') + ' ' + (r.name || '') + ' ' + (r.supplier || '')).toLowerCase().indexOf(pq) >= 0); });
@@ -1370,9 +1372,11 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     table('t-catalog', rows, {
       name: function (r, td) { td.className = 'wrap'; return r.name; }, intervals: function (r) { return (r.intervals || []).join(', '); }, price: pr,
       equiv: function (r, td) { td.className = 'wrap hn'; return r.equiv ? (r.equiv_url ? link(r.equiv_url, r.equiv) : r.equiv) : ''; },
+      g_price: function (r) { return r.g_price != null ? f2(r.g_price) : 'quote'; }, am_price: function (r) { return r.am_price != null ? f2(r.am_price) : ''; },
+      aftermarket: function (r, td) { td.className = 'wrap hn'; var L = r.aftermarket || []; if (!L.length) return ''; var d = el('div'); L.forEach(function (o) { var ln = el('div'); ln.appendChild(document.createTextNode((o.brand ? o.brand + ' ' : '') + (o.part_no || '') + ' ' + o.shown + (o.fit === 'direct' ? '' : ' (check fit)') + ' ')); if (o.url) ln.appendChild(link(o.url, o.supplier || 'link')); else if (o.supplier) ln.appendChild(document.createTextNode(o.supplier)); if (o.note) ln.title = o.note; d.appendChild(ln); }); return d; },
       supplier: function (r, td) { td.className = 'wrap hn'; return r.link && /^https?:/.test(r.link) ? link(r.link, r.supplier || 'link') : (r.supplier || ''); },
       verified: function (r) { return r.verified === 'yes' ? 'yes' : (r.verified || ''); }, on_hand: function (r) { return r.on_hand ? String(r.on_hand) : ''; }
-    }, { numeric: ['price'] });
+    }, { numeric: ['price', 'g_price', 'am_price'], sortVal: { aftermarket: function (r) { return r.am_price; } } });
   }
   $('#cat-model').addEventListener('change', function (e) { state.catModel = e.target.value; drawParts(); });
   $('#cat-kind').addEventListener('change', function (e) { state.catKind = e.target.value; drawParts(); });
@@ -1635,7 +1639,8 @@ var CUR = MODELS['5010h'];
 // ------------------------------------------------------------------ helpers
 function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
 function money(v) { return v == null ? null : '$' + (v < 10 ? v.toFixed(2) : v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')); }
-function norm(p) { return String(p || '').replace(/^toro\s*/i, '').replace(/[\s-]/g, '').toUpperCase(); }
+function amList(L) { var d = el('div'); L.forEach(function (o) { var line = el('div', 'x3-am'); line.appendChild(document.createTextNode((o.brand ? o.brand + ' ' : '') + (o.part_no || '') + ' · ' + o.shown + (o.supplier ? ' · ' : ''))); if (o.supplier) { if (o.url) { var a = el('a', null, o.supplier); a.href = o.url; a.target = '_blank'; a.rel = 'noopener'; line.appendChild(a); } else line.appendChild(document.createTextNode(o.supplier)); } line.appendChild(document.createTextNode(o.fit === 'direct' ? ' · replaces this number' : ' · same spec, check fit')); if (o.note) line.title = o.note; d.appendChild(line); }); return d; }
+  function norm(p) { return String(p || '').replace(/^toro\s*/i, '').replace(/[\s-]/g, '').toUpperCase(); }
 function partInfo(no) {
 var live = null;
 try {
@@ -1646,7 +1651,7 @@ for (var i = 0; i < d.data.length; i++) { var r = d.data[i]; if (r.slug === CUR.
 }
 }
 } catch (e) {}
-if (live) return { no: no, name: live.name, price: live.price, kind: live.price_kind, onHand: live.on_hand, supplier: live.supplier, url: live.equiv_url || live.link, every: (live.intervals || []).map(function (h) { return h + ' h'; }).join(', '), note: live.note, alt: live.alt, equiv: live.equiv, live: true };
+if (live) return { no: no, name: live.name, price: live.price, kind: live.price_kind, onHand: live.on_hand, supplier: live.supplier, url: live.equiv_url || live.link, every: (live.intervals || []).map(function (h) { return h + ' h'; }).join(', '), note: live.note, alt: live.alt, equiv: live.equiv, live: true, g: live.genuine || null, am: live.aftermarket || [], amPrice: live.am_price };
 var s = SNAP[no];
 if (s) return { no: no, name: s[0], price: s[1], kind: s[2], onHand: s[3], supplier: s[4], url: s[5], every: s[6] };
 var x = EXTRA[no] || { name: no, note: '' };
@@ -1674,7 +1679,7 @@ var PL = D.lazy && window.MX3D_PHOTOS && window.MX3D_PHOTOS[D.id];
 if (PL && PL.model) { for (var mk in PL.model) D[mk] = PL.model[mk]; D.lazy = false; }
 COMP = D.COMP || {}; SUB = D.SUB || {}; EXTRA = D.EXTRA || {}; SNAP = D.SNAP || {}; STOCK_EXTRA = D.STOCK || {}; LOOKUP = D.LOOKUP; CAT_OM = D.OM;
 (function () { var host = root.closest('section') || root; var t = host.querySelector('.x3-title'), s2 = host.querySelector('.x3-sub'), n = root.querySelector('.x3-note'), xb0 = root.querySelector('.x3-xray');
-if (t) t.textContent = D.title; if (s2) s2.textContent = D.sub; if (n) n.textContent = D.note + ' Prices are ex GST: club cost from workshop stock first, then AU retail, then an aftermarket equivalent. Stock counts update hourly.'; var hp = host.querySelector('.x3-help'); if (hp) hp.textContent = 'Hover over the photo to find a part, click it for part numbers, price, what is on the shelf and where to order. Slide to blow the machine apart; click a cutting unit and choose Blow up this unit to pull just that one out.';
+if (t) t.textContent = D.title; if (s2) s2.textContent = D.sub; if (n) n.textContent = D.note + ' Prices are ex GST. Genuine: latest invoice, club stock cost or AU retail. Aftermarket: every credible equivalent found, cheapest first (hover a line for notes). Stock counts update hourly.'; var hp = host.querySelector('.x3-help'); if (hp) hp.textContent = 'Hover over the photo to find a part, click it for part numbers, price, what is on the shelf and where to order. Slide to blow the machine apart; click a cutting unit and choose Blow up this unit to pull just that one out.';
 host.querySelectorAll('.x3-model').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.model === D.id);
 if (!b.__bound) { b.__bound = true; b.addEventListener('click', function () { if (root.dataset.model === b.dataset.model || (!root.dataset.model && b.dataset.model === '3370')) return; root.dataset.model = b.dataset.model; if (root.__mx3d && root.__mx3d.destroy) root.__mx3d.destroy(); root.__mx3d = null; mount(root, opts); }); } }); })();
 var api = { resize: function () {} }; root.__mx3d = api;
@@ -1788,13 +1793,13 @@ var sm = el('summary');
 var l = el('div', 'x3-prl'); l.appendChild(el('div', 'x3-prn', p.name)); l.appendChild(el('code', 'x3-prno', no));
 sm.appendChild(l);
 var r = el('div', 'x3-prr');
-r.appendChild(el('div', 'x3-prp', p.price != null ? money(p.price) + (p.kind === 'equivalent' ? ' equiv.' : '') : 'quote'));
+if (p.g !== undefined) { r.appendChild(el('div', 'x3-prp', p.g && p.g.price != null ? 'Genuine ' + money(p.g.price) : 'Genuine: quote')); if (p.amPrice != null) r.appendChild(el('div', 'x3-pro ok', 'Aftermarket from ' + money(p.amPrice))); } else r.appendChild(el('div', 'x3-prp', p.price != null ? money(p.price) + (p.kind === 'equivalent' ? ' equiv.' : '') : 'quote'));
 r.appendChild(el('div', 'x3-pro ' + (p.onHand > 0 ? 'ok' : ''), p.onHand > 0 ? p.onHand + ' on shelf' : 'none on shelf'));
 sm.appendChild(r); row.appendChild(sm);
 var body = el('div', 'x3-prb');
 var dl = el('dl');
 function add(k, v) { if (v == null || v === '') return; dl.appendChild(el('dt', null, k)); var dd = el('dd'); if (v.nodeType) dd.appendChild(v); else dd.textContent = v; dl.appendChild(dd); }
-add('Price', p.price != null ? money(p.price) + ' ex GST' + (p.kind === 'equivalent' ? ' (aftermarket equivalent' + (p.equiv ? ': ' + p.equiv.replace(/\s*\$[\d.,]+$/, '') : '') + ')' : (p.kind === 'genuine' ? ' (genuine, club cost / AU retail)' : '')) : 'No public price. Ask the Toro dealer for a quote.');
+if (p.g !== undefined) { add('Genuine', p.g ? (p.g.shown || money(p.g.price)) + (p.g.src ? ' (' + p.g.src + ')' : '') + (p.g.supplier ? ', ' + p.g.supplier : '') : 'No public price. Ask the dealer for a quote.'); add('Aftermarket', p.am && p.am.length ? amList(p.am) : 'None found yet.'); } else add('Price', p.price != null ? money(p.price) + ' ex GST' + (p.kind === 'equivalent' ? ' (aftermarket equivalent' + (p.equiv ? ': ' + p.equiv.replace(/\s*\$[\d.,]+$/, '') : '') + ')' : (p.kind === 'genuine' ? ' (genuine, club cost / AU retail)' : '')) : 'No public price. Ask the Toro dealer for a quote.');
 add('On the shelf', String(p.onHand || 0) + (STOCK_EXTRA[no] && !p.live ? ' (workshop stock)' : ''));
 add('Service', p.every);
 add('Where to order', p.supplier);
