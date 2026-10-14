@@ -1,0 +1,113 @@
+{
+  "_about": "Ranfurlie tank-mix product library. One record per product, read off the current AU label / maker SDS. {amt} in 'how' is replaced with the tank amount. 'why' is the default reason for its place in the order; a recipe can override it. PPE keys: overalls, hat, gloves, goggles, shield, mask, apron, boots. Checked 14-15 Oct 2026.",
+  "companion": {
+    "name": "Companion", "gk_name": "Companion",
+    "sig": "CAUTION", "sigc": "caution", "form": "Adjuvant",
+    "what": "Acidifying and penetrating surfactant (soya phospholipids + propionic acid)",
+    "haz": "Damages eyes. Irritates skin.",
+    "hazFull": "Will damage eyes. Will irritate the skin. Avoid contact with eyes and skin. Label: DO NOT use with copper products.",
+    "ppe": ["overalls", "gloves", "shield"],
+    "how": ["Measure {amt}", "Pour in before anything else"],
+    "why": "The label says Companion goes in first, before the other products. It holds the tank pH down for the ethephon.",
+    "src": "Label APVMA 51664 (Apr 2023) · <a href=\"https://elabels.apvma.gov.au/51664ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+  },
+  "chlorostick": {
+    "name": "Chlorostick 720 SC", "gk_name": "Chlorostick 720",
+    "sig": "POISON", "sigc": "poison", "form": "Suspension concentrate (SC)",
+    "what": "Chlorothalonil 720 g/L fungicide, Group M5",
+    "haz": "Attacks eyes and skin. Don't breathe the mist.",
+    "hazFull": "Attacks eyes and skin. Don't inhale spray mist. Repeated exposure may cause allergies. If clothing gets product or spray on it, take it off straight away. Label: DO NOT mix spraying oils or wetting agents with this product.",
+    "ppe": ["overalls", "hat", "gloves", "goggles", "mask"],
+    "how": ["Shake and turn each drum over", "Pour with the agitator running", "Rinse each drum 3 times into the tank"],
+    "why": "A suspension goes in early so it spreads through plenty of moving water.",
+    "src": "Label APVMA 69652 · SDS Feb 2025 · <a href=\"https://elabels.apvma.gov.au/69652ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2026/04/CHLOROSTICK-720-SC-FUNGICIDE_2025_SDS.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+  },
+  "shadow": {
+    "name": "Shadow Ultra", "gk_name": "Shadow Ultra (AU)",
+    "sig": "CAUTION", "sigc": "caution", "form": "Micro-emulsion (ME)",
+    "what": "Trinexapac-ethyl 120 g/L growth regulator",
+    "haz": "Harmful if breathed in.",
+    "hazFull": "Harmful if inhaled (SDS). Avoid contact with eyes and skin. Don't breathe spray mist. No rain or irrigation within 1 h of spraying. No entry without protective clothing until the spray has dried.",
+    "ppe": ["overalls", "gloves"],
+    "how": ["Measure {amt} in a jug", "Pour straight in, no pre-mix", "Rinse the jug into the tank"],
+    "why": "The label says add it to a tank at least two-thirds full of water. You're at {before} L.",
+    "src": "Label APVMA 88267 · <a href=\"https://elabels.apvma.gov.au/88267ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+  },
+  "promote": {
+    "name": "Promote Plus 900", "gk_name": "Promote Plus 900",
+    "sig": "POISON", "sigc": "poison", "form": "Soluble liquid (SL)",
+    "what": "Ethephon 900 g/L growth regulator",
+    "haz": "Corrosive. Burns skin and eyes.",
+    "hazFull": "Corrosive (SDS: causes severe skin burns and eye damage). Splash in the eye: flush with water for at least 15 minutes and get medical help. Don't use alkaline water. Don't let the mix stand in metal for more than 2 hours. No rain expected within 8 hours.",
+    "ppe": ["overalls", "gloves", "goggles", "shield", "apron"],
+    "how": ["Measure {amt}", "Pour slowly, low to the opening", "Rinse the jug and drums into the tank"],
+    "why": "Goes in after Companion so it lands in acidified water. The label says don't use alkaline water.",
+    "src": "Label APVMA 69487 · SDS ADAMA Jun 2023 · <a href=\"https://elabels.apvma.gov.au/69487ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.adama.com/australia/en/media/2596/download?attachment\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+  },
+  "astron": {
+    "name": "ASTRON", "gk_name": "ASTRON (0-0-0)",
+    "sig": "Eye damage", "sigc": "", "form": "Liquid nutrient",
+    "what": "Floratine foliar biostimulant (Ca, Mg, Fe, Zn, Cu, B)",
+    "haz": "Causes serious eye damage.", "soft": true,
+    "hazFull": "SDS signal word DANGER: causes serious eye damage, causes skin irritation. Contains a copper salt (0.15% Cu). Chemical goggles and impervious gloves.",
+    "ppe": ["overalls", "gloves", "goggles"],
+    "how": ["Shake the drums hard", "Lift the fill strainer out", "Pour {amt}"],
+    "why": "Floratine's mixing order is ASTRON, then Perk Up, then GlycoFuze. It's high in solids, so the strainer comes out.",
+    "src": "Floratine info sheet + SDS Apr 2024 · <a href=\"https://turfcareaus.com.au/wp-content/uploads/2026/03/Astron_SDS_2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+  },
+  "perkup": {
+    "name": "Perk Up", "gk_name": "Perk Up (0-0-0)",
+    "sig": "Eye damage", "sigc": "", "form": "Liquid nutrient",
+    "what": "Floratine calcium (8% Ca) + carbohydrates",
+    "haz": "Causes serious eye damage.", "soft": true,
+    "hazFull": "SDS signal word DANGER: causes serious eye damage. Chemical goggles; impervious gloves for long contact.",
+    "ppe": ["overalls", "gloves", "goggles"],
+    "how": ["Shake well", "Pour {amt}, strainer still out", "Put the strainer back in"],
+    "why": "Floratine's order puts Perk Up before GlycoFuze.",
+    "src": "Floratine info sheet + SDS Apr 2024 · <a href=\"https://turfcareaus.com.au/wp-content/uploads/2026/03/Perk-Up_SDS_2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+  },
+  "glyco": {
+    "name": "GlycoFuze 2-1-2", "gk_name": "GlycoFuze (2-1-2)",
+    "sig": "Not hazardous", "sigc": "", "form": "Liquid nutrient",
+    "what": "Floratine carbohydrate + N-P-K",
+    "haz": "",
+    "hazFull": "Not classified as hazardous (SDS). Goggles and gloves if handling for long.",
+    "ppe": ["gloves", "goggles"],
+    "how": ["Pour {amt}"],
+    "why": "Last of the Floratine products, by their order.",
+    "src": "Floratine info sheet + SDS Apr 2024 · <a href=\"https://turfcareaus.com.au/wp-content/uploads/2026/03/GlycoFuze_SDS_2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+  },
+  "iron": {
+    "name": "Grass Roots Iron", "gk_name": "Grass Roots Iron (0-0-0)",
+    "sig": "Eye irritant", "sigc": "", "form": "Liquid nutrient",
+    "what": "Oasis Turf liquid iron, 6% Fe, pH about 2",
+    "haz": "Eye irritant. Strongly acidic.", "soft": true,
+    "hazFull": "SDS signal word WARNING: eye irritation. Safety glasses, PVC gloves, overalls, apron and safety boots; eyewash nearby. Label rate 10-20 L/ha.",
+    "ppe": ["overalls", "gloves", "goggles", "apron", "boots"],
+    "how": ["Agitate the drums", "Pour {amt}"],
+    "why": "Big volume and no mixing restrictions on its label, so it goes in late.",
+    "src": "Label + SDS May 2025 (Oasis Turf) · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2024/03/OT-Iron.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2025/05/IRON-SDS-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+  },
+  "prokelp": {
+    "name": "Pro Kelp", "gk_name": "Pro Kelp (0-0-0)",
+    "sig": "Alkaline", "sigc": "", "form": "Liquid kelp extract",
+    "what": "Grass Roots Pro Kelp 25: Tasmanian bull kelp extracted with caustic potash, pH 10-12.5",
+    "haz": "Strongly alkaline. Keep it apart from the iron and GreenMaxx neat.", "soft": true,
+    "hazFull": "Not classified as hazardous (SDS Nov 2025). pH above 10, contains potassium hydroxide under 5%. Impervious gloves, safety glasses with side shields, cotton overalls; apron for large volumes. Label: 20-50 L/ha in 700 L water/ha; check compatibility before tank mixing.",
+    "ppe": ["overalls", "gloves", "goggles"],
+    "how": ["Agitate the drums", "Pour {amt} into the tank water", "Rinse the drums into the tank"],
+    "why": "It's strongly alkaline. Going in early, into plain water, means it never meets the acidic products neat.",
+    "src": "Oasis Turf label + SDS Nov 2025 · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2021/09/OT_GR_PRO_KELP_25_BACK_LABEL.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2026/01/Pro-Kelp-SDS-Nov-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+  },
+  "greenmaxx": {
+    "name": "GreenMaxx 20-0-0", "gk_name": "Liquimaxx Greenmaxx 20-0-0 AU (20-0-0)",
+    "sig": "Irritant", "sigc": "", "form": "Liquid fertiliser",
+    "what": "LiquiMaxx GreenMaxx: stabilised urea N 20%, with 6% Fe and 1% Mg as sulphates, pH 2-3",
+    "haz": "Irritates skin and eyes.", "soft": true,
+    "hazFull": "SDS signal word WARNING: harmful if swallowed, skin and eye irritant, may irritate airways. PVC gloves, overalls and apron, safety glasses or goggles; eyewash nearby. Strong bases listed as incompatible. May settle in the IBC, so stir before drawing. Label rate 20-50 L/ha.",
+    "ppe": ["overalls", "gloves", "goggles", "apron"],
+    "how": ["Stir the IBC first", "Draw {amt}", "Pour with the agitator running"],
+    "why": "Acidic, like the iron. Goes in late with the other fertiliser.",
+    "src": "SDS Dec 2024 (Indigo / Greenway) · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/AAC-Liquimaxx-GreenMaxx-SDS-2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a> · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/GTS-Greenmaxx-Brochure.pdf\" target=\"_blank\" rel=\"noopener\">brochure</a>"
+  }
+}
