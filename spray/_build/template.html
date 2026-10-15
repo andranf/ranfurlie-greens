@@ -533,7 +533,8 @@ function tank(from,to,done){
     (done||to<=from?'':'<div class="band" style="bottom:'+pct(from)+'%;height:max(6px,'+(pct(to)-pct(from))+'%)"></div>')+
     '<span class="mk900" data-l="'+SHEET.total+'" style="bottom:'+pct(SHEET.total)+'%"></span></div></div>';
 }
-function phBox(){var ph=parseFloat(st.ph);if(isNaN(ph))return"";return ph<R.ph_max?'<div class="phok"><b>pH OK</b> &nbsp;'+ph+' is under '+R.ph_max+'</div>':'<div class="haz">'+WARN+'<span>pH '+ph+' is '+R.ph_max+' or above. Don’t spray. Call Ben or Andy.</span></div>'}
+function phState(){var ph=parseFloat(String(st.ph).replace(",","."));if(isNaN(ph))return "none";if(ph<1||ph>=14)return "bad";return ph<R.ph_max?"ok":"high"}
+function phBox(){var ph=parseFloat(String(st.ph).replace(",","."));var s=phState();if(s==="none")return"";if(s==="bad")return '<div class="haz soft">'+WARN+'<span>'+esc(st.ph)+' isn’t a pH reading. Check the meter and enter what it shows.</span></div>';return s==="ok"?'<div class="phok"><b>pH OK</b> &nbsp;'+ph+' is under '+R.ph_max+'</div>':'<div class="haz">'+WARN+'<span>pH '+ph+' is '+R.ph_max+' or above. Don’t spray. Call Ben or Andy.</span></div>'}
 
 /* ---------- who + signature ---------- */
 function whoField(id,preset){
@@ -640,11 +641,11 @@ function render(){
   }
   else if(s.k==="sign"){
     var miss=[];if(!st.fillAt)miss.push("water fill");P.forEach(function(p){if(!st.added[p.id])miss.push(p.name)});if(!st.topAt)miss.push("top up");
-    var phv=parseFloat(st.ph),phBad=!!R.ph_max&&(isNaN(phv)||phv>=R.ph_max);
+    var phv=parseFloat(String(st.ph).replace(",",".")),phs=phState(),phBad=!!R.ph_max&&phs!=="ok";
     h='<h2 class="pname">Sign off the mix</h2>'+
       '<div class="facts"><span class="fact">'+SHEET.total+' L mixed</span><span class="fact">'+N+' products</span>'+(R.ph_max&&st.ph?'<span class="fact">pH '+esc(st.ph)+'</span>':'')+'</div>'+
       (miss.length?'<div class="haz soft">'+WARN+'<span>Not ticked yet: '+esc(miss.join(", "))+'. Go back and tick them first.</span></div>':'')+
-      (phBad?'<div class="haz">'+WARN+'<span>'+(isNaN(phv)?'Enter the tank pH on the top-up step first.':'pH '+phv+' is '+R.ph_max+' or above. Call Ben or Andy before signing.')+'</span></div>':'')+
+      (phBad?'<div class="haz">'+WARN+'<span>'+(phs==="none"?'Enter the tank pH on the top-up step first.':phs==="bad"?'Check the pH reading on the top-up step. '+esc(st.ph)+' isn’t a real reading.':'pH '+phv+' is '+R.ph_max+' or above. Call Ben or Andy before signing.')+'</span></div>':'')+
       whoField("mix")+
       '<p class="decl">I mixed this tank to the recipe, wore the PPE listed and checked the pH.</p>'+
       sigPad("mix")+
@@ -662,7 +663,7 @@ function render(){
   setLitres(litres());
   renderRecipe();
 }
-function mixReady(){var phv=parseFloat(st.ph);if(R.ph_max&&(isNaN(phv)||phv>=R.ph_max))return false;if(!st.fillAt||!st.topAt)return false;return P.every(function(p){return st.added[p.id]})}
+function mixReady(){if(R.ph_max&&phState()!=="ok")return false;if(!st.fillAt||!st.topAt)return false;return P.every(function(p){return st.added[p.id]})}
 function refreshSignMix(){var b=$("signMixBtn");if(!b)return;var was=b.disabled;b.disabled=!(mixReady()&&readWho("mix").name&&padHas("mix"));if(was&&!b.disabled&&!RM){b.classList.remove("ready");void b.offsetWidth;b.classList.add("ready")}}
 function countUp(el,from,to,d,dur){
   var t0=null;function f(t){if(!t0)t0=t;var k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=(from+(to-from)*e).toFixed(d);if(k<1)requestAnimationFrame(f);else el.textContent=to.toFixed(d)}
