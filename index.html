@@ -25,7 +25,7 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 
 /* PHONE LAYOUT (Andy, 16 Oct 2026: "make the changes to the github page to suit mobile exactly like what the bunker page has done").
    Same breakpoint and moves as Ranfurlie Bunkers v1.2: bigger body text, compact header, one swipeable row of tabs/chips
-   instead of wrapped rows, 2-up KPI tiles with the decoration dropped, tighter panels, long lists capped with "Show all",
+   instead of wrapped rows, 2-up KPI tiles (sparklines, gauge and rain animation kept; only the gauge's side labels hidden), tighter panels, long lists capped with "Show all",
    map: one finger scrolls the page until you zoom in, pinch or +/- to zoom. Public copy only - the Claude dashboard page is untouched. */
 #dash-root .rg-mz{display:none}
 @media (max-width:600px){
@@ -36,7 +36,6 @@ body{font-size:16px}
 #dash-root .rg-head{padding-block:8px 4px;gap:8px}
 #dash-root .rg-title{font-size:28px;line-height:1.08;flex-wrap:wrap;row-gap:6px}
 #dash-root .rg-live{font-size:12px;padding:4px 10px}
-#dash-root .rg-live i{animation:none}
 #dash-root .rg-take{font-size:16px;line-height:1.4;margin-top:6px}
 #dash-root .rg-asof{font-size:12.5px;line-height:1.35}
 /* tabs: one row you swipe sideways, like the bunker filter chips */
@@ -54,7 +53,7 @@ body{font-size:16px}
 /* KPI tiles: 2-up, number first, sparklines/gauges dropped */
 #dash-root .rg-kpis{grid-template-columns:1fr 1fr;gap:6px}
 #dash-root .rg-kpi,#dash-root .rg-kpi.hero{grid-column:auto;padding:9px 11px 8px}
-#dash-root .rg-kpi svg,#dash-root .rg-kpi .rg-rain,#dash-root .rg-kpi .rg-dial{display:none}
+#dash-root #dial-gp text{display:none}
 #dash-root .rg-kpi-l{font-size:11.5px;letter-spacing:.02em;line-height:1.25}
 #dash-root .rg-kpi-v{font-size:30px}
 #dash-root .rg-kpi .rg-delta,#dash-root .rg-kpi .rg-note{font-size:12.5px;line-height:1.3}
@@ -99,6 +98,30 @@ body{font-size:16px}
 #dash-root .rg-vid-more button{appearance:none;border:1px solid var(--color-border-line);background:none;color:var(--color-fg-muted);border-radius:999px;padding:.2rem .65rem;font:inherit;font-size:var(--cds-font-size-caption);cursor:pointer}
 #dash-root .rg-vid-more button[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg)}
 @media (max-width:600px){#dash-root .rg-vid-head{padding:10px 12px 6px}#dash-root .rg-vid-foot{padding:8px 12px 10px}#dash-root .rg-vid-head h3{font-size:19px}}
+
+/* SCROLL-TRIGGERED MOTION (Andy, 16 Oct 2026: "make sure we didnt lose any cool animations ... add any animation where you can.
+   make it look very impressive"). Public copy only. Every card below the fold waits until you scroll to it, then rises in and
+   plays its own animations; line charts draw on, bars grow from the axis, dots pop, table rows cascade, headings get an
+   underline. Nothing is hidden unless the JS is running, and prefers-reduced-motion switches all of it off. */
+#rg-progress{position:fixed;top:0;left:0;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);z-index:50;pointer-events:none;
+  background:linear-gradient(90deg,var(--color-ok),#3fc7b4 45%,#f0a35a);box-shadow:0 0 10px color-mix(in srgb,var(--color-ok) 55%,transparent)}
+@media (prefers-reduced-motion: no-preference){
+#dash-root .rg-pre{opacity:0;transform:translateY(26px) scale(.985);filter:blur(6px)}
+#dash-root .rg-pre,#dash-root .rg-pre *,#dash-root .rg-pre *::before,#dash-root .rg-pre *::after{animation-play-state:paused!important}
+#dash-root .rg-reveal{animation:rg-x-in .85s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rg-x-in{0%{opacity:0;transform:translateY(26px) scale(.985);filter:blur(6px)}60%{filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
+#dash-root .rg-reveal>h3,#dash-root .rg-reveal>.rg-row>h3,#dash-root .rg-vid.rg-reveal h3{background:linear-gradient(90deg,var(--color-ok),#3fc7b4) no-repeat 0 100%/0 2px;padding-bottom:3px;animation:rg-x-ul 1.1s cubic-bezier(.2,.8,.2,1) .35s forwards}
+@keyframes rg-x-ul{to{background-size:2.4rem 2px}}
+#dash-root .rg-reveal tbody tr{animation:rg-x-row .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.25s + var(--ri,0) * 45ms)}
+@keyframes rg-x-row{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+#dash-root .rg-vid{position:relative}
+#dash-root .rg-vid::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;
+  background:conic-gradient(from var(--rg-a,0deg),transparent 0 70%,color-mix(in srgb,var(--color-ok) 80%,transparent) 82%,#f0a35a 90%,transparent 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:rg-x-spin 6s linear infinite}
+@property --rg-a{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes rg-x-spin{to{--rg-a:360deg}}
+}
+@media (prefers-reduced-motion: reduce){#rg-progress{display:none}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
@@ -189,5 +212,55 @@ and the ethephon window opens <b data-source="eth_window" data-field="opens">—
   }
   fetch('videos/videos.json?v=' + Date.now()).then(function(r){ return r.ok ? r.json() : []; }).then(function(list){
     var go = function(){ if (document.getElementById('today')) build(list); else setTimeout(go, 300); }; go(); }).catch(function(){});
+})();
+</script><script>
+(function(){
+  if (!window.matchMedia || matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  var root = document.getElementById('dash-root'); if (!root) return;
+  // scroll progress bar
+  var bar = document.createElement('div'); bar.id = 'rg-progress'; document.body.append(bar);
+  var ticking = false;
+  function prog(){ ticking = false; var h = document.documentElement.scrollHeight - innerHeight; bar.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, scrollY / h) : 0) + ')'; }
+  addEventListener('scroll', function(){ if (!ticking) { ticking = true; requestAnimationFrame(prog); } }, {passive:true}); addEventListener('resize', prog); prog();
+  var EASE = 'cubic-bezier(.2,.8,.2,1)';
+  function inView(el){ var r = el.getBoundingClientRect(); return r.width > 0 && r.top < innerHeight * .92 && r.bottom > 0; }
+  // charts: lines draw on, bars grow from their axis, dots pop, areas fade - only marks that have no animation of their own
+  function playCharts(card){
+    card.querySelectorAll('svg').forEach(function(svg){ try {
+      if (svg.closest('.rg-map') || svg.classList.contains('rg-sprk') || svg.closest('.rg-kpi')) return;
+      var vb = svg.getBoundingClientRect(); if (vb.width < 120 || vb.height < 60) return;
+      var rects = [].slice.call(svg.querySelectorAll('rect')).filter(function(r){ var b = r.getBBox(); return b.height > 1.5 && b.width > 0 && b.width < vb.width * .25 && !r.closest('defs,clipPath,mask') && getComputedStyle(r).animationName === 'none'; });
+      if (rects.length >= 3) {
+        var cnt = {}; rects.forEach(function(r){ var b = r.getBBox(); var k = Math.round(b.y + b.height); cnt[k] = (cnt[k] || 0) + 1; });
+        var base = +Object.keys(cnt).sort(function(a, b){ return cnt[b] - cnt[a]; })[0];
+        rects.forEach(function(r, i){ var b = r.getBBox(); var top = Math.abs(b.y - base) < 1.5 && Math.abs(b.y + b.height - base) >= 1.5;
+          r.style.transformBox = 'fill-box'; r.style.transformOrigin = top ? '50% 0%' : '50% 100%';
+          r.animate([{transform:'scaleY(0)'}, {transform:'scaleY(1)'}], {duration:750, delay:Math.min(i * 18, 650), easing:EASE, fill:'backwards'}); });
+      }
+      var k = 0;
+      svg.querySelectorAll('path').forEach(function(p){
+        if (p.closest('defs,clipPath,mask') || p.classList.contains('rg-draw') || p.classList.contains('rg-comet') || p.classList.contains('rg-march')) return;
+        var cs = getComputedStyle(p); if (cs.animationName && cs.animationName !== 'none') return;
+        var fillNone = cs.fill === 'none' || p.getAttribute('fill') === 'none', stroked = cs.stroke && cs.stroke !== 'none';
+        if (fillNone && stroked && !p.getAttribute('stroke-dasharray') && cs.strokeDasharray === 'none') {
+          var L = 0; try { L = p.getTotalLength(); } catch (e) {} if (L < 40) return;
+          p.animate([{strokeDasharray: L + ' ' + L, strokeDashoffset: L}, {strokeDasharray: L + ' ' + L, strokeDashoffset: 0}], {duration:1300 + Math.min(L, 900) * .4, delay:150 + k++ * 120, easing:EASE});
+        } else if (!fillNone && p.getBBox().width > vb.width * .3 && !p.closest('.domain,.tick')) {
+          p.animate([{opacity:0}, {opacity:getComputedStyle(p).opacity}], {duration:1100, delay:250, easing:EASE, fill:'backwards'});
+        }
+      });
+      var dots = [].slice.call(svg.querySelectorAll('circle')).filter(function(c){ var r = +c.getAttribute('r'); return r > 0 && r < 9 && !getComputedStyle(c).animationName.match(/rg-/); });
+      if (dots.length && dots.length < 400) dots.forEach(function(c, i){ c.style.transformBox = 'fill-box'; c.style.transformOrigin = 'center';
+        c.animate([{transform:'scale(0)', opacity:0}, {transform:'scale(1.35)', opacity:1, offset:.7}, {transform:'scale(1)', opacity:1}], {duration:520, delay:500 + Math.min(i * 14, 700), easing:EASE, fill:'backwards'}); });
+    } catch (e) {} });
+    card.querySelectorAll('tbody').forEach(function(tb){ [].slice.call(tb.rows, 0, 24).forEach(function(tr, i){ tr.style.setProperty('--ri', i); }); });
+  }
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (!e.isIntersecting) return; var c = e.target; io.unobserve(c);
+    c.classList.remove('rg-pre'); c.classList.add('rg-reveal'); playCharts(c); }); }, {threshold:.08, rootMargin:'0px 0px -6% 0px'});
+  function scan(){ root.querySelectorAll('.rg-card:not([data-rgx]), .rg-vid:not([data-rgx])').forEach(function(c){ c.setAttribute('data-rgx', '1');
+      if (!inView(c)) c.classList.add('rg-pre'); io.observe(c); }); }
+  // the first screen keeps the page's own entrance; everything after it waits for the scroll
+  var pend = 0; new MutationObserver(function(){ if (!pend) pend = setTimeout(function(){ pend = 0; scan(); }, 150); }).observe(root, {childList:true, subtree:true});
+  scan();
 })();
 </script></body></html>
