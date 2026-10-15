@@ -13,6 +13,12 @@ Sign-offs post to the Zapier "Spray sign-offs" hook in config.json.
 
 Every product id in the recipe must already be in products.json, read off its
 current AU label and SDS. The build stops if one is missing rather than guessing.
+
+EVERY TIME a recipe is built and published (Andy, 16 Oct 2026: "this is a MUST"):
+post the link in #spraying (C06KFFNE5R7) and tag the applicator. Set "applicator":
+["Name", "Slack ID"] in the recipe from today's TurfDog board (the daily course setup
+brief in #dailycoursesetup names who's on the sprayer). The build prints the post,
+ready to send.
 """
 import argparse, html, json, os, re, sys
 
@@ -122,6 +128,43 @@ def main():
         print(f'  {i}. {p["name"]:<20} {p["show"]:>6} {p["u"]:<2}  sheet {p["sheet"]}  -> {lvl:6.1f} L')
     print(f'Top up {R["mix_l"] - lvl:.1f} L to {R["mix_l"]} L')
     print(f'Post-application checks: {len(R["post_checks"])} · crew {len(R["crew"])} · date {R["date_iso"]}')
+    print_slack_post(R, prods, cfg)
+
+
+KIT = {"overalls": "overalls", "hat": "hat", "gloves": "elbow gloves", "goggles": "goggles",
+       "shield": "face shield", "mask": "mist mask", "apron": "apron", "boots": "boots"}
+
+
+def print_slack_post(R, prods, cfg):
+    """The #spraying post that goes out with every new recipe, tagging the applicator."""
+    app = R.get("applicator")
+    url = cfg.get("page_url", "https://andranf.github.io/ranfurlie-greens/spray/") + R["slug"] + "/"
+    changed = any(p.get("sheet") not in (None, i) for i, p in enumerate(prods, 1))
+    kit = [KIT[k] for k in KIT if any(k in p.get("ppe", []) for p in prods)]
+    lines = [f':test_tube: **Today\'s tank: {R["title"]} ({R["sprayer"].replace("Toro ", "")})**',
+             (f'<@{app[1]}> ' if app else '') + 'step-by-step mixing guide, open it on your phone at the shed:',
+             url, '',
+             f'**Setup:** {R["area_ha"]:g} ha · {R["rate_lha"]} L/ha · {R["mix_l"]} L mix · '
+             f'{R["nozzles"]} · {R["speed"]} · {R["pressure"]}', '',
+             '**Mixing order' + (' (changed from the sheet):**' if changed else ':**'),
+             f'1. Water to {R["fill_l"]} L, agitator on']
+    for i, p in enumerate(prods, 2):
+        amt = f'{p["name"]} {p["show"]} {p["u"]}'
+        lines.append(f'{i}. **{amt}** ({p["note"].rstrip(".").split(" (")[0].lower()})' if p.get("note") else f'{i}. {amt}')
+    top = f'{len(prods) + 2}. Top up to {R["mix_l"]} L'
+    if R.get("ph_max"):
+        top += f', then **check pH: must be under {R["ph_max"]}**. If it\'s {R["ph_max"]} or above, don\'t spray. Call Ben or Andy.'
+    lines += [top, '']
+    if kit:
+        lines.append(':warning: ' + (R.get("ppe_note", "").strip() + ' ' if R.get("ppe_note") else '') +
+                     'Kit: ' + ', '.join(kit) + '.')
+    if R.get("spray_rules"):
+        lines.append('. '.join(r.rstrip('.') for r in R["spray_rules"]) + '.')
+    lines.append('Sign off the mix on the page once it\'s in the tank, then do the post-application checklist once it\'s sprayed out.')
+    print('\n==== Post to #spraying (C06KFFNE5R7) — every recipe, tag the applicator ====')
+    if not app:
+        print('!! NO APPLICATOR SET. Add "applicator": ["Name", "Slack ID"] from today\'s TurfDog board, then rebuild.')
+    print('\n'.join(lines))
 
 
 if __name__ == "__main__":
