@@ -85,6 +85,20 @@ body{font-size:16px}
 #dash-root .rg-mz button:disabled{opacity:.4}
 #dash-root .pub-foot{font-size:14px;padding:1.2rem 0 1.6rem}
 }
+
+/* COURSE BRIEFING VIDEO (16 Oct 2026, HyperFrames). public_dash/videos/videos.json lists the clips, newest first; the
+   newest plays (muted) under the KPI strip on Today. The same MP4 goes into the Greens Report in Notion. */
+#dash-root .rg-vid{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);overflow:hidden;display:flex;flex-direction:column}
+#dash-root .rg-vid-head{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;padding:var(--cds-pad-md) var(--cds-pad-lg) .5rem;flex-wrap:wrap}
+#dash-root .rg-vid-head h3{margin:0;font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium)}
+#dash-root .rg-vid-head span{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+#dash-root .rg-vid video{display:block;width:100%;aspect-ratio:16/9;background:#0f1a12;object-fit:cover}
+#dash-root .rg-vid-foot{display:flex;gap:.5rem;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:.55rem var(--cds-pad-lg) var(--cds-pad-md);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+#dash-root .rg-vid-foot a{color:var(--color-fg)}
+#dash-root .rg-vid-more{display:flex;gap:.4rem;flex-wrap:wrap}
+#dash-root .rg-vid-more button{appearance:none;border:1px solid var(--color-border-line);background:none;color:var(--color-fg-muted);border-radius:999px;padding:.2rem .65rem;font:inherit;font-size:var(--cds-font-size-caption);cursor:pointer}
+#dash-root .rg-vid-more button[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg)}
+@media (max-width:600px){#dash-root .rg-vid-head{padding:10px 12px 6px}#dash-root .rg-vid-foot{padding:8px 12px 10px}#dash-root .rg-vid-head h3{font-size:19px}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
@@ -157,5 +171,23 @@ and the ethephon window opens <b data-source="eth_window" data-field="opens">—
   PHONE.addEventListener && PHONE.addEventListener('change', function(){ anomAll = false; run(); });
   var go = function(){ new MutationObserver(function(){ if (!go.t) go.t = setTimeout(function(){ go.t = 0; run(); }, 120); }).observe(document.getElementById('dash-root'), {childList:true, subtree:true}); run(); setTimeout(tabIntoView, 300); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+</script><script>
+(function(){
+  function fmt(d){ try { return new Date(d + 'T12:00:00').toLocaleDateString('en-AU', {weekday:'short', day:'numeric', month:'short', year:'numeric'}); } catch (e) { return d; } }
+  function build(list){
+    var today = document.getElementById('today'); if (!today || !list || !list.length || document.querySelector('.rg-vid')) return;
+    var card = document.createElement('section'); card.className = 'rg-vid'; card.setAttribute('aria-label', 'Course briefing video');
+    card.innerHTML = '<div class="rg-vid-head"><h3></h3><span></span></div><video muted autoplay playsinline controls preload="metadata"></video><div class="rg-vid-foot"><span class="cap"></span><div class="rg-vid-more"></div></div>';
+    var v = card.querySelector('video'), h = card.querySelector('h3'), d = card.querySelector('.rg-vid-head span'), c = card.querySelector('.cap'), more = card.querySelector('.rg-vid-more');
+    function show(i){ var x = list[i]; h.textContent = x.title || 'Course briefing'; d.textContent = 'Data to ' + fmt(x.date);
+      c.textContent = x.caption || ''; if (x.poster) v.poster = x.poster; v.src = x.file; try { v.play(); } catch (e) {}
+      more.querySelectorAll('button').forEach(function(b, j){ b.setAttribute('aria-pressed', String(i === j)); }); }
+    if (list.length > 1) list.slice(0, 6).forEach(function(x, i){ var b = document.createElement('button'); b.type = 'button'; b.textContent = i ? fmt(x.date).replace(/ \d{4}$/, '') : 'Latest'; b.onclick = function(){ show(i); }; more.append(b); });
+    var k = today.querySelector('.rg-kpis'); if (k) k.after(card); else today.prepend(card);
+    show(0);
+  }
+  fetch('videos/videos.json?v=' + Date.now()).then(function(r){ return r.ok ? r.json() : []; }).then(function(list){
+    var go = function(){ if (document.getElementById('today')) build(list); else setTimeout(go, 300); }; go(); }).catch(function(){});
 })();
 </script></body></html>
