@@ -22,6 +22,67 @@ html,body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:
 [hidden]{display:none!important}
 .dash-skeleton{color:transparent;background:var(--cds-chart-grid);border-radius:6px}
 .pub-foot{font-size:.75rem;color:var(--color-fg-muted);padding:1.5rem 0 2rem;border-top:1px solid var(--color-border-line);margin-top:2rem}
+/* mobile v1.2 (16 Oct 2026, public page only): same phone treatment as the bunker page */
+.mx-more{width:100%;margin-top:2px;border:1px dashed var(--color-border-line);background:transparent;color:var(--color-fg);border-radius:12px;padding:12px;font:inherit;font-weight:600;cursor:pointer;grid-column:1/-1;list-style:none}
+@media (max-width:600px){
+body{font-size:16px}
+#dash-root{--dash-gutter:12px}
+#dash-root .mx{gap:14px;padding-block:14px 40px}
+#dash-root .mx-head{padding-block:4px 0}
+#dash-root .mx-title{font-size:28px;line-height:1.08;gap:.5rem}
+#dash-root .mx-live{font-size:11px}
+#dash-root .mx-take{font-size:15px;line-height:1.4}
+#dash-root .mx-asof{font-size:12.5px;line-height:1.35}
+#dash-root .mx-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px}
+#dash-root .mx-tabs::-webkit-scrollbar{display:none}
+#dash-root .mx-tab{flex:none;font-size:15px;padding:.6rem .75rem;white-space:nowrap}
+#dash-root .mx-kpis{grid-template-columns:1fr 1fr;gap:6px}
+#dash-root .mx-kpi{padding:9px 11px 8px}
+#dash-root .mx-kpi-l{font-size:11.5px;line-height:1.25}
+#dash-root .mx-kpi-v{font-size:30px}
+#dash-root .mx-kpi-s{font-size:12.5px;line-height:1.3}
+#dash-root .mx-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+#dash-root .mx-card{padding:12px;gap:8px}
+#dash-root .mx-card h3{font-size:19px}
+#dash-root .mx-row{gap:4px 8px}
+#dash-root .mx-note{font-size:13.5px}
+#dash-root .mx-do-t{font-size:17px}
+#dash-root .mx-wl{grid-template-columns:minmax(0,1fr);gap:8px}
+#dash-root .mx-wc{padding:10px 12px}
+#dash-root .mx-wc-m{font-size:17px}
+#dash-root .mx-wc-j{font-size:15px}
+#dash-root .mx-wc-w,#dash-root .mx-wc-p,#dash-root .mx-wc ul{font-size:13px}
+#dash-root .mx-ctl{gap:8px}
+#dash-root .mx-in{order:-1;flex:1 1 100%;max-width:none;width:100%;font-size:16px;padding:9px 14px;border-radius:999px}
+#dash-root .mx-sel{flex:1 1 40%;font-size:15px;padding:8px 10px}
+#dash-root .mx-chip{flex:none;font-size:14px;padding:8px 13px}
+#dash-root .mx-ubtn{font-size:14px;padding:.5rem 1rem}
+#dash-root .mx-ubtn.sm{padding:.35rem .75rem}
+#dash-root .mx-tbox{overflow-x:auto;margin:0 -12px;padding:0 12px}
+#dash-root .mx-table{font-size:14px}
+#dash-root .mx-table th{white-space:nowrap}
+#dash-root .mx-table td{white-space:normal;overflow-wrap:break-word}
+#dash-root .mx-table td,#dash-root .mx-table th{padding-left:6px;padding-right:6px}
+#dash-root .mx-table td.wrap{min-width:9rem}
+#dash-root #t-updates th:nth-child(5),#dash-root #t-updates td:nth-child(5){display:none}
+#dash-root .mx-pill{font-size:11.5px;padding:.05rem .4rem}
+#dash-root .mx-dl{grid-template-columns:1fr 1fr}
+#dash-root .mx-dl dd{font-size:15px}
+#dash-root .mx-chart{min-height:200px}
+#dash-root .mx-chart.tall{min-height:300px}
+#dash-root .mx-legend{font-size:12.5px}
+#dash-root .mx-src li{grid-template-columns:auto 1fr;font-size:13px}
+#dash-root .mx-dlg .acts button{padding:.7rem 1.2rem;font-size:15px}
+#dash-root .mx-live i,#dash-root .mx-dot.live,#dash-root .mx-do{animation:none}
+.pub-foot{font-size:13px}
+}
+/* older iPhones (iOS before 16.2) can't do color-mix: give badges and buttons solid colours so nothing looks see-through */
+@supports not (background:color-mix(in srgb,red 50%,blue)){
+.mx-upd,.mx-upd.done,.mx-upd.wait,.mx-upd.appr{background:var(--color-panel);border:1px solid var(--color-border-line)}
+.mx-pill.overdue,.mx-pill.Overdue,.mx-pill.Fault{border-color:var(--color-bad)}
+.mx-pill.due,.mx-pill.Due{border-color:var(--color-warn)}
+.mx-table tr.sel td{background:var(--color-panel)}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
@@ -1836,5 +1897,27 @@ window.MX3D = { mount: mount, MODELS: MODELS };
 })();
 </script>
 
+<script>
+(function(){
+  var PHONE = window.matchMedia ? matchMedia('(max-width:600px)') : {matches:false}, all = false, mo = null;
+  function cap(){
+    var ol = document.getElementById('wl'); if (!ol) return;
+    if (mo) mo.disconnect();
+    var old = ol.querySelector('.mx-more'); if (old) old.remove();
+    var L = Array.prototype.filter.call(ol.children, function(li){ return li.classList.contains('mx-wc'); });
+    var on = PHONE.matches && !all && L.length > 8;
+    L.forEach(function(li, i){ li.hidden = on && i >= 8; });
+    if (on) { var b = document.createElement('li'); b.className = 'mx-more'; b.setAttribute('role','button'); b.tabIndex = 0;
+      b.textContent = 'Show all ' + L.length + ' jobs';
+      b.onclick = b.onkeydown = function(e){ if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return; e.preventDefault(); all = true; cap(); };
+      ol.appendChild(b); }
+    if (mo) mo.observe(ol, {childList:true});
+  }
+  function hook(){ var ol = document.getElementById('wl'); if (!ol) return setTimeout(hook, 300);
+    mo = new MutationObserver(cap); cap(); }
+  if (PHONE.addEventListener) PHONE.addEventListener('change', cap);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hook); else hook();
+})();
+</script>
 <div class="pub-foot">Ranfurlie Golf Club machinery · shared copy · <span id="pub-built">updated hourly</span></div>
 </div></body></html>
