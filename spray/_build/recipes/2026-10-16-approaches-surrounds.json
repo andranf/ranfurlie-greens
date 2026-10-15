@@ -1,0 +1,136 @@
+{
+  "slug": "2026-10-16-approaches-surrounds",
+  "title": "Fert + PGR, Remaining Approaches & Surrounds",
+  "sheet_name": "5800 - 300L/Ha - Fert + PGR to Approaches and Surrounds (partial tank, 270 L)",
+  "sprayer": "Toro 5800",
+  "date": "Fri 16 Oct",
+  "date_long": "Fri 16 Oct 2026",
+  "date_iso": "2026-10-16",
+  "area_ha": 0.9,
+  "rate_lha": 300,
+  "mix_l": 270,
+  "tank_cap_l": 1200,
+  "fill_l": 180,
+  "nozzles": "Red AIC",
+  "speed": "6.9 km/h",
+  "pressure": "4 bar",
+  "last_load": "Fert + PGR to Approaches & Surrounds, Thu 15 Oct",
+  "site_check": "Spray signs out on the remaining approaches and surrounds",
+  "weather": "Delta T 2–8 · wind under 15 km/h · gusts under 30 · no rain for 8 h",
+  "ph_max": 4.5,
+  "products": [
+    {
+      "id": "companion",
+      "rate": "300 mL/ha",
+      "rate_lha": 0.3,
+      "unit": "mL",
+      "sheet": 1
+    },
+    {
+      "id": "shadow",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "sheet": 2,
+      "unit": "mL"
+    },
+    {
+      "id": "prokelp",
+      "rate": "20 L/ha",
+      "rate_lha": 20,
+      "sheet": 5,
+      "note": "Goes in before the iron (sheet had it 5th).",
+      "why": "It's strongly alkaline (pH 10–12.5, caustic potash). Going in early, into plain water, means it never meets the acidic iron or GreenMaxx neat, and it's well spread before the ethephon goes in."
+    },
+    {
+      "id": "iron",
+      "rate": "30 L/ha",
+      "rate_lha": 30,
+      "sheet": 4,
+      "why": "Acidic (pH about 2). Goes in once the kelp is spread through the tank, and starts bringing the pH back down."
+    },
+    {
+      "id": "greenmaxx",
+      "rate": "35 L/ha",
+      "rate_lha": 35,
+      "sheet": 6,
+      "why": "Acidic (pH 2–3), like the iron. Its SDS lists strong bases as incompatible, so it goes in after the kelp is well diluted."
+    },
+    {
+      "id": "promote",
+      "rate": "3.5 L/ha",
+      "rate_lha": 3.5,
+      "sheet": 3,
+      "note": "Goes in last (sheet had it 3rd).",
+      "why": "Goes in last, once the iron and GreenMaxx have brought the pH back down after the kelp, so the ethephon never sits in alkaline water. The label says don't use alkaline water."
+    }
+  ],
+  "ppe_note": "Promote Plus 900 is corrosive, so mix in the full kit.",
+  "spray_ppe": [
+    "overalls",
+    "gloves",
+    "goggles"
+  ],
+  "spray_rules": [
+    "Spray out straight away",
+    "No irrigation for 24 h. Don’t water in",
+    "No mowing until fully dry",
+    "Keep people off until dry"
+  ],
+  "spray_more": "Spraying PPE is from the Shadow Ultra and Promote Plus 900 labels: cotton overalls, elbow-length chemical-resistant gloves, goggles or a face shield. Promote Plus 900: don’t spray if rain is expected within 8 h, and don’t leave the mix standing in metal for more than 2 h. Shadow Ultra: no rain or irrigation within 1 h, and no entry without protective clothing until the spray has dried.",
+  "flags": [
+    {
+      "c": "red",
+      "t": "Pro Kelp is caustic in an ethephon tank",
+      "d": "Pro Kelp is pH 10–12.5 (caustic potash). Promote Plus 900’s label says don’t use alkaline water, and the GreenMaxx SDS lists strong bases as incompatible. This page puts the kelp in early and the Promote Plus last, then checks the tank is under pH 4.5. Jar test per 1 L of mix, in page order: 700 mL water, 1 mL Companion, 3 mL Shadow Ultra, 67 mL Pro Kelp, 100 mL iron, 117 mL GreenMaxx, 12 mL Promote Plus. Look for sludge or flecks after 10 minutes.",
+      "s": "Pro Kelp SDS Nov 2025 · GreenMaxx SDS Dec 2024 · APVMA 69487 eLabel"
+    },
+    {
+      "c": "",
+      "t": "Shadow Ultra 1.0 L/ha on the couch",
+      "d": "The label has no approach row. Bentgrass greens are 1–2 L/ha, hybrid couch fairways 0.15–0.6 L/ha, common couch 0.8–1.6 L/ha. Where the approach couch is a hybrid, 1.0 is above its row. Label also notes cool conditions or low growth may cause discolouration.",
+      "s": "APVMA 88267 eLabel"
+    },
+    {
+      "c": "",
+      "t": "Grass Roots Iron: sheet 30 L/ha, label 10–20 L/ha",
+      "d": "At 20 L/ha this tank takes 18 L, not 27 L. GreenMaxx carries 6% Fe as well, so the tank puts on about 4–5 kg Fe/ha in total.",
+      "s": "Oasis Turf label · GreenMaxx SDS Dec 2024"
+    },
+    {
+      "c": "",
+      "t": "Water volume is under two labels",
+      "d": "300 L/ha is under Pro Kelp’s label volume (700 L/ha) and Shadow Ultra’s golf course range (350–500 L/ha).",
+      "s": "Pro Kelp label · APVMA 88267 eLabel"
+    },
+    {
+      "c": "info",
+      "t": "Nitrogen: about 9 kg N/ha",
+      "d": "GreenMaxx at 35 L/ha is about 9 kg N/ha (SG 1.31, 20% w/w) as stabilised urea, plus 1% Mg. Label range 20–50 L/ha. If its 20% is w/v, it’s 7 kg N/ha.",
+      "s": "GreenMaxx SDS Dec 2024 · Greenway brochure"
+    },
+    {
+      "c": "info",
+      "t": "Small tank: 180 L first fill",
+      "d": "180 L is two-thirds of the 270 L mix, so Shadow Ultra still goes into a tank two-thirds full and every product lands at the same dilution as yesterday’s tank. The 6 products add about 81 L, then top up about 9 L to 270 L.",
+      "s": "Shadow Ultra APVMA 88267 eLabel"
+    },
+    {
+      "c": "info",
+      "t": "Order changed from the sheet",
+      "d": "Pro Kelp moves up from 5th to 3rd, Promote Plus 900 moves from 3rd to last. Everything else keeps its place.",
+      "s": "Reasoning on each product card"
+    }
+  ],
+  "post_checks": [
+    [
+      "irrig",
+      "Irrigation off on approaches and surrounds for 24 h",
+      ""
+    ],
+    [
+      "mow",
+      "Mowers told: no mowing until it's dry",
+      ""
+    ]
+  ]
+}
