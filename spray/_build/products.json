@@ -315,5 +315,165 @@
     ],
     "why": "Wetting agents go in last so they don't foam the tank or coat the other products. You're at {before} L.",
     "src": "Indigo tech sheet · <a href=\"https://gilbasolutions.com/wp-content/uploads/2022/05/HydroForce-Ultra_Tech.pdf\" target=\"_blank\" rel=\"noopener\">tech sheet</a>"
+  },
+  "quinstar": {
+    "name": "Quinstar 200 SC",
+    "gk_name": "Quinstar (AU)",
+    "sig": "CAUTION",
+    "sigc": "caution",
+    "form": "Suspension concentrate (SC)",
+    "what": "Herbicide: quinclorac 200 g/L (summer grass, white clover, kikuyu suppression)",
+    "haz": "May irritate eyes and skin.",
+    "soft": true,
+    "hazFull": "Schedule 5. Label rate 4.1 L/ha in 400 L water. Tolerant turf: common and seeded couch, zoysia, Kentucky bluegrass, perennial ryegrass, bentgrass (with a caution). Not tolerant: Qld blue couch, buffalo, kikuyu (suppressed). Tall fescue isn't listed. Kikuyu suppression is 2 applications 14–21 days apart, autumn best. Don't mow 2 days before or after. Avoid rain within 48 h and irrigation within 8 h.",
+    "ppe": [
+      "overalls",
+      "gloves",
+      "goggles"
+    ],
+    "how": [
+      "Shake the drum hard",
+      "Measure {amt}",
+      "Pour into moving water, agitator on",
+      "Rinse the drum 3 times into the tank"
+    ],
+    "why": "A suspension concentrate goes in first after Companion, so it disperses before the oils and salts. You're at {before} L.",
+    "src": "ADAMA Quinstar product guide · <a href=\"https://www.adama.com/australia/en/media/8771/download\" target=\"_blank\" rel=\"noopener\">guide</a>"
+  },
+  "firepower": {
+    "name": "Firepower 900",
+    "gk_name": "Firepower 900",
+    "sig": "POISON",
+    "sigc": "poison",
+    "form": "Emulsifiable concentrate (EC)",
+    "what": "Grass herbicide: haloxyfop-R methyl ester 900 g/L (Group 1)",
+    "haz": "Harmful if swallowed. Irritates eyes and skin. Kills bent, couch, kikuyu and most grasses.",
+    "hazFull": "Schedule 6. Harmful if swallowed, very toxic to aquatic life. SDS PPE: impervious elbow-length gloves, protective clothing and eye or face protection. Registered for forestry and industrial grass control, not turf. Kills green couch, Qld blue couch, zoysia, buffalo, kikuyu and paspalum.",
+    "ppe": [
+      "overalls",
+      "gloves",
+      "goggles",
+      "shield"
+    ],
+    "how": [
+      "Measure {amt} (small measure: it's 900 g/L)",
+      "Pour into moving water",
+      "Rinse the measure and drum 3 times into the tank"
+    ],
+    "why": "An EC goes in after the suspension concentrate and before the soluble hormone herbicides. You're at {before} L.",
+    "src": "ADAMA SDS · <a href=\"https://www.adama.com/australia/sites/adama_australia/files/downloads/Firepower%20900%20SDS%20Dec%2020.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a> · <a href=\"https://www.adama.com/australia/sites/adama_australia/files/product-documents/2025-04/ADAMA_Firepower_TN_v4.pdf\" target=\"_blank\" rel=\"noopener\">tech note</a>"
+  },
+  "fusilade": {
+    "name": "Fusilade Forte",
+    "gk_name": "Fusilade Forte 128 EC",
+    "sig": "POISON",
+    "sigc": "poison",
+    "form": "Emulsifiable concentrate (EC)",
+    "what": "Grass herbicide: fluazifop-P (butyl ester) 128 g/L (Group 1)",
+    "haz": "Poison. Kills bent, couch, kikuyu and ryegrass. Face shield and elbow gloves.",
+    "hazFull": "Label signal POISON (APVMA 58521). Label PPE when mixing and spraying: elbow-length PVC gloves and a face shield. Registered for horticulture, ornamentals and plantations, not turf. Controls couch, kikuyu, paspalum and ryegrass; Poa and silver grass aren't controlled. Rainfast in 1 hour. Label: DO NOT tank mix with other pesticides without prior reference to Syngenta. No adjuvant needed.",
+    "ppe": [
+      "overalls",
+      "gloves",
+      "shield"
+    ],
+    "how": [
+      "Measure {amt}",
+      "Pour into moving water",
+      "Rinse the drum 3 times into the tank"
+    ],
+    "why": "The second EC, before the soluble hormone herbicides. You're at {before} L.",
+    "src": "Label APVMA 58521 · <a href=\"https://nuturf.com.au/media/catalog/product/file/FUSILADE%20FORTE%20Label%20-%2058521%20-%20134241.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+  },
+  "sportsground": {
+    "name": "Sportsground",
+    "gk_name": "Sportsground (AU)",
+    "sig": "POISON",
+    "sigc": "poison",
+    "form": "Soluble concentrate (amine salts)",
+    "what": "Broadleaf herbicide: mecoprop 336 + dicamba 40 g/L + a third phenoxy (Campbell three-way, Group 4)",
+    "haz": "Poison. Respirator, goggles and elbow gloves when mixing.",
+    "hazFull": "Campbell Sportsground Herbicide, APVMA 31538. The registered label wasn't readable online; the retailer lists mecoprop 336, MCPA 80 and dicamba 40 g/L, and avoid Qld blue couch, carpet grass, kikuyu and centipede. PPE here follows the Campbell Tri-Kombi label (same three-way family). Label PPE (Tri-Kombi): opening and mixing, waterproof protective clothing, washable hat, elbow-length chemical-resistant gloves, impervious footwear, goggles and a half-face respirator with organic vapour cartridges. Hand-held spraying: chemical-resistant clothing buttoned at neck and wrist, washable hat, elbow-length gloves and the half-face respirator.",
+    "ppe": [
+      "suit",
+      "hat",
+      "gloves",
+      "goggles",
+      "resp",
+      "boots"
+    ],
+    "how": [
+      "Measure {amt}",
+      "Pour into moving water",
+      "Rinse the drum 3 times into the tank"
+    ],
+    "why": "Soluble amine salts go in after the ECs. You're at {before} L.",
+    "src": "Retailer listing (Pestrol) · <a href=\"https://www.pestrol.com.au/buy-online/sportsground-herbicide-10l\" target=\"_blank\" rel=\"noopener\">product page</a>"
+  },
+  "trikombi": {
+    "name": "Methar Tri-Kombi",
+    "gk_name": "Methar Tri-Kombi (AU)",
+    "sig": "POISON",
+    "sigc": "poison",
+    "form": "Soluble concentrate (amine salts)",
+    "what": "Broadleaf herbicide: mecoprop 336 + 2,4-D 80 + dicamba 40 g/L (Group 4)",
+    "haz": "Poison. Respirator, goggles and elbow gloves when mixing and spraying by hand.",
+    "hazFull": "Campbell Methar Tri-Kombi, APVMA 31536. Turf rate 4.2 L in 450 L water per ha (label maximum). Don't use on buffalo. Wind 3–20 km/h, no surface inversions. Don't mow 2 days before or after. No heavy rain or storms within 3 days. Don't irrigate to run-off for 3 days. Not by backpack sprayer. Label PPE (Tri-Kombi): opening and mixing, waterproof protective clothing, washable hat, elbow-length chemical-resistant gloves, impervious footwear, goggles and a half-face respirator with organic vapour cartridges. Hand-held spraying: chemical-resistant clothing buttoned at neck and wrist, washable hat, elbow-length gloves and the half-face respirator.",
+    "ppe": [
+      "suit",
+      "hat",
+      "gloves",
+      "goggles",
+      "resp",
+      "boots"
+    ],
+    "how": [
+      "Measure {amt}",
+      "Pour into moving water",
+      "Rinse the drum 3 times into the tank"
+    ],
+    "why": "The second amine-salt hormone, after the ECs. You're at {before} L.",
+    "src": "Label APVMA 31536 · <a href=\"https://elabels.apvma.gov.au/31536ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+  },
+  "ecodye": {
+    "name": "Ecodye Blue",
+    "gk_name": "Ecodye Blue",
+    "sig": "MARKER",
+    "sigc": "caution",
+    "form": "Spray marker dye",
+    "soft": true,
+    "what": "Blue marker dye so you can see where you've sprayed",
+    "haz": "Stains skin and clothes.",
+    "hazFull": "Marker dye, not a pesticide. Stains skin, clothing and hard surfaces: keep it off paths and carts.",
+    "ppe": [
+      "gloves"
+    ],
+    "how": [
+      "Measure {amt}",
+      "Pour into moving water"
+    ],
+    "why": "Dye before the oil adjuvant, which goes in last. You're at {before} L.",
+    "src": "Marker dye (not APVMA-registered)"
+  },
+  "hasten": {
+    "name": "Hasten",
+    "gk_name": "Hasten Spray Adjuvant",
+    "sig": "CAUTION",
+    "sigc": "caution",
+    "form": "Oil adjuvant (EC)",
+    "soft": true,
+    "what": "Esterified vegetable oil + non-ionic surfactant",
+    "haz": "May irritate eyes and skin.",
+    "hazFull": "Vicchem Hasten. May irritate the eyes and skin; wear protective clothing. Label: add Hasten last and keep agitating until spraying is finished. General rate 0.5–1.0 L/ha, not under 0.2 L/ha.",
+    "ppe": [
+      "overalls",
+      "gloves"
+    ],
+    "how": [
+      "Measure {amt}",
+      "Pour in last, agitator on until it's sprayed out"
+    ],
+    "why": "Hasten's label says it goes in last. You're at {before} L.",
+    "src": "Vicchem label · <a href=\"https://www.nuturf.com.au/images/product-tech-sds/Hasten_Spray_Adjuvant_Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
   }
 }

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Today's Tanks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+/* Ranfurlie spraying bookmark when several tanks share a day (build.py write_chooser, 19 Oct 2026). */
+:root{
+  color-scheme:light;
+  --bg:#e4f1f7; --sky1:#7fd3ff; --sky2:#86e8b4; --sky3:#ffe08a;
+  --glass:rgba(255,255,255,.62); --rim:rgba(255,255,255,.9); --edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -18px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231; --muted:#3f5d6e; --faint:#6f8a99; --line:rgba(16,52,72,.12);
+  --go:#13a356; --go-ink:#ffffff; --tank:#0aa6dc; --tank-deep:#0573a8;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark; --bg:#06121b; --sky1:#0a6fa8; --sky2:#0d7a4c; --sky3:#5a4a12;
+  --glass:rgba(18,40,56,.6); --rim:rgba(255,255,255,.22); --edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.1);
+  --go:#2fd27a; --go-ink:#03210f; --tank:#38c6ff; --tank-deep:#38c6ff;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark; --bg:#06121b; --sky1:#0a6fa8; --sky2:#0d7a4c; --sky3:#5a4a12;
+  --glass:rgba(18,40,56,.6); --rim:rgba(255,255,255,.22); --edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.1);
+  --go:#2fd27a; --go-ink:#03210f; --tank:#38c6ff; --tank-deep:#38c6ff;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;min-height:100vh;
+  padding:calc(18px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(8px);opacity:.85}
+.sky i:nth-child(1){width:80vmax;height:80vmax;left:-30vmax;top:-34vmax;background:radial-gradient(circle,var(--sky1) 0,transparent 62%)}
+.sky i:nth-child(2){width:75vmax;height:75vmax;right:-34vmax;top:18vh;background:radial-gradient(circle,var(--sky2) 0,transparent 62%)}
+.sky i:nth-child(3){width:60vmax;height:60vmax;left:-10vmax;bottom:-30vmax;background:radial-gradient(circle,var(--sky3) 0,transparent 60%);opacity:.6}
+.wrap{max-width:720px;margin:0 auto}
+.when{font-weight:600;color:var(--muted);font-size:15px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(38px,9vw,56px);line-height:.98;margin:4px 0 6px;letter-spacing:-.01em}
+.lead{color:var(--muted);margin:0 0 18px}
+.tks{display:grid;gap:12px}
+.tk{display:grid;grid-template-columns:1fr auto;grid-template-areas:"sp go" "b go" "who go";gap:2px 14px;align-items:center;
+  padding:18px 18px 16px;border-radius:22px;text-decoration:none;color:var(--fg);background:var(--glass);
+  -webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+  border:1px solid var(--edge);box-shadow:inset 0 1px 0 var(--rim),var(--shadow);transition:transform .15s}
+.tk:active{transform:scale(.985)}
+.tk .sp{grid-area:sp;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tank-deep)}
+.tk b{grid-area:b;font-family:var(--display);font-weight:700;font-size:26px;line-height:1.05}
+.tk .who{grid-area:who;color:var(--muted);font-size:15px}
+.tk .go{grid-area:go;background:var(--go);color:var(--go-ink);font-weight:700;border-radius:999px;padding:12px 18px;font-size:16px}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:26px 0 8px}
+ul{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+li{display:flex;justify-content:space-between;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);font-size:15px}
+li a{color:var(--fg);font-weight:600;text-decoration:none}
+li span{color:var(--faint);white-space:nowrap}
+.foot{color:var(--faint);font-size:13px;margin-top:22px}
+@media (max-width:420px){li{flex-direction:column;gap:0}}
+</style>
+<div class="sky" aria-hidden="true"><i></i><i></i><i></i></div>
+<main class="wrap">
+  <div class="when">Ranfurlie · {{DATE}}</div>
+  <h1>Today's tanks</h1>
+  <p class="lead">{{N}} tanks going today. Open yours: each one has its own mixing guide, sign-off and post-application checklist.</p>
+  <div class="tks">{{CARDS}}</div>
+  <h2>Earlier tanks</h2>
+  <ul>{{EARLIER}}</ul>
+  <p class="foot">Progress stays on your phone. Sign-offs go to #spraying and the Spray Records in Notion.</p>
+</main>
+</html>

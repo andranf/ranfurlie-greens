@@ -8,7 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
-/* Ranfurlie Tank Mix template v1.5 (15 Oct 2026). Built by spray/_build/build.py from a recipe + products.json + config.json.
+/* Ranfurlie Tank Mix template v1.6 (19 Oct 2026). Built by spray/_build/build.py from a recipe + products.json + config.json.
+   v1.6: handgun rigs (recipe checks, facts and post-app fields), several tanks open at once (each mix is its own run),
+   a Today's tanks card, and Mix another tank after the checklist.
    Two views: the mixing guide (front and centre on a spray day until the mix is signed) and the spraying dashboard
    (default once signed). Sign-offs and the post-application checklist post to the Zapier "Spray sign-offs" hook.
    Glass: frosted, rim-lit panels over a soft water-and-turf sky. The tank is the one memorable element. */
@@ -134,6 +136,7 @@ button,select,textarea,input{font:inherit;color:inherit}
 .amount{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:end;padding:16px 16px 14px 20px;border-radius:var(--r2);background:linear-gradient(160deg,color-mix(in srgb,var(--tank) 20%,transparent),var(--tank-soft));box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 .amount .big{font-family:var(--display);font-weight:800;font-size:clamp(84px,25vw,150px);line-height:.86;letter-spacing:-.01em;font-variant-numeric:tabular-nums lining-nums;display:flex;align-items:baseline;gap:.1em;color:var(--fg);min-width:0}
 .amount .big u{text-decoration:none;font-size:.4em;font-weight:700;color:var(--tank-deep)}
+.amount .big.long{font-size:clamp(64px,19.5vw,124px)}
 .amount .sub{grid-column:1;display:flex;flex-wrap:wrap;gap:2px 14px;font-family:var(--display);font-weight:600;font-size:17px;color:var(--muted)}
 .amount .sub b{color:var(--tank-deep);font-weight:700}
 .amount .tank{grid-column:2;grid-row:1/span 2}
@@ -436,7 +439,7 @@ details.more[open] .morebody{animation:open .3s var(--ease)}
 <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
 <div class="toast" id="toast" role="status"></div>
 
-<script id="recipe-data" type="application/json">{"slug": "2026-10-19-greens-fairy-ring", "title": "Fairy Ring + Root Disease, Front 9 Greens", "sheet_name": "5800 600L/Ha - Fairy Ring + Root Disease to Greens", "sprayer": "Toro 5800", "applicator": ["Nathan Ferguson", "U06H9J0LBEC"], "date": "Mon 19 Oct", "date_long": "Mon 19 Oct 2026", "date_iso": "2026-10-19", "area_ha": 0.625, "rate_lha": 600, "mix_l": 375, "tank_cap_l": 1200, "fill_l": 250, "nozzles": "Blue AIC", "speed": "7.8 km/h", "pressure": "3 bar", "last_load": "Fert + PGR to Approaches & Surrounds, Fri 16 Oct", "site_check": "Spray signs out on the front nine greens", "weather": "Delta T 2–8 · wind 3–20 km/h · gusts under 30 · no rain for 48 h", "extra_checks": [["catch", "Catch test: the boom puts out 600 L/ha at 3 bar and 7.8 km/h", "Well under? Stop and call Andy before you fill"], ["boxout", "No GPS on the 5800: box out each green, then fill in", "Surrounds don't need spraying. Every part of the green does"], ["waterin", "Watering in lined up behind the sprayer", "6–10 mm on each green, starting within 1 h"]], "products": [{"name": "Companion", "gk_name": "Companion", "sig": "CAUTION", "sigc": "caution", "form": "Adjuvant", "what": "Acidifying and penetrating surfactant (soya phospholipids + propionic acid)", "haz": "Damages eyes. Irritates skin.", "hazFull": "Will damage eyes. Will irritate the skin. Avoid contact with eyes and skin. Label: DO NOT use with copper products.", "ppe": ["overalls", "gloves", "shield"], "how": ["Measure {amt}", "Pour in before anything else"], "why": "The label says Companion goes in first, before the other products. It holds the tank pH down for the ethephon.", "src": "Label APVMA 51664 (Apr 2023) · <a href=\"https://elabels.apvma.gov.au/51664ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "companion", "rate": "800 mL/ha", "sheet": 1, "amt": 0.5, "show": "500", "u": "mL"}, {"name": "Terreplex", "gk_name": "Terreplex Carbon Rich Accidifier (0-0-0)", "sig": "", "sigc": "", "form": "Liquid, low pH (lignosulfonic acid)", "what": "Carbon-rich acidifier: 55% plant-derived organic acid", "haz": "Low pH. Irritates eyes and skin.", "soft": true, "hazFull": "Eye and skin irritant. Harmful if swallowed. Wear eye protection, gloves and appropriate clothing. Don't mix with high-pH products unless the tank goes out straight away.", "ppe": ["overalls", "gloves", "goggles"], "how": ["Measure {amt}", "Pour into moving water, agitator on", "Rinse the drum 3 times into the tank"], "why": "An acidifier, so it goes in early with the Companion and conditions the water before the fungicides. You're at {before} L.", "src": "Mitchell Products label · <a href=\"https://tricure.com/wp-content/uploads/2022/08/Terreplex-Label.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "terreplex", "rate": "5.0 L/ha", "sheet": 2, "amt": 3.125, "show": "3125", "u": "mL"}, {"name": "Evolution Advance", "gk_name": "Quali-Pro Evolution Advance (AU)", "sig": "CAUTION", "sigc": "caution", "form": "Suspension concentrate (SC)", "what": "Fungicide: tebuconazole 370 g/L + azoxystrobin 222 g/L (Group 3 + 11)", "haz": "May irritate eyes.", "soft": true, "hazFull": "Harmful if swallowed. May irritate the eyes. Avoid contact with eyes. Label PPE: cotton overalls buttoned to the neck and wrist when opening, mixing and spraying. Don't apply if rain is expected within 48 h. Wind 3–20 km/h, medium droplets or coarser.", "ppe": ["overalls"], "how": ["Shake the drum hard", "Measure {amt}", "Pour into moving water, agitator on", "Rinse the drum 3 times into the tank"], "why": "A suspension concentrate goes in before the EC and the wetting agent so it disperses properly. You're at {before} L.", "src": "Label APVMA 93144 · <a href=\"https://www.adama.com/australia/en/media/7016/download\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "evoadv", "rate": "2.2 L/ha", "sheet": 5, "note": "Goes in 3rd, before the Zeemil and the wetting agent (sheet had it last).", "amt": 1.375, "show": "1375", "u": "mL"}, {"name": "Zeemil 250 EC", "gk_name": "Zeemil", "sig": "CAUTION", "sigc": "caution", "form": "Emulsifiable concentrate (EC)", "what": "Fungicide: metalaxyl 250 g/L (Group 4) for Pythium. Off-label on turf", "haz": "Irritates eyes and skin. Don't breathe the solvent vapour.", "soft": true, "hazFull": "Label: avoid contact with eyes and skin. Do not inhale spray mist. Beware of solvent vapours when handling the concentrate and near an open spray tank. Registered for pineapples only (2 L/ha).", "ppe": ["overalls", "gloves", "goggles"], "how": ["Measure {amt}", "Pour straight in and mix well", "Stand upwind of the open lid", "Rinse the drum 3 times into the tank"], "why": "An EC goes in after the suspension so it doesn't stop it dispersing. You're at {before} L.", "src": "Label APVMA 49822 · <a href=\"https://elabels.apvma.gov.au/49822ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "zeemil", "rate": "2.0 L/ha", "sheet": 3, "amt": 1.25, "show": "1250", "u": "mL"}, {"name": "HydroForce Ultra", "gk_name": "HydroForce Ultra (AU)", "sig": "", "sigc": "", "form": "Soil surfactant (block co-polymer)", "what": "Wetting agent: carries the fungicides into the thatch and root zone", "haz": "", "hazFull": "No hazard statements on the tech sheet. Can foam: add slowly. Irrigate after application to move it into the root zone.", "ppe": ["gloves"], "how": ["Shake well", "Measure {amt}", "Pour in slowly, agitator on. It can foam", "Rinse the drum 3 times into the tank"], "why": "Wetting agents go in last so they don't foam the tank or coat the other products. You're at {before} L.", "src": "Indigo tech sheet · <a href=\"https://gilbasolutions.com/wp-content/uploads/2022/05/HydroForce-Ultra_Tech.pdf\" target=\"_blank\" rel=\"noopener\">tech sheet<\/a>", "id": "hydroforce", "rate": "6.0 L/ha", "sheet": 4, "note": "Goes in last.", "amt": 3.75, "show": "3.75", "u": "L"}], "ppe_note": "Terreplex and Zeemil irritate eyes and skin, and Zeemil gives off solvent vapour, so mix in the full kit.", "spray_ppe": ["overalls", "gloves"], "spray_rules": ["No GPS on this sprayer: box out each green (a lap round the edge), then fill in. Surrounds don't need it, but every part of the green does", "Start once Delta T is over 2 (about 8am). Off by 10:30, before the gusts", "Water in 6–10 mm behind each green, starting within 1 h. Don't let it dry on the leaf", "Keep people off until it's watered in"], "spray_more": "Evolution Advance label: wind 3–20 km/h, medium droplets or coarser, no spraying in an inversion, don't apply if rain is expected within 48 h. Zeemil label: beware of solvent vapours near the open tank.", "post_checks": [["out", "Whole tank sprayed out", "No mix left standing in the sprayer"], ["flush", "Sprayer flushed through the boom", "Clean water"], ["rinsate", "Rinse water sprayed back over the treated area", "Not down a drain or onto hard surfaces"], ["nozzles", "Filters and nozzles checked and clean", ""], ["drums", "Empty drums triple rinsed, caps off, set aside for drumMUSTER", ""], ["ppe", "Gloves, goggles and face shield washed, overalls in the wash", ""], ["signs", "Spray signs stay out until the turf is dry", ""], ["gk", "Application entered in GreenKeeper", "Batch numbers, start and finish times, weather"], ["turfdog", "Job ticked off in TurfDog", ""], ["waterin", "Every green watered in, 6–10 mm, within 1 h of spraying", "Soil pass: it must not dry on the leaf"]], "flags": [{"c": "", "t": "Zeemil 2.0 L/ha: at its label max, off-label on turf", "d": "Zeemil 250 EC (metalaxyl 250 g/L) is registered for pineapples only, at 2 L/ha every 4 to 8 weeks. On greens it's off-label; Victoria allows that at or below the label rate and interval. Last went on greens 18 Sep (31 days). It's the only Pythium root rot product in this tank.", "s": "APVMA 49822 eLabel · Turf Data reference notes 18 Oct"}, {"c": "red", "t": "Boom setup won't give 600 L/ha", "d": "Blue AIC (03) at 3 bar is about 1.2 L/min a nozzle. On the 5800's 50 cm spacing at 7.8 km/h that's about 180 L/ha if they're TeeJet 03s, not 600. 600 L/ha at 3 bar: white AIC (08) at about 6.2 km/h, or grey (06) at about 4.7 km/h. The catch test on the sprayer check settles it.", "s": "TeeJet AIC flow at 4 bar · 50 cm nozzle spacing"}, {"c": "", "t": "Evolution Advance 2.2 L/ha is the label high rate", "d": "Fairy ring 1.6–2.2 L/ha. Label: low rate from late October to early November, high rate if symptoms are present, reapply after 30 days if needed. Max 2 consecutive sprays, 3 per season.", "s": "APVMA 93144 label"}, {"c": "", "t": "Rain inside the 48 h label restraint", "d": "Evolution Advance: don't apply if rain is expected within 48 h. The forecast has about 1 to 2.5 mm on Tue 20 Oct. Light, and the tank is watered in anyway, but it's a label condition.", "s": "APVMA 93144 label · forecast 18 Oct"}, {"c": "", "t": "Wash in straight away: 600 L/ha is under label volume", "d": "The label's root-disease use is about 1000 L/ha with 6–10 mm of irrigation within 1 hour. At 600 L/ha the washing in matters more: start on each green as soon as it's sprayed.", "s": "APVMA 93144 label"}, {"c": "", "t": "Fungicide + wetting agent on bentgrass in the heat", "d": "Tebuconazole plus HydroForce, 27 °C by afternoon, five days after Shadow Ultra and Promote Plus. Envu's guidance is to keep wetting agents two weeks clear of DMI fungicides. Spraying early and watering in straight behind keeps it off the leaf.", "s": "Turf Data reference notes"}, {"c": "info", "t": "No leaf cover from this pass", "d": "Evolution Advance's dollar spot, brown patch and anthracnose claims are leaf and crown uses (350–500 L/ha, left on the leaf). Watered in, this is a root-zone pass, so don't count it against the 22–24 Oct leaf-disease spike.", "s": "APVMA 93144 label"}, {"c": "info", "t": "Order changed from the sheet", "d": "Evolution Advance moves from last to 3rd so the suspension goes in before the EC (Zeemil) and the wetting agent. HydroForce goes in last. Companion and Terreplex condition the water first.", "s": "Reasoning on each product card"}], "webhook": "https://hooks.zapier.com/hooks/catch/18429017/W9qCDw7MkvuzL8et/", "data_url": "https://andranf.github.io/ranfurlie-greens/data.json", "crew": [["Andy Anderson", "U06BCCG4HT9"], ["Ben Hartley", "U06NBNSR9LG"], ["Neil Harper", "U06FJ0J1RH8"], ["Kyle Craig", "U06FWK6ND5X"], ["Nathan Drew", "U06FJ0J5DS6"], ["Nathan Ferguson", "U06H9J0LBEC"], ["Brodie Macdonald", "U0839HLQA8G"], ["Nicholas Debrincat", "U07QSB7MDK5"], ["Flynn Sinclair", "U08C1SVFSFR"], ["James King", "U08D57N6JSC"], ["Joshua Cope", "U08ENB28AQZ"], ["Mitch Mahoney", "U08K55E3QJU"], ["Samuel Cope", "U09LN1Q8QH2"], ["Tremayne Gallagher", "U09V6AVPUDP"]]}</script>
+<script id="recipe-data" type="application/json">{"slug": "2026-10-19-greens-fairy-ring", "title": "Fairy Ring + Root Disease, Front 9 Greens", "sheet_name": "5800 600L/Ha - Fairy Ring + Root Disease to Greens", "sprayer": "Toro 5800", "applicator": ["Nathan Ferguson", "U06H9J0LBEC"], "date": "Mon 19 Oct", "date_long": "Mon 19 Oct 2026", "date_iso": "2026-10-19", "area_ha": 0.625, "rate_lha": 600, "mix_l": 375, "tank_cap_l": 1200, "fill_l": 250, "nozzles": "Blue AIC", "speed": "7.8 km/h", "pressure": "3 bar", "last_load": "Fert + PGR to Approaches & Surrounds, Fri 16 Oct", "site_check": "Spray signs out on the front nine greens", "weather": "Delta T 2–8 · wind 3–20 km/h · gusts under 30 · no rain for 48 h", "extra_checks": [["catch", "Catch test: the boom puts out 600 L/ha at 3 bar and 7.8 km/h", "Well under? Stop and call Andy before you fill"], ["boxout", "No GPS on the 5800: box out each green, then fill in", "Surrounds don't need spraying. Every part of the green does"], ["waterin", "Watering in lined up behind the sprayer", "6–10 mm on each green, starting within 1 h"]], "products": [{"name": "Companion", "gk_name": "Companion", "sig": "CAUTION", "sigc": "caution", "form": "Adjuvant", "what": "Acidifying and penetrating surfactant (soya phospholipids + propionic acid)", "haz": "Damages eyes. Irritates skin.", "hazFull": "Will damage eyes. Will irritate the skin. Avoid contact with eyes and skin. Label: DO NOT use with copper products.", "ppe": ["overalls", "gloves", "shield"], "how": ["Measure {amt}", "Pour in before anything else"], "why": "The label says Companion goes in first, before the other products. It holds the tank pH down for the ethephon.", "src": "Label APVMA 51664 (Apr 2023) · <a href=\"https://elabels.apvma.gov.au/51664ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "companion", "rate": "800 mL/ha", "sheet": 1, "amt": 0.5, "show": "500", "u": "mL"}, {"name": "Terreplex", "gk_name": "Terreplex Carbon Rich Accidifier (0-0-0)", "sig": "", "sigc": "", "form": "Liquid, low pH (lignosulfonic acid)", "what": "Carbon-rich acidifier: 55% plant-derived organic acid", "haz": "Low pH. Irritates eyes and skin.", "soft": true, "hazFull": "Eye and skin irritant. Harmful if swallowed. Wear eye protection, gloves and appropriate clothing. Don't mix with high-pH products unless the tank goes out straight away.", "ppe": ["overalls", "gloves", "goggles"], "how": ["Measure {amt}", "Pour into moving water, agitator on", "Rinse the drum 3 times into the tank"], "why": "An acidifier, so it goes in early with the Companion and conditions the water before the fungicides. You're at {before} L.", "src": "Mitchell Products label · <a href=\"https://tricure.com/wp-content/uploads/2022/08/Terreplex-Label.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "terreplex", "rate": "5.0 L/ha", "sheet": 2, "amt": 3.125, "show": "3125", "u": "mL"}, {"name": "Evolution Advance", "gk_name": "Quali-Pro Evolution Advance (AU)", "sig": "CAUTION", "sigc": "caution", "form": "Suspension concentrate (SC)", "what": "Fungicide: tebuconazole 370 g/L + azoxystrobin 222 g/L (Group 3 + 11)", "haz": "May irritate eyes.", "soft": true, "hazFull": "Harmful if swallowed. May irritate the eyes. Avoid contact with eyes. Label PPE: cotton overalls buttoned to the neck and wrist when opening, mixing and spraying. Don't apply if rain is expected within 48 h. Wind 3–20 km/h, medium droplets or coarser.", "ppe": ["overalls"], "how": ["Shake the drum hard", "Measure {amt}", "Pour into moving water, agitator on", "Rinse the drum 3 times into the tank"], "why": "A suspension concentrate goes in before the EC and the wetting agent so it disperses properly. You're at {before} L.", "src": "Label APVMA 93144 · <a href=\"https://www.adama.com/australia/en/media/7016/download\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "evoadv", "rate": "2.2 L/ha", "sheet": 5, "note": "Goes in 3rd, before the Zeemil and the wetting agent (sheet had it last).", "amt": 1.375, "show": "1375", "u": "mL"}, {"name": "Zeemil 250 EC", "gk_name": "Zeemil", "sig": "CAUTION", "sigc": "caution", "form": "Emulsifiable concentrate (EC)", "what": "Fungicide: metalaxyl 250 g/L (Group 4) for Pythium. Off-label on turf", "haz": "Irritates eyes and skin. Don't breathe the solvent vapour.", "soft": true, "hazFull": "Label: avoid contact with eyes and skin. Do not inhale spray mist. Beware of solvent vapours when handling the concentrate and near an open spray tank. Registered for pineapples only (2 L/ha).", "ppe": ["overalls", "gloves", "goggles"], "how": ["Measure {amt}", "Pour straight in and mix well", "Stand upwind of the open lid", "Rinse the drum 3 times into the tank"], "why": "An EC goes in after the suspension so it doesn't stop it dispersing. You're at {before} L.", "src": "Label APVMA 49822 · <a href=\"https://elabels.apvma.gov.au/49822ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label<\/a>", "id": "zeemil", "rate": "2.0 L/ha", "sheet": 3, "amt": 1.25, "show": "1250", "u": "mL"}, {"name": "HydroForce Ultra", "gk_name": "HydroForce Ultra (AU)", "sig": "", "sigc": "", "form": "Soil surfactant (block co-polymer)", "what": "Wetting agent: carries the fungicides into the thatch and root zone", "haz": "", "hazFull": "No hazard statements on the tech sheet. Can foam: add slowly. Irrigate after application to move it into the root zone.", "ppe": ["gloves"], "how": ["Shake well", "Measure {amt}", "Pour in slowly, agitator on. It can foam", "Rinse the drum 3 times into the tank"], "why": "Wetting agents go in last so they don't foam the tank or coat the other products. You're at {before} L.", "src": "Indigo tech sheet · <a href=\"https://gilbasolutions.com/wp-content/uploads/2022/05/HydroForce-Ultra_Tech.pdf\" target=\"_blank\" rel=\"noopener\">tech sheet<\/a>", "id": "hydroforce", "rate": "6.0 L/ha", "sheet": 4, "note": "Goes in last.", "amt": 3.75, "show": "3.75", "u": "L"}], "ppe_note": "Terreplex and Zeemil irritate eyes and skin, and Zeemil gives off solvent vapour, so mix in the full kit.", "spray_ppe": ["overalls", "gloves"], "spray_rules": ["No GPS on this sprayer: box out each green (a lap round the edge), then fill in. Surrounds don't need it, but every part of the green does", "Start once Delta T is over 2 (about 8am). Off by 10:30, before the gusts", "Water in 6–10 mm behind each green, starting within 1 h. Don't let it dry on the leaf", "Keep people off until it's watered in"], "spray_more": "Evolution Advance label: wind 3–20 km/h, medium droplets or coarser, no spraying in an inversion, don't apply if rain is expected within 48 h. Zeemil label: beware of solvent vapours near the open tank.", "post_checks": [["out", "Whole tank sprayed out", "No mix left standing in the sprayer"], ["flush", "Sprayer flushed through the boom", "Clean water"], ["rinsate", "Rinse water sprayed back over the treated area", "Not down a drain or onto hard surfaces"], ["nozzles", "Filters and nozzles checked and clean", ""], ["drums", "Empty drums triple rinsed, caps off, set aside for drumMUSTER", ""], ["ppe", "Gloves, goggles and face shield washed, overalls in the wash", ""], ["signs", "Spray signs stay out until the turf is dry", ""], ["gk", "Application entered in GreenKeeper", "Batch numbers, start and finish times, weather"], ["turfdog", "Job ticked off in TurfDog", ""], ["waterin", "Every green watered in, 6–10 mm, within 1 h of spraying", "Soil pass: it must not dry on the leaf"]], "flags": [{"c": "", "t": "Zeemil 2.0 L/ha: at its label max, off-label on turf", "d": "Zeemil 250 EC (metalaxyl 250 g/L) is registered for pineapples only, at 2 L/ha every 4 to 8 weeks. On greens it's off-label; Victoria allows that at or below the label rate and interval. Last went on greens 18 Sep (31 days). It's the only Pythium root rot product in this tank.", "s": "APVMA 49822 eLabel · Turf Data reference notes 18 Oct"}, {"c": "red", "t": "Boom setup won't give 600 L/ha", "d": "Blue AIC (03) at 3 bar is about 1.2 L/min a nozzle. On the 5800's 50 cm spacing at 7.8 km/h that's about 180 L/ha if they're TeeJet 03s, not 600. 600 L/ha at 3 bar: white AIC (08) at about 6.2 km/h, or grey (06) at about 4.7 km/h. The catch test on the sprayer check settles it.", "s": "TeeJet AIC flow at 4 bar · 50 cm nozzle spacing"}, {"c": "", "t": "Evolution Advance 2.2 L/ha is the label high rate", "d": "Fairy ring 1.6–2.2 L/ha. Label: low rate from late October to early November, high rate if symptoms are present, reapply after 30 days if needed. Max 2 consecutive sprays, 3 per season.", "s": "APVMA 93144 label"}, {"c": "", "t": "Rain inside the 48 h label restraint", "d": "Evolution Advance: don't apply if rain is expected within 48 h. The forecast has about 1 to 2.5 mm on Tue 20 Oct. Light, and the tank is watered in anyway, but it's a label condition.", "s": "APVMA 93144 label · forecast 18 Oct"}, {"c": "", "t": "Wash in straight away: 600 L/ha is under label volume", "d": "The label's root-disease use is about 1000 L/ha with 6–10 mm of irrigation within 1 hour. At 600 L/ha the washing in matters more: start on each green as soon as it's sprayed.", "s": "APVMA 93144 label"}, {"c": "", "t": "Fungicide + wetting agent on bentgrass in the heat", "d": "Tebuconazole plus HydroForce, 27 °C by afternoon, five days after Shadow Ultra and Promote Plus. Envu's guidance is to keep wetting agents two weeks clear of DMI fungicides. Spraying early and watering in straight behind keeps it off the leaf.", "s": "Turf Data reference notes"}, {"c": "info", "t": "No leaf cover from this pass", "d": "Evolution Advance's dollar spot, brown patch and anthracnose claims are leaf and crown uses (350–500 L/ha, left on the leaf). Watered in, this is a root-zone pass, so don't count it against the 22–24 Oct leaf-disease spike.", "s": "APVMA 93144 label"}, {"c": "info", "t": "Order changed from the sheet", "d": "Evolution Advance moves from last to 3rd so the suspension goes in before the EC (Zeemil) and the wetting agent. HydroForce goes in last. Companion and Terreplex condition the water first.", "s": "Reasoning on each product card"}], "webhook": "https://hooks.zapier.com/hooks/catch/18429017/W9qCDw7MkvuzL8et/", "page_url": "https://andranf.github.io/ranfurlie-greens/spray/", "tanks_url": "https://andranf.github.io/ranfurlie-greens/spray/tanks.json", "data_url": "https://andranf.github.io/ranfurlie-greens/data.json", "crew": [["Andy Anderson", "U06BCCG4HT9"], ["Ben Hartley", "U06NBNSR9LG"], ["Neil Harper", "U06FJ0J1RH8"], ["Kyle Craig", "U06FWK6ND5X"], ["Nathan Drew", "U06FJ0J5DS6"], ["Nathan Ferguson", "U06H9J0LBEC"], ["Brodie Macdonald", "U0839HLQA8G"], ["Nicholas Debrincat", "U07QSB7MDK5"], ["Flynn Sinclair", "U08C1SVFSFR"], ["James King", "U08D57N6JSC"], ["Joshua Cope", "U08ENB28AQZ"], ["Mitch Mahoney", "U08K55E3QJU"], ["Samuel Cope", "U09LN1Q8QH2"], ["Tremayne Gallagher", "U09V6AVPUDP"], ["Michael K", "U07QSB7HVM1"]]}</script>
 <script>
 (function(){
 "use strict";
@@ -455,16 +458,18 @@ var ICON={
   shield:'<path d="M5 4h14"/><path d="M5.5 4.5S4.5 14 12 21c7.5-7 6.5-16.5 6.5-16.5"/><path d="M8.5 9.5h7"/>',
   mask:'<path d="M5 9c3.5-2.5 10.5-2.5 14 0v4c0 3.5-3 6.5-7 6.5S5 16.5 5 13z"/><path d="M5 10 2 8M19 10l3-2M5 13.5 2 15M19 13.5l3 1.5M9 12h6"/>',
   apron:'<path d="M9 3h6v3.5l3.5 2.5V21h-13V9L9 6.5z"/><path d="M5.5 11 3 12.5M18.5 11 21 12.5"/>',
-  boots:'<path d="M7.5 3h6v10l6 3.2V21h-16v-4l4-3z"/><path d="M3.5 18h16"/>'
+  boots:'<path d="M7.5 3h6v10l6 3.2V21h-16v-4l4-3z"/><path d="M3.5 18h16"/>',
+  suit:'<path d="M8 2.5 5 5v6l2 1v9.5h4V14h2v7.5h4V12l2-1V5l-3-2.5"/><path d="M9.5 2.5h5L12 6z"/><path d="M5 8h3M16 8h3"/>',
+  resp:'<path d="M7 7.5c3-2 7-2 10 0l1 5c-1.5 4-4 6-6 6s-4.5-2-6-6z"/><circle cx="6" cy="14" r="2.6"/><circle cx="18" cy="14" r="2.6"/><path d="M7 7.5 4 5M17 7.5l3-2.5"/>'
 };
 var UI={
   dash:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7.5" height="9" rx="2"/><rect x="13.5" y="3" width="7.5" height="5.5" rx="2"/><rect x="3" y="15" width="7.5" height="6" rx="2"/><rect x="13.5" y="11.5" width="7.5" height="9.5" rx="2"/></svg>',
   mix:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6.5L4.8 18.2A2 2 0 0 0 6.5 21h11a2 2 0 0 0 1.7-2.8L14 9.5V3"/><path d="M7.5 15h9"/></svg>'
 };
 function ic(k,cls){return '<svg class="'+(cls||"")+'" viewBox="0 0 24 24" aria-hidden="true">'+ICON[k]+'</svg>'}
-var SHORT={overalls:"Overalls",hat:"Hat",gloves:"Elbow gloves",goggles:"Goggles",shield:"Face shield",mask:"Mist mask",apron:"Apron",boots:"Boots"};
-var FULL={overalls:"Cotton overalls, buttoned neck and wrist",hat:"Washable hat",gloves:"Elbow-length PVC gloves",goggles:"Goggles",shield:"Face shield",mask:"Disposable mist mask over mouth and nose",apron:"Chemical apron",boots:"Safety boots"};
-var PPE_ORDER=["overalls","hat","gloves","goggles","shield","mask","apron","boots"];
+var SHORT={overalls:"Overalls",suit:"Spray suit",hat:"Hat",gloves:"Elbow gloves",goggles:"Goggles",shield:"Face shield",mask:"Mist mask",resp:"Respirator",apron:"Apron",boots:"Boots"};
+var FULL={overalls:"Cotton overalls, buttoned neck and wrist",suit:"Chemical-resistant spray suit, buttoned neck and wrist",hat:"Washable hat",gloves:"Elbow-length PVC gloves",goggles:"Goggles",shield:"Face shield",mask:"Disposable mist mask over mouth and nose",resp:"Half-face respirator with organic vapour cartridges",apron:"Chemical apron",boots:"Impervious safety boots"};
+var PPE_ORDER=["suit","overalls","hat","gloves","goggles","shield","resp","mask","apron","boots"];
 var TICK='<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>';
 var WARN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>';
 var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -479,7 +484,7 @@ function daysBetween(a,b){return Math.round((dObj(b)-dObj(a))/864e5)}
 var SHEET={area:R.area_ha,total:R.mix_l,cap:R.tank_cap_l,startFill:R.fill_l};
 var AREA=R.area_ha.toFixed(2)+" ha";
 var P=R.products, N=P.length, CREW=R.crew||[];
-var CHECKS=[
+var CHECKS=(R.checks||[
  ["pre","Pre-start done in TurfDog",""],
  ["rinse","Tank rinsed since last load",R.last_load?"Last load: "+R.last_load:""],
  ["filters","Filters washed and refitted, lids tight",""],
@@ -492,20 +497,25 @@ var CHECKS=[
  ["sds","Labels and SDSs for all "+N+" products at the shed",""],
  ["site",R.site_check||"Spray signs out",""],
  ["wx","Weather in the window",R.weather||"Delta T 2–8 · wind under 15 km/h · gusts under 30"]
-].concat(R.extra_checks||[]);
+]).concat(R.extra_checks||[]);
+var CHECK_T=R.check_title||"Sprayer check";
+var FACTS=R.facts||[R.mix_l+" L",R.area_ha.toFixed(2)+" ha",R.rate_lha+" L/ha",R.nozzles,R.speed,R.pressure];
+var POSTF=R.post_fields||[];
 var POSTC=(R.post_checks||[]);
 var TANK_PPE=PPE_ORDER.filter(function(k){return P.some(function(p){return p.ppe.indexOf(k)>=0})});
+if(TANK_PPE.indexOf("suit")>=0)TANK_PPE=TANK_PPE.filter(function(k){return k!=="overalls"});
 var FLAGS=R.flags||[];
 
-var S=[{k:"check",n:"Sprayer check"},{k:"ppe",n:"PPE on"},{k:"fill",n:"Fill"}];
+var S=[{k:"check",n:CHECK_T},{k:"ppe",n:"PPE on"},{k:"fill",n:"Fill"}];
 P.forEach(function(p,i){S.push({k:"prod",n:p.name,p:p,i:i})});
 S.push({k:"topup",n:R.ph_max?"Top up + pH":"Top up"},{k:"sign",n:"Sign off"});
 
 var TK=TESTMODE?"-test":"";
 var KEY="ranfurlie-tankmix-"+R.slug+TK, MEKEY="ranfurlie-spray-me"+TK, OUTKEY="ranfurlie-spray-outbox"+TK;
 var st=load()||fresh();
-function fresh(){return {i:0,checks:{},ppe:{},post:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixSig:null,postSig:null,postDue:false,pd:{}}}
-function load(){try{var s=localStorage.getItem(KEY);if(!s)return null;var o=JSON.parse(s);var f=fresh();for(var k in f)if(!(k in o))o[k]=f[k];if(o.i>=S.length)o.i=S.length-1;return o}catch(e){return null}}
+function rid(){var a="abcdefghjkmnpqrstuvwxyz23456789",o="";for(var i=0;i<5;i++)o+=a[Math.floor(Math.random()*a.length)];return o}
+function fresh(){return {i:0,checks:{},ppe:{},post:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixSig:null,postSig:null,postDue:false,pd:{},run:rid()}}
+function load(){try{var s=localStorage.getItem(KEY);if(!s)return null;var o=JSON.parse(s);var legacy=!("run" in o)&&!!o.mixSig;var f=fresh();for(var k in f)if(!(k in o))o[k]=f[k];if(legacy)o.run="";if(o.i>=S.length)o.i=S.length-1;return o}catch(e){return null}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
 function getMe(){try{return JSON.parse(localStorage.getItem(MEKEY)||"null")}catch(e){return null}}
 function saveMe(w){try{localStorage.setItem(MEKEY,JSON.stringify(w))}catch(e){}}
@@ -529,7 +539,7 @@ function tileBtn(k){var on=!!st.ppe[k];return '<button class="tile" type="button
 function allOn(group,list){return list.every(function(r){return st[group][typeof r==="string"?r:r[0]]})}
 function back(){return st.i>0?'<button class="btn ghost" type="button" data-act="back">Back</button>':'<span></span>'}
 function dec(s){var i=s.indexOf(".");return i<0?0:s.length-i-1}
-function big(show,u){return '<div class="big"><span class="cnt" data-to="'+parseFloat(show)+'" data-dec="'+dec(show)+'">'+show+'</span><u>'+u+'</u></div>'}
+function big(show,u){return '<div class="big'+((String(show).length+String(u).length)>=5?' long':'')+'"><span class="cnt" data-to="'+parseFloat(show)+'" data-dec="'+dec(show)+'">'+show+'</span><u>'+u+'</u></div>'}
 function tank(from,to,done){
   var lvl=done?to:from;
   return '<div class="tank" aria-hidden="true"><div class="tank-in">'+
@@ -591,7 +601,7 @@ function flush(){
   var body=new URLSearchParams();Object.keys(item).forEach(function(k){body.append(k,item[k]==null?"":String(item[k]))});
   fetch(R.webhook,{method:"POST",mode:"no-cors",body:body}).then(function(){var b=outbox();b.shift();setOutbox(b);flushing=false;markSent(item);flush()},function(){flushing=false;if(VIEW==="dash")renderDash()});
 }
-function markSent(item){if(item.slug!==R.slug)return;if(item.kind==="mix"&&st.mixSig)st.mixSig.sent=true;if(item.kind==="post"&&st.postSig)st.postSig.sent=true;save();if(VIEW==="dash")renderDash()}
+function markSent(item){if(item.slug!==R.slug||(item.run||"")!==(st.run||""))return;if(item.kind==="mix"&&st.mixSig)st.mixSig.sent=true;if(item.kind==="post"&&st.postSig)st.postSig.sent=true;save();if(VIEW==="dash")renderDash()}
 window.addEventListener("online",flush);setInterval(flush,30000);
 function pendingCount(){return outbox().length}
 
@@ -600,7 +610,7 @@ var lastI=null, shownL=0;
 function render(){
   var s=S[st.i], h="";
   if(s.k==="check"){
-    h='<h2 class="pname">Sprayer check</h2>'+
+    h='<h2 class="pname">'+esc(CHECK_T)+'</h2>'+
       '<div class="checks">'+CHECKS.map(function(r){return checkBtn("checks",r[0],r[1],r[2])}).join("")+'</div>'+
       '<div id="stopMsg" hidden class="stopmsg"><b>Stop.</b> No chemical. Post the fault in #machinery and tell Ben or Andy.</div>'+
       '<div class="actions"><button class="btn stop" type="button" data-act="problem">Problem</button><button class="btn go" type="button" data-act="next" '+(allOn("checks",CHECKS)?"":"disabled")+'>All checked</button></div>';
@@ -700,7 +710,8 @@ function recordText(signer){
 }
 
 /* ---------- dashboard ---------- */
-var DATA=null, DATAERR=false, SWSEL=null;
+var DATA=null, DATAERR=false, SWSEL=null, TANKS=null;
+function loadTanks(){if(!R.tanks_url)return;fetch(R.tanks_url+"?v="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){TANKS=d.tanks||[];if(VIEW==="dash")renderDash()},function(){})}
 function loadData(){
   if(!R.data_url){DATAERR=true;renderDash();return}
   fetch(R.data_url+(R.data_url.indexOf("?")<0?"?v=":"&v=")+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){DATA=d;DATAERR=false;renderDash()},function(){DATAERR=true;renderDash()});
@@ -720,7 +731,8 @@ function todayCard(){
     '<div class="dhead"><span class="small">'+rel+' · '+esc(R.sprayer)+'</span>'+(pend?'<span class="chip warn">'+pend+' sign-off waiting for signal</span>':'')+'</div>'+
     '<h2>'+esc(R.title)+'</h2>'+
     '<div class="statusline">'+statusChips()+'</div>'+
-    '<div class="facts"><span class="fact">'+R.mix_l+' L</span><span class="fact">'+AREA+'</span><span class="fact">'+R.rate_lha+' L/ha</span><span class="fact">'+esc(R.nozzles)+'</span><span class="fact">'+esc(R.speed)+'</span><span class="fact">'+esc(R.pressure)+'</span></div>'+
+    '<div class="facts">'+FACTS.map(function(x){return '<span class="fact">'+esc(x)+'</span>'}).join("")+'</div>'+
+    (st.postSig&&R.date_iso>=TODAY?'<button class="btn go md wide" type="button" data-act="another">Mix another tank</button>':'')+
     (showRules?'<ul class="rules">'+(R.spray_rules||[]).map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>':'')+
     (postBtn&&(st.mixSig||st.postDue)?'<button class="btn go md wide" type="button" data-act="open-post">Post-application checklist</button>':
       (R.date_iso===TODAY&&!st.mixSig?'<button class="btn go md wide" type="button" data-act="to-mix">Open mixing guide</button>':''))+
@@ -732,6 +744,12 @@ function todayCard(){
     (FLAGS.length?'<details class="more"><summary>Label checks on this sheet ('+FLAGS.length+')</summary><div class="morebody flags">'+FLAGS.map(function(f){return '<details class="flag '+(f.c||"")+'"><summary>'+f.t+'</summary><p>'+f.d+'</p><span class="s">'+f.s+'</span></details>'}).join("")+'</div></details>':'')+
     (st.mixSig&&st.mixSig.sig?'<details class="more"><summary>Signatures</summary><div class="morebody"><div class="small">Mix: '+esc(st.mixSig.name)+', '+hm(st.mixSig.at)+(st.mixSig.sent?' · sent':'')+'</div>'+sigSvg(st.mixSig.sig)+(st.postSig&&st.postSig.sig?'<div class="small">Post-application: '+esc(st.postSig.name)+', '+hm(st.postSig.at)+(st.postSig.sent?' · sent':'')+'</div>'+sigSvg(st.postSig.sig):'')+'</div></details>':'')+
   '</section>';
+}
+function tanksCard(){
+  var all=(TANKS||[]).filter(function(t){return t.date_iso===TODAY&&t.slug!==R.slug});
+  if(!all.length)return "";
+  var rows=all.map(function(t){return '<li><span class="d"><span class="dot plan"></span></span><span class="t"><a href="'+esc(R.page_url+t.slug+"/")+'">'+esc(t.title)+'</a><small>'+esc(t.sprayer)+(t.applicator?' · '+esc(t.applicator):'')+'</small></span><span class="v"><a class="btn soft sm" href="'+esc(R.page_url+t.slug+"/#dash")+'">Open</a></span></li>'}).join("");
+  return '<section class="card dcard span2"><div class="dhead"><h2>Other tanks today</h2><span class="small">each has its own sign-offs</span></div><ul class="list">'+rows+'</ul></section>';
 }
 function windowCard(){
   var sw=(DATA.spray_window||[]).filter(function(x){return x.date>=TODAY});
@@ -832,6 +850,7 @@ function watchCard(){
 function renderDash(){
   $("dWhen").textContent="Ranfurlie · "+dLabel(TODAY);
   var h=todayCard();
+  try{h+=tanksCard()}catch(e){}
   if(DATA){
     $("dAsOf").textContent="Course data built "+(DATA._built||"");
     [windowCard,clocksCard,gvxCard,diseaseCard,coverCard,aheadCard,appsCard,watchCard].forEach(function(fn){try{h+=fn()}catch(e){}});
@@ -865,6 +884,7 @@ function openPost(){
       '<div class="field"><label for="pdDir">Wind from</label><select id="pdDir">'+dirs.map(function(d){return '<option'+(pd.dir===d?' selected':'')+' value="'+d+'">'+(d||"–")+'</option>'}).join("")+'</select></div>'+
       '<div class="field"><label for="pdTemp">Temp (°C)</label><input id="pdTemp" inputmode="decimal" value="'+esc(pd.temp||"")+'" placeholder="e.g. 18"></div>'+
     '</div>'+
+    POSTF.map(function(f){return '<div class="field"><label for="pdx-'+f[0]+'">'+esc(f[1])+'</label>'+(f[3]==="text"?'<textarea id="pdx-'+f[0]+'" data-pdx="'+f[0]+'" placeholder="'+esc(f[2]||"")+'">'+esc(pd["x_"+f[0]]||"")+'</textarea>':'<input id="pdx-'+f[0]+'" data-pdx="'+f[0]+'" inputmode="'+(f[3]==="num"?"decimal":"text")+'" value="'+esc(pd["x_"+f[0]]||"")+'" placeholder="'+esc(f[2]||"")+'">')+'</div>'}).join("")+
     '<div class="field"><label for="pdIssues">Anything to report? (optional)</label><textarea id="pdIssues" placeholder="Drift, blocked nozzles, mix left over, areas missed">'+esc(pd.issues||"")+'</textarea></div>'+
     whoField("post",preset)+
     '<p class="decl">I sprayed this tank out, cleaned up as above and recorded the application.</p>'+
@@ -878,13 +898,14 @@ function openPost(){
 }
 function closePost(){$("sheet").hidden=true;document.documentElement.style.overflow="";renderFab();renderPostbar()}
 function refreshSignPost(){var b=$("signPostBtn");if(!b)return;var was=b.disabled;b.disabled=!(allOn("post",POSTC)&&readWho("post").name&&padHas("post"));if(was&&!b.disabled&&!RM){b.classList.remove("ready");void b.offsetWidth;b.classList.add("ready")}}
+function extraText(){var pd=st.pd||{};return POSTF.map(function(f){var v=String(pd["x_"+f[0]]||"").trim();return v?f[1]+": "+v:""}).filter(Boolean).join("\n")}
 function finishText(){var pd=st.pd||{};var parts=[];if(pd.finish)parts.push(pd.finish);if(pd.wind)parts.push("wind "+pd.wind+" km/h"+(pd.dir?" from "+pd.dir:""));if(pd.temp)parts.push(pd.temp+" °C");return parts.join(" · ")}
 
 /* ---------- views + fab ---------- */
 var VIEW="mix";
 function setView(v,anim){
   VIEW=v;$("mixView").hidden=v!=="mix";$("dashView").hidden=v!=="dash";
-  if(v==="dash"){renderDash();if(!DATA&&!DATAERR)loadData()}else{render()}
+  if(v==="dash"){renderDash();if(!DATA&&!DATAERR)loadData();if(TANKS===null){TANKS=[];loadTanks()}}else{render()}
   renderFab();renderPostbar();
   try{window.scrollTo({top:0,behavior:"auto"})}catch(e){window.scrollTo(0,0)}
   if(anim&&!RM){var el=$(v+"View");el.classList.remove("viewin");void el.offsetWidth;el.classList.add("viewin")}
@@ -921,7 +942,7 @@ function signMix(){
   var who=readWho("mix");if(!who.name||!padHas("mix")||!mixReady())return;
   saveMe(who);var sig=padPath("mix");
   st.mixSig={at:Date.now(),name:who.name,slack:who.slack,sig:sig,sent:false};save();
-  send({kind:"mix",slug:R.slug,title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,ph:st.ph||"",record:recordText(who.name),sig:sig});
+  send({kind:"mix",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,ph:st.ph||"",record:recordText(who.name),sig:sig});
   buzz();toast(PREVIEW?"Signed (preview copy, not sent)":"Mix signed. Sent to #spraying");
   setTimeout(function(){setView("dash",true)},350);
 }
@@ -930,7 +951,7 @@ function signPost(){
   saveMe(who);var sig=padPath("post");
   st.postSig={at:Date.now(),name:who.name,slack:who.slack,sig:sig,sent:false};save();
   var checks=POSTC.map(function(r){return "✓ "+r[1]}).join("\n");
-  send({kind:"post",slug:R.slug,title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,checks:checks,finish:finishText(),issues:(st.pd&&st.pd.issues)||"",sig:sig});
+  send({kind:"post",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,checks:checks,finish:finishText(),issues:(st.pd&&st.pd.issues)||"",extra:extraText(),sig:sig});
   buzz();closePost();renderDash();toast(PREVIEW?"Checklist done (preview copy, not sent)":"Checklist done. Sent to #spraying");
 }
 
@@ -967,11 +988,13 @@ document.addEventListener("click",function(e){
   else if(a==="sw"){SWSEL=+b.getAttribute("data-i");renderDash()}
   else if(a==="ask-reset"){$("resetBox").innerHTML='<span class="small">Clear this phone’s progress on this tank?</span><button class="btn stop sm" type="button" data-act="reset">Clear</button><button class="btn ghost sm" type="button" data-act="keep">Keep</button>'}
   else if(a==="reset"){st=fresh();save();PADS={};renderReset();setView("mix",true);toast("Started again")}
+  else if(a==="another"){st=fresh();save();PADS={};renderReset();setView("mix",true);toast("New tank started")}
   else if(a==="keep"){renderReset()}
 });
 document.addEventListener("input",function(e){
   var t=e.target;
   if(t.hasAttribute("data-batch")){st.batch[t.getAttribute("data-batch")]=t.value;save()}
+  else if(t.hasAttribute("data-pdx")){st.pd=st.pd||{};st.pd["x_"+t.getAttribute("data-pdx")]=t.value;save()}
   else if(t.id==="ph"){st.ph=t.value.trim();save();$("phMsg").innerHTML=phBox()}
   else if(t.id==="pdFinish"||t.id==="pdWind"||t.id==="pdTemp"||t.id==="pdIssues"||t.id==="pdDir"){var k={pdFinish:"finish",pdWind:"wind",pdTemp:"temp",pdIssues:"issues",pdDir:"dir"}[t.id];st.pd=st.pd||{};st.pd[k]=t.value;save()}
   else if(t.id&&t.id.indexOf("whoOther-")===0){var id=t.id.slice(9);if(id==="mix")refreshSignMix();else refreshSignPost()}

@@ -4,30 +4,112 @@
   "page_url": "https://andranf.github.io/ranfurlie-greens/spray/",
   "data_url": "https://andranf.github.io/ranfurlie-greens/data.json",
   "crew": [
-    ["Andy Anderson", "U06BCCG4HT9"],
-    ["Ben Hartley", "U06NBNSR9LG"],
-    ["Neil Harper", "U06FJ0J1RH8"],
-    ["Kyle Craig", "U06FWK6ND5X"],
-    ["Nathan Drew", "U06FJ0J5DS6"],
-    ["Nathan Ferguson", "U06H9J0LBEC"],
-    ["Brodie Macdonald", "U0839HLQA8G"],
-    ["Nicholas Debrincat", "U07QSB7MDK5"],
-    ["Flynn Sinclair", "U08C1SVFSFR"],
-    ["James King", "U08D57N6JSC"],
-    ["Joshua Cope", "U08ENB28AQZ"],
-    ["Mitch Mahoney", "U08K55E3QJU"],
-    ["Samuel Cope", "U09LN1Q8QH2"],
-    ["Tremayne Gallagher", "U09V6AVPUDP"]
+    [
+      "Andy Anderson",
+      "U06BCCG4HT9"
+    ],
+    [
+      "Ben Hartley",
+      "U06NBNSR9LG"
+    ],
+    [
+      "Neil Harper",
+      "U06FJ0J1RH8"
+    ],
+    [
+      "Kyle Craig",
+      "U06FWK6ND5X"
+    ],
+    [
+      "Nathan Drew",
+      "U06FJ0J5DS6"
+    ],
+    [
+      "Nathan Ferguson",
+      "U06H9J0LBEC"
+    ],
+    [
+      "Brodie Macdonald",
+      "U0839HLQA8G"
+    ],
+    [
+      "Nicholas Debrincat",
+      "U07QSB7MDK5"
+    ],
+    [
+      "Flynn Sinclair",
+      "U08C1SVFSFR"
+    ],
+    [
+      "James King",
+      "U08D57N6JSC"
+    ],
+    [
+      "Joshua Cope",
+      "U08ENB28AQZ"
+    ],
+    [
+      "Mitch Mahoney",
+      "U08K55E3QJU"
+    ],
+    [
+      "Samuel Cope",
+      "U09LN1Q8QH2"
+    ],
+    [
+      "Tremayne Gallagher",
+      "U09V6AVPUDP"
+    ],
+    [
+      "Michael K",
+      "U07QSB7HVM1"
+    ]
   ],
   "post_checks": [
-    ["out", "Whole tank sprayed out", "No mix left standing in the sprayer"],
-    ["flush", "Sprayer flushed through the boom", "Clean water"],
-    ["rinsate", "Rinse water sprayed back over the treated area", "Not down a drain or onto hard surfaces"],
-    ["nozzles", "Filters and nozzles checked and clean", ""],
-    ["drums", "Empty drums triple rinsed, caps off, set aside for drumMUSTER", ""],
-    ["ppe", "Gloves, goggles and face shield washed, overalls in the wash", ""],
-    ["signs", "Spray signs stay out until the turf is dry", ""],
-    ["gk", "Application entered in GreenKeeper", "Batch numbers, start and finish times, weather"],
-    ["turfdog", "Job ticked off in TurfDog", ""]
+    [
+      "out",
+      "Whole tank sprayed out",
+      "No mix left standing in the sprayer"
+    ],
+    [
+      "flush",
+      "Sprayer flushed through the boom",
+      "Clean water"
+    ],
+    [
+      "rinsate",
+      "Rinse water sprayed back over the treated area",
+      "Not down a drain or onto hard surfaces"
+    ],
+    [
+      "nozzles",
+      "Filters and nozzles checked and clean",
+      ""
+    ],
+    [
+      "drums",
+      "Empty drums triple rinsed, caps off, set aside for drumMUSTER",
+      ""
+    ],
+    [
+      "ppe",
+      "Gloves, goggles and face shield washed, overalls in the wash",
+      ""
+    ],
+    [
+      "signs",
+      "Spray signs stay out until the turf is dry",
+      ""
+    ],
+    [
+      "gk",
+      "Application entered in GreenKeeper",
+      "Batch numbers, start and finish times, weather"
+    ],
+    [
+      "turfdog",
+      "Job ticked off in TurfDog",
+      ""
+    ]
   ]
 }

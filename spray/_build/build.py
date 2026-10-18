@@ -3,8 +3,10 @@
 
   python3 spray/_build/build.py spray/_build/recipes/<slug>.json [--latest] [--fragment OUT]
 
-Writes spray/<slug>/index.html. --latest also writes spray/index.html (the crew's
-bookmark, always the newest spray). --fragment writes the page without its
+Writes spray/<slug>/index.html and refreshes spray/tanks.json (every tank, for the
+"Other tanks today" card). --latest also writes spray/index.html, the crew's bookmark:
+the newest tank's page, or a "Today's tanks" chooser when more than one tank shares
+the newest date (several rigs going at once). --fragment writes the page without its
 doctype wrapper (for publishing as a Claude artifact).
 
 The page has two views: the mixing guide (front and centre on the spray day until
@@ -85,14 +87,16 @@ def main():
         sys.exit("First fill plus products is more than the mix volume. Lower fill_l.")
 
     R["webhook"] = cfg.get("webhook", "")
+    R["page_url"] = cfg.get("page_url", "https://andranf.github.io/ranfurlie-greens/spray/")
+    R["tanks_url"] = R["page_url"] + "tanks.json"
     R["data_url"] = cfg.get("data_url", "")
     R["crew"] = cfg.get("crew", [])
     R["post_checks"] = merge_checks(cfg.get("post_checks", []), R.get("post_checks"))
 
     facts = "".join(
         f'<span class="fact">{html.escape(x)}</span>'
-        for x in [f'{R["area_ha"]:.2f} ha', f'{R["rate_lha"]} L/ha', f'{R["mix_l"]} L mix',
-                  R["nozzles"], R["speed"], R["pressure"]])
+        for x in (R.get("facts") or [f'{R["area_ha"]:.2f} ha', f'{R["rate_lha"]} L/ha', f'{R["mix_l"]} L mix',
+                  R["nozzles"], R["speed"], R["pressure"]]))
     demo = (f'<div class="demo"><div class="wrap gut"><p class="pill"><strong>Demo:</strong> '
             f'{html.escape(R["demo"])}</p></div></div>') if R.get("demo") else ""
     data = json.dumps(R, ensure_ascii=False).replace("</", "<\\/")
@@ -114,9 +118,15 @@ def main():
     os.makedirs(os.path.dirname(out), exist_ok=True)
     open(out, "w", encoding="utf-8").write(full)
     print("wrote", os.path.relpath(out, os.path.dirname(SPRAY)))
+    tanks = write_tanks_index()
     if a.latest:
-        open(os.path.join(SPRAY, "index.html"), "w", encoding="utf-8").write(full)
-        print("wrote spray/index.html")
+        same_day = [t for t in tanks if t["date_iso"] == R["date_iso"]]
+        if len(same_day) > 1:
+            write_chooser(R["date_iso"], R.get("date_long", R["date_iso"]), same_day, tanks, R["page_url"])
+            print(f'wrote spray/index.html (chooser: {len(same_day)} tanks on {R["date_iso"]})')
+        else:
+            open(os.path.join(SPRAY, "index.html"), "w", encoding="utf-8").write(full)
+            print("wrote spray/index.html")
     if a.fragment:
         open(a.fragment, "w", encoding="utf-8").write(page)
         print("wrote", a.fragment)
@@ -131,8 +141,46 @@ def main():
     print_slack_post(R, prods, cfg)
 
 
-KIT = {"overalls": "overalls", "hat": "hat", "gloves": "elbow gloves", "goggles": "goggles",
-       "shield": "face shield", "mask": "mist mask", "apron": "apron", "boots": "boots"}
+KIT = {"suit": "chemical-resistant spray suit", "overalls": "overalls", "hat": "hat", "gloves": "elbow gloves",
+       "goggles": "goggles", "shield": "face shield", "resp": "half-face respirator (organic vapour cartridges)",
+       "mask": "mist mask", "apron": "apron", "boots": "boots"}
+
+
+def write_tanks_index():
+    """spray/tanks.json: every recipe, newest first. The pages read it for 'Other tanks today'."""
+    out = []
+    rdir = os.path.join(HERE, "recipes")
+    for f in sorted(os.listdir(rdir)):
+        if not f.endswith(".json"):
+            continue
+        r = json.load(open(os.path.join(rdir, f), encoding="utf-8"))
+        d = r.get("date_iso") or r["slug"][:10]
+        app = r.get("applicator")
+        out.append({"slug": r["slug"], "title": r["title"], "sprayer": r["sprayer"], "date_iso": d,
+                    "date": r.get("date", d), "applicator": app[0] if app else "",
+                    "method": r.get("method", "boom")})
+    out.sort(key=lambda t: (t["date_iso"], t["slug"]), reverse=True)
+    json.dump({"tanks": out}, open(os.path.join(SPRAY, "tanks.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    print(f"wrote spray/tanks.json ({len(out)} tanks)")
+    return out
+
+
+def write_chooser(date_iso, date_long, today, tanks, page_url):
+    tpl = open(os.path.join(HERE, "chooser.html"), encoding="utf-8").read()
+    cards = "".join(
+        f'<a class="tk" href="{html.escape(page_url + t["slug"] + "/")}"><span class="sp">{html.escape(t["sprayer"])}</span>'
+        f'<b>{html.escape(t["title"])}</b>'
+        f'<span class="who">{html.escape(t["applicator"] or "Applicator not set")}</span><span class="go">Open</span></a>'
+        for t in today)
+    earlier = "".join(
+        f'<li><a href="{html.escape(page_url + t["slug"] + "/")}">{html.escape(t["title"])}</a><span>{html.escape(t["date"])} · {html.escape(t["sprayer"])}</span></li>'
+        for t in tanks if t["date_iso"] < date_iso)[:4000]
+    page = (tpl.replace("{{DATE}}", html.escape(date_long)).replace("{{N}}", str(len(today)))
+               .replace("{{CARDS}}", cards).replace("{{EARLIER}}", earlier))
+    left = re.findall(r"\{\{[A-Z]+\}\}", page)
+    if left:
+        sys.exit(f"Chooser placeholders not filled: {left}")
+    open(os.path.join(SPRAY, "index.html"), "w", encoding="utf-8").write(page)
 
 
 def print_slack_post(R, prods, cfg):
@@ -141,11 +189,14 @@ def print_slack_post(R, prods, cfg):
     url = cfg.get("page_url", "https://andranf.github.io/ranfurlie-greens/spray/") + R["slug"] + "/"
     changed = any(p.get("sheet") not in (None, i) for i, p in enumerate(prods, 1))
     kit = [KIT[k] for k in KIT if any(k in p.get("ppe", []) for p in prods)]
+    if "chemical-resistant spray suit" in kit:
+        kit.remove("overalls") if "overalls" in kit else None
     lines = [f':test_tube: **Today\'s tank: {R["title"]} ({R["sprayer"].replace("Toro ", "")})**',
              (f'<@{app[1]}> ' if app else '') + 'step-by-step mixing guide, open it on your phone at the shed:',
              url, '',
-             f'**Setup:** {R["area_ha"]:g} ha · {R["rate_lha"]} L/ha · {R["mix_l"]} L mix · '
-             f'{R["nozzles"]} · {R["speed"]} · {R["pressure"]}', '',
+             ('**Setup:** ' + ' · '.join(R["facts"]) if R.get("facts") else
+              f'**Setup:** {R["area_ha"]:g} ha · {R["rate_lha"]} L/ha · {R["mix_l"]} L mix · '
+              f'{R["nozzles"]} · {R["speed"]} · {R["pressure"]}'), '',
              '**Mixing order' + (' (changed from the sheet):**' if changed else ':**'),
              f'1. Water to {R["fill_l"]} L, agitator on']
     for i, p in enumerate(prods, 2):

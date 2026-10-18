@@ -1,0 +1,40 @@
+{
+ "tanks": [
+  {
+   "slug": "2026-10-19-rough-handgun",
+   "title": "Herbicide to Rough, Handgun",
+   "sprayer": "Silvan 1000 L",
+   "date_iso": "2026-10-19",
+   "date": "Mon 19 Oct",
+   "applicator": "Michael K",
+   "method": "handgun"
+  },
+  {
+   "slug": "2026-10-19-greens-fairy-ring",
+   "title": "Fairy Ring + Root Disease, Front 9 Greens",
+   "sprayer": "Toro 5800",
+   "date_iso": "2026-10-19",
+   "date": "Mon 19 Oct",
+   "applicator": "Nathan Ferguson",
+   "method": "boom"
+  },
+  {
+   "slug": "2026-10-16-approaches-surrounds",
+   "title": "Fert + PGR, Remaining Approaches & Surrounds",
+   "sprayer": "Toro 5800",
+   "date_iso": "2026-10-16",
+   "date": "Fri 16 Oct",
+   "applicator": "Mitch Mahoney",
+   "method": "boom"
+  },
+  {
+   "slug": "2026-10-15-approaches-surrounds",
+   "title": "Fert + PGR, Approaches & Surrounds",
+   "sprayer": "Toro 5800",
+   "date_iso": "2026-10-15",
+   "date": "Thu 15 Oct",
+   "applicator": "",
+   "method": "boom"
+  }
+ ]
+}

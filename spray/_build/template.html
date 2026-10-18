@@ -4,7 +4,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
-/* Ranfurlie Tank Mix template v1.5 (15 Oct 2026). Built by spray/_build/build.py from a recipe + products.json + config.json.
+/* Ranfurlie Tank Mix template v1.6 (19 Oct 2026). Built by spray/_build/build.py from a recipe + products.json + config.json.
+   v1.6: handgun rigs (recipe checks, facts and post-app fields), several tanks open at once (each mix is its own run),
+   a Today's tanks card, and Mix another tank after the checklist.
    Two views: the mixing guide (front and centre on a spray day until the mix is signed) and the spraying dashboard
    (default once signed). Sign-offs and the post-application checklist post to the Zapier "Spray sign-offs" hook.
    Glass: frosted, rim-lit panels over a soft water-and-turf sky. The tank is the one memorable element. */
@@ -130,6 +132,7 @@ button,select,textarea,input{font:inherit;color:inherit}
 .amount{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:end;padding:16px 16px 14px 20px;border-radius:var(--r2);background:linear-gradient(160deg,color-mix(in srgb,var(--tank) 20%,transparent),var(--tank-soft));box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 .amount .big{font-family:var(--display);font-weight:800;font-size:clamp(84px,25vw,150px);line-height:.86;letter-spacing:-.01em;font-variant-numeric:tabular-nums lining-nums;display:flex;align-items:baseline;gap:.1em;color:var(--fg);min-width:0}
 .amount .big u{text-decoration:none;font-size:.4em;font-weight:700;color:var(--tank-deep)}
+.amount .big.long{font-size:clamp(64px,19.5vw,124px)}
 .amount .sub{grid-column:1;display:flex;flex-wrap:wrap;gap:2px 14px;font-family:var(--display);font-weight:600;font-size:17px;color:var(--muted)}
 .amount .sub b{color:var(--tank-deep);font-weight:700}
 .amount .tank{grid-column:2;grid-row:1/span 2}
@@ -451,16 +454,18 @@ var ICON={
   shield:'<path d="M5 4h14"/><path d="M5.5 4.5S4.5 14 12 21c7.5-7 6.5-16.5 6.5-16.5"/><path d="M8.5 9.5h7"/>',
   mask:'<path d="M5 9c3.5-2.5 10.5-2.5 14 0v4c0 3.5-3 6.5-7 6.5S5 16.5 5 13z"/><path d="M5 10 2 8M19 10l3-2M5 13.5 2 15M19 13.5l3 1.5M9 12h6"/>',
   apron:'<path d="M9 3h6v3.5l3.5 2.5V21h-13V9L9 6.5z"/><path d="M5.5 11 3 12.5M18.5 11 21 12.5"/>',
-  boots:'<path d="M7.5 3h6v10l6 3.2V21h-16v-4l4-3z"/><path d="M3.5 18h16"/>'
+  boots:'<path d="M7.5 3h6v10l6 3.2V21h-16v-4l4-3z"/><path d="M3.5 18h16"/>',
+  suit:'<path d="M8 2.5 5 5v6l2 1v9.5h4V14h2v7.5h4V12l2-1V5l-3-2.5"/><path d="M9.5 2.5h5L12 6z"/><path d="M5 8h3M16 8h3"/>',
+  resp:'<path d="M7 7.5c3-2 7-2 10 0l1 5c-1.5 4-4 6-6 6s-4.5-2-6-6z"/><circle cx="6" cy="14" r="2.6"/><circle cx="18" cy="14" r="2.6"/><path d="M7 7.5 4 5M17 7.5l3-2.5"/>'
 };
 var UI={
   dash:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7.5" height="9" rx="2"/><rect x="13.5" y="3" width="7.5" height="5.5" rx="2"/><rect x="3" y="15" width="7.5" height="6" rx="2"/><rect x="13.5" y="11.5" width="7.5" height="9.5" rx="2"/></svg>',
   mix:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6.5L4.8 18.2A2 2 0 0 0 6.5 21h11a2 2 0 0 0 1.7-2.8L14 9.5V3"/><path d="M7.5 15h9"/></svg>'
 };
 function ic(k,cls){return '<svg class="'+(cls||"")+'" viewBox="0 0 24 24" aria-hidden="true">'+ICON[k]+'</svg>'}
-var SHORT={overalls:"Overalls",hat:"Hat",gloves:"Elbow gloves",goggles:"Goggles",shield:"Face shield",mask:"Mist mask",apron:"Apron",boots:"Boots"};
-var FULL={overalls:"Cotton overalls, buttoned neck and wrist",hat:"Washable hat",gloves:"Elbow-length PVC gloves",goggles:"Goggles",shield:"Face shield",mask:"Disposable mist mask over mouth and nose",apron:"Chemical apron",boots:"Safety boots"};
-var PPE_ORDER=["overalls","hat","gloves","goggles","shield","mask","apron","boots"];
+var SHORT={overalls:"Overalls",suit:"Spray suit",hat:"Hat",gloves:"Elbow gloves",goggles:"Goggles",shield:"Face shield",mask:"Mist mask",resp:"Respirator",apron:"Apron",boots:"Boots"};
+var FULL={overalls:"Cotton overalls, buttoned neck and wrist",suit:"Chemical-resistant spray suit, buttoned neck and wrist",hat:"Washable hat",gloves:"Elbow-length PVC gloves",goggles:"Goggles",shield:"Face shield",mask:"Disposable mist mask over mouth and nose",resp:"Half-face respirator with organic vapour cartridges",apron:"Chemical apron",boots:"Impervious safety boots"};
+var PPE_ORDER=["suit","overalls","hat","gloves","goggles","shield","resp","mask","apron","boots"];
 var TICK='<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>';
 var WARN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>';
 var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -475,7 +480,7 @@ function daysBetween(a,b){return Math.round((dObj(b)-dObj(a))/864e5)}
 var SHEET={area:R.area_ha,total:R.mix_l,cap:R.tank_cap_l,startFill:R.fill_l};
 var AREA=R.area_ha.toFixed(2)+" ha";
 var P=R.products, N=P.length, CREW=R.crew||[];
-var CHECKS=[
+var CHECKS=(R.checks||[
  ["pre","Pre-start done in TurfDog",""],
  ["rinse","Tank rinsed since last load",R.last_load?"Last load: "+R.last_load:""],
  ["filters","Filters washed and refitted, lids tight",""],
@@ -488,20 +493,25 @@ var CHECKS=[
  ["sds","Labels and SDSs for all "+N+" products at the shed",""],
  ["site",R.site_check||"Spray signs out",""],
  ["wx","Weather in the window",R.weather||"Delta T 2–8 · wind under 15 km/h · gusts under 30"]
-].concat(R.extra_checks||[]);
+]).concat(R.extra_checks||[]);
+var CHECK_T=R.check_title||"Sprayer check";
+var FACTS=R.facts||[R.mix_l+" L",R.area_ha.toFixed(2)+" ha",R.rate_lha+" L/ha",R.nozzles,R.speed,R.pressure];
+var POSTF=R.post_fields||[];
 var POSTC=(R.post_checks||[]);
 var TANK_PPE=PPE_ORDER.filter(function(k){return P.some(function(p){return p.ppe.indexOf(k)>=0})});
+if(TANK_PPE.indexOf("suit")>=0)TANK_PPE=TANK_PPE.filter(function(k){return k!=="overalls"});
 var FLAGS=R.flags||[];
 
-var S=[{k:"check",n:"Sprayer check"},{k:"ppe",n:"PPE on"},{k:"fill",n:"Fill"}];
+var S=[{k:"check",n:CHECK_T},{k:"ppe",n:"PPE on"},{k:"fill",n:"Fill"}];
 P.forEach(function(p,i){S.push({k:"prod",n:p.name,p:p,i:i})});
 S.push({k:"topup",n:R.ph_max?"Top up + pH":"Top up"},{k:"sign",n:"Sign off"});
 
 var TK=TESTMODE?"-test":"";
 var KEY="ranfurlie-tankmix-"+R.slug+TK, MEKEY="ranfurlie-spray-me"+TK, OUTKEY="ranfurlie-spray-outbox"+TK;
 var st=load()||fresh();
-function fresh(){return {i:0,checks:{},ppe:{},post:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixSig:null,postSig:null,postDue:false,pd:{}}}
-function load(){try{var s=localStorage.getItem(KEY);if(!s)return null;var o=JSON.parse(s);var f=fresh();for(var k in f)if(!(k in o))o[k]=f[k];if(o.i>=S.length)o.i=S.length-1;return o}catch(e){return null}}
+function rid(){var a="abcdefghjkmnpqrstuvwxyz23456789",o="";for(var i=0;i<5;i++)o+=a[Math.floor(Math.random()*a.length)];return o}
+function fresh(){return {i:0,checks:{},ppe:{},post:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixSig:null,postSig:null,postDue:false,pd:{},run:rid()}}
+function load(){try{var s=localStorage.getItem(KEY);if(!s)return null;var o=JSON.parse(s);var legacy=!("run" in o)&&!!o.mixSig;var f=fresh();for(var k in f)if(!(k in o))o[k]=f[k];if(legacy)o.run="";if(o.i>=S.length)o.i=S.length-1;return o}catch(e){return null}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
 function getMe(){try{return JSON.parse(localStorage.getItem(MEKEY)||"null")}catch(e){return null}}
 function saveMe(w){try{localStorage.setItem(MEKEY,JSON.stringify(w))}catch(e){}}
@@ -525,7 +535,7 @@ function tileBtn(k){var on=!!st.ppe[k];return '<button class="tile" type="button
 function allOn(group,list){return list.every(function(r){return st[group][typeof r==="string"?r:r[0]]})}
 function back(){return st.i>0?'<button class="btn ghost" type="button" data-act="back">Back</button>':'<span></span>'}
 function dec(s){var i=s.indexOf(".");return i<0?0:s.length-i-1}
-function big(show,u){return '<div class="big"><span class="cnt" data-to="'+parseFloat(show)+'" data-dec="'+dec(show)+'">'+show+'</span><u>'+u+'</u></div>'}
+function big(show,u){return '<div class="big'+((String(show).length+String(u).length)>=5?' long':'')+'"><span class="cnt" data-to="'+parseFloat(show)+'" data-dec="'+dec(show)+'">'+show+'</span><u>'+u+'</u></div>'}
 function tank(from,to,done){
   var lvl=done?to:from;
   return '<div class="tank" aria-hidden="true"><div class="tank-in">'+
@@ -587,7 +597,7 @@ function flush(){
   var body=new URLSearchParams();Object.keys(item).forEach(function(k){body.append(k,item[k]==null?"":String(item[k]))});
   fetch(R.webhook,{method:"POST",mode:"no-cors",body:body}).then(function(){var b=outbox();b.shift();setOutbox(b);flushing=false;markSent(item);flush()},function(){flushing=false;if(VIEW==="dash")renderDash()});
 }
-function markSent(item){if(item.slug!==R.slug)return;if(item.kind==="mix"&&st.mixSig)st.mixSig.sent=true;if(item.kind==="post"&&st.postSig)st.postSig.sent=true;save();if(VIEW==="dash")renderDash()}
+function markSent(item){if(item.slug!==R.slug||(item.run||"")!==(st.run||""))return;if(item.kind==="mix"&&st.mixSig)st.mixSig.sent=true;if(item.kind==="post"&&st.postSig)st.postSig.sent=true;save();if(VIEW==="dash")renderDash()}
 window.addEventListener("online",flush);setInterval(flush,30000);
 function pendingCount(){return outbox().length}
 
@@ -596,7 +606,7 @@ var lastI=null, shownL=0;
 function render(){
   var s=S[st.i], h="";
   if(s.k==="check"){
-    h='<h2 class="pname">Sprayer check</h2>'+
+    h='<h2 class="pname">'+esc(CHECK_T)+'</h2>'+
       '<div class="checks">'+CHECKS.map(function(r){return checkBtn("checks",r[0],r[1],r[2])}).join("")+'</div>'+
       '<div id="stopMsg" hidden class="stopmsg"><b>Stop.</b> No chemical. Post the fault in #machinery and tell Ben or Andy.</div>'+
       '<div class="actions"><button class="btn stop" type="button" data-act="problem">Problem</button><button class="btn go" type="button" data-act="next" '+(allOn("checks",CHECKS)?"":"disabled")+'>All checked</button></div>';
@@ -696,7 +706,8 @@ function recordText(signer){
 }
 
 /* ---------- dashboard ---------- */
-var DATA=null, DATAERR=false, SWSEL=null;
+var DATA=null, DATAERR=false, SWSEL=null, TANKS=null;
+function loadTanks(){if(!R.tanks_url)return;fetch(R.tanks_url+"?v="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){TANKS=d.tanks||[];if(VIEW==="dash")renderDash()},function(){})}
 function loadData(){
   if(!R.data_url){DATAERR=true;renderDash();return}
   fetch(R.data_url+(R.data_url.indexOf("?")<0?"?v=":"&v=")+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){DATA=d;DATAERR=false;renderDash()},function(){DATAERR=true;renderDash()});
@@ -716,7 +727,8 @@ function todayCard(){
     '<div class="dhead"><span class="small">'+rel+' · '+esc(R.sprayer)+'</span>'+(pend?'<span class="chip warn">'+pend+' sign-off waiting for signal</span>':'')+'</div>'+
     '<h2>'+esc(R.title)+'</h2>'+
     '<div class="statusline">'+statusChips()+'</div>'+
-    '<div class="facts"><span class="fact">'+R.mix_l+' L</span><span class="fact">'+AREA+'</span><span class="fact">'+R.rate_lha+' L/ha</span><span class="fact">'+esc(R.nozzles)+'</span><span class="fact">'+esc(R.speed)+'</span><span class="fact">'+esc(R.pressure)+'</span></div>'+
+    '<div class="facts">'+FACTS.map(function(x){return '<span class="fact">'+esc(x)+'</span>'}).join("")+'</div>'+
+    (st.postSig&&R.date_iso>=TODAY?'<button class="btn go md wide" type="button" data-act="another">Mix another tank</button>':'')+
     (showRules?'<ul class="rules">'+(R.spray_rules||[]).map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>':'')+
     (postBtn&&(st.mixSig||st.postDue)?'<button class="btn go md wide" type="button" data-act="open-post">Post-application checklist</button>':
       (R.date_iso===TODAY&&!st.mixSig?'<button class="btn go md wide" type="button" data-act="to-mix">Open mixing guide</button>':''))+
@@ -728,6 +740,12 @@ function todayCard(){
     (FLAGS.length?'<details class="more"><summary>Label checks on this sheet ('+FLAGS.length+')</summary><div class="morebody flags">'+FLAGS.map(function(f){return '<details class="flag '+(f.c||"")+'"><summary>'+f.t+'</summary><p>'+f.d+'</p><span class="s">'+f.s+'</span></details>'}).join("")+'</div></details>':'')+
     (st.mixSig&&st.mixSig.sig?'<details class="more"><summary>Signatures</summary><div class="morebody"><div class="small">Mix: '+esc(st.mixSig.name)+', '+hm(st.mixSig.at)+(st.mixSig.sent?' · sent':'')+'</div>'+sigSvg(st.mixSig.sig)+(st.postSig&&st.postSig.sig?'<div class="small">Post-application: '+esc(st.postSig.name)+', '+hm(st.postSig.at)+(st.postSig.sent?' · sent':'')+'</div>'+sigSvg(st.postSig.sig):'')+'</div></details>':'')+
   '</section>';
+}
+function tanksCard(){
+  var all=(TANKS||[]).filter(function(t){return t.date_iso===TODAY&&t.slug!==R.slug});
+  if(!all.length)return "";
+  var rows=all.map(function(t){return '<li><span class="d"><span class="dot plan"></span></span><span class="t"><a href="'+esc(R.page_url+t.slug+"/")+'">'+esc(t.title)+'</a><small>'+esc(t.sprayer)+(t.applicator?' · '+esc(t.applicator):'')+'</small></span><span class="v"><a class="btn soft sm" href="'+esc(R.page_url+t.slug+"/#dash")+'">Open</a></span></li>'}).join("");
+  return '<section class="card dcard span2"><div class="dhead"><h2>Other tanks today</h2><span class="small">each has its own sign-offs</span></div><ul class="list">'+rows+'</ul></section>';
 }
 function windowCard(){
   var sw=(DATA.spray_window||[]).filter(function(x){return x.date>=TODAY});
@@ -828,6 +846,7 @@ function watchCard(){
 function renderDash(){
   $("dWhen").textContent="Ranfurlie · "+dLabel(TODAY);
   var h=todayCard();
+  try{h+=tanksCard()}catch(e){}
   if(DATA){
     $("dAsOf").textContent="Course data built "+(DATA._built||"");
     [windowCard,clocksCard,gvxCard,diseaseCard,coverCard,aheadCard,appsCard,watchCard].forEach(function(fn){try{h+=fn()}catch(e){}});
@@ -861,6 +880,7 @@ function openPost(){
       '<div class="field"><label for="pdDir">Wind from</label><select id="pdDir">'+dirs.map(function(d){return '<option'+(pd.dir===d?' selected':'')+' value="'+d+'">'+(d||"–")+'</option>'}).join("")+'</select></div>'+
       '<div class="field"><label for="pdTemp">Temp (°C)</label><input id="pdTemp" inputmode="decimal" value="'+esc(pd.temp||"")+'" placeholder="e.g. 18"></div>'+
     '</div>'+
+    POSTF.map(function(f){return '<div class="field"><label for="pdx-'+f[0]+'">'+esc(f[1])+'</label>'+(f[3]==="text"?'<textarea id="pdx-'+f[0]+'" data-pdx="'+f[0]+'" placeholder="'+esc(f[2]||"")+'">'+esc(pd["x_"+f[0]]||"")+'</textarea>':'<input id="pdx-'+f[0]+'" data-pdx="'+f[0]+'" inputmode="'+(f[3]==="num"?"decimal":"text")+'" value="'+esc(pd["x_"+f[0]]||"")+'" placeholder="'+esc(f[2]||"")+'">')+'</div>'}).join("")+
     '<div class="field"><label for="pdIssues">Anything to report? (optional)</label><textarea id="pdIssues" placeholder="Drift, blocked nozzles, mix left over, areas missed">'+esc(pd.issues||"")+'</textarea></div>'+
     whoField("post",preset)+
     '<p class="decl">I sprayed this tank out, cleaned up as above and recorded the application.</p>'+
@@ -874,13 +894,14 @@ function openPost(){
 }
 function closePost(){$("sheet").hidden=true;document.documentElement.style.overflow="";renderFab();renderPostbar()}
 function refreshSignPost(){var b=$("signPostBtn");if(!b)return;var was=b.disabled;b.disabled=!(allOn("post",POSTC)&&readWho("post").name&&padHas("post"));if(was&&!b.disabled&&!RM){b.classList.remove("ready");void b.offsetWidth;b.classList.add("ready")}}
+function extraText(){var pd=st.pd||{};return POSTF.map(function(f){var v=String(pd["x_"+f[0]]||"").trim();return v?f[1]+": "+v:""}).filter(Boolean).join("\n")}
 function finishText(){var pd=st.pd||{};var parts=[];if(pd.finish)parts.push(pd.finish);if(pd.wind)parts.push("wind "+pd.wind+" km/h"+(pd.dir?" from "+pd.dir:""));if(pd.temp)parts.push(pd.temp+" °C");return parts.join(" · ")}
 
 /* ---------- views + fab ---------- */
 var VIEW="mix";
 function setView(v,anim){
   VIEW=v;$("mixView").hidden=v!=="mix";$("dashView").hidden=v!=="dash";
-  if(v==="dash"){renderDash();if(!DATA&&!DATAERR)loadData()}else{render()}
+  if(v==="dash"){renderDash();if(!DATA&&!DATAERR)loadData();if(TANKS===null){TANKS=[];loadTanks()}}else{render()}
   renderFab();renderPostbar();
   try{window.scrollTo({top:0,behavior:"auto"})}catch(e){window.scrollTo(0,0)}
   if(anim&&!RM){var el=$(v+"View");el.classList.remove("viewin");void el.offsetWidth;el.classList.add("viewin")}
@@ -917,7 +938,7 @@ function signMix(){
   var who=readWho("mix");if(!who.name||!padHas("mix")||!mixReady())return;
   saveMe(who);var sig=padPath("mix");
   st.mixSig={at:Date.now(),name:who.name,slack:who.slack,sig:sig,sent:false};save();
-  send({kind:"mix",slug:R.slug,title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,ph:st.ph||"",record:recordText(who.name),sig:sig});
+  send({kind:"mix",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,ph:st.ph||"",record:recordText(who.name),sig:sig});
   buzz();toast(PREVIEW?"Signed (preview copy, not sent)":"Mix signed. Sent to #spraying");
   setTimeout(function(){setView("dash",true)},350);
 }
@@ -926,7 +947,7 @@ function signPost(){
   saveMe(who);var sig=padPath("post");
   st.postSig={at:Date.now(),name:who.name,slack:who.slack,sig:sig,sent:false};save();
   var checks=POSTC.map(function(r){return "✓ "+r[1]}).join("\n");
-  send({kind:"post",slug:R.slug,title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,checks:checks,finish:finishText(),issues:(st.pd&&st.pd.issues)||"",sig:sig});
+  send({kind:"post",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,checks:checks,finish:finishText(),issues:(st.pd&&st.pd.issues)||"",extra:extraText(),sig:sig});
   buzz();closePost();renderDash();toast(PREVIEW?"Checklist done (preview copy, not sent)":"Checklist done. Sent to #spraying");
 }
 
@@ -963,11 +984,13 @@ document.addEventListener("click",function(e){
   else if(a==="sw"){SWSEL=+b.getAttribute("data-i");renderDash()}
   else if(a==="ask-reset"){$("resetBox").innerHTML='<span class="small">Clear this phone’s progress on this tank?</span><button class="btn stop sm" type="button" data-act="reset">Clear</button><button class="btn ghost sm" type="button" data-act="keep">Keep</button>'}
   else if(a==="reset"){st=fresh();save();PADS={};renderReset();setView("mix",true);toast("Started again")}
+  else if(a==="another"){st=fresh();save();PADS={};renderReset();setView("mix",true);toast("New tank started")}
   else if(a==="keep"){renderReset()}
 });
 document.addEventListener("input",function(e){
   var t=e.target;
   if(t.hasAttribute("data-batch")){st.batch[t.getAttribute("data-batch")]=t.value;save()}
+  else if(t.hasAttribute("data-pdx")){st.pd=st.pd||{};st.pd["x_"+t.getAttribute("data-pdx")]=t.value;save()}
   else if(t.id==="ph"){st.ph=t.value.trim();save();$("phMsg").innerHTML=phBox()}
   else if(t.id==="pdFinish"||t.id==="pdWind"||t.id==="pdTemp"||t.id==="pdIssues"||t.id==="pdDir"){var k={pdFinish:"finish",pdWind:"wind",pdTemp:"temp",pdIssues:"issues",pdDir:"dir"}[t.id];st.pd=st.pd||{};st.pd[k]=t.value;save()}
   else if(t.id&&t.id.indexOf("whoOther-")===0){var id=t.id.slice(9);if(id==="mix")refreshSignMix();else refreshSignPost()}
