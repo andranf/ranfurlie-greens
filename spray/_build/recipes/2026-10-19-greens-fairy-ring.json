@@ -1,0 +1,142 @@
+{
+  "slug": "2026-10-19-greens-fairy-ring",
+  "title": "Fairy Ring + Root Disease, Front 9 Greens",
+  "sheet_name": "5800 600L/Ha - Fairy Ring + Root Disease to Greens",
+  "sprayer": "Toro 5800",
+  "applicator": [
+    "Nathan Ferguson",
+    "U06H9J0LBEC"
+  ],
+  "date": "Mon 19 Oct",
+  "date_long": "Mon 19 Oct 2026",
+  "date_iso": "2026-10-19",
+  "area_ha": 0.625,
+  "rate_lha": 600,
+  "mix_l": 375,
+  "tank_cap_l": 1200,
+  "fill_l": 250,
+  "nozzles": "Blue AIC",
+  "speed": "7.5 km/h",
+  "pressure": "4 bar",
+  "last_load": "Fert + PGR to Approaches & Surrounds, Fri 16 Oct",
+  "site_check": "Spray signs out on the front nine greens",
+  "weather": "Delta T 2–8 · wind 3–20 km/h · gusts under 30 · no rain for 48 h",
+  "extra_checks": [
+    [
+      "catch",
+      "Catch test: the boom puts out 600 L/ha",
+      "Blue AIC at 4 bar and 7.5 km/h only gives about 220 L/ha. Check with Andy or Ben"
+    ],
+    [
+      "waterin",
+      "Watering in lined up behind the sprayer",
+      "6–10 mm on each green, starting within 1 h"
+    ]
+  ],
+  "products": [
+    {
+      "id": "companion",
+      "rate": "800 mL/ha",
+      "rate_lha": 0.8,
+      "unit": "mL",
+      "sheet": 1
+    },
+    {
+      "id": "terreplex",
+      "rate": "5.0 L/ha",
+      "rate_lha": 5.0,
+      "sheet": 2,
+      "unit": "mL"
+    },
+    {
+      "id": "evoadv",
+      "rate": "2.2 L/ha",
+      "rate_lha": 2.2,
+      "unit": "mL",
+      "sheet": 5,
+      "note": "Goes in 3rd, before the Zeemil and the wetting agent (sheet had it last)."
+    },
+    {
+      "id": "zeemil",
+      "rate": "3.0 L/ha",
+      "rate_lha": 3.0,
+      "unit": "mL",
+      "sheet": 3
+    },
+    {
+      "id": "hydroforce",
+      "rate": "6.0 L/ha",
+      "rate_lha": 6.0,
+      "sheet": 4,
+      "note": "Goes in last."
+    }
+  ],
+  "ppe_note": "Terreplex and Zeemil irritate eyes and skin, and Zeemil gives off solvent vapour, so mix in the full kit.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "Start once Delta T is over 2 (about 8am). Off by 10:30, before the gusts",
+    "Water in 6–10 mm behind each green, starting within 1 h. Don't let it dry on the leaf",
+    "Keep people off until it's watered in"
+  ],
+  "spray_more": "Evolution Advance label: wind 3–20 km/h, medium droplets or coarser, no spraying in an inversion, don't apply if rain is expected within 48 h. Zeemil label: beware of solvent vapours near the open tank.",
+  "post_checks": [
+    [
+      "waterin",
+      "Every green watered in, 6–10 mm, within 1 h of spraying",
+      "Soil pass: it must not dry on the leaf"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "Zeemil 3.0 L/ha is over its label rate",
+      "d": "Zeemil 250 EC (metalaxyl 250 g/L) is registered for pineapples only, at 2 L/ha. On greens it's off-label, and in Victoria off-label use can't go over the label rate. At 2.0 L/ha this tank takes 1.25 L, not 1.875 L. It's the only Pythium root rot product in this tank.",
+      "s": "APVMA 49822 eLabel · Turf Data reference notes 18 Oct"
+    },
+    {
+      "c": "red",
+      "t": "Boom setup won't give 600 L/ha",
+      "d": "Blue AIC (03) at 4 bar is about 1.4 L/min a nozzle. On the 5800's 50 cm spacing at 7.5 km/h that's about 220 L/ha, so the greens would get about a third of the rate. 600 L/ha at 4 bar: grey AIC (06) at about 5.5 km/h, or red (04) at about 3.7 km/h. Confirm with a catch test. (On 15 and 16 Oct the 5800 ran red AIC at 6.9 km/h for 300 L/ha, which matches.)",
+      "s": "TeeJet AIC flow at 4 bar · 50 cm nozzle spacing"
+    },
+    {
+      "c": "",
+      "t": "Evolution Advance 2.2 L/ha is the label high rate",
+      "d": "Fairy ring 1.6–2.2 L/ha. Label: low rate from late October to early November, high rate if symptoms are present, reapply after 30 days if needed. Max 2 consecutive sprays, 3 per season.",
+      "s": "APVMA 93144 label"
+    },
+    {
+      "c": "",
+      "t": "Rain inside the 48 h label restraint",
+      "d": "Evolution Advance: don't apply if rain is expected within 48 h. The forecast has about 1 to 2.5 mm on Tue 20 Oct. Light, and the tank is watered in anyway, but it's a label condition.",
+      "s": "APVMA 93144 label · forecast 18 Oct"
+    },
+    {
+      "c": "",
+      "t": "Wash in straight away: 600 L/ha is under label volume",
+      "d": "The label's root-disease use is about 1000 L/ha with 6–10 mm of irrigation within 1 hour. At 600 L/ha the washing in matters more: start on each green as soon as it's sprayed.",
+      "s": "APVMA 93144 label"
+    },
+    {
+      "c": "",
+      "t": "Fungicide + wetting agent on bentgrass in the heat",
+      "d": "Tebuconazole plus HydroForce, 27 °C by afternoon, five days after Shadow Ultra and Promote Plus. Envu's guidance is to keep wetting agents two weeks clear of DMI fungicides. Spraying early and watering in straight behind keeps it off the leaf.",
+      "s": "Turf Data reference notes"
+    },
+    {
+      "c": "info",
+      "t": "No leaf cover from this pass",
+      "d": "Evolution Advance's dollar spot, brown patch and anthracnose claims are leaf and crown uses (350–500 L/ha, left on the leaf). Watered in, this is a root-zone pass, so don't count it against the 22–24 Oct leaf-disease spike.",
+      "s": "APVMA 93144 label"
+    },
+    {
+      "c": "info",
+      "t": "Order changed from the sheet",
+      "d": "Evolution Advance moves from last to 3rd so the suspension goes in before the EC (Zeemil) and the wetting agent. HydroForce goes in last. Companion and Terreplex condition the water first.",
+      "s": "Reasoning on each product card"
+    }
+  ]
+}
