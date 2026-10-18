@@ -37,6 +37,14 @@ main{padding:12px 0 140px}
 .edit input.note{flex:1 1 200px}
 .var{font-size:.8rem;font-weight:600}.var.neg{color:var(--bad)}.var.pos{color:var(--ok)}
 .last{font-size:.76rem;color:var(--muted)}
+.lvl{font-size:.76rem;color:var(--muted);margin-top:2px}.lvl.lowt{color:var(--bad);font-weight:600}.lvl.onl{color:var(--warn);font-weight:600}
+.card.low{box-shadow:inset 4px 0 0 var(--bad)}
+.ro{margin-top:7px;border:1px solid var(--line);background:none;color:var(--muted);border-radius:999px;padding:5px 12px;font:inherit;font-size:.8rem;cursor:pointer;touch-action:manipulation}
+.ro[aria-pressed=true]{background:var(--bad);border-color:var(--bad);color:#fff;animation:pop .35s}
+.ro.sug{border-color:var(--bad);color:var(--bad);animation:nudge 1.8s ease-in-out infinite}
+.ro.req{border-style:dashed;cursor:default;color:var(--warn);border-color:var(--warn)}
+@keyframes nudge{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--bad) 40%,transparent)}60%{box-shadow:0 0 0 6px color-mix(in srgb,var(--bad) 0%,transparent)}}
+.chip.lowc[aria-pressed=false]{border-color:var(--bad);color:var(--bad)}
 footer{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
 footer .wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .send{background:var(--acc);color:#fff;border:0;border-radius:12px;padding:12px 16px;font:inherit;font-weight:600;flex:1 1 140px;cursor:pointer}
@@ -61,7 +69,7 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted)}
   <p class="sub">Add it here. Name, amount and unit (e.g. "Banner Maxx, 10 L").</p>
   <textarea id="extra" rows="3" style="width:100%" placeholder="One product per line"></textarea>
 </details>
-<p class="sub">Expected amounts come from GreenKeeper's inventory each morning. Tap <b>✓</b> if the shelf matches, or <b>≠</b> to enter what's really there. Send emails the counts to Andy. The morning run checks them, corrects GreenKeeper and logs every change.</p></div>
+<p class="sub">Tap <b>✓</b> if the shelf matches, or <b>≠</b> to enter what's really there. Tap <b>Re-order</b> on anything that needs ordering, with or without a count. Products we use often show a re-order level (about 4 weeks of use) and a red edge when they're at or below it. Send emails it all to Andy; the next run corrects GreenKeeper, logs every change and sends the re-order list.</p></div>
 </main>
 <footer><div class="wrap">
   <button class="send" id="send" disabled>Send count</button>
@@ -73,59 +81,75 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted)}
 <script>
 (function(){
 const $=(s)=>document.querySelector(s);
-const KEY='rgc-stock-v1';let D=null,state={},type='All',showZero=false;
+const KEY='rgc-stock-v1';let D=null,state={},type='All',showZero=false,lowOnly=false;
 const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({snap:D&&D.snapshot,who:$('#who').value,state,extra:$('#extra').value}))}catch(e){}};
 const fmt=(v)=>(Math.round(v*100)/100).toLocaleString('en-AU',{maximumFractionDigits:2});
 const expTxt=(i)=>{if(!i.expected)return'<b>0</b> on record';if(i.cont){const n=Math.floor(i.expected/i.cont+1e-9),r=i.expected-n*i.cont;return n?`<b>${fmt(i.expected)} ${i.unit}</b> · ${n} × ${fmt(i.cont)} ${i.unit}${r>0.01?' + '+fmt(r)+' '+i.unit:''}`:`<b>${fmt(i.expected)} ${i.unit}</b> · part of a ${fmt(i.cont)} ${i.unit} container`}return`<b>${fmt(i.expected)} ${i.unit}</b>`};
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
 function total(i,s){const n=parseFloat(s.full)||0,p=parseFloat(s.part)||0;return i.cont?n*i.cont+p:p}
+const hasCnt=(s)=>s&&s.st==='diff'&&((s.full??'')!==''||(s.part??'')!=='');
+const onHand=(i,s)=>hasCnt(s)?total(i,s):i.expected;
+const isLow=(i,s)=>!!i.reorder_at&&onHand(i,s||{})<=i.reorder_at+1e-9;
+const dmy=(d)=>{const t=new Date(d+'T00:00');return isNaN(t)?d:t.toLocaleDateString('en-AU',{day:'numeric',month:'short'})};
+function setS(id,cur){if(!cur.st&&!cur.ro&&!cur.note)delete state[id];else state[id]=cur}
+function lvlTxt(i,s){if(i.reorder)return['onl',`On re-order list · ${dmy(i.reorder.date)} · ${i.reorder.by}`];if(!i.reorder_at)return['',''];
+  const lo=isLow(i,s);return[lo?'lowt':'',(lo?(hasCnt(s)?'Low after count · ':'Low · '):'')+`re-order at ${fmt(i.reorder_at)} ${i.unit}`]}
 function render(){
   const L=$('#list');L.replaceChildren();const q=$('#q').value.trim().toLowerCase();let g='',k=0;
-  D.items.filter(i=>(type==='All'||i.type===type)&&(!q||i.name.toLowerCase().includes(q))&&(showZero||i.expected>0||state[i.id]||q)).forEach(i=>{
+  D.items.filter(i=>(type==='All'||i.type===type)&&(!q||i.name.toLowerCase().includes(q))&&(showZero||i.expected>0||state[i.id]||q||i.low||i.reorder)&&(!lowOnly||i.reorder||isLow(i,state[i.id])||(state[i.id]&&state[i.id].ro))).forEach(i=>{
     if(i.type!==g){g=i.type;const h=document.createElement('div');h.className='grp';h.textContent=g;L.appendChild(h)}
-    const s=state[i.id]||{};const c=document.createElement('div');c.className='card'+(s.st==='ok'?' ok':s.st==='diff'?' diff':'');c.style.animationDelay=Math.min(k++,14)*25+'ms';
+    const s=state[i.id]||{};const c=document.createElement('div');c.className='card'+(s.st==='ok'?' ok':s.st==='diff'?' diff':'')+(isLow(i,s)?' low':'');c.style.animationDelay=Math.min(k++,14)*25+'ms';
     const last=i.last_count?`<div class="last">Last counted ${i.last_count.date} by ${i.last_count.by}: ${fmt(i.last_count.counted)} ${i.unit}</div>`:'';
-    c.innerHTML=`<div class="row"><div><div class="nm"></div><div class="exp">${expTxt(i)}</div>${i.flag?`<div class="flag">⚠ ${i.flag}</div>`:''}${last}</div>
+    c.innerHTML=`<div class="row"><div><div class="nm"></div><div class="exp">${expTxt(i)}</div>${i.flag?`<div class="flag">⚠ ${i.flag}</div>`:''}${last}<div class="lvl"></div>${i.reorder?'<button class="ro req" disabled>✓ On re-order list</button>':`<button class="ro" aria-pressed="${!!s.ro}">${s.ro?'✓ Re-order':'Re-order'}</button>`}</div>
       <div class="btns"><button class="b okb" aria-pressed="${s.st==='ok'}" aria-label="Matches">✓</button><button class="b dfb" aria-pressed="${s.st==='diff'}" aria-label="Different">≠</button></div></div>
       <div class="edit">${i.cont?`<label>Full ${fmt(i.cont)} ${i.unit} containers<input type="number" inputmode="decimal" min="0" step="1" class="full" value="${s.full??''}"></label>`:''}
       <label>${i.cont?'Plus part container':'Amount'} (${i.unit})<input type="number" inputmode="decimal" min="0" step="0.1" class="part" value="${s.part??''}"></label>
       <span class="tot"></span><input type="text" class="note" placeholder="Note (optional)" value="${(s.note||'').replace(/"/g,'&quot;')}"></div>`;
     c.querySelector('.nm').textContent=i.name;
-    const upd=()=>{const ss=state[i.id];const t=c.querySelector('.tot');if(!ss||ss.st!=='diff'){t.textContent='';return}
+    const upd=()=>{const ss=state[i.id];const t=c.querySelector('.tot');
+      const [lc,lt]=lvlTxt(i,ss);const lv=c.querySelector('.lvl');lv.className='lvl'+(lc?' '+lc:'');lv.textContent=lt;lv.style.display=lt?'':'none';
+      c.classList.toggle('low',isLow(i,ss));const rb=c.querySelector('.ro:not(.req)');if(rb)rb.classList.toggle('sug',isLow(i,ss)&&!(ss&&ss.ro));
+      if(!ss||ss.st!=='diff'){t.textContent='';return}
       const tot=total(i,ss);const has=(ss.full??'')!==''||(ss.part??'')!=='';const d=tot-i.expected;
       t.innerHTML=has?`= ${fmt(tot)} ${i.unit} <span class="var ${d<0?'neg':'pos'}">${d>=0?'+':'−'}${fmt(Math.abs(d))}</span>`:'enter the count';};
-    c.querySelector('.okb').onclick=()=>{state[i.id]=s.st==='ok'?undefined:{st:'ok'};if(!state[i.id])delete state[i.id];save();render();tick()};
-    c.querySelector('.dfb').onclick=()=>{state[i.id]=s.st==='diff'?undefined:{st:'diff',full:'',part:''};if(!state[i.id])delete state[i.id];save();render();tick();if(state[i.id]){const f=L.querySelector(`[data-id="${i.id}"] input`);}};
+    c.querySelector('.okb').onclick=()=>{const cur={...(state[i.id]||{})};if(cur.st==='ok')delete cur.st;else{cur.st='ok';delete cur.full;delete cur.part}setS(i.id,cur);save();render();tick()};
+    c.querySelector('.dfb').onclick=()=>{const cur={...(state[i.id]||{})};if(cur.st==='diff'){delete cur.st;delete cur.full;delete cur.part}else{cur.st='diff';cur.full='';cur.part=''}setS(i.id,cur);save();render();tick()};
+    const rb=c.querySelector('.ro:not(.req)');if(rb)rb.onclick=()=>{const cur={...(state[i.id]||{})};if(cur.ro)delete cur.ro;else cur.ro=true;setS(i.id,cur);save();render();tick();if(cur.ro)toast(i.name+' added to the re-order list')};
     c.dataset.id=i.id;
-    c.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{const ss=state[i.id]||(state[i.id]={st:'diff'});ss.full=c.querySelector('.full')?.value??'';ss.part=c.querySelector('.part').value;ss.note=c.querySelector('.note').value;save();upd();tick()});
+    c.querySelectorAll('input').forEach(inp=>inp.oninput=()=>{const ss=state[i.id]||(state[i.id]={st:'diff'});if(!ss.st)ss.st='diff';ss.full=c.querySelector('.full')?.value??'';ss.part=c.querySelector('.part').value;ss.note=c.querySelector('.note').value;save();upd();tick()});
     upd();L.appendChild(c);
   });
   if(!L.children.length){L.innerHTML='<p class="sub" style="margin-top:24px">Nothing matches.</p>'}
 }
+function ros(){return Object.entries(state).filter(([id,s])=>s&&s.ro&&D.items.some(i=>i.id===id))}
 function done(){return Object.entries(state).filter(([id,s])=>s&&(s.st==='ok'||(s.st==='diff'&&((s.full??'')!==''||(s.part??'')!==''))))}
 function tick(){
   const n=D.items.filter(i=>i.expected>0).length,d=done().length,p=Math.min(1,d/Math.max(1,n));
   $('#ringfg').style.strokeDashoffset=119.4*(1-p);$('#ringtx').textContent=Math.round(p*100)+'%';
   const diffs=done().filter(([,s])=>s.st==='diff').length;
-  $('#sum').textContent=d?`${d} counted · ${d-diffs} match · ${diffs} different`+($('#who').value?'':' · add your name'):'Tick products as you go. You can send a part count.';
-  $('#send').disabled=!d||!$('#who').value.trim();
+  const r=ros().length;const parts=[];if(d)parts.push(`${d} counted · ${d-diffs} match · ${diffs} different`);if(r)parts.push(`${r} to re-order`);
+  $('#sum').textContent=parts.length?parts.join(' · ')+($('#who').value?'':' · add your name'):'Tick products as you go. You can send a part count.';
+  $('#send').disabled=!(d||r)||!$('#who').value.trim();$('#send').textContent=d?'Send count':r?'Send re-order':'Send count';
+  const lc=document.querySelector('.chip.lowc');if(lc)lc.textContent=`Low stock (${D.items.filter(i=>i.reorder||isLow(i,state[i.id])||(state[i.id]&&state[i.id].ro)).length})`;
 }
 function body(){
   const by=Object.fromEntries(D.items.map(i=>[i.id,i]));const ok=[],cnt=[];
   done().forEach(([id,s])=>{if(s.st==='ok')ok.push(id);else{const i=by[id];cnt.push(`CNT ${id} | ${fmt(total(i,s))} ${i.unit} | exp ${i.expected} | ${i.name}${s.note?' | '+s.note.replace(/\|/g,'/'):''}`)}});
   const ex=$('#extra').value.trim().split(/\n+/).filter(Boolean).map(l=>'NEW | '+l.replace(/\|/g,'/'));
-  return [`STOCKTAKE v1 | snapshot ${D.snapshot} | by ${$('#who').value.trim()} | sent ${new Date().toISOString()}`,ok.length?'OK '+ok.join(','):'',...cnt,...ex,'END'].filter(Boolean).join('\n');
+  const ro=ros().map(([id,s])=>{const i=by[id];const oh=hasCnt(s)||s.st==='ok'?`${fmt(onHand(i,s))} ${i.unit}`:`~${fmt(i.expected)} ${i.unit} (not counted)`;return `REORDER ${id} | ${i.name.replace(/\|/g,'/')} | on hand ${oh}`});
+  return [`STOCKTAKE v1 | snapshot ${D.snapshot} | by ${$('#who').value.trim()} | sent ${new Date().toISOString()}`,ok.length?'OK '+ok.join(','):'',...cnt,...ro,...ex,'END'].filter(Boolean).join('\n');
 }
-$('#send').onclick=()=>{const b=body(),n=done().length;const sub=`Ranfurlie stocktake | ${new Date().toISOString().slice(0,10)} | ${$('#who').value.trim()} | ${n} items`;
+$('#send').onclick=()=>{const b=body(),n=done().length,r=ros().length;const sub=`Ranfurlie stocktake | ${new Date().toISOString().slice(0,10)} | ${$('#who').value.trim()} | ${n} items`+(r?` + ${r} re-order`:'');
   location.href=`mailto:${D.send_to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(b)}`;toast('Opening your email app — press Send there');};
 $('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(body());toast('Copied. Paste into an email to Andy')}catch(e){prompt('Copy this text',body())}};
 $('#clear').onclick=()=>{if(confirm('Clear this count and start again?')){state={};$('#extra').value='';save();render();tick()}};
 ['#who','#extra'].forEach(s=>$(s).addEventListener('input',()=>{save();tick()}));$('#q').addEventListener('input',render);
 fetch('stock.json?x='+Date.now()).then(r=>r.json()).then(d=>{D=d;const s=load();if(s.snap===d.snapshot||s.snap){state=s.state||{};$('#extra').value=s.extra||''}$('#who').value=s.who||'';
-  const n=d.items.filter(i=>i.expected>0).length;$('#sub').textContent=`${n} products expected on the shelf (KD stocktake + purchases − GreenKeeper use) · updated ${d.built}`+(d.counted_30d?` · ${d.counted_30d} counted in the last 30 days`:'');
+  const n=d.items.filter(i=>i.expected>0).length;$('#sub').textContent=`${n} products expected on the shelf (KD stocktake + purchases − GreenKeeper use) · updated ${d.built}`+(d.counted_30d?` · ${d.counted_30d} counted in the last 30 days`:'')+(d.low_count?` · ${d.low_count} at or below re-order level`:'');
   const types=['All',...new Set(d.items.map(i=>i.type))];const C=$('#chips');
-  types.forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.setAttribute('aria-pressed',t===type);b.onclick=()=>{type=t;[...C.children].forEach(x=>x.setAttribute('aria-pressed',x.textContent===t));render()};C.appendChild(b)});
+  types.forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.dataset.t=t;b.setAttribute('aria-pressed',t===type);b.onclick=()=>{type=t;[...C.querySelectorAll('[data-t]')].forEach(x=>x.setAttribute('aria-pressed',x.dataset.t===t));render()};C.appendChild(b)});
+  const lw=document.createElement('button');lw.className='chip lowc';lw.textContent='Low stock';lw.setAttribute('aria-pressed','false');lw.onclick=()=>{lowOnly=!lowOnly;lw.setAttribute('aria-pressed',String(lowOnly));render()};C.insertBefore(lw,C.children[1]||null);
   const z=document.createElement('button');z.className='chip';z.textContent='Show zero on record';z.setAttribute('aria-pressed','false');z.onclick=()=>{showZero=!showZero;z.setAttribute('aria-pressed',String(showZero));render()};C.appendChild(z);
   render();tick();}).catch(()=>{$('#sub').textContent='Could not load the product list. Check your connection and reload.'});
 })();
