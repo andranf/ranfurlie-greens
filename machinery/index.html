@@ -1001,7 +1001,8 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       setTimeout(function () { closeUpd(); FX.open(900); draw(); }, 900);
     }).catch(function () { UM._go.disabled = false; UM._go.classList.remove('busy'); bad('Could not send. Check your signal and try again.'); });
   }
-  function jobFromCard(c) { return c.kind === 'fault' ? { kind: 'fault', ref: c.ref || '', machine: c.machine, job: c.job, items: [] }
+  function jobFromCard(c) { return c.kind === 'fault' ? { kind: 'fault', ref: c.ref || '', machine: c.machine, job: c.job,
+        items: (c.items || []).map(function (i) { return { id: i.id, fleet: i.fleet, label: i.label, interval_h: i.interval_h, kind: i.kind }; }) }
     : { kind: 'service', ref: (c.items || []).map(function (i) { return i.id; }).join(','), machine: c.machine, job: c.job,
         items: (c.items || []).map(function (i) { return { id: i.id, fleet: i.fleet || c.machine, label: i.label, interval_h: i.interval_h, kind: i.kind }; }) }; }
   function jobFromFault(f) { return { kind: 'fault', ref: f.id || '', machine: f.fleet || f.machine || '', job: f.job, items: [] }; }
