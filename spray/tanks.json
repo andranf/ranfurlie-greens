@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-10-20-greens-fairy-ring-back9",
+   "title": "Fairy Ring + Root Disease, Back 9 Greens, Nursery + Himalayan",
+   "sprayer": "Toro 5800",
+   "date_iso": "2026-10-20",
+   "date": "Tue 20 Oct",
+   "applicator": "Nathan Ferguson",
+   "method": "boom"
+  },
+  {
    "slug": "2026-10-19-rough-handgun",
    "title": "Herbicide to Rough, Handgun",
    "sprayer": "Silvan 1000 L",
