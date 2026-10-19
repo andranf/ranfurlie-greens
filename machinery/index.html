@@ -159,6 +159,9 @@ body{font-size:16px}
 .mx-wc-w{font-size:var(--cds-font-size-caption);font-weight:600;}
 .mx-wc ul{margin:0;padding-left:1.1rem;font-size:var(--cds-font-size-caption);line-height:1.45;}
 .mx-wc-p{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.45;}
+.mx-wc-s{font-size:var(--cds-font-size-caption);line-height:1.45;border-left:3px solid var(--color-ok);padding:.1rem 0 .1rem .55rem;}
+.mx-wc-s b{display:block;font-weight:600;}
+.mx-stk-chk{color:var(--color-warn);font-weight:600;}
 .mx-ctl{display:flex;flex-wrap:wrap;gap:var(--cds-gap-sm);align-items:center;}
 .mx-chip{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);background:var(--color-panel);color:var(--color-fg);border-radius:999px;padding:.3rem .75rem;cursor:pointer;}
 .mx-chip[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);}
@@ -472,9 +475,9 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
 <section class="mx-page" id="cutting" role="tabpanel" aria-labelledby="tab-cutting" hidden>
   <div class="mx-card" id="card-hoc">
     <div class="mx-row"><h3>Heights of cut and bedknives</h3><span class="mx-note">Reel mowers in service</span></div>
-    <p class="mx-note">Height of cut as set now, the bedknife that suits it (from the OEM bedknife charts), and when each mower was last backlapped and ground. A knife used below its rated height scalps and wears fast.</p>
+    <p class="mx-note">Height of cut as set now, the bedknife that suits it (from the OEM bedknife charts), what is on the workshop shelf for it (bedknives, screws, lapping paste), and when each mower was last backlapped and ground. A knife used below its rated height scalps and wears fast.</p>
     <div class="mx-tbox"><table class="mx-table" id="t-hoc" data-source="m_hoc" data-row-key="fleet"><thead><tr>
-      <th data-field="fleet">Machine</th><th data-field="area">Area</th><th data-field="hoc" class="n">HOC mm</th><th data-field="knives">Bedknife for this height</th><th data-field="backlap">Backlap</th><th data-field="grind">Grind</th>
+      <th data-field="fleet">Machine</th><th data-field="area">Area</th><th data-field="hoc" class="n">HOC mm</th><th data-field="knives">Bedknife for this height</th><th data-field="stock">In the workshop</th><th data-field="backlap">Backlap</th><th data-field="grind">Grind</th>
     </tr></thead><tbody></tbody></table></div>
   </div>
   <div id="hoc-guides" class="mx-grid" data-source="m_hoc"></div>
@@ -482,6 +485,18 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
 
 <!-- PARTS -->
 <section class="mx-page" id="parts" role="tabpanel" aria-labelledby="tab-parts" hidden>
+  <div class="mx-card" id="card-stock">
+    <div class="mx-row"><h3>Workshop stock</h3><span class="mx-note" id="st-count"></span></div>
+    <p class="mx-note">What is on the workshop shelf now (Notion R&amp;M Parts), kept up to date from the stock photos posted in #machinery. "Fits" is every machine the part, or the genuine part it replaces, is listed for. Check here before starting a job or ordering.</p>
+    <div class="mx-ctl">
+      <select class="mx-sel" id="st-grp" aria-label="Type"><option value="">All types</option></select>
+      <label class="mx-note"><input type="checkbox" id="st-have" checked> On hand only</label>
+      <input class="mx-in" id="st-q" type="search" placeholder="Search part, number or machine" aria-label="Search workshop stock">
+    </div>
+    <div class="mx-tbox"><table class="mx-table" id="t-stock" data-source="m_stock" data-row-key="key"><thead><tr>
+      <th data-field="name">Item</th><th data-field="part_no">Part no.</th><th data-field="on_hand" class="n">On hand</th><th data-field="fits">Fits</th><th data-field="group" class="hn">Type</th><th data-field="counted" class="hn">Counted</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
   <div class="mx-card" id="card-order">
     <div class="mx-row"><h3>Order list, next 30 days</h3><span class="mx-note">Parts for every service overdue or due within 30 days, less stock on the shelf</span></div>
     <p class="mx-note">Prices are ex GST. Genuine: the latest supplier invoice first, then the club average cost from the workshop stock list, then what taskTracker recorded as paid, then Australian retail. Aftermarket: the cheapest credible equivalent (Courser, Turftines, JRM, R&amp;R, Ryco, Wesfil and others); every option is listed in the Parts catalogue and the parts explorer.</p>
@@ -690,7 +705,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   'use strict';
   var PAGES = ['today', 'plan', 'fleet', 'usage', 'cutting', 'parts', 'explore', 'costs', 'history', 'checks'];
   var state = { page: 'today', planSt: 'act', planCat: '', planKind: '', planQ: '', item: null, fleetCat: '', fleetSt: 'live', fleetQ: '', machine: null,
-                catModel: '', catKind: '', catQ: '', histQ: '', sev: 'check', sorts: {} };
+                catModel: '', catKind: '', catQ: '', histQ: '', sev: 'check', stQ: '', stGrp: '', stHave: true, sorts: {} };
   var f0 = d3.format(',.0f'), f1 = d3.format(',.1f'), f2 = d3.format(',.2f'), pct = d3.format('.0%');
   var DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   function D(id) { try { return dash.data(id); } catch (e) { return { status: 'error', data: [] }; } }
@@ -1164,6 +1179,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         if (c.note) li.appendChild(el('div', 'mx-wc-p', c.note));
         if (c.tasks && c.tasks.length) { var ul = el('ul'); c.tasks.slice(0, 4).forEach(function (t) { ul.appendChild(el('li', null, t)); }); li.appendChild(ul); }
         if (c.parts && c.parts.length) li.appendChild(el('div', 'mx-wc-p', 'Parts: ' + c.parts.join('; ')));
+        if (c.stock && c.stock.length) { var sk = el('div', 'mx-wc-s'); sk.appendChild(el('b', null, 'In the workshop')); c.stock.forEach(function (x) { sk.appendChild(el('div', null, x)); }); li.appendChild(sk); }
         var meta = []; if (c.labour_h) meta.push('Labour ~' + c.labour_h + ' h'); if (c.hours_now) meta.push('hours ~' + f0(c.hours_now)); if (c.ref) meta.push(c.ref);
         if (meta.length) li.appendChild(el('div', 'mx-wc-p', meta.join(' · ')));
         var job = jobFromCard(c); var uf = updFoot(c.upd, job, 'wl:' + (c.ref || job.ref)); if (uf) li.appendChild(uf);
@@ -1174,6 +1190,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     table('t-faults', R('m_faults'), {
       fleet: function (r) { var a = el('span', 'mx-wc-m', r.fleet || r.machine); a.addEventListener('click', function (e) { e.stopPropagation(); openMachine(r.fleet); }); return a; },
       job: function (r, td) { td.className = 'wrap'; var d = el('div', null, r.job); if (r.note) d.appendChild(el('div', 'mx-note', r.note));
+        if (r.stock && r.stock.length) d.appendChild(el('div', 'mx-note', 'In the workshop: ' + r.stock.join(' · ')));
         var uf = updFoot(r.upd, jobFromFault(r), 'f:' + r.id); if (uf) d.appendChild(uf); return d; },
       priority: function (r) { return pill(r.priority === 'High' ? 'overdue' : r.priority === 'Medium' ? 'due' : 'ok', r.priority + (r.safety ? ' · safety' : '')); },
       id: function (r) { return r.link ? link(r.link, r.id) : r.id; }
@@ -1256,7 +1273,8 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     parent.appendChild(dl);
     if (r.note) parent.appendChild(el('p', 'mx-note', r.note));
     if (r.tasks && r.tasks.length) { parent.appendChild(el('p', 'mx-sub', 'Tasks')); var ul = el('ul', 'mx-list'); r.tasks.forEach(function (t) { ul.appendChild(el('li', null, t)); }); parent.appendChild(ul); }
-    if (r.parts && r.parts.length) { parent.appendChild(el('p', 'mx-sub', 'Parts')); var ul2 = el('ul', 'mx-list'); r.parts.forEach(function (p) { var li = el('li', null, (p.name || '') + ' · ' + p.part_no + (p.qty && p.qty !== 1 ? ' × ' + p.qty : '') + (p.g_price != null ? ' · genuine $' + f2(p.g_price) : (p.am_price != null ? ' · genuine: quote' : '')) + (p.am_price != null ? ' · aftermarket from $' + f2(p.am_price) + (p.am_best ? ' (' + p.am_best + ')' : '') : '') + (p.g_price == null && p.am_price == null && p.price ? ' · $' + f2(p.price) : '') + (p.on_hand ? ' · ' + p.on_hand + ' on hand' : '') + (p.verified === 'no' ? ' · number not confirmed' : '')); if (p.link) { li.appendChild(document.createTextNode(' · ')); li.appendChild(link(p.link, 'buy / look up')); } ul2.appendChild(li); }); parent.appendChild(ul2); }
+    if (r.parts && r.parts.length) { parent.appendChild(el('p', 'mx-sub', 'Parts')); var ul2 = el('ul', 'mx-list'); r.parts.forEach(function (p) { var li = el('li', null, (p.name || '') + ' · ' + p.part_no + (p.qty && p.qty !== 1 ? ' × ' + p.qty : '') + (p.g_price != null ? ' · genuine $' + f2(p.g_price) : (p.am_price != null ? ' · genuine: quote' : '')) + (p.am_price != null ? ' · aftermarket from $' + f2(p.am_price) + (p.am_best ? ' (' + p.am_best + ')' : '') : '') + (p.g_price == null && p.am_price == null && p.price ? ' · $' + f2(p.price) : '') + (p.shelf ? ' · ' + p.shelf : (p.on_hand ? ' · ' + p.on_hand + ' on hand' : '')) + (p.verified === 'no' ? ' · number not confirmed' : '')); if (p.link) { li.appendChild(document.createTextNode(' · ')); li.appendChild(link(p.link, 'buy / look up')); } ul2.appendChild(li); }); parent.appendChild(ul2); }
+    if (r.stock && r.stock.length) { parent.appendChild(el('p', 'mx-sub', 'In the workshop')); var us = el('ul', 'mx-list'); r.stock.forEach(function (x) { us.appendChild(el('li', null, x)); }); parent.appendChild(us); }
     if (r.fluids && r.fluids.length) { parent.appendChild(el('p', 'mx-sub', 'Fluids')); var ul3 = el('ul', 'mx-list'); r.fluids.forEach(function (f) { ul3.appendChild(el('li', null, (f.what || '') + ': ' + (f.spec || '') + (f.qty_l ? ' · ' + f.qty_l + ' L' : ''))); }); parent.appendChild(ul3); }
   }
   function drawItem() {
@@ -1375,6 +1393,11 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         dt.appendChild(sm); var inner = el('div'); var uf = updFoot(it.upd, jobFromItem(it), 'i:' + it.id); if (uf) inner.appendChild(uf); itemBlock(it, inner); dt.appendChild(inner); box.appendChild(dt);
       });
     }
+    // workshop stock that fits this machine
+    var stk = R('m_stock').filter(function (x) { return (x.fleets || []).indexOf(r.fleet) >= 0 && x.on_hand > 0; });
+    if (stk.length) { var d8 = el('details', 'mx-iv'); d8.appendChild(el('summary', null, 'In the workshop for this machine (' + stk.length + ')')); var ul8 = el('ul', 'mx-list');
+      stk.forEach(function (x) { ul8.appendChild(el('li', null, f0(x.on_hand) + ' × ' + (x.part_no && (x.name || '').indexOf(x.part_no) < 0 ? x.part_no + ' ' : '') + x.name + (x.equiv ? ' (' + x.equiv + ')' : '') + (x.counted ? ' · counted ' + fmtDs(x.counted) : ''))); });
+      d8.appendChild(ul8); box.appendChild(d8); }
     // model bible
     var md = R('m_models').filter(function (m) { return m.slug === r.slug; })[0];
     if (md) {
@@ -1457,6 +1480,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       knives: function (r, td) { td.className = 'wrap'; var fit = (r.knives || []).filter(function (k) { return k.fits; });
         var pref = fit.filter(function (k) { return /tournament/i.test(k.name) && r.hoc >= 3; })[0] || fit[0];
         return pref ? pref.part_no + ' ' + pref.name + ' (' + pref.range + ')' + (fit.length > 1 ? ' · ' + (fit.length - 1) + ' other options fit' : '') : 'No listed knife covers this height'; },
+      stock: function (r, td) { td.className = 'wrap'; var d = el('div'); (r.stock || []).forEach(function (x) { d.appendChild(el('div', null, x)); }); return d; },
       backlap: function (r) { var b = r.backlap; if (!b) return ''; var s = el('span'); s.appendChild(pill(b.status, b.status)); s.appendChild(document.createTextNode(' last ' + (b.last ? fmtDs(b.last) : '–') + (b.due ? ' · due ' + fmtDs(b.due) : ''))); return s; },
       grind: function (r) { var b = r.grind; if (!b) return ''; var s = el('span'); s.appendChild(pill(b.status, b.status)); s.appendChild(document.createTextNode(' last ' + (b.last ? fmtDs(b.last) : '–') + (b.due ? ' · due ' + fmtDs(b.due) : '') + (b.every_h ? ' · every ' + b.every_h + ' h' : ''))); return s; }
     }, { onClick: function (k) { openMachine(k); } });
@@ -1466,6 +1490,20 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
 
   // ---------- parts
   function drawParts() {
+    if (!failed($('#t-stock'), 'm_stock')) {
+      var sall = R('m_stock').filter(function (r) { return r.key !== 'none'; }); var gs = $('#st-grp');
+      if (gs.options.length < 2 && sall.length) Array.from(new Set(sall.map(function (r) { return r.group; }))).sort().forEach(function (g) { gs.appendChild(new Option(g, g)); });
+      var sq = (state.stQ || '').toLowerCase();
+      var srows = sall.filter(function (r) { if (state.stHave && !(r.on_hand > 0) && !r.check) return false; if (state.stGrp && r.group !== state.stGrp) return false;
+        if (sq && [r.name, r.part_no, r.desc, r.equiv, r.fits, r.vendor, r.group].join(' ').toLowerCase().indexOf(sq) < 0) return false; return true; });
+      $('#st-count').textContent = srows.length + (srows.length === 1 ? ' item' : ' items');
+      table('t-stock', srows, {
+        name: function (r, td) { td.className = 'wrap'; var d = el('div', null, r.name); if (r.desc) d.appendChild(el('div', 'mx-note', r.desc)); if (r.equiv) d.appendChild(el('div', 'mx-note', 'Aftermarket ' + r.equiv)); return d; },
+        on_hand: function (r) { return r.check ? el('span', 'mx-stk-chk', 'count needed') : f0(r.on_hand); },
+        fits: function (r, td) { td.className = 'wrap'; return r.fits || ''; },
+        counted: function (r) { return r.counted ? fmtDs(r.counted) + (r.counted_how ? ' · ' + r.counted_how : '') : ''; }
+      }, { numeric: ['on_hand'], sortVal: { counted: function (r) { return r.counted || ''; } }, empty: 'Nothing matches.' });
+    }
     var pr = function (r) { return r.price ? f2(r.price) + (r.price_kind === 'equivalent' ? ' equiv.' : '') : ''; };
     table('t-order', R('m_order'), {
       g_price: function (r) { return r.g_price != null ? f2(r.g_price) : 'quote'; }, am_price: function (r) { return r.am_price != null ? f2(r.am_price) : ''; },
@@ -1505,6 +1543,9 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   $('#cat-kind').addEventListener('change', function (e) { state.catKind = e.target.value; drawParts(); });
   $('#cat-q').addEventListener('input', function (e) { state.catQ = e.target.value; drawParts(); });
   $('#pr-q').addEventListener('input', function (e) { state.prQ = e.target.value; drawParts(); });
+  $('#st-q').addEventListener('input', function (e) { state.stQ = e.target.value; drawParts(); });
+  $('#st-grp').addEventListener('change', function (e) { state.stGrp = e.target.value; drawParts(); });
+  $('#st-have').addEventListener('change', function (e) { state.stHave = e.target.checked; drawParts(); });
 
   // ---------- costs
   function drawCosts() {
