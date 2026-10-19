@@ -115,52 +115,63 @@ def sheet(fill, opacity, stroke='#13304A', sop=0.35, dash=''):
 
 
 def hero_svg():
+    """The hero as stacked, separately composited SVG layers.
+
+    Each layer is its own <svg> with the same viewBox, positioned over the others, so the
+    page can float and separate them with GPU transforms without re-drawing the map.
+    Moving parts (TurfRad scan sweep, water in the drainage pipes, job pins) live in small
+    overlay SVGs that travel with their layer.
+    """
     cm = D['course_map']
     by = lambda L: [c for c in cm if c['layer'] == L]
-    out = []
     vb_x = bx0 - 30
     vb_y = by0 - GAP * (LAYERS - 1) - 40
     vb_w = (LABEL_X + 300) - vb_x
     vb_h = (by1 + 30) - vb_y
     vbm_w = (bx1 + 30) - vb_x
-    out.append(f'<svg class="stack" viewBox="{vb_x:.0f} {vb_y:.0f} {vb_w:.0f} {vb_h:.0f}" '
-               f'data-vbm="{vb_x:.0f} {vb_y:.0f} {vbm_w:.0f} {vb_h:.0f}" '
-               f'role="img" aria-labelledby="stackTitle stackDesc" preserveAspectRatio="xMidYMid meet">')
-    out.append('<defs><filter id="soft" x="-10%" y="-10%" width="120%" height="130%"><feGaussianBlur stdDeviation="9"/></filter></defs>')
-    out.append('<title id="stackTitle">Ranfurlie Golf Club in four layers</title>')
-    out.append('<desc id="stackDesc">The course map, the latest moisture scan, the drainage plans and the '
-               'open jobs from Slack, drawn as layers stacked over the same ground.</desc>')
+    VB = f'{vb_x:.0f} {vb_y:.0f} {vb_w:.0f} {vb_h:.0f}'
+    VBM = f'{vb_x:.0f} {vb_y:.0f} {vbm_w:.0f} {vb_h:.0f}'
+    pct = lambda i: -GAP * i / vb_h * 100
 
-    def layer(i, inner, extra='', label=None):
-        dz = -GAP * i
-        g = [f'<g class="lyr lyr{i}" style="--dz:{dz}px;--i:{i}">']
-        if i:
-            g.append(f'<g transform="translate(0 16)"><g transform="{MAT}"><polygon points="{pts(bound)}" fill="#13304A" '
-                     f'fill-opacity=".16" filter="url(#soft)"/></g></g>')
-        g.append(f'<g transform="{MAT}">{inner}</g>')
-        g.append(extra)
-        if label:
-            ax, ay = anchor
-            ly = ay - 6
-            g.append(f'<g class="lbl"><path d="M{ax+6:.1f} {ay:.1f} L{LABEL_X-12:.1f} {ly:.1f}" class="lead"/>'
-                     f'<circle cx="{ax:.1f}" cy="{ay:.1f}" r="3.5" class="leaddot"/>'
-                     f'<text x="{LABEL_X:.1f}" y="{ly-6:.1f}" class="lt">{html.escape(label[0])}</text>'
-                     f'<text x="{LABEL_X:.1f}" y="{ly+20:.1f}" class="ls">{html.escape(label[1])}</text></g>')
-        g.append('</g>')
-        return ''.join(g)
+    def svg(cls, i, body, defs=''):
+        return (f'<svg class="sl {cls}" style="--dz:{pct(i):.3f}%;--i:{i}" viewBox="{VB}" '
+                f'preserveAspectRatio="xMidYMid meet" aria-hidden="true">{defs}{body}</svg>')
+
+    def shadow(i):
+        if not i:
+            return ''
+        return (f'<g transform="translate(0 16)"><g transform="{MAT}"><polygon points="{pts(bound)}" fill="#13304A" '
+                f'fill-opacity=".16" filter="url(#soft{i})"/></g></g>')
+
+    def soft(i):
+        return (f'<defs><filter id="soft{i}" x="-10%" y="-10%" width="120%" height="130%">'
+                f'<feGaussianBlur stdDeviation="9"/></filter></defs>') if i else ''
+
+    def label(i, a, b):
+        ax, ay = anchor
+        ly = ay - 6
+        return (f'<g class="lbl"><path d="M{ax+6:.1f} {ay:.1f} L{LABEL_X-12:.1f} {ly:.1f}" class="lead"/>'
+                f'<circle cx="{ax:.1f}" cy="{ay:.1f}" r="3.5" class="leaddot"/>'
+                f'<text x="{LABEL_X:.1f}" y="{ly-6:.1f}" class="lt">{html.escape(a)}</text>'
+                f'<text x="{LABEL_X:.1f}" y="{ly+20:.1f}" class="ls">{html.escape(b)}</text></g>')
+
+    layers = []
 
     # L0 the course
     inner = [sheet('#F7F9F5', 1, sop=.5)]
     for w in SCENE['water']:
         inner.append(f'<polygon points="{pts(w["ring"])}" fill="#9CC7DE"/>')
     for t in SCENE['trees']:
+        if t[2] < 3.2:
+            continue
         x, y = fy(t)
-        inner.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{max(2.5, t[2]*.7):.1f}" fill="#7FA486" fill-opacity=".28"/>')
+        inner.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{t[2]*.7:.1f}" fill="#7FA486" fill-opacity=".3"/>')
     colors = {'fairway': '#B5D3A8', 'approach': '#97C08E', 'tee': '#6FA675', 'green': '#2E6A46', 'bunker': '#E9D7A8'}
     for L in ('fairway', 'approach', 'tee', 'green', 'bunker'):
         for c in by(L):
             inner.append(f'<polygon points="{pts(c["pts"])}" fill="{colors[L]}"/>')
-    out.append(layer(0, ''.join(inner), label=('The course', 'Every green, tee, fairway and bunker')))
+    layers.append(svg('l0', 0, f'<g transform="{MAT}">{"".join(inner)}</g>' +
+                      label(0, 'The course', 'Every green, tee, fairway and bunker')))
 
     # L1 moisture
     inner = [sheet('#FBFCFA', .88)]
@@ -177,7 +188,18 @@ def hero_svg():
         inner.append(f'<polygon points="{pts(c["pts"])}" fill="{ramp(v)}" stroke="#13304A" stroke-opacity=".5" '
                      f'stroke-width="1" vector-effect="non-scaling-stroke"/>')
     dt = datetime.strptime(TR_DATE, '%Y-%m-%d')
-    out.append(layer(1, ''.join(inner), label=('How wet it is', f'TurfRad scan, {dt.day} {dt:%b}')))
+    layers.append(svg('l1', 1, shadow(1) + f'<g transform="{MAT}">{"".join(inner)}</g>' +
+                      label(1, 'How wet it is', f'TurfRad scan, {dt.day} {dt:%b}'), soft(1)))
+    # the radar sweep, clipped to the sheet, travelling with layer 1
+    fx0 = min(fy(p)[0] for p in bound) - 60; fx1 = max(fy(p)[0] for p in bound) + 60
+    fy0 = min(fy(p)[1] for p in bound) - 40; fy1 = max(fy(p)[1] for p in bound) + 40
+    scan = (f'<defs><clipPath id="sheetclip"><polygon points="{pts(bound)}"/></clipPath>'
+            f'<linearGradient id="scang" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#69C3EE" stop-opacity="0"/>'
+            f'<stop offset=".82" stop-color="#69C3EE" stop-opacity=".38"/><stop offset=".97" stop-color="#ffffff" stop-opacity=".95"/>'
+            f'<stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient></defs>'
+            f'<g transform="{MAT}"><g clip-path="url(#sheetclip)"><rect class="sweepband" x="{fx0-120:.0f}" y="{fy0:.0f}" '
+            f'width="120" height="{fy1-fy0:.0f}" fill="url(#scang)" style="--travel:{fx1-fx0+120:.0f}px"/></g></g>')
+    layers.append(svg('l1 fx scan', 1, scan))
 
     # L2 underground
     net = DRN['net']
@@ -193,42 +215,49 @@ def hero_svg():
             inner.append(f'<polyline points="{pts(ln)}" fill="none" stroke="#2B7A78" stroke-width="1" '
                          f'stroke-opacity=".8" vector-effect="non-scaling-stroke"/>')
     for p in net['pipes']:
-        inner.append(f'<polyline points="{pts(p["pts"])}" fill="none" stroke="#13304A" stroke-width="2.2" '
+        inner.append(f'<polyline points="{pts(p["pts"])}" fill="none" stroke="#13304A" stroke-width="2.4" '
                      f'vector-effect="non-scaling-stroke"/>')
     extra = []
     for p in net['pits'] + net['outfalls']:
         sx, sy = proj(*fy((p['x'], p['y'])))
         extra.append(f'<rect x="{sx-3:.1f}" y="{sy-3:.1f}" width="6" height="6" fill="#13304A"/>')
-    out.append(layer(2, ''.join(inner), ''.join(extra),
-                     label=("What's underground", 'Drainage plans, hole by hole')))
+    layers.append(svg('l2', 2, shadow(2) + f'<g transform="{MAT}">{"".join(inner)}</g>' + ''.join(extra) +
+                      label(2, "What's underground", 'Drainage plans, hole by hole'), soft(2)))
+    flow = ''.join(f'<polyline class="water" style="--k:{k%5}" points="{pts(p["pts"])}"/>' for k, p in enumerate(net['pipes']))
+    layers.append(svg('l2 fx flow', 2, f'<g transform="{MAT}">{flow}</g>'))
 
     # L3 jobs
     inner = [sheet('#FBFCFA', .74, dash='2 6')]
     for c in by('fairway') + by('green'):
         inner.append(f'<polygon points="{pts(c["pts"])}" fill="#2E6A46" fill-opacity=".09"/>')
-    extra = []
+    layers.append(svg('l3', 3, shadow(3) + f'<g transform="{MAT}">{"".join(inner)}</g>' +
+                      label(3, 'Jobs the crew reported', 'Posts and photos in Slack'), soft(3)))
     pins = ([('irr', p) for p in IRR['pins'] if p.get('live')] +
             [('drn', p) for p in DRN['pins'] if p.get('live')] +
             [('bnk', p) for p in BNK['pins'] if p.get('live')])
-    seen = set()
+    seen = set(); pg = []; n = 0
     for k, (kind, p) in enumerate(pins):
         sx, sy = proj(*fy((p['x'], p['y'])))
         key = (kind, round(sx / 4), round(sy / 4))
         if key in seen:
             continue
         seen.add(key)
-        pulse = ' pulse' if k % 5 == 0 else ''
-        extra.append(f'<g class="pin {kind}{pulse}" style="--d:{(k % 9) * .35:.2f}s">'
-                     f'<line x1="{sx:.1f}" y1="{sy:.1f}" x2="{sx:.1f}" y2="{sy-16:.1f}"/>'
-                     f'<circle class="ring" cx="{sx:.1f}" cy="{sy-16:.1f}" r="5"/>'
-                     f'<circle cx="{sx:.1f}" cy="{sy-16:.1f}" r="5"/></g>')
-    out.append(layer(3, ''.join(inner), ''.join(extra),
-                     label=('Jobs the crew reported', 'Posts and photos in Slack')))
-    out.append('</svg>')
+        pulse = ' pulse' if n % 4 == 0 else ''
+        pg.append(f'<g class="pin {kind}{pulse}" style="--n:{n};--d:{(n % 7) * .45:.2f}s">'
+                  f'<line x1="{sx:.1f}" y1="{sy:.1f}" x2="{sx:.1f}" y2="{sy-16:.1f}"/>'
+                  f'<circle class="ring" cx="{sx:.1f}" cy="{sy-16:.1f}" r="5"/>'
+                  f'<circle class="head" cx="{sx:.1f}" cy="{sy-16:.1f}" r="5"/></g>')
+        n += 1
+    layers.append(svg('l3 fx pins', 3, ''.join(pg)))
+
+    out = (f'<div class="stack" id="stack" role="img" aria-label="Ranfurlie Golf Club in four layers: the course map, '
+           f'the latest moisture scan, the drainage plans and the open jobs from Slack, stacked over the same ground." '
+           f'data-vb="{VB}" data-vbm="{VBM}" style="--ar:{vb_w:.0f}/{vb_h:.0f};--arm:{vbm_w:.0f}/{vb_h:.0f}">'
+           + ''.join(layers) + '</div>')
     counts = {'irr': sum(1 for p in IRR['pins'] if p.get('live')),
               'drn': sum(1 for p in DRN['pins'] if p.get('live')),
               'bnk': sum(1 for p in BNK['pins'] if p.get('live'))}
-    return '\n'.join(out), counts
+    return out, counts
 
 
 # ---------------------------------------------------------------- one green, close up

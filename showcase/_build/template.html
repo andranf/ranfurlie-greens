@@ -2,7 +2,7 @@
 <html lang="en-AU">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ranfurlie Golf Club: every system on the course, talking to each other</title>
 <meta name="description" content="How the course maintenance team at Ranfurlie Golf Club uses Claude to join up Cirrus Pro, TurfRad, TurfDog, Slack, Notion and twenty-odd other systems, so we can act before the turf tells us something is wrong.">
 <meta property="og:type" content="website">
@@ -17,121 +17,168 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2313304A'/%3E%3Cpath d='M9 26V6l12 5-10 4' fill='none' stroke='%23EDF1EC' stroke-width='2.4' stroke-linejoin='round'/%3E%3Ccircle cx='9' cy='26' r='2' fill='%2369C3EE'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Big+Shoulders+Display:wght@600;700;800;900&family=Big+Shoulders+Text:wght@500;600;700&display=swap" rel="stylesheet">
-<script>document.documentElement.classList.add('js');if(/[?&]og\b/.test(location.search))document.documentElement.classList.add('og')</script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Big+Shoulders+Display:wght@700;800&family=Big+Shoulders+Text:wght@600;700&display=swap" rel="stylesheet">
+<script>
+(function(d){var h=d.documentElement;h.classList.add('js');
+if(/[?&]og\b/.test(location.search))h.classList.add('og');
+if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)h.classList.add('still');})(document);
+</script>
 <style>
 :root{
   color-scheme:light;
   --paper:#EDF1EC; --paper-2:#E2E9E1; --sheet:#FAFBF8;
   --ink:#13304A; --ink-2:#465F72; --ink-3:#768A98; --rule:#C3CFC5;
-  --turf:#2E6A46; --turf-2:#8DB98F; --turf-3:#C5DDBE; --sand:#E9D7A8;
-  --water:#1C74C4; --dry:#C07A17; --flag:#C2372C; --drain:#2B7A78; --grey:#7D8F9C;
+  --turf:#2E6A46; --turf-2:#8DB98F; --sand:#E9D7A8;
+  --water:#1C74C4; --dry:#C07A17; --flag:#C2372C; --drain:#2B7A78;
   --night:#0F2438; --night-2:#17324D; --night-3:#24476A; --night-ink:#E8EFF5; --night-ink-2:#A9BCCB; --spray:#69C3EE;
   --display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
   --label:'Big Shoulders Text','Arial Narrow',sans-serif;
   --body:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --wrap:1240px; --gut:clamp(16px,4vw,40px);
+  --wrap:1240px; --gut:clamp(18px,4vw,40px);
+  --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{margin:0;background:var(--paper);color:var(--ink);font:400 18px/1.6 var(--body);overflow-x:hidden}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:64px}
+html.still{scroll-behavior:auto}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 18px/1.6 var(--body);overflow-x:hidden;-webkit-tap-highlight-color:rgba(28,116,196,.15)}
 img{max-width:100%;display:block;height:auto}
 a{color:var(--water);text-underline-offset:3px;text-decoration-thickness:1px}
 a:hover{text-decoration-thickness:2px}
 :focus-visible{outline:3px solid var(--water);outline-offset:3px;border-radius:4px}
-.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut)}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--gut);padding-left:max(var(--gut),env(safe-area-inset-left));padding-right:max(var(--gut),env(safe-area-inset-right))}
 h1,h2,h3{font-family:var(--display);font-weight:800;line-height:.94;letter-spacing:.002em;margin:0;color:inherit}
 h2{font-size:clamp(42px,5.4vw,76px);max-width:16ch}
 h3{font-size:30px;font-weight:700;line-height:1}
 p{margin:0 0 1em}
-.lede{font-size:clamp(19px,1.6vw,21px);line-height:1.58;max-width:58ch}
-.sec{padding:clamp(72px,10vw,136px) 0}
+.lede{font-size:clamp(18px,1.6vw,21px);line-height:1.58;max-width:58ch}
+.sec{padding:clamp(72px,10vw,136px) 0;position:relative}
 .alt{background:var(--paper-2)}
-.head{display:grid;gap:22px;margin-bottom:clamp(36px,5vw,64px)}
+.head{display:grid;gap:22px;margin-bottom:clamp(32px,5vw,64px)}
 .head p{max-width:62ch;color:var(--ink-2)}
 .head p strong{color:var(--ink)}
 .small{font-size:15px;line-height:1.5;color:var(--ink-2)}
-.num{font-family:var(--display);font-weight:800}
+
+/* ---------- motion system */
+.split .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.14em;margin-bottom:-.14em}
+.split .w>i{display:inline-block;font-style:normal;transform:translate3d(0,108%,0);transition:transform 1s var(--ease) calc(var(--k)*60ms)}
+.split.in .w>i{transform:none}
+.js [data-r]{opacity:0;transform:translate3d(0,30px,0);transition:opacity .8s ease var(--rd,0s),transform 1s var(--ease) var(--rd,0s)}
+.js [data-r].in{opacity:1;transform:none}
+.js [data-r=wipe]{transform:none;transition:opacity .45s ease var(--rd,0s)}
+.js [data-r=wipe]>*{clip-path:inset(0 100% 0 0);transition:clip-path 1.25s cubic-bezier(.7,0,.2,1) calc(var(--rd,0s) + .08s)}
+.js [data-r=wipe].in>*{clip-path:inset(0 0 0 0)}
+.js [data-r=pop]{transform:translate3d(0,40px,0) scale(.94)}
+.js [data-r=deal]{transform:translate3d(-24px,-10px,0) rotate(-3deg)}
+.js [data-r=left]{transform:translate3d(-40px,0,0)}
+.still .sl{transition:none!important}
+.still .split .w>i,.still [data-r],.still [data-r]>*{transition:none!important;transform:none!important;opacity:1!important;clip-path:none!important}
+.still *,.still *::before,.still *::after{animation:none!important}
+.progress{position:fixed;left:0;right:0;top:0;height:3px;z-index:40;pointer-events:none}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--turf),var(--spray));transform-origin:0 50%;transform:scaleX(0)}
 
 /* ---------- top bar */
-.top{position:sticky;top:0;z-index:20;background:rgba(237,241,236,.86);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
+.top{position:sticky;top:0;z-index:30;background:rgba(237,241,236,.86);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px);border-bottom:1px solid transparent;transition:border-color .2s}
 .top.scrolled{border-bottom-color:var(--rule)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
 .brand b{font:800 22px/1 var(--display);letter-spacing:.01em}
 .brand span{font-size:14px;color:var(--ink-2)}
 .brand svg{flex:none}
+.brand .flag{transform-origin:9px 6px;animation:wave 3.6s ease-in-out infinite}
+@keyframes wave{0%,100%{transform:skewY(0)}50%{transform:skewY(-6deg) scaleX(.92)}}
 .nav{display:flex;gap:22px;font-size:15px}
-.nav a{color:var(--ink-2);text-decoration:none}
-.nav a:hover{color:var(--ink)}
-@media (max-width:860px){.nav{display:none}.brand span{display:none}}
+.nav a{color:var(--ink-2);text-decoration:none;position:relative}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:var(--turf);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.nav a:hover{color:var(--ink)}.nav a:hover::after,.nav a.on::after{transform:scaleX(1)}
+.jump{display:none;font:700 15px/1 var(--body);color:var(--ink);text-decoration:none;border:1.5px solid var(--ink);border-radius:999px;padding:9px 14px}
+@media (max-width:860px){.nav{display:none}.brand span{display:none}.top .wrap{height:54px}.jump{display:inline-flex}}
 
 /* ---------- hero */
-.hero{position:relative;padding:clamp(28px,5vw,56px) 0 clamp(56px,8vw,96px);overflow:hidden}
-.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(19,48,74,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(19,48,74,.055) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:linear-gradient(180deg,#000 30%,transparent 95%);mask-image:linear-gradient(180deg,#000 30%,transparent 95%);pointer-events:none}
-.hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,4.4fr) minmax(0,7.6fr);gap:clamp(24px,4vw,56px);align-items:center}
-.hero h1{font-size:clamp(50px,6.3vw,94px);line-height:.9;max-width:9.5ch;margin-bottom:26px}
-.hero .facts{font-size:17px;color:var(--ink-2);border-left:3px solid var(--turf);padding:2px 0 2px 16px;margin:26px 0 30px;max-width:46ch}
-.hero .facts strong{font:800 1.35em/1 var(--display);color:var(--ink);letter-spacing:.01em}
+.hero{position:relative;padding:clamp(22px,5vw,56px) 0 clamp(56px,8vw,96px);overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-44px 0 0 -44px;background-image:linear-gradient(rgba(19,48,74,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(19,48,74,.055) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:linear-gradient(180deg,#000 30%,transparent 95%);mask-image:linear-gradient(180deg,#000 30%,transparent 95%);pointer-events:none;animation:grid 40s linear infinite}
+@keyframes grid{to{transform:translate3d(44px,44px,0)}}
+.hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,4.4fr) minmax(0,7.6fr);grid-template-areas:"head fig" "body fig";column-gap:clamp(24px,4vw,56px);align-items:center}
+.hero-head{grid-area:head;align-self:end}
+.hero-body{grid-area:body;align-self:start}
+.hero-fig{grid-area:fig;margin:0 calc(var(--gut)*-1) 0 0;position:relative}
+.hero h1{font-size:clamp(46px,6.3vw,94px);line-height:.9;max-width:9.5ch;margin-bottom:24px}
+.hero .facts{font-size:17px;color:var(--ink-2);border-left:3px solid var(--turf);padding:2px 0 2px 16px;margin:24px 0 28px;max-width:46ch}
+.hero .facts strong{font:800 1.4em/1 var(--display);color:var(--ink);letter-spacing:.01em;display:inline-block;min-width:1ch}
 .ctas{display:flex;flex-wrap:wrap;gap:12px}
-.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 20px;border-radius:999px;font:700 16px/1 var(--body);text-decoration:none;border:1.5px solid var(--ink);color:var(--ink);background:transparent;cursor:pointer;transition:background .2s,color .2s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:999px;font:700 16px/1 var(--body);text-decoration:none;border:1.5px solid var(--ink);color:var(--ink);background:transparent;cursor:pointer;transition:background .2s,color .2s,transform .2s}
 .btn.solid{background:var(--ink);color:var(--paper)}
 .btn:hover{background:var(--ink);color:var(--paper)}
+.btn:active{transform:scale(.97)}
 .btn.solid:hover{background:var(--night-3);border-color:var(--night-3)}
-.hero-fig{margin:0 calc(var(--gut)*-1) 0 0;position:relative}
-.stack{width:100%;height:auto;overflow:visible;display:block}
-.stack .lyr{transform:translateY(var(--dz));transition:transform 1.5s cubic-bezier(.16,.84,.2,1) calc(.25s + var(--i)*.14s),opacity .9s ease calc(.25s + var(--i)*.14s)}
-.js .stack:not(.open) .lyr{transform:translateY(0)}
-.js .stack:not(.open) .lyr:not(.lyr0){opacity:0}
-.stack .lbl{transition:opacity .7s ease calc(1.35s + var(--i)*.14s)}
+.stack{position:relative;width:100%;aspect-ratio:var(--ar)}
+.sl{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transform:translate3d(0,var(--dz),0);transition:transform 1.6s cubic-bezier(.16,.84,.2,1) calc(.3s + var(--i)*.16s),opacity .9s ease calc(.3s + var(--i)*.16s);will-change:transform}
+.js .stack:not(.open) .sl{transform:translate3d(0,0,0)}
+.js .stack:not(.open) .sl:not(.l0){opacity:0}
+.stack.float .sl:not(.l0){animation:float 7.5s ease-in-out calc(var(--i)*.9s) infinite}
+@keyframes float{0%,100%{transform:translate3d(0,var(--dz),0)}50%{transform:translate3d(0,calc(var(--dz) - 1.6%),0)}}
+.stack .lbl{transition:opacity .7s ease calc(1.5s + var(--i)*.16s)}
 .js .stack:not(.open) .lbl{opacity:0}
 .stack .lead{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-dasharray:3 5}
 .stack .leaddot{fill:var(--ink)}
 .stack .lt{font:700 40px var(--display);fill:var(--ink)}
 .stack .ls{font:400 22px var(--body);fill:var(--ink-2)}
+.sweepband{animation:sweep 6s cubic-bezier(.45,0,.55,1) 2.2s infinite}
+@keyframes sweep{0%{transform:translateX(0)}62%,100%{transform:translateX(var(--travel))}}
+.water{fill:none;stroke:var(--spray);stroke-width:3;stroke-linecap:round;stroke-dasharray:3 15;vector-effect:non-scaling-stroke;animation:flowd 1.3s linear infinite;animation-delay:calc(var(--k)*-.26s)}
+@keyframes flowd{to{stroke-dashoffset:-18}}
 .pin line{stroke:var(--ink);stroke-width:1.4}
 .pin circle{fill:var(--water);stroke:#fff;stroke-width:1.6}
-.pin.drn circle{fill:var(--drain)}
-.pin.bnk circle{fill:var(--dry)}
-.pin .ring{fill:none;stroke:var(--water);stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center}
+.pin.drn circle{fill:var(--drain)}.pin.bnk circle{fill:var(--dry)}
+.pin .ring{fill:none!important;stroke:var(--water);stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center}
 .pin.drn .ring{stroke:var(--drain)}.pin.bnk .ring{stroke:var(--dry)}
-.stack.open .pin.pulse .ring{animation:ping 3.2s ease-out calc(2.4s + var(--d)) infinite}
-@keyframes ping{0%{opacity:.85;transform:scale(1)}70%,100%{opacity:0;transform:scale(3.4)}}
-@media (prefers-reduced-motion:reduce){.stack .lyr,.stack .lbl{transition:none}.stack.open .pin.pulse .ring{animation:none}}
-.legend{list-style:none;padding:0;margin:14px 0 0;display:none;gap:10px}
-.legend li{display:grid;grid-template-columns:14px 1fr;gap:10px;align-items:start;font-size:15px;line-height:1.35}
-.legend i{width:14px;height:14px;border-radius:3px;margin-top:3px}
-.legend b{display:block;font:700 19px/1.1 var(--display)}
+.js .pin{opacity:0;transform:translate3d(0,-70px,0)}
+.stack.open .pin{animation:drop .75s cubic-bezier(.3,1.5,.5,1) calc(1.7s + var(--n)*28ms) forwards}
+@keyframes drop{to{opacity:1;transform:none}}
+.stack.float .pin.pulse .ring{animation:ping 3.2s ease-out var(--d) infinite}
+@keyframes ping{0%{opacity:.9;transform:scale(1)}70%,100%{opacity:0;transform:scale(3.6)}}
+.stack.paused *,.paused *{animation-play-state:paused!important}
+.legend{list-style:none;padding:0;margin:10px 0 0;display:none;grid-template-columns:1fr 1fr;gap:10px 14px}
+.legend li{display:grid;grid-template-columns:12px 1fr;gap:8px;align-items:start;font-size:13px;line-height:1.3;color:var(--ink-2)}
+.legend i{width:12px;height:12px;border-radius:3px;margin-top:2px}
+.legend b{display:block;font:700 17px/1.05 var(--display);color:var(--ink);margin-bottom:2px}
 .figcap{font-size:14px;color:var(--ink-3);margin-top:10px;max-width:60ch}
 .ramp{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
-.ramp i{display:inline-block;width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,#C7731F,#E0AE45,#D6D8A0,#7FB8D8,#2C78BE,#1B4F8F)}
+.ramp i{display:inline-block;width:110px;height:8px;border-radius:4px;background:linear-gradient(90deg,#C7731F,#E0AE45,#D6D8A0,#7FB8D8,#2C78BE,#1B4F8F)}
+.scrollcue{display:none}
 @media (max-width:980px){
-  .hero-grid{grid-template-columns:1fr}
-  .hero h1{max-width:11ch}
+  .hero-grid{grid-template-columns:1fr;grid-template-areas:"head" "fig" "body"}
+  .hero-fig{margin:4px calc(var(--gut)*-.6) 0}
+  .hero h1{max-width:12ch;margin-bottom:10px}
+  .stack{aspect-ratio:var(--arm)}
   .stack .lbl{display:none}
   .legend{display:grid}
+  .hero-body{margin-top:26px}
 }
 
 /* ---------- connected */
 .flow{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,320px) minmax(0,1fr);gap:clamp(40px,7vw,110px);align-items:center}
 .flow-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .flow-lines path{fill:none;stroke-width:1.6;stroke-linecap:round}
-.flow-lines .in{stroke:var(--water);stroke-opacity:.55}
-.flow-lines .out{stroke:var(--turf);stroke-opacity:.6}
-.flow-lines .run{stroke-dasharray:2 14;stroke-width:3;stroke-opacity:.95;animation:run 2.6s linear infinite}
-.flow-lines.paused .run{animation-play-state:paused}
+.flow-lines .in{stroke:var(--water);stroke-opacity:.5}
+.flow-lines .out{stroke:var(--turf);stroke-opacity:.55}
+.flow-lines .run{stroke-dasharray:2 14;stroke-width:3.2;stroke-opacity:.95;animation:run 2.4s linear infinite}
 @keyframes run{to{stroke-dashoffset:-32}}
-@media (prefers-reduced-motion:reduce){.flow-lines .run{display:none}}
+.flow-lines .draw{stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset 1.4s var(--ease) var(--rd,0s)}
+.flow.in .flow-lines .draw{stroke-dashoffset:0}
 .col{display:grid;gap:14px;position:relative;z-index:1}
 .col-title{font:700 22px/1 var(--display);margin:0 0 4px;color:var(--ink-2)}
-.grp{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px 16px 12px}
+.grp{background:var(--sheet);border:1px solid var(--rule);border-radius:14px;padding:14px 16px 12px;transition:border-color .3s,box-shadow .3s}
+.grp:hover{border-color:var(--turf-2);box-shadow:0 10px 30px -18px rgba(19,48,74,.4)}
 .grp h4{margin:0 0 6px;font:700 19px/1.1 var(--display);color:var(--ink)}
 .grp ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
 .grp li{font-size:15px;line-height:1.4;color:var(--ink-2)}
 .grp li b{color:var(--ink);font-weight:700}
 .both{display:inline-block;font-size:12px;font-weight:700;color:var(--turf);border:1px solid var(--turf-2);border-radius:999px;padding:0 7px;margin-left:4px;vertical-align:1px}
-.core{position:relative;z-index:1;background:var(--ink);color:var(--paper);border-radius:22px;padding:28px 26px 24px;box-shadow:0 30px 60px -30px rgba(19,48,74,.6)}
+.core{position:relative;z-index:1;background:var(--ink);color:var(--paper);border-radius:22px;padding:28px 26px 24px;box-shadow:0 30px 60px -30px rgba(19,48,74,.6);overflow:hidden}
+.core::before{content:"";position:absolute;inset:-40%;background:conic-gradient(from 0deg,transparent 0 70%,rgba(105,195,238,.35) 80%,transparent 90%);animation:spin 6s linear infinite}
+.core::after{content:"";position:absolute;inset:2px;border-radius:20px;background:var(--ink)}
+.core>*{position:relative;z-index:1}
+@keyframes spin{to{transform:rotate(360deg)}}
 .core h3{font-size:54px;font-weight:800;margin-bottom:10px}
 .core p{font-size:16px;line-height:1.5;color:#C9D6E1;margin:0 0 12px}
 .core p:last-child{margin:0}
@@ -139,77 +186,117 @@ p{margin:0 0 1em}
 .core .verbs span{color:var(--spray)}
 .down{display:none}
 @media (max-width:980px){
-  .flow{grid-template-columns:1fr;gap:18px}
+  .flow{grid-template-columns:1fr;gap:12px}
   .flow-lines{display:none}
-  .down{display:flex;justify-content:center;color:var(--ink-3)}
+  .down{display:flex;justify-content:center;height:46px;color:var(--ink-3)}
+  .down path{stroke-dasharray:4 6;animation:run 1s linear infinite}
+  .col{gap:10px}
+  .grp{padding:12px 14px 10px}
+  .grp li{font-size:14.5px}
+  .core{padding:24px 22px 22px}
+  .core h3{font-size:46px}
 }
 
 /* ---------- clock */
-.clock-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,5vw,72px);align-items:start}
-.dial{width:100%;max-width:640px;height:auto;display:block;margin:0 auto;touch-action:manipulation}
+.clock-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(24px,5vw,72px);align-items:start}
+.dial{width:100%;max-width:640px;height:auto;display:block;margin:0 auto;touch-action:manipulation;overflow:visible}
 .dial .rg{fill:none;stroke:var(--rule);stroke-width:1}
 .dial .hr{stroke:var(--ink-3);stroke-width:1}
 .dial .hl{font:600 17px var(--label);fill:var(--ink-2);text-anchor:middle;dominant-baseline:middle}
-.dial .dot{cursor:pointer;transition:opacity .2s,r .2s}
-.dial.sel .dot{opacity:.16}
-.dial.sel .dot.on{opacity:1}
+.dial .dot{cursor:pointer;transition:opacity .25s;transform-box:fill-box;transform-origin:center}
+.js .dial .dot{opacity:0;transform:scale(.2)}
+.dial.go .dot{animation:dotin .5s var(--ease) calc(.15s + var(--a)*1.9s) forwards}
+@keyframes dotin{to{opacity:1;transform:none}}
+.dial.done .dot{opacity:1;transform:none;animation:none}
+.still .dial .dot{opacity:1;transform:none}
+.dial.sel .dot{opacity:.15!important}
+.dial.sel .dot.on{opacity:1!important;transform:scale(1.35)}
+.dial .hand{stroke:var(--ink);stroke-width:2;stroke-linecap:round;opacity:0}
+.dial.go .hand{animation:hand 2.05s cubic-bezier(.45,0,.3,1) .1s forwards}
+@keyframes hand{0%{opacity:.9;transform:rotate(0)}92%{opacity:.9}100%{opacity:0;transform:rotate(360deg)}}
+.dial .now line{stroke:var(--flag);stroke-width:3;stroke-linecap:round}
+.dial .now circle{fill:var(--flag)}
+.dial .now text{font:700 16px var(--label);fill:var(--flag);text-anchor:middle;dominant-baseline:middle}
+.dial .now{opacity:0;transition:opacity .6s ease 2.2s}
+.dial.go .now{opacity:1}
+.dial .now .glow{fill:var(--flag);opacity:.25;transform-box:fill-box;transform-origin:center;animation:ping 2.4s ease-out 2.6s infinite}
 .dial .ctr-n{font:800 64px var(--display);fill:var(--ink);text-anchor:middle}
 .dial .ctr-l{font:400 15px var(--body);fill:var(--ink-2);text-anchor:middle}
 .dial .ctr-t{font:800 40px var(--display);fill:var(--ink);text-anchor:middle}
-.keys{display:flex;flex-wrap:wrap;gap:8px 18px;margin:18px 0 0;padding:0;list-style:none;font-size:14px;color:var(--ink-2)}
+.keys{display:flex;flex-wrap:wrap;gap:8px 16px;margin:18px 0 0;padding:0;list-style:none;font-size:14px;color:var(--ink-2)}
 .keys li{display:flex;align-items:center;gap:7px}
 .keys i{width:11px;height:11px;border-radius:50%}
 .keys .ww{width:22px;height:5px;border-radius:3px;background:var(--water)}
+.keys .nw{width:16px;height:3px;border-radius:2px;background:var(--flag)}
 .pick{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:22px 22px 18px;min-height:190px}
 .pick .when{font:700 20px/1.1 var(--display);color:var(--ink-2);margin-bottom:6px}
 .pick h3{margin-bottom:10px}
 .pick p{margin:0;color:var(--ink-2);font-size:16px}
+.pick .next{margin-top:14px;padding-top:12px;border-top:1px dashed var(--rule);font-size:15px;color:var(--ink-2)}
+.pick .next b{color:var(--flag)}
+.pick.swap{animation:swap .45s var(--ease)}
+@keyframes swap{from{opacity:.2;transform:translateY(8px)}}
 .tasklist{list-style:none;margin:22px 0 0;padding:0;columns:2;column-gap:20px;font-size:14px}
 .tasklist li{break-inside:avoid}
-.tasklist button{all:unset;cursor:pointer;display:grid;grid-template-columns:62px 1fr;gap:6px;width:100%;padding:4px 6px;border-radius:6px;line-height:1.3;color:var(--ink-2)}
+.tasklist button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:62px 1fr;gap:6px;width:100%;padding:4px 6px;border-radius:6px;line-height:1.3;color:var(--ink-2)}
 .tasklist button:hover,.tasklist button[aria-pressed=true]{background:var(--sheet);color:var(--ink)}
 .tasklist button:focus-visible{outline:2px solid var(--water)}
 .tasklist .t{font:600 15px/1.3 var(--label);color:var(--ink)}
 .tasklist .c{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
-@media (max-width:980px){.clock-grid{grid-template-columns:1fr}}
-@media (max-width:520px){.tasklist{columns:1}}
+.more{display:none}
+@media (max-width:980px){.clock-grid{grid-template-columns:1fr}.dial{max-width:520px;margin:0 -6px}}
+@media (max-width:620px){
+  .tasklist{columns:1}
+  .tasklist button{min-height:42px;align-items:center;padding:6px 8px;font-size:15px}
+  .tasklist.short li:nth-child(n+7){display:none}
+  .more{display:inline-flex;margin-top:12px;width:100%}
+  .pick{min-height:0}
+}
 
 /* ---------- spatially (night) */
-.night{background:radial-gradient(1200px 600px at 80% 0%,#1B3C5C 0%,transparent 60%),var(--night);color:var(--night-ink)}
+.night{background:radial-gradient(1200px 600px at 80% 0%,#1B3C5C 0%,transparent 60%),var(--night);color:var(--night-ink);overflow:hidden}
 .night .head p{color:var(--night-ink-2)}
 .night .head p strong{color:#fff}
 .night a{color:var(--spray)}
-.sc-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(28px,5vw,64px);align-items:center}
+.drops{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.drops i{position:absolute;width:2px;height:60px;border-radius:2px;background:linear-gradient(180deg,transparent,rgba(105,195,238,.55));opacity:0;animation:fall linear infinite}
+@keyframes fall{0%{transform:translate3d(20px,-45vh,0);opacity:0}15%,80%{opacity:var(--o)}100%{transform:translate3d(-20px,45vh,0);opacity:0}}
+.sc-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(24px,5vw,64px);align-items:center;position:relative}
 .greenbox{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));border:1px solid rgba(169,188,203,.18);border-radius:22px;padding:10px}
 .gsvg{width:100%;height:auto;display:block}
 .gsvg .hd{fill:#fff;stroke:var(--night);stroke-width:.5}
 .gsvg .hn{font:600 2.9px var(--label);fill:var(--night-ink-2);text-anchor:middle}
 .gsvg .ht{font:800 4.1px var(--display);fill:#fff;text-anchor:middle;paint-order:stroke;stroke:#1D4434;stroke-width:.8px}
-.gsvg .throw{fill:var(--spray);transition:fill-opacity .7s ease}
+.gsvg .throw{fill:var(--spray);transition:fill-opacity .9s ease}
 .gsvg .sweep{fill:var(--spray);fill-opacity:.22}
-.seg{display:inline-flex;background:var(--night-2);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap}
-.seg button{all:unset;cursor:pointer;padding:10px 16px;border-radius:999px;font:700 15px/1.1 var(--body);color:var(--night-ink-2)}
+.gsvg .hdring{fill:none;stroke:var(--spray);stroke-width:.35;transform-box:fill-box;transform-origin:center;animation:ping 2.6s ease-out infinite;animation-delay:var(--d)}
+.seg{display:inline-flex;background:var(--night-2);border-radius:999px;padding:4px;gap:4px}
+.seg button{all:unset;box-sizing:border-box;cursor:pointer;min-height:42px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:999px;font:700 15px/1.1 var(--body);color:var(--night-ink-2);transition:background .3s,color .3s}
 .seg button[aria-pressed=true]{background:var(--night-ink);color:var(--night)}
 .seg button:focus-visible{outline:2px solid var(--spray);outline-offset:2px}
 .bars{list-style:none;margin:22px 0 14px;padding:0;display:grid;gap:9px}
-.bars li{display:grid;grid-template-columns:52px 1fr 54px;gap:12px;align-items:center;font-size:15px}
+.bars li{display:grid;grid-template-columns:52px 1fr 58px;gap:12px;align-items:center;font-size:15px}
 .bars .n{font:700 17px/1 var(--label);color:var(--night-ink)}
 .bars .b{height:12px;border-radius:6px;background:rgba(169,188,203,.16);overflow:hidden}
-.bars .b i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#3E8FD0,var(--spray));transition:width .8s cubic-bezier(.2,.8,.2,1)}
-.bars .v{font:800 19px/1 var(--display);text-align:right;color:#fff}
+.bars .b i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#3E8FD0,var(--spray));transition:width 1s var(--ease);position:relative;overflow:hidden}
+.bars .b i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-100%);animation:shine 2.8s ease-in-out infinite}
+@keyframes shine{60%,100%{transform:translateX(100%)}}
+.bars .v{font:800 19px/1 var(--display);text-align:right;color:#fff;font-variant-numeric:tabular-nums}
 .bars .r{grid-column:2/4;font-size:13px;color:var(--night-ink-2);margin-top:-5px}
 .note{font-size:14px;color:var(--night-ink-2);line-height:1.5}
 .steps{list-style:none;counter-reset:s;margin:clamp(56px,8vw,96px) 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:34px 40px}
-.steps li{counter-increment:s;border-top:1px solid rgba(169,188,203,.28);padding-top:16px}
+.steps li{counter-increment:s;border-top:1px solid rgba(169,188,203,.28);padding-top:16px;position:relative}
+.steps li::after{content:"";position:absolute;left:0;top:-1px;height:2px;width:100%;background:var(--spray);transform:scaleX(0);transform-origin:left;transition:transform 1.1s var(--ease) calc(var(--rd,0s) + .2s)}
+.steps li.in::after{transform:scaleX(1)}
 .steps li::before{content:counter(s);display:block;font:800 46px/1 var(--display);color:var(--spray);margin-bottom:8px}
 .steps h3{font-size:28px;margin-bottom:8px}
 .steps p{font-size:16px;color:var(--night-ink-2);margin:0}
 @media (max-width:860px){.steps{grid-template-columns:1fr 1fr}}
-@media (max-width:520px){.steps{grid-template-columns:1fr}}
+@media (max-width:560px){.steps{grid-template-columns:1fr;gap:26px}.steps li{display:grid;grid-template-columns:44px 1fr;column-gap:12px}.steps li::before{grid-row:1/3;font-size:40px}}
 .ledger{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:clamp(56px,8vw,90px);padding-top:30px;border-top:1px solid rgba(169,188,203,.28)}
 .ledger div{font-size:16px;color:var(--night-ink-2);line-height:1.45}
-.ledger b{display:block;font:800 clamp(52px,6vw,78px)/.95 var(--display);color:#fff;margin-bottom:8px}
-@media (max-width:760px){.ledger{grid-template-columns:1fr}}
+.ledger b{display:block;font:800 clamp(56px,6vw,78px)/.95 var(--display);color:#fff;margin-bottom:8px;font-variant-numeric:tabular-nums}
+@media (max-width:760px){.ledger{grid-template-columns:1fr;gap:26px}}
 .slack{margin-top:clamp(56px,8vw,90px);display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,4vw,56px);align-items:start}
 .msg{background:#fff;color:#1d1c1d;border-radius:14px;padding:18px 20px;font:15px/1.5 -apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)}
 .msg .ch{font-weight:700;color:#616061;font-size:13px;margin-bottom:10px;border-bottom:1px solid #eee;padding-bottom:8px}
@@ -217,59 +304,88 @@ p{margin:0 0 1em}
 .msg .av{width:34px;height:34px;border-radius:8px;background:var(--ink);display:grid;place-items:center;color:#fff;font:800 18px var(--display)}
 .msg .who b{font-size:15px}.msg .who span{font-size:12px;color:#616061}
 .msg p{margin:0 0 8px}
+.msg .typing{display:inline-flex;gap:4px;padding:8px 0}
+.msg .typing i{width:7px;height:7px;border-radius:50%;background:#bbb;animation:typ 1.2s infinite}
+.msg .typing i:nth-child(2){animation-delay:.2s}.msg .typing i:nth-child(3){animation-delay:.4s}
+@keyframes typ{0%,60%,100%{opacity:.3;transform:none}30%{opacity:1;transform:translateY(-3px)}}
+.msg .body{display:none}
+.msg.done .typing{display:none}.msg.done .body{display:block;animation:swap .6s var(--ease)}
+.still .msg .typing{display:none}.still .msg .body{display:block}
 .msg code{display:block;white-space:pre-wrap;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f8f8f8;border:1px solid #e8e8e8;border-radius:6px;padding:8px 10px;margin:4px 0 8px;color:#1d1c1d}
 .msg .flag{background:#fff6e6;border-left:3px solid #e8a33d;padding:6px 10px;border-radius:4px;font-size:14px}
 @media (max-width:860px){.slack{grid-template-columns:1fr}.sc-grid{grid-template-columns:1fr}}
-@media (max-width:520px){.seg{display:flex;width:100%}.seg button{flex:1;text-align:center;padding:10px 8px;font-size:14px}}
+@media (max-width:520px){.seg{display:flex;width:100%}.seg button{flex:1;padding:0 8px;font-size:14px}.msg{padding:14px 14px}.bars li{grid-template-columns:46px 1fr 54px;gap:10px}}
 
 /* ---------- cirrus */
 .ci-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:start}
 .arcbox{background:var(--sheet);border:1px solid var(--rule);border-radius:22px;padding:12px}
 .asvg{width:100%;height:auto;display:block}
-.asvg .wet{fill:var(--water);fill-opacity:.15;stroke:var(--water);stroke-opacity:.4;stroke-width:.22}
+.asvg .wet{fill:var(--water);fill-opacity:.15;stroke:var(--water);stroke-opacity:.4;stroke-width:.22;transition:opacity .9s ease}
+.asvg .wet.off{opacity:0}
 .asvg .hd{fill:var(--ink)}
 .asvg .hn{font:700 3.4px var(--label);fill:var(--ink);text-anchor:middle}
-.asvg .bk{fill:var(--sand);stroke:#C9B47C;stroke-width:.3;transition:fill .4s}
-.asvg .bk.hit{fill:#B9CFE6;stroke:var(--water)}
+.asvg .bk{fill:var(--sand);stroke:#C9B47C;stroke-width:.3}
+.asvg .tick{fill:none;stroke:var(--water);stroke-width:.5;stroke-dasharray:1.4 1.4;transform-box:fill-box;transform-origin:center;animation:spinslow 14s linear infinite}
+@keyframes spinslow{to{transform:rotate(360deg)}}
 .seg.light{background:var(--paper-2)}
 .seg.light button{color:var(--ink-2)}
 .seg.light button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
 .ci-cap{font-size:15px;color:var(--ink-2);margin:14px 4px 4px}
 .tally{display:grid;grid-template-columns:1fr 1fr;gap:22px 28px;margin:28px 0 34px}
 .tally div{font-size:15px;line-height:1.4;color:var(--ink-2);border-top:2px solid var(--ink);padding-top:10px}
-.tally b{display:block;font:800 44px/1 var(--display);color:var(--ink);margin-bottom:4px}
+.tally b{display:block;font:800 44px/1 var(--display);color:var(--ink);margin-bottom:4px;font-variant-numeric:tabular-nums}
 .sheets{list-style:none;margin:0;padding:0;position:relative}
-.sheets li{position:relative;background:rgba(250,251,248,.9);border:1px solid var(--rule);border-radius:10px;padding:10px 14px 10px 46px;margin-top:-4px;box-shadow:0 2px 0 rgba(19,48,74,.04);font-size:15px;line-height:1.35;color:var(--ink-2)}
+.sheets li{position:relative;background:rgba(250,251,248,.95);border:1px solid var(--rule);border-radius:10px;padding:10px 14px 10px 46px;margin-top:-4px;box-shadow:0 2px 0 rgba(19,48,74,.04);font-size:15px;line-height:1.35;color:var(--ink-2)}
 .sheets li b{color:var(--ink);display:block;font:700 18px/1.15 var(--display)}
 .sheets li::before{content:"";position:absolute;left:14px;top:13px;width:18px;height:18px;border-radius:4px;background:var(--c,var(--turf))}
 .sheets-title{font:700 22px/1 var(--display);margin:0 0 14px;color:var(--ink-2)}
 @media (max-width:980px){.ci-grid{grid-template-columns:1fr}}
+@media (max-width:420px){.tally{gap:18px 18px}.tally b{font-size:38px}}
 
 /* ---------- dashboards */
 .bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(18px,2.4vw,30px);align-items:start}
 .shot{margin:0}
-.frame{border-radius:14px;overflow:hidden;background:#fff;border:1px solid var(--rule);box-shadow:0 1px 0 rgba(19,48,74,.05),0 24px 48px -28px rgba(19,48,74,.45)}
+.frame{border-radius:14px;overflow:hidden;background:#fff;border:1px solid var(--rule);box-shadow:0 1px 0 rgba(19,48,74,.05),0 24px 48px -28px rgba(19,48,74,.45);transition:transform .5s var(--ease),box-shadow .5s}
 .frame .bar{display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;background:#F3F6F2;border-bottom:1px solid var(--rule);font:13px/1 var(--body);color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.frame .bar::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:#3BA55C;box-shadow:0 0 0 3px rgba(59,165,92,.18)}
+.frame .bar::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:#3BA55C;animation:live 2s ease-in-out infinite}
+@keyframes live{50%{box-shadow:0 0 0 5px rgba(59,165,92,.18)}}
+.frame .pic{overflow:hidden}
+.frame .pic img{transform:scale(1.08);transition:transform 2.2s var(--ease)}
+.in .frame .pic img,.frame.in .pic img,[data-r].in .pic img{transform:none}
+@media (hover:hover){.shot:hover .frame{transform:translateY(-6px);box-shadow:0 1px 0 rgba(19,48,74,.05),0 34px 60px -28px rgba(19,48,74,.55)}}
 .shot figcaption{padding:14px 2px 0}
 .shot h3{font-size:28px;margin-bottom:6px}
 .shot p{font-size:16px;color:var(--ink-2);margin:0 0 6px;max-width:58ch}
-.shot .go{font-size:15px;font-weight:700}
+.go{font-size:15px;font-weight:700;display:inline-flex;align-items:center;min-height:44px}
 .s8{grid-column:span 8}.s7{grid-column:span 7}.s6{grid-column:span 6}.s5{grid-column:span 5}.s4{grid-column:span 4}.s12{grid-column:span 12}
 .stackcol{display:grid;gap:clamp(18px,2.4vw,30px)}
 .side-note{align-self:center;padding:8px 4px}
 .side-note h3{font-size:40px;margin-bottom:12px}
 .side-note p{color:var(--ink-2);font-size:17px}
-.phones{display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,220px));gap:clamp(16px,2.4vw,28px);align-items:center}
+.phones{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,700px);gap:clamp(16px,3vw,40px);align-items:center}
+.rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2.4vw,28px);align-items:center}
 .phone{border-radius:34px;padding:9px;background:var(--ink);box-shadow:0 30px 50px -28px rgba(19,48,74,.65)}
 .phone img{border-radius:26px}
-.phone:nth-child(3){transform:translateY(-22px)}
+.rail .phone:nth-child(2){transform:translateY(-22px)}
+.rail .phone.in:nth-child(2){transform:translateY(-22px)}
+.dots{display:none;justify-content:center;gap:8px;margin-top:12px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--rule);transition:background .3s,width .3s}
+.dots i.on{background:var(--ink);width:22px;border-radius:4px}
+.swipe{display:none;font-size:14px;color:var(--ink-3);align-items:center;gap:8px;margin:6px 0 0}
+.swipe svg{animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(6px)}}
 @media (max-width:980px){
   .s8,.s7,.s6,.s5,.s4{grid-column:span 12}
-  .phones{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .phones .side-note{grid-column:1/-1}
-  .phone{border-radius:22px;padding:5px}.phone img{border-radius:18px}
-  .phone:nth-child(3){transform:none}
+  .phones{grid-template-columns:minmax(0,1fr)}
+  .phones>*{min-width:0}
+  .rail{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;padding:6px var(--gut) 18px;margin:0 calc(var(--gut)*-1);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .rail::-webkit-scrollbar{display:none}
+  .rail .phone{flex:0 0 min(64vw,300px);scroll-snap-align:center;border-radius:28px;padding:7px}
+  .rail .phone img{border-radius:22px}
+  .rail .phone:nth-child(2),.rail .phone.in:nth-child(2){transform:none}
+  .dots{display:flex}.swipe{display:flex}
+  .side-note h3{font-size:34px}
+  .shot h3{font-size:26px}
 }
 
 /* ---------- ahead */
@@ -279,10 +395,10 @@ p{margin:0 0 1em}
 .tile p{font-size:15px;line-height:1.45;color:var(--ink-2);margin:0}
 .gauge{width:72px;height:72px}
 .gauge .t{fill:none;stroke:var(--paper-2);stroke-width:8}
-.gauge .v{fill:none;stroke-width:8;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1s ease}
+.gauge .v{fill:none;stroke-width:8;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1.6s var(--ease) .2s}
 .gauge text{font:800 22px var(--display);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
-@media (max-width:980px){.tiles{grid-template-columns:1fr}}
-.week{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,1fr);gap:10px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x proximity}
+@media (max-width:980px){.tiles{grid-template-columns:1fr;gap:12px}.tile{padding:16px}}
+.week{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,1fr);gap:10px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x proximity;scrollbar-width:thin}
 .day{scroll-snap-align:start;border-top:3px solid var(--ink);padding-top:10px;min-width:0}
 .day.today{border-top-color:var(--turf)}
 .day h4{margin:0 0 8px;font:700 20px/1 var(--display)}
@@ -293,7 +409,8 @@ p{margin:0 0 1em}
 .empty{font-size:13px;color:var(--ink-3)}
 .live{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2)}
 .live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
-.live.on::before{background:#3BA55C;box-shadow:0 0 0 3px rgba(59,165,92,.2)}
+.live.on::before{background:#3BA55C;animation:live 2s ease-in-out infinite}
+@media (max-width:620px){.week{grid-auto-columns:minmax(132px,42vw);margin:0 calc(var(--gut)*-1);padding:4px var(--gut) 14px}}
 
 /* ---------- safety */
 .sf-grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:clamp(32px,6vw,90px);align-items:center}
@@ -301,53 +418,57 @@ p{margin:0 0 1em}
 .cycle{display:grid;gap:10px;margin:26px 0 30px;max-width:560px}
 .cycle div{display:grid;grid-template-columns:86px 1fr;gap:12px;align-items:center;font-size:15px;color:var(--ink-2)}
 .cycle .track{position:relative;height:12px;border-radius:6px;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/24 - 1px),rgba(19,48,74,.12) calc(100%/24 - 1px) calc(100%/24))}
-.cycle .track i{position:absolute;top:0;bottom:0;border-radius:6px;background:var(--c)}
+.cycle .track i{position:absolute;top:0;bottom:0;border-radius:6px;background:var(--c);transform-origin:left;transform:scaleX(0);transition:transform 1s var(--ease) calc(var(--rd,0s) + var(--q,0)*.25s)}
+.cycle.in .track i{transform:scaleX(1)}
+.still .cycle .track i{transform:none}
 .cycle b{font:700 18px/1 var(--display);color:var(--ink)}
 .checks{list-style:none;padding:0;margin:0;display:grid;gap:14px;max-width:62ch}
 .checks li{padding-left:30px;position:relative;font-size:17px;color:var(--ink-2)}
 .checks li b{color:var(--ink)}
-.checks li::before{content:"";position:absolute;left:0;top:7px;width:16px;height:9px;border-left:3px solid var(--turf);border-bottom:3px solid var(--turf);transform:rotate(-45deg)}
-@media (max-width:860px){.sf-grid{grid-template-columns:1fr}.sf-grid .phone{max-width:240px;margin:0 auto}}
+.checks li::before{content:"";position:absolute;left:0;top:7px;width:16px;height:9px;border-left:3px solid var(--turf);border-bottom:3px solid var(--turf);transform:rotate(-45deg) scale(0);transform-origin:20% 80%;transition:transform .5s cubic-bezier(.3,1.6,.5,1) calc(var(--rd,0s) + .3s)}
+.checks li.in::before,.still .checks li::before{transform:rotate(-45deg) scale(1)}
+@media (max-width:860px){.sf-grid{grid-template-columns:1fr}.sf-grid .phone{max-width:230px;margin:0 auto;order:2}}
 
 /* ---------- how */
 .how-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,6vw,90px)}
 .kit{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
 .kit li{padding:14px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:150px 1fr;gap:16px;font-size:16px;color:var(--ink-2)}
 .kit li b{font:700 20px/1.2 var(--display);color:var(--ink)}
-.rule{background:var(--ink);color:var(--paper);border-radius:22px;padding:30px 30px 26px}
+.rule{background:var(--ink);color:var(--paper);border-radius:22px;padding:30px 30px 26px;position:relative;overflow:hidden}
 .rule h3{font-size:42px;margin-bottom:14px}
 .rule p{color:#C9D6E1;font-size:17px}
 .rule ul{margin:0 0 6px;padding-left:20px;color:#E5ECF2;font-size:16px}
 .rule li{margin-bottom:6px}
 .sign{margin-top:clamp(56px,8vw,90px);display:flex;flex-wrap:wrap;justify-content:space-between;gap:24px;align-items:end;border-top:2px solid var(--ink);padding-top:24px}
-.sign .big{font:800 clamp(36px,4.6vw,60px)/.95 var(--display);max-width:20ch}
-.sign .who{font-size:16px;color:var(--ink-2);text-align:right}
+.sign .big{font:800 clamp(38px,4.8vw,64px)/.95 var(--display);max-width:16ch;margin:0}
+.sign .who{font-size:16px;color:var(--ink-2);text-align:right;margin:0}
 .sign .who b{color:var(--ink);display:block;font-size:18px}
-@media (max-width:860px){.how-grid{grid-template-columns:1fr}.kit li{grid-template-columns:1fr;gap:2px}.sign .who{text-align:left}}
-footer{padding:28px 0 44px;font-size:14px;color:var(--ink-3)}
+@media (max-width:860px){.how-grid{grid-template-columns:1fr}.kit li{grid-template-columns:1fr;gap:2px}.sign .who{text-align:left}.rule{padding:24px 22px}}
+footer{padding:28px 0 calc(44px + env(safe-area-inset-bottom));font-size:14px;color:var(--ink-3)}
 footer .wrap{display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
 
 /* ---------- og card mode (screenshot only) */
-html.og .top,html.og main>section:not(.hero),html.og footer,html.og .ctas,html.og .figcap,html.og .legend{display:none!important}
+html.og .top,html.og .progress,html.og main>section:not(.hero),html.og footer,html.og .ctas,html.og .figcap,html.og .legend{display:none!important}
 html.og body{width:1200px;height:627px;overflow:hidden}
 html.og .hero{padding:44px 0 0;height:627px}
+html.og .hero::before{animation:none}
 html.og .wrap{max-width:1200px;padding:0 54px}
-html.og .hero-grid{grid-template-columns:450px 1fr;gap:20px}
+html.og .hero-grid{grid-template-columns:450px 1fr;grid-template-areas:"head fig" "body fig";gap:0 20px;align-items:start}
 html.og .hero h1{font-size:76px;margin-bottom:26px}
 html.og .hero .lede,html.og .hero .facts{display:none}
 html.og .og-only{display:block!important}
 html.og .hero-fig{margin:0}
-html.og .hero-grid{align-items:start}
 html.og .stack .lbl{display:block}
 .og-only{display:none;font:400 22px/1.4 var(--body);color:var(--ink-2);max-width:20em;border-left:4px solid var(--turf);padding-left:16px}
 .og-only b{display:block;font:800 30px/1.1 var(--display);color:var(--ink);margin-bottom:4px}
 </style>
 </head>
 <body>
+<div class="progress" aria-hidden="true"><i id="prog"></i></div>
 <header class="top" id="topbar">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="Ranfurlie Golf Club, back to top">
-      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 28V5l13 5.5L11 15" fill="none" stroke="#13304A" stroke-width="2.6" stroke-linejoin="round"/><ellipse cx="9" cy="28" rx="5" ry="1.6" fill="#2E6A46"/></svg>
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 28V5" fill="none" stroke="#13304A" stroke-width="2.6"/><path class="flag" d="M9 5l13 5.5L9 15" fill="#13304A"/><ellipse cx="9" cy="28" rx="5" ry="1.6" fill="#2E6A46"/></svg>
       <b>Ranfurlie</b><span>Course maintenance</span>
     </a>
     <nav class="nav" aria-label="Sections">
@@ -357,45 +478,48 @@ html.og .stack .lbl{display:block}
       <a href="#dashboards">Dashboards</a>
       <a href="#safety">Safety</a>
     </nav>
+    <a class="jump" href="#dashboards">Dashboards</a>
   </div>
 </header>
 
 <main>
 <section class="hero" id="top">
   <div class="wrap hero-grid">
-    <div class="hero-copy">
-      <h1>Every system on the course, talking to each other.</h1>
+    <div class="hero-head">
+      <h1 data-split>Every system on the course, talking to each other.</h1>
       <p class="og-only"><b>Ranfurlie Golf Club</b>How our course maintenance team runs on Claude, Cirrus Pro, TurfRad, TurfDog, Slack and Notion</p>
-      <p class="lede">At Ranfurlie we run the course off more than twenty systems: the irrigation central, a moisture radar on the greens mower, soil probes, weather stations, spray records, machinery telematics and the crew's job board. None of them were built to work together. Claude joins them up, so the crew starts each day with one clear picture and we deal with problems before the turf shows them.</p>
-      <p class="facts">On a normal weekday that's <strong>{{WEEKDAY_RUNS}}</strong> scheduled runs across <strong>{{TASK_COUNT}}</strong> jobs, and every night <strong>683</strong> sprinklers get a run time worked out for them one by one.</p>
-      <div class="ctas">
-        <a class="btn solid" href="#spatially">How the watering works</a>
-        <a class="btn" href="#dashboards">See the dashboards</a>
-      </div>
     </div>
-    <figure class="hero-fig">
+    <figure class="hero-fig" id="heroFig">
       <!--HERO_SVG-->
       <ol class="legend" aria-label="Layers, top to bottom">
-        <li><i style="background:var(--water)"></i><span><b>Jobs the crew reported</b>Open irrigation, drainage and bunker jobs from Slack, pinned where they are</span></li>
+        <li><i style="background:var(--water)"></i><span><b>Jobs the crew reported</b>From Slack, pinned where they are</span></li>
         <li><i style="background:var(--ink)"></i><span><b>What's underground</b>Drainage plans, hole by hole</span></li>
-        <li><i style="background:linear-gradient(90deg,#C7731F,#7FB8D8,#1B4F8F)"></i><span><b>How wet it is</b>The latest TurfRad scan, greens and fairways</span></li>
+        <li><i style="background:linear-gradient(90deg,#C7731F,#7FB8D8,#1B4F8F)"></i><span><b>How wet it is</b>The latest TurfRad scan</span></li>
         <li><i style="background:var(--turf)"></i><span><b>The course</b>Every green, tee, fairway and bunker</span></li>
       </ol>
       <figcaption class="figcap">Ranfurlie as the systems see it, drawn from the same data the crew dashboards use. <span class="ramp"><span>Dry</span><i></i><span>Wet</span></span></figcaption>
     </figure>
+    <div class="hero-body">
+      <p class="lede" data-r>At Ranfurlie we run the course off more than twenty systems: the irrigation central, a moisture radar on the greens mower, soil probes, weather stations, spray records, machinery telematics and the crew's job board. None of them were built to work together. Claude joins them up, so the crew starts each day with one clear picture and we deal with problems before the turf shows them.</p>
+      <p class="facts" data-r style="--rd:.1s">On a normal weekday that's <strong data-count="{{WEEKDAY_RUNS}}">{{WEEKDAY_RUNS}}</strong> scheduled runs across <strong data-count="{{TASK_COUNT}}">{{TASK_COUNT}}</strong> jobs, and every night <strong data-count="683">683</strong> sprinklers get a run time worked out for them one by one.</p>
+      <div class="ctas" data-r style="--rd:.2s">
+        <a class="btn solid" href="#spatially">How the watering works</a>
+        <a class="btn" href="#dashboards">See the dashboards</a>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="sec" id="connected">
   <div class="wrap">
     <div class="head">
-      <h2>Not locked in to anyone's app.</h2>
-      <p class="lede">Every tool we use is good at its own job. The trouble was always the gaps between them. The irrigation central doesn't know what the radar saw this morning. The job board doesn't know a sprinkler failed at 2am. The spray records don't know it's about to rain.</p>
-      <p>Claude reads each system the way a person would: through its website, its data feed, or a post in Slack. It checks one source against another, works out what matters, and puts the answer back where the crew already looks. When we moved the job board from taskTracker to TurfDog this month, we rewrote some instructions. <strong>Nothing else had to change.</strong></p>
+      <h2 data-split>Not locked in to anyone's app.</h2>
+      <p class="lede" data-r>Every tool we use is good at its own job. The trouble was always the gaps between them. The irrigation central doesn't know what the radar saw this morning. The job board doesn't know a sprinkler failed at 2am. The spray records don't know it's about to rain.</p>
+      <p data-r>Claude reads each system the way a person would: through its website, its data feed, or a post in Slack. It checks one source against another, works out what matters, and puts the answer back where the crew already looks. When we moved the job board from taskTracker to TurfDog this month, we rewrote some instructions. <strong>Nothing else had to change.</strong></p>
     </div>
     <div class="flow" id="flow">
       <svg class="flow-lines" id="flowLines" aria-hidden="true"></svg>
-      <div class="col" id="colIn">
+      <div class="col" id="colIn" data-stagger>
         <p class="col-title">What it reads</p>
         <div class="grp" data-in><h4>Moisture and water</h4><ul>
           <li><b>TurfRad</b>, radar on the greens mower</li>
@@ -421,15 +545,15 @@ html.og .stack .lbl{display:block}
           <li><b>Outlook</b>, alarm emails and order history</li>
         </ul></div>
       </div>
-      <div class="down" aria-hidden="true"><svg width="24" height="36" viewBox="0 0 24 36"><path d="M12 2v30m-8-8 8 8 8-8" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
-      <div class="core" id="core">
+      <div class="down" aria-hidden="true"><svg width="24" height="46" viewBox="0 0 24 46"><path d="M12 2v40" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 34l8 8 8-8" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;stroke-dasharray:none"/></svg></div>
+      <div class="core" id="core" data-r="pop">
         <h3>Claude</h3>
         <p class="verbs">Reads it. Checks one source against another. <span>Decides what matters.</span> Writes it back.</p>
         <p>{{TASK_COUNT}} scheduled tasks. Connectors for the apps that have them, and Chrome on the shed PC for the ones that don't.</p>
         <p>Every job's instructions are a plain text file we can read and change ourselves.</p>
       </div>
-      <div class="down" aria-hidden="true"><svg width="24" height="36" viewBox="0 0 24 36"><path d="M12 2v30m-8-8 8 8 8-8" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
-      <div class="col" id="colOut">
+      <div class="down" aria-hidden="true"><svg width="24" height="46" viewBox="0 0 24 46"><path d="M12 2v40" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 34l8 8 8-8" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;stroke-dasharray:none"/></svg></div>
+      <div class="col" id="colOut" data-stagger>
         <p class="col-title">Where it lands</p>
         <div class="grp" data-out><h4>Slack, 12 channels</h4><ul><li>#dailycoursesetup, #spatially-claude, #irrigation, #drainage, #bunkers, #machinery, #spraying, #topdressing, #ohs, #safe-work-procedures, #course-team, #timeinlieu</li></ul></div>
         <div class="grp" data-out><h4>Cirrus Pro</h4><ul><li>Per-head run times and start times every night, plus map layers</li></ul></div>
@@ -445,12 +569,12 @@ html.og .stack .lbl{display:block}
 <section class="sec alt" id="clock">
   <div class="wrap">
     <div class="head">
-      <h2>It starts at 4:45 every morning.</h2>
-      <p class="lede">Before the first cart leaves the shed, the course setup has been checked against the comp, the weather and the soil moisture, and the crew brief is in Slack. Through the day the boards rebuild every hour. At 5pm the irrigation brief lands. At 6pm tomorrow's pins are checked against the slope and wind rules.</p>
+      <h2 data-split>It starts at 4:45 every morning.</h2>
+      <p class="lede" data-r>Before the first cart leaves the shed, the course setup has been checked against the comp, the weather and the soil moisture, and the crew brief is in Slack. Through the day the boards rebuild every hour. At 5pm the irrigation brief lands. At 6pm tomorrow's pins are checked against the slope and wind rules.</p>
     </div>
     <div class="clock-grid">
       <div>
-        <svg class="dial" id="dial" viewBox="-320 -320 640 640" role="img" aria-label="A 24 hour clock with a dot for every scheduled run. The list beside it has every task."></svg>
+        <svg class="dial" id="dial" viewBox="-320 -320 640 640" role="img" aria-label="A 24 hour clock with a dot for every scheduled run and a red hand at the current time in Melbourne. The list beside it has every task."></svg>
         <ul class="keys" id="keys"></ul>
       </div>
       <div>
@@ -458,32 +582,35 @@ html.og .stack .lbl{display:block}
           <p class="when">Tap a dot, or pick from the list</p>
           <h3>{{TASK_COUNT}} jobs that run themselves</h3>
           <p>Each one is a set of written instructions Claude follows on a schedule, on the shed PC or in the cloud. Most post somewhere the crew already looks. The ones that touch anything important are built to be checked: irrigation programs are written but never switched on by Claude, and orders stay as drafts.</p>
+          <p class="next" id="next"></p>
         </div>
-        <ul class="tasklist" id="tasklist" aria-label="All scheduled tasks"></ul>
+        <ul class="tasklist short" id="tasklist" aria-label="All scheduled tasks"></ul>
+        <button class="btn more" type="button" id="moreBtn" aria-controls="tasklist" aria-expanded="false">Show all {{TASK_COUNT}} jobs</button>
       </div>
     </div>
   </div>
 </section>
 
 <section class="sec night" id="spatially">
-  <div class="wrap">
+  <div class="drops" id="drops" aria-hidden="true"></div>
+  <div class="wrap" style="position:relative">
     <div class="head">
-      <h2>Spatially Claude: watering head by head.</h2>
-      <p class="lede">Most programs give every sprinkler on a green the same run time and hope the green is even. It never is. Spatially Claude works out a separate time for every head, from the moisture under that head.</p>
-      <p>The name is a nod to Toro's Spatial Adjust. Ours runs on our Rain Bird system, with our rules, and covers the whole course: <strong>93 heads on the greens and 590 everywhere else.</strong></p>
+      <h2 data-split>Spatially Claude: watering head by head.</h2>
+      <p class="lede" data-r>Most programs give every sprinkler on a green the same run time and hope the green is even. It never is. Spatially Claude works out a separate time for every head, from the moisture under that head.</p>
+      <p data-r>The name is a nod to Toro's Spatial Adjust. Ours runs on our Rain Bird system, with our rules, and covers the whole course: <strong>93 heads on the greens and 590 everywhere else.</strong></p>
     </div>
-    <div class="sc-grid">
-      <div class="greenbox"><svg class="gsvg" id="g18" role="img" aria-label="The 18th green with its six sprinklers and their run times"></svg></div>
-      <div>
+    <div class="sc-grid" id="scGrid">
+      <div class="greenbox" data-r="pop"><svg class="gsvg" id="g18" role="img" aria-label="The 18th green with its six sprinklers and their run times"></svg></div>
+      <div data-r style="--rd:.15s">
         <div class="seg" role="group" aria-label="Compare programs">
-          <button type="button" id="mFlat" aria-pressed="false">One time for every head</button>
-          <button type="button" id="mHead" aria-pressed="true">Each head its own time</button>
+          <button type="button" id="mFlat" aria-pressed="false">Flat program</button>
+          <button type="button" id="mHead" aria-pressed="true">Spatially Claude</button>
         </div>
         <ul class="bars" id="bars18"></ul>
-        <p class="note" id="note18">18th green, Saturday 17 October. The back of the green read 8.8 to 10.1% on the morning scan, so those heads got the longest times. Same total water either way. The heads are placed for the diagram; the times are the real ones.</p>
+        <p class="note">18th green, Saturday 17 October. The back of the green read 8.8 to 10.1% on the morning scan, so those heads got the longest times. Same total water either way. The heads are placed for the diagram; the times are the real ones.</p>
       </div>
     </div>
-    <ol class="steps">
+    <ol class="steps" data-stagger>
       <li><h3>Scan</h3><p>The TurfRad radar on the greens mower maps moisture across every green most mornings. A satellite pass from SkimTurf fills in the fairways the mower doesn't reach.</p></li>
       <li><h3>Match</h3><p>Each patch of the scan is tied to the sprinkler that waters it, using the head positions from Cirrus Pro.</p></li>
       <li><h3>Check</h3><p>The Spiio soil probes, the TDR probe and the on-course weather station check the radar, and track how much has dried out since the scan.</p></li>
@@ -491,24 +618,27 @@ html.og .stack .lbl{display:block}
       <li><h3>Write</h3><p>The times go straight into Cirrus Pro around 5pm. Claude never switches a program on. That's my call, after I've read the brief in Slack.</p></li>
       <li><h3>Learn</h3><p>If I reply with a correction, it becomes a standing rule from that night on. The same goes for what it learns about the system itself.</p></li>
     </ol>
-    <div class="ledger">
-      <div><b>683</b>sprinklers sized one at a time, every night, from the best data under each one.</div>
-      <div><b>18</b>stations is all our Rain Bird decoder interface can run at once, so every night's set is budgeted to finish before the crew arrives.</div>
+    <div class="ledger" data-stagger>
+      <div><b data-count="683">683</b>sprinklers sized one at a time, every night, from the best data under each one.</div>
+      <div><b data-count="18">18</b>stations is all our Rain Bird decoder interface can run at once, so every night's set is budgeted to finish before the crew arrives.</div>
       <div><b>0</b>programs switched on by Claude. It builds them and explains them. I decide.</div>
     </div>
     <div class="slack">
-      <div>
+      <div data-r>
         <h3 style="font-size:36px;margin-bottom:12px">What lands in Slack at 5pm</h3>
         <p class="note" style="font-size:16px">A brief I can read on my phone in a minute: what it recommends and why, every head's time in the thread, and anything that doesn't look right. That includes faults it finds along the way, like heads that were in the program but never ran.</p>
       </div>
-      <div class="msg" aria-label="Example Slack message">
+      <div class="msg" id="msg" data-r="pop" aria-label="Example Slack message">
         <div class="ch">#spatially-claude</div>
         <div class="who"><div class="av">C</div><div><b>Claude</b> <span>Sat 17 Oct, 5:16 pm</span></div></div>
-        <p><b>Greens irrigation brief</b></p>
-        <p><b>Recommendation:</b> replacement, per head. 92 heads, avg 4.2 mm (1.6 to 5.9), driest 18G2 and 18G3 at 8.8%. The greens have had no program water since Tuesday night and today's scan has every green at 10.7 to 15.3%, the driest yet this week. Program updated in Cirrus Pro and left <b>off</b> for you to check.</p>
-        <code>18: 18G1 15:00 · 18G2 24:30 · 18G3 23:30 · 18G4 21:30 · 18G5 20:30 · 18G6 13:00</code>
-        <p class="flag"><b>Flag:</b> 8G3, 17G4 and 18G5 still have an untested decoder or station fault. Nothing has run on them since Tuesday.</p>
-        <p style="margin:6px 0 0;color:#616061;font-size:13px">Trimmed from the real brief. Every head's time follows in the thread.</p>
+        <div class="typing" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="body">
+          <p><b>Greens irrigation brief</b></p>
+          <p><b>Recommendation:</b> replacement, per head. 92 heads, avg 4.2 mm (1.6 to 5.9), driest 18G2 and 18G3 at 8.8%. The greens have had no program water since Tuesday night and today's scan has every green at 10.7 to 15.3%, the driest yet this week. Program updated in Cirrus Pro and left <b>off</b> for you to check.</p>
+          <code>18: 18G1 15:00 · 18G2 24:30 · 18G3 23:30 · 18G4 21:30 · 18G5 20:30 · 18G6 13:00</code>
+          <p class="flag"><b>Flag:</b> 8G3, 17G4 and 18G5 still have an untested decoder or station fault. Nothing has run on them since Tuesday.</p>
+          <p style="margin:6px 0 0;color:#616061;font-size:13px">Trimmed from the real brief. Every head's time follows in the thread.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -517,12 +647,12 @@ html.og .stack .lbl{display:block}
 <section class="sec" id="cirrus">
   <div class="wrap">
     <div class="head">
-      <h2>Layers Cirrus Pro never had.</h2>
-      <p class="lede">Our irrigation design isn't great, and a lot of what we knew about the course lived on paper plans in the shed. Now it's going into Cirrus Pro as map layers we can switch on and off.</p>
-      <p>We've been tracing every turf area and assigning each head to the area it actually sits in. The drainage plans and the as-built pipework are layers now too. Then we went after the sprinklers: Claude pulled the position, arc, radius and nozzle of every station, drew each head's real throw, and checked it against the traced areas. Heads putting water on bunkers or rough are coloured by priority on their own layer, so the crew can see which ones to change first.</p>
+      <h2 data-split>Layers Cirrus Pro never had.</h2>
+      <p class="lede" data-r>Our irrigation design isn't great, and a lot of what we knew about the course lived on paper plans in the shed. Now it's going into Cirrus Pro as map layers we can switch on and off.</p>
+      <p data-r>We've been tracing every turf area and assigning each head to the area it actually sits in. The drainage plans and the as-built pipework are layers now too. Then we went after the sprinklers: Claude pulled the position, arc, radius and nozzle of every station, drew each head's real throw, and checked it against the traced areas. Heads putting water on bunkers or rough are coloured by priority on their own layer, so the crew can see which ones to change first.</p>
     </div>
     <div class="ci-grid">
-      <div>
+      <div data-r="pop" id="arcWrap">
         <div class="arcbox"><svg class="asvg" id="g8" role="img" aria-label="The 8th green, its bunkers and the throw of each sprinkler"></svg></div>
         <div style="margin-top:14px" class="seg light" role="group" aria-label="Sprinkler arcs">
           <button type="button" id="aFull" aria-pressed="false">Full circle</button>
@@ -531,14 +661,14 @@ html.og .stack .lbl{display:block}
         <p class="ci-cap" id="cap8">The 8th green. Four of its heads went to part circle in October, so they water the green and stop soaking the bunker faces. 8G3 is still full circle. Head positions are drawn for the diagram.</p>
       </div>
       <div>
-        <div class="tally">
-          <div><b>~700</b>stations checked, every one in Cirrus Pro</div>
-          <div><b>131</b>heads flagged to change first, watering sand or rough</div>
-          <div><b>135</b>heads whose recorded details didn't add up, like arcs never set or models that can't do what Cirrus says</div>
-          <div><b>9</b>green and surround heads missing from the map altogether</div>
+        <div class="tally" data-stagger>
+          <div><b data-count="700" data-prefix="~">~700</b>stations checked, every one in Cirrus Pro</div>
+          <div><b data-count="131">131</b>heads flagged to change first, watering sand or rough</div>
+          <div><b data-count="135">135</b>heads whose recorded details didn't add up, like arcs never set or models that can't do what Cirrus says</div>
+          <div><b data-count="9">9</b>green and surround heads missing from the map altogether</div>
         </div>
-        <p class="sheets-title">On the Cirrus Pro map now</p>
-        <ul class="sheets">
+        <p class="sheets-title" data-r>On the Cirrus Pro map now</p>
+        <ul class="sheets" data-stagger="deal">
           <li style="--c:#9CC7DE"><b>Sprinkler arcs, what Cirrus has recorded</b>Every head's throw, with data problems flagged in red</li>
           <li style="--c:var(--water)"><b>Sprinkler arcs, hard edge</b>Green heads water in, surround heads water out</li>
           <li style="--c:#7FB8D8"><b>Sprinkler arcs, everything else</b>Fairways, tees and rough by priority</li>
@@ -555,51 +685,57 @@ html.og .stack .lbl{display:block}
 <section class="sec alt" id="dashboards">
   <div class="wrap">
     <div class="head">
-      <h2>Live pages the whole crew can open.</h2>
-      <p class="lede">No logins and nothing to install. Each page rebuilds through the day from what the crew posts in Slack and what the systems report, so the mechanic, the irrigation tech and the greens committee are all looking at the same thing.</p>
+      <h2 data-split>Live pages the whole crew can open.</h2>
+      <p class="lede" data-r>No logins and nothing to install. Each page rebuilds through the day from what the crew posts in Slack and what the systems report, so the mechanic, the irrigation tech and the greens committee are all looking at the same thing.</p>
     </div>
     <div class="bento">
       <figure class="shot s8">
-        <div class="frame"><div class="bar">ranfurlie-greens/irrigation</div><img src="img/irrigation-3d.webp" width="1600" height="1279" loading="lazy" alt="The irrigation dashboard in 3D: the course with open sprinkler jobs as pins"></div>
+        <div class="frame" data-r="wipe"><div class="bar">ranfurlie-greens/irrigation</div><div class="pic"><img src="img/irrigation-3d.webp" srcset="img/irrigation-3d-800.webp 800w, img/irrigation-3d.webp 1600w" sizes="(max-width:980px) 100vw, 62vw" width="1600" height="1279" loading="lazy" decoding="async" alt="The irrigation dashboard in 3D: the course with open sprinkler jobs as pins"></div></div>
       </figure>
-      <div class="side-note s4">
+      <div class="side-note s4" data-r>
         <h3>Irrigation</h3>
         <p>Every fault the crew posts in #irrigation becomes a job with a pin on the course, greens heads first. Cirrus Pro alarms come in on their own. Parts used and parts to order are logged from photos and replies.</p>
-        <div class="frame" style="margin:18px 0 14px"><img src="img/irrigation-top.webp" width="1600" height="331" loading="lazy" alt="The irrigation dashboard header with the Cirrus Pro alarm ticker and job counts"></div>
+        <div class="frame" style="margin:18px 0 6px"><img src="img/irrigation-top.webp" srcset="img/irrigation-top-800.webp 800w, img/irrigation-top.webp 1600w" sizes="(max-width:980px) 100vw, 30vw" width="1600" height="331" loading="lazy" decoding="async" alt="The irrigation dashboard header with the Cirrus Pro alarm ticker and job counts"></div>
         <a class="go" href="../irrigation/">Open the irrigation board</a>
       </div>
       <figure class="shot s6">
-        <div class="frame"><div class="bar">ranfurlie-greens/drainage</div><img src="img/drainage-3d.webp" width="1600" height="1386" loading="lazy" alt="The drainage dashboard showing pipes and pits under the course in 3D"></div>
-        <figcaption><h3>Drainage</h3><p>Pits, pipes and outfalls from the drainage plans, shown underground in 3D, with every reported blockage on top.</p><a class="go" href="../drainage/">Open the drainage board</a></figcaption>
+        <div class="frame" data-r="wipe"><div class="bar">ranfurlie-greens/drainage</div><div class="pic"><img src="img/drainage-3d.webp" srcset="img/drainage-3d-800.webp 800w, img/drainage-3d.webp 1600w" sizes="(max-width:980px) 100vw, 48vw" width="1600" height="1386" loading="lazy" decoding="async" alt="The drainage dashboard showing pipes and pits under the course in 3D"></div></div>
+        <figcaption data-r><h3>Drainage</h3><p>Pits, pipes and outfalls from the drainage plans, shown underground in 3D, with every reported blockage on top.</p><a class="go" href="../drainage/">Open the drainage board</a></figcaption>
       </figure>
       <figure class="shot s6">
-        <div class="frame"><div class="bar">ranfurlie-greens/bunkers</div><img src="img/bunkers-3d.webp" width="1600" height="1358" loading="lazy" alt="The bunker dashboard with every bunker on the course in 3D"></div>
-        <figcaption><h3>Bunkers</h3><p>All 90 bunkers numbered and audited: washouts, exposed liner, sand top-ups and the sand used. A map video of the open work goes to the crew when it changes.</p><a class="go" href="../bunkers/">Open the bunker board</a></figcaption>
+        <div class="frame" data-r="wipe" style="--rd:.15s"><div class="bar">ranfurlie-greens/bunkers</div><div class="pic"><img src="img/bunkers-3d.webp" srcset="img/bunkers-3d-800.webp 800w, img/bunkers-3d.webp 1600w" sizes="(max-width:980px) 100vw, 48vw" width="1600" height="1358" loading="lazy" decoding="async" alt="The bunker dashboard with every bunker on the course in 3D"></div></div>
+        <figcaption data-r><h3>Bunkers</h3><p>All 90 bunkers numbered and audited: washouts, exposed liner, sand top-ups and the sand used. A map video of the open work goes to the crew when it changes.</p><a class="go" href="../bunkers/">Open the bunker board</a></figcaption>
       </figure>
       <figure class="shot s5">
-        <div class="frame"><div class="bar">ranfurlie-greens</div><img src="img/greens-map.webp" width="1600" height="1310" loading="lazy" alt="The greens dashboard course map coloured by moisture from the latest TurfRad scan"></div>
-        <figcaption><h3>Greens Live</h3><p>Moisture, growth, clippings, soil probes, disease cover, PGR clocks and the next three days of spray windows on one page. The monthly Greens Report for the committee is built from the same data.</p></figcaption>
+        <div class="frame" data-r="wipe"><div class="bar">ranfurlie-greens</div><div class="pic"><img src="img/greens-map.webp" srcset="img/greens-map-800.webp 800w, img/greens-map.webp 1600w" sizes="(max-width:980px) 100vw, 40vw" width="1600" height="1310" loading="lazy" decoding="async" alt="The greens dashboard course map coloured by moisture from the latest TurfRad scan"></div></div>
+        <figcaption data-r><h3>Greens Live</h3><p>Moisture, growth, clippings, soil probes, disease cover, PGR clocks and the next three days of spray windows on one page. The monthly Greens Report for the committee is built from the same data.</p></figcaption>
       </figure>
       <div class="stackcol s7">
-        <div class="frame"><img src="img/greens-radar.webp" width="1600" height="528" loading="lazy" alt="Greens radar: one disc per green showing moisture and uniformity from the mower scan"></div>
-        <div class="frame"><img src="img/greens-moisture-heat.webp" width="1600" height="521" loading="lazy" alt="Moisture by green and by day, with the dry days outlined"></div>
+        <div class="frame" data-r="wipe" style="--rd:.1s"><div class="pic"><img src="img/greens-radar.webp" srcset="img/greens-radar-800.webp 800w, img/greens-radar.webp 1600w" sizes="(max-width:980px) 100vw, 56vw" width="1600" height="528" loading="lazy" decoding="async" alt="Greens radar: one disc per green showing moisture and uniformity from the mower scan"></div></div>
+        <div class="frame" data-r="wipe" style="--rd:.2s"><div class="pic"><img src="img/greens-moisture-heat.webp" srcset="img/greens-moisture-heat-800.webp 800w, img/greens-moisture-heat.webp 1600w" sizes="(max-width:980px) 100vw, 56vw" width="1600" height="521" loading="lazy" decoding="async" alt="Moisture by green and by day, with the dry days outlined"></div></div>
       </div>
       <figure class="shot s7">
-        <div class="frame"><div class="bar">ranfurlie-greens/machinery</div><img src="img/machinery-top.webp" width="1600" height="606" loading="lazy" alt="The machinery dashboard: overdue services, open faults and the job to do first"></div>
-        <figcaption><h3>Machinery</h3><p>{{MACHINES_ACTIVE}} machines in service. Hours from Toro telematics, faults from Slack, and services projected from how much each machine actually gets used. The mechanic's list is waiting at 5:35 on weekday mornings, safety faults first.</p></figcaption>
+        <div class="frame" data-r="wipe"><div class="bar">ranfurlie-greens/machinery</div><div class="pic"><img src="img/machinery-top.webp" srcset="img/machinery-top-800.webp 800w, img/machinery-top.webp 1600w" sizes="(max-width:980px) 100vw, 56vw" width="1600" height="606" loading="lazy" decoding="async" alt="The machinery dashboard: overdue services, open faults and the job to do first"></div></div>
+        <figcaption data-r><h3>Machinery</h3><p>{{MACHINES_ACTIVE}} machines in service. Hours from Toro telematics, faults from Slack, and services projected from how much each machine actually gets used. The mechanic's list is waiting at 5:35 on weekday mornings, safety faults first.</p></figcaption>
       </figure>
       <figure class="shot s5">
-        <div class="frame"><img src="img/machinery-plan.webp" width="1600" height="938" loading="lazy" alt="The next eight weeks of servicing, one row per machine"></div>
-        <figcaption><p>The next eight weeks of servicing, one row per machine. Red is overdue.</p></figcaption>
+        <div class="frame" data-r="wipe" style="--rd:.15s"><div class="pic"><img src="img/machinery-plan.webp" srcset="img/machinery-plan-800.webp 800w, img/machinery-plan.webp 1600w" sizes="(max-width:980px) 100vw, 40vw" width="1600" height="938" loading="lazy" decoding="async" alt="The next eight weeks of servicing, one row per machine"></div></div>
+        <figcaption data-r><p>The next eight weeks of servicing, one row per machine. Red is overdue.</p></figcaption>
       </figure>
       <div class="phones s12">
-        <div class="side-note">
+        <div class="side-note" data-r>
           <h3>Spray mixes</h3>
           <p>Each tank becomes a step-by-step recipe on the applicator's phone. Pre-start first, then PPE, then each product in the right tank order with the amount in big numbers and the label warnings where they matter. The link goes into #spraying with the applicator tagged.</p>
+          <p class="swipe"><span>Swipe through a real mix</span><svg width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><path d="M1 6h19m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></p>
         </div>
-        <div class="phone"><img src="img/spray-1.webp" width="780" height="1688" loading="lazy" alt="Spray recipe step one: the sprayer pre-start checklist"></div>
-        <div class="phone"><img src="img/spray-3.webp" width="780" height="1688" loading="lazy" alt="Spray recipe: fill the tank to 250 litres"></div>
-        <div class="phone"><img src="img/spray-4.webp" width="780" height="1688" loading="lazy" alt="Spray recipe: add 500 mL of Companion, with the PPE and hazard warning"></div>
+        <div>
+          <div class="rail" id="rail" data-stagger>
+            <div class="phone" data-r="pop"><img src="img/spray-1.webp" srcset="img/spray-1-520.webp 520w, img/spray-1.webp 780w" sizes="(max-width:980px) 64vw, 220px" width="780" height="1688" loading="lazy" decoding="async" alt="Spray recipe step one: the sprayer pre-start checklist"></div>
+            <div class="phone" data-r="pop"><img src="img/spray-3.webp" srcset="img/spray-3-520.webp 520w, img/spray-3.webp 780w" sizes="(max-width:980px) 64vw, 220px" width="780" height="1688" loading="lazy" decoding="async" alt="Spray recipe: fill the tank to 250 litres"></div>
+            <div class="phone" data-r="pop"><img src="img/spray-4.webp" srcset="img/spray-4-520.webp 520w, img/spray-4.webp 780w" sizes="(max-width:980px) 64vw, 220px" width="780" height="1688" loading="lazy" decoding="async" alt="Spray recipe: add 500 mL of Companion, with the PPE and hazard warning"></div>
+          </div>
+          <div class="dots" id="railDots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+        </div>
       </div>
     </div>
   </div>
@@ -608,28 +744,28 @@ html.og .stack .lbl{display:block}
 <section class="sec" id="ahead">
   <div class="wrap">
     <div class="head">
-      <h2>Seeing it before it shows.</h2>
-      <p class="lede">The best day on a course is the one where nothing goes wrong because we saw it coming. The greens dashboard keeps a running list of what's due, what's about to lapse and what the weather is going to do. This is that list, read straight from the live data.</p>
+      <h2 data-split>Seeing it before it shows.</h2>
+      <p class="lede" data-r>The best day on a course is the one where nothing goes wrong because we saw it coming. The greens dashboard keeps a running list of what's due, what's about to lapse and what the weather is going to do. This is that list, read straight from the live data.</p>
       <p><span class="live" id="liveTag">Snapshot</span></p>
     </div>
-    <div class="tiles" id="tiles"></div>
+    <div class="tiles" id="tiles" data-stagger></div>
     <div class="week" id="week" aria-label="The days ahead"></div>
   </div>
 </section>
 
 <section class="sec alt" id="safety">
   <div class="wrap sf-grid">
-    <div class="phone"><img src="img/safety-phone.webp" width="780" height="1691" loading="lazy" alt="The Ranfurlie Safety page on a phone, listing safe work procedures and training modules"></div>
+    <div class="phone" data-r="pop"><img src="img/safety-phone.webp" srcset="img/safety-phone-520.webp 520w, img/safety-phone.webp 780w" sizes="(max-width:860px) 230px, 300px" width="780" height="1691" loading="lazy" decoding="async" alt="The Ranfurlie Safety page on a phone, listing safe work procedures and training modules"></div>
     <div>
-      <h2 style="margin-bottom:22px">Safety that follows itself up.</h2>
-      <p class="lede">Every safe work procedure and OHS document is on a page the crew can read on their phone and sign with a finger. Each one comes back for renewal based on how risky the job is. When someone's due, they get tagged in Slack, and they keep getting tagged until it's done.</p>
-      <div class="cycle" aria-label="Renewal by risk, over two years">
-        <div><b>High risk</b><span class="track"><i style="--c:var(--flag);left:0;width:25%"></i><i style="--c:var(--flag);left:25%;width:25%;opacity:.75"></i><i style="--c:var(--flag);left:50%;width:25%;opacity:.55"></i><i style="--c:var(--flag);left:75%;width:25%;opacity:.4"></i></span></div>
-        <div><b>Medium</b><span class="track"><i style="--c:var(--dry);left:0;width:50%"></i><i style="--c:var(--dry);left:50%;width:50%;opacity:.6"></i></span></div>
-        <div><b>Low</b><span class="track"><i style="--c:var(--turf);left:0;width:100%"></i></span></div>
+      <h2 style="margin-bottom:22px" data-split>Safety that follows itself up.</h2>
+      <p class="lede" data-r>Every safe work procedure and OHS document is on a page the crew can read on their phone and sign with a finger. Each one comes back for renewal based on how risky the job is. When someone's due, they get tagged in Slack, and they keep getting tagged until it's done.</p>
+      <div class="cycle" data-r aria-label="Renewal by risk, over two years">
+        <div><b>High risk</b><span class="track"><i style="--c:var(--flag);left:0;width:25%;--q:0"></i><i style="--c:var(--flag);left:25%;width:25%;opacity:.75;--q:1"></i><i style="--c:var(--flag);left:50%;width:25%;opacity:.55;--q:2"></i><i style="--c:var(--flag);left:75%;width:25%;opacity:.4;--q:3"></i></span></div>
+        <div><b>Medium</b><span class="track"><i style="--c:var(--dry);left:0;width:50%;--q:0"></i><i style="--c:var(--dry);left:50%;width:50%;opacity:.6;--q:1"></i></span></div>
+        <div><b>Low</b><span class="track"><i style="--c:var(--turf);left:0;width:100%;--q:0"></i></span></div>
         <div><span></span><span class="small">Re-sign every 6, 12 or 24 months</span></div>
       </div>
-      <ul class="checks">
+      <ul class="checks" data-stagger>
         <li><b>Pre-starts are checked every hour</b> from 6am. Anyone on a machine in TurfDog without a pre-start or a signed SWP for it gets a tag.</li>
         <li><b>18 training modules</b> with a short knowledge check each, from site induction to lightning, heat, fire danger days and working alone, checked against current Victorian requirements.</li>
         <li><b>Shed keys</b> are signed out and back with a QR code on the wall. If one isn't back by Tuesday 10am, Slack hears about it.</li>
@@ -642,18 +778,18 @@ html.og .stack .lbl{display:block}
 <section class="sec" id="how">
   <div class="wrap">
     <div class="head">
-      <h2>What it actually takes.</h2>
-      <p class="lede">No developers and no new software contract. Every one of these started as a job that annoyed me, described to Claude in plain English.</p>
+      <h2 data-split>What it actually takes.</h2>
+      <p class="lede" data-r>No developers and no new software contract. Every one of these started as a job that annoyed me, described to Claude in plain English.</p>
     </div>
     <div class="how-grid">
-      <ul class="kit">
+      <ul class="kit" data-stagger>
         <li><b>Claude</b><span>Doing the reading, checking and writing, on a schedule or when someone asks in Slack.</span></li>
         <li><b>A shed PC</b><span>Left on, with Chrome signed in to Cirrus Pro, TurfRad, GreenKeeper, TurfDog and the rest, for the systems that have no other way in.</span></li>
         <li><b>Connectors</b><span>Slack, Notion, Microsoft 365, Gmail, Google Drive and Zapier.</span></li>
         <li><b>GitHub</b><span>A free account that hosts the live pages, including this one.</span></li>
         <li><b>Plain text</b><span>The instructions for every job, versioned in a folder, so we can read exactly what it's been told.</span></li>
       </ul>
-      <div class="rule">
+      <div class="rule" data-r="pop">
         <h3>Claude prepares. People decide.</h3>
         <p>The line we hold everywhere:</p>
         <ul>
@@ -665,8 +801,8 @@ html.og .stack .lbl{display:block}
       </div>
     </div>
     <div class="sign">
-      <p class="big">AI gives superintendents the power to do almost anything now.</p>
-      <p class="who"><b>Andrew Anderson</b>Course Superintendent, Ranfurlie Golf Club<br>Cranbourne, Victoria. @andrewturfnerd</p>
+      <p class="big" data-split>AI gives superintendents the power to do almost anything now.</p>
+      <p class="who" data-r><b>Andrew Anderson</b>Course Superintendent, Ranfurlie Golf Club<br>Cranbourne, Victoria. @andrewturfnerd</p>
     </div>
   </div>
 </section>
@@ -680,48 +816,104 @@ html.og .stack .lbl{display:block}
 
 <script>
 (()=>{
-const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const $ = s => document.querySelector(s);
-const NS = 'http://www.w3.org/2000/svg';
+const H=document.documentElement, STILL=H.classList.contains('still'), OG=H.classList.contains('og');
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const mqMobile=matchMedia('(max-width:980px)');
 
-/* ---------- top bar */
-const tb=$('#topbar'); addEventListener('scroll',()=>tb.classList.toggle('scrolled',scrollY>8),{passive:true});
+/* ---------- split headings into words */
+$$('[data-split]').forEach(el=>{
+  if(STILL||OG) return;
+  const words=el.textContent.trim().split(/\s+/);
+  el.innerHTML=words.map((w,k)=>`<span class="w"><i style="--k:${k}">${w}</i></span>`).join(' ');
+  el.classList.add('split');
+});
 
-/* ---------- hero */
-const st=document.querySelector('.stack');
-if(st){
-  const vbFull=st.getAttribute('viewBox'), vbm=st.dataset.vbm;
-  const fit=()=>{ if(vbm) st.setAttribute('viewBox', innerWidth<=980 && !document.documentElement.classList.contains('og') ? vbm : vbFull); };
-  fit(); addEventListener('resize',fit);
-  if(RM||document.documentElement.classList.contains('og')) st.classList.add('open');
-  else requestAnimationFrame(()=>setTimeout(()=>st.classList.add('open'),120));
+/* ---------- staggered children */
+$$('[data-stagger]').forEach(box=>{
+  const kind=box.dataset.stagger||'';
+  [...box.children].forEach((c,i)=>{ if(!c.hasAttribute('data-r')) c.setAttribute('data-r',kind); c.style.setProperty('--rd',(i*.09).toFixed(2)+'s'); });
+});
+
+/* ---------- count up */
+const fmtN=n=>n.toLocaleString('en-AU');
+function countUp(el){
+  const to=+el.dataset.count, pre=el.dataset.prefix||'';
+  if(STILL||!to){el.textContent=pre+fmtN(to);return}
+  const t0=performance.now(), dur=Math.min(1800,600+to*4);
+  const step=t=>{const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3); el.textContent=pre+fmtN(Math.round(to*e)); if(p<1) requestAnimationFrame(step)};
+  el.textContent=pre+'0'; requestAnimationFrame(step);
 }
 
-/* ---------- flow lines */
+/* ---------- reveal on scroll */
+const hooks=new Map(); // element -> callback on first reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting) return;
+  const el=e.target; el.classList.add('in'); io.unobserve(el);
+  el.querySelectorAll&&el.querySelectorAll('[data-count]').forEach(countUp);
+  if(el.hasAttribute('data-count')) countUp(el);
+  const f=hooks.get(el); if(f) f();
+}),{rootMargin:'0px 0px -8% 0px',threshold:.12});
+if(STILL||OG){ $$('[data-r],[data-split]').forEach(el=>el.classList.add('in')); }
+else { $$('[data-r],[data-split]').forEach(el=>io.observe(el)); }
+const onReveal=(el,f)=>{ if(!el) return; if(STILL||OG){f();return} hooks.set(el,f); if(!el.hasAttribute('data-r')&&!el.hasAttribute('data-split')) io.observe(el); };
+$$('.facts [data-count]').forEach(el=>{ if(STILL||OG) return; el.textContent='0'; });
+
+/* ---------- pause looping animation when off screen */
+const vis=new IntersectionObserver(es=>es.forEach(e=>{
+  e.target.classList.toggle('paused',!e.isIntersecting);
+  e.target.querySelectorAll('svg').forEach(s=>{ if(s.pauseAnimations) e.isIntersecting?s.unpauseAnimations():s.pauseAnimations(); });
+}),{rootMargin:'120px'});
+$$('.hero,#connected,#clock,#spatially,#cirrus,#dashboards').forEach(s=>vis.observe(s));
+
+/* ---------- top bar, progress, active nav */
+const tb=$('#topbar'), prog=$('#prog'); let ticking=false;
+const navLinks=$$('.nav a'), secs=navLinks.map(a=>$(a.getAttribute('href')));
+function onScroll(){
+  ticking=false;
+  const y=scrollY, max=document.documentElement.scrollHeight-innerHeight;
+  tb.classList.toggle('scrolled',y>8);
+  prog.style.transform=`scaleX(${max>0?(y/max).toFixed(4):0})`;
+  let cur=-1; secs.forEach((s,i)=>{ if(s&&s.getBoundingClientRect().top<innerHeight*.4) cur=i; });
+  navLinks.forEach((a,i)=>a.classList.toggle('on',i===cur));
+}
+addEventListener('scroll',()=>{ if(!ticking){ticking=true;requestAnimationFrame(onScroll)} },{passive:true}); onScroll();
+
+/* ---------- hero stack */
+const st=$('#stack');
+if(st){
+  const svgs=st.querySelectorAll('svg.sl');
+  const fit=()=>{ const vb=(mqMobile.matches&&!OG)?st.dataset.vbm:st.dataset.vb; svgs.forEach(s=>s.setAttribute('viewBox',vb)); };
+  fit(); mqMobile.addEventListener?mqMobile.addEventListener('change',fit):mqMobile.addListener(fit);
+  if(STILL||OG){ st.classList.add('open'); st.querySelectorAll('.pin').forEach(p=>{p.style.opacity=1;p.style.transform='none'}); }
+  else {
+    requestAnimationFrame(()=>setTimeout(()=>st.classList.add('open'),150));
+    setTimeout(()=>st.classList.add('float'),2600);
+  }
+}
+
+/* ---------- flow lines (desktop) */
 const flow=$('#flow'), fl=$('#flowLines');
 function drawFlow(){
-  if(!flow||innerWidth<=980){fl.innerHTML='';return}
+  if(!flow||mqMobile.matches){fl.innerHTML='';return}
   const fr=flow.getBoundingClientRect(), core=$('#core').getBoundingClientRect();
   const cxL=core.left-fr.left, cxR=core.right-fr.left, cy=core.top-fr.top+core.height/2;
   let h='';
-  document.querySelectorAll('[data-in]').forEach((g,i,a)=>{
+  $$('[data-in]').forEach((g,i,a)=>{
     const r=g.getBoundingClientRect(), x=r.right-fr.left, y=r.top-fr.top+r.height/2;
-    const ty=cy+(i-(a.length-1)/2)*16, mx=(x+cxL)/2;
-    const d=`M${x} ${y} C${mx} ${y} ${mx} ${ty} ${cxL} ${ty}`;
-    h+=`<path class="in" d="${d}"/><path class="in run" d="${d}" style="animation-delay:${-i*.5}s"/>`;
+    const ty=cy+(i-(a.length-1)/2)*16, mx=(x+cxL)/2, d=`M${x} ${y} C${mx} ${y} ${mx} ${ty} ${cxL} ${ty}`;
+    h+=`<path class="in draw" d="${d}" style="--rd:${(.3+i*.12).toFixed(2)}s"/><path class="in run" d="${d}" style="animation-delay:${-i*.5}s"/>`;
   });
-  document.querySelectorAll('[data-out]').forEach((g,i,a)=>{
+  $$('[data-out]').forEach((g,i,a)=>{
     const r=g.getBoundingClientRect(), x=r.left-fr.left, y=r.top-fr.top+r.height/2;
-    const sy=cy+(i-(a.length-1)/2)*14, mx=(x+cxR)/2;
-    const d=`M${cxR} ${sy} C${mx} ${sy} ${mx} ${y} ${x} ${y}`;
-    h+=`<path class="out" d="${d}"/><path class="out run" d="${d}" style="animation-delay:${-i*.4}s"/>`;
+    const sy=cy+(i-(a.length-1)/2)*14, mx=(x+cxR)/2, d=`M${cxR} ${sy} C${mx} ${sy} ${mx} ${y} ${x} ${y}`;
+    h+=`<path class="out draw" d="${d}" style="--rd:${(.9+i*.12).toFixed(2)}s"/><path class="out run" d="${d}" style="animation-delay:${-i*.4}s"/>`;
   });
   fl.innerHTML=h;
+  fl.querySelectorAll('.draw').forEach(p=>p.style.setProperty('--len',Math.ceil(p.getTotalLength())));
 }
 drawFlow(); addEventListener('resize',drawFlow); document.fonts&&document.fonts.ready.then(drawFlow);
-if('IntersectionObserver' in window){
-  new IntersectionObserver(es=>es.forEach(e=>fl.classList.toggle('paused',!e.isIntersecting))).observe(flow);
-}
+onReveal(flow,()=>flow.classList.add('in'));
+if(STILL||OG) flow.classList.add('in');
 
 /* ---------- 24h dial */
 const TASKS=__TASKS__;
@@ -731,6 +923,7 @@ const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
 const ang=m=>m/1440*Math.PI*2-Math.PI/2;
 const P=(r,a)=>[r*Math.cos(a),r*Math.sin(a)];
 const fmt=t=>{let[h,m]=t.split(':').map(Number);const ap=h<12?'am':'pm';h=h%12||12;return `${h}:${String(m).padStart(2,'0')}${ap}`};
+const fmtM=m=>fmt(`${Math.floor(m/60)%24}:${m%60}`);
 const when=k=>{const t=k.t; return t.length>2?`Every hour, ${fmt(t[0])} to ${fmt(t[t.length-1])}`:t.map(fmt).join(' and ')};
 const days=k=>({daily:'Every day',weekdays:'Weekdays',Fridays:'Fridays',Sundays:'Sundays'})[k.d];
 function arc(r0,r1,m0,m1){
@@ -738,42 +931,65 @@ function arc(r0,r1,m0,m1){
   const[p,q]=[P(r1,a0),P(r1,a1)],[s,t]=[P(r0,a1),P(r0,a0)];
   return `M${p} A${r1} ${r1} 0 ${big} 1 ${q} L${s} A${r0} ${r0} 0 ${big} 0 ${t}Z`;
 }
+function melb(){
+  const parts=new Intl.DateTimeFormat('en-AU',{timeZone:'Australia/Melbourne',hour:'numeric',minute:'numeric',weekday:'short',hourCycle:'h23'}).formatToParts(new Date());
+  const g=k=>(parts.find(p=>p.type===k)||{}).value; return {m:(+g('hour'))*60+(+g('minute')), wd:g('weekday')};
+}
+const runsOn=(k,wd)=>k.d==='daily'||(k.d==='weekdays'&&!/Sat|Sun/.test(wd))||(k.d==='Fridays'&&wd==='Fri')||(k.d==='Sundays'&&wd==='Sun');
 const dial=$('#dial'); let svg='';
 svg+=`<path d="${arc(80,262,1185,380)}" fill="rgba(19,48,74,.06)"/>`;
 svg+=`<path d="${arc(268,275,1140,330)}" fill="#1C74C4" opacity=".85"/>`;
 RR.forEach(r=>svg+=`<circle class="rg" r="${r}"/>`);
 for(let h=0;h<24;h++){const a=ang(h*60),[x1,y1]=P(258,a),[x2,y2]=P(h%3?262:254,a);svg+=`<line class="hr" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
   if(h%3===0){const[x,y]=P(296,a);svg+=`<text class="hl" x="${x}" y="${y}">${h===0?'12am':h===12?'12pm':h<12?h+'am':(h-12)+'pm'}</text>`}}
+svg+=`<line class="hand" x1="0" y1="0" x2="0" y2="-262" style="transform-origin:0 0"/>`;
 const slot={};
 TASKS.forEach((k,i)=>{
   const jitter=[0,-9,9,-4.5,4.5][(TASKS.filter((q,j)=>j<i&&q.r===k.r).length)%5];
   k.t.forEach(t=>{
-    let m=toMin(t); const key=k.r+'|'+m; slot[key]=(slot[key]||0)+1; const off=(slot[key]-1)*7;
+    const m=toMin(t), key=k.r+'|'+m; slot[key]=(slot[key]||0)+1; const off=(slot[key]-1)*7;
     const[x,y]=P(RR[k.r]+jitter,ang(m+off)); const c=RINGS[k.r].c, hollow=/Sun|Fri/.test(k.d);
-    svg+=`<circle class="dot" data-i="${i}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.2" fill="${hollow?'#E2E9E1':c}" stroke="${c}" stroke-width="${hollow?2:1}"/>`;
+    svg+=`<circle class="dot" data-i="${i}" style="--a:${(m/1440).toFixed(3)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.4" fill="${hollow?'#E2E9E1':c}" stroke="${c}" stroke-width="${hollow?2:1}"/>`;
   });
 });
-svg+=`<circle r="84" fill="#FAFBF8" stroke="#C3CFC5"/><g id="ctr"></g>`;
+svg+=`<g class="now" id="nowHand"></g><circle r="84" fill="#FAFBF8" stroke="#C3CFC5"/><g id="ctr"></g>`;
 dial.innerHTML=svg;
 const ctr=dial.querySelector('#ctr');
 const ctrDefault=()=>{ctr.innerHTML=`<text class="ctr-n" y="10">{{WEEKDAY_RUNS}}</text><text class="ctr-l" y="36">runs on a weekday</text>`};
 ctrDefault();
-$('#keys').innerHTML=RINGS.map(r=>`<li><i style="background:${r.c}"></i>${r.n}</li>`).join('')+`<li><span class="ww"></span>Cirrus watering window</li><li><i style="background:#E2E9E1;border:2px solid #768A98"></i>Weekly</li>`;
+function drawNow(){
+  const {m,wd}=melb(), a=ang(m), [x,y]=P(262,a), [tx,ty]=P(304,a), [gx,gy]=P(262,a);
+  $('#nowHand').innerHTML=`<line x1="0" y1="0" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/><circle class="glow" cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="9"/><circle cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="6"/><text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}">Now</text>`;
+  let best=null;
+  TASKS.forEach(k=>{ if(!runsOn(k,wd)) return; k.t.forEach(t=>{const tm=toMin(t); if(tm>m&&(!best||tm<best.m)) best={m:tm,k}; }); });
+  const nx=$('#next'); if(!nx) return;
+  nx.innerHTML= best?`It's <b>${fmtM(m)}</b> in Melbourne right now. Next up at ${fmtM(best.m)}: <b>${best.k.n}</b>.`:`It's <b>${fmtM(m)}</b> in Melbourne. Everything's run for today. Next up at 4:45am: <b>Course setup, morning check</b>.`;
+}
+drawNow(); setInterval(drawNow,30000);
+$('#keys').innerHTML=RINGS.map(r=>`<li><i style="background:${r.c}"></i>${r.n}</li>`).join('')+`<li><span class="ww"></span>Cirrus watering window</li><li><span class="nw"></span>Now, Melbourne time</li><li><i style="background:#E2E9E1;border:2px solid #768A98"></i>Weekly</li>`;
 const order=TASKS.map((k,i)=>[toMin(k.t[0]),i]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
 $('#tasklist').innerHTML=order.map(i=>{const k=TASKS[i];return `<li><button type="button" data-i="${i}" aria-pressed="false"><span class="t">${fmt(k.t[0])}</span><span><span class="c" style="background:${RINGS[k.r].c}"></span>${k.n}</span></button></li>`}).join('');
-let selI=-1;
+$('#moreBtn').addEventListener('click',e=>{const tl=$('#tasklist'), open=tl.classList.toggle('short'); e.currentTarget.textContent=open?'Show all {{TASK_COUNT}} jobs':'Show fewer'; e.currentTarget.setAttribute('aria-expanded',!open)});
+let selI=-1; const pickHTML=$('#pick').innerHTML;
 function select(i){
   selI=i; dial.classList.toggle('sel',i>=0);
   dial.querySelectorAll('.dot').forEach(d=>d.classList.toggle('on',+d.dataset.i===i));
-  document.querySelectorAll('#tasklist button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.i===i));
-  if(i<0){ctrDefault();return}
+  $$('#tasklist button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.i===i));
+  const pk=$('#pick'); pk.classList.remove('swap'); void pk.offsetWidth; pk.classList.add('swap');
+  if(i<0){ctrDefault(); pk.innerHTML=pickHTML; drawNow(); return}
   const k=TASKS[i];
-  $('#pick').innerHTML=`<p class="when" style="color:${RINGS[k.r].c}">${when(k)}. ${days(k)}.</p><h3>${k.n}</h3><p>${k.x}</p>`;
+  pk.innerHTML=`<p class="when" style="color:${RINGS[k.r].c}">${when(k)}. ${days(k)}.</p><h3>${k.n}</h3><p>${k.x}</p>`;
   ctr.innerHTML=`<text class="ctr-t" y="4">${fmt(k.t[0])}</text><text class="ctr-l" y="30">${k.t.length>2?'then hourly':days(k).toLowerCase()}</text>`;
 }
 dial.addEventListener('click',e=>{const d=e.target.closest('.dot'); select(d?(+d.dataset.i===selI?-1:+d.dataset.i):-1)});
 dial.addEventListener('mouseover',e=>{const d=e.target.closest('.dot'); if(d&&matchMedia('(hover:hover)').matches) select(+d.dataset.i)});
 $('#tasklist').addEventListener('click',e=>{const b=e.target.closest('button'); if(b) select(+b.dataset.i===selI?-1:+b.dataset.i)});
+onReveal(dial,()=>{dial.classList.add('go'); setTimeout(()=>dial.classList.add('done'),2500)});
+if(STILL||OG) dial.classList.add('go','done');
+
+/* ---------- rain in the night section */
+(function(){ if(STILL||OG) return; const d=$('#drops'); let h='';
+  const n=mqMobile.matches?14:28; for(let i=0;i<n;i++){h+=`<i style="left:${(Math.random()*104).toFixed(1)}%;top:${(Math.random()*100).toFixed(1)}%;animation-duration:${(2.2+Math.random()*2.2).toFixed(2)}s;animation-delay:${(-Math.random()*5).toFixed(2)}s;--o:${(.25+Math.random()*.5).toFixed(2)}"></i>`} d.innerHTML=h; })();
 
 /* ---------- 18th green */
 const G18=__G18__;
@@ -790,34 +1006,49 @@ const G18=__G18__;
   ${(G18.bunkers||[]).map(b=>`<polygon points="${b.map(p=>p.join(',')).join(' ')}" fill="#D9C79A" fill-opacity=".85"/>`).join('')}</g>
   <polygon points="${poly}" fill="url(#mow)" stroke="#9FD3A6" stroke-width=".3"/>`;
   g+=`<g clip-path="url(#gclip)">`;
-  G18.heads.forEach((hd,i)=>{g+=`<circle class="throw" data-h="${hd.n}" cx="${hd.x}" cy="${hd.y}" r="17" fill-opacity=".12"/>`});
+  G18.heads.forEach(hd=>{g+=`<circle class="throw" data-h="${hd.n}" cx="${hd.x}" cy="${hd.y}" r="17" fill-opacity=".03"/>`});
   g+=`</g>`;
-  G18.heads.forEach((hd,i)=>{
-    const sw=RM?'':`<g clip-path="url(#gclip)"><path class="sweep" d="M${hd.x} ${hd.y} L${hd.x+17} ${hd.y} A17 17 0 0 1 ${(hd.x+17*Math.cos(.45)).toFixed(2)} ${(hd.y+17*Math.sin(.45)).toFixed(2)}Z"><animateTransform attributeName="transform" type="rotate" from="${i*60} ${hd.x} ${hd.y}" to="${i*60+360} ${hd.x} ${hd.y}" dur="${9+i}s" repeatCount="indefinite"/></path></g>`;
-    g+=sw;
-  });
+  if(!(STILL||OG)){
+    g+=`<g clip-path="url(#gclip)">`;
+    G18.heads.forEach((hd,i)=>{
+      g+=`<path class="sweep" d="M${hd.x} ${hd.y} L${hd.x+17} ${hd.y} A17 17 0 0 1 ${(hd.x+17*Math.cos(.45)).toFixed(2)} ${(hd.y+17*Math.sin(.45)).toFixed(2)}Z"><animateTransform attributeName="transform" type="rotate" from="${i*60} ${hd.x} ${hd.y}" to="${i*60+360} ${hd.x} ${hd.y}" dur="${7+i}s" repeatCount="indefinite"/></path>`;
+    });
+    g+=`</g>`;
+  }
   const cx=G18.green.reduce((a,p)=>a+p[0],0)/G18.green.length, cy=G18.green.reduce((a,p)=>a+p[1],0)/G18.green.length;
-  G18.heads.forEach(hd=>{
+  G18.heads.forEach((hd,i)=>{
     const dx=hd.x-cx, dy=hd.y-cy, L=Math.hypot(dx,dy)||1, lx=hd.x+dx/L*7.5, ly=hd.y+dy/L*7.5;
-    g+=`<circle class="hd" cx="${hd.x}" cy="${hd.y}" r="1.25"/><text class="hn" x="${lx.toFixed(1)}" y="${(ly-1.6).toFixed(1)}">${hd.n}</text><text class="ht" data-t="${hd.n}" x="${lx.toFixed(1)}" y="${(ly+3.4).toFixed(1)}"></text>`;
+    g+=`<circle class="hdring" style="--d:${(i*.4).toFixed(1)}s" cx="${hd.x}" cy="${hd.y}" r="1.6"/><circle class="hd" cx="${hd.x}" cy="${hd.y}" r="1.25"/><text class="hn" x="${lx.toFixed(1)}" y="${(ly-1.6).toFixed(1)}">${hd.n}</text><text class="ht" data-t="${hd.n}" x="${lx.toFixed(1)}" y="${(ly+3.4).toFixed(1)}"></text>`;
   });
   s.innerHTML=g;
-  const ms=v=>`${Math.floor(v/60)}:${String(v%60).padStart(2,'0')}`;
+  const ms=v=>`${Math.floor(v/60)}:${String(Math.round(v%60)).padStart(2,'0')}`;
   const bars=$('#bars18');
-  bars.innerHTML=names.map(n=>`<li><span class="n">${n}</span><span class="b"><i data-b="${n}" style="width:0"></i></span><span class="v" data-v="${n}"></span>${G18.read[n]?`<span class="r">${G18.read[n]}% on the morning scan</span>`:''}</li>`).join('');
+  bars.innerHTML=names.map(n=>`<li><span class="n">${n}</span><span class="b"><i data-b="${n}" style="width:0"></i></span><span class="v" data-v="${n}">0:00</span>${G18.read[n]?`<span class="r">${G18.read[n]}% on the morning scan</span>`:''}</li>`).join('');
+  const cur={}; names.forEach(n=>cur[n]=0);
+  function tween(to){
+    const from={...cur}, t0=performance.now(), dur=STILL?0:900;
+    const step=t=>{const p=dur?Math.min(1,(t-t0)/dur):1, e=1-Math.pow(1-p,3);
+      names.forEach(n=>{cur[n]=from[n]+(to[n]-from[n])*e; s.querySelector(`[data-t="${n}"]`).textContent=ms(cur[n]); bars.querySelector(`[data-v="${n}"]`).textContent=ms(cur[n]);});
+      if(p<1) requestAnimationFrame(step)};
+    requestAnimationFrame(step);
+  }
   function mode(perHead){
     $('#mHead').setAttribute('aria-pressed',perHead); $('#mFlat').setAttribute('aria-pressed',!perHead);
-    names.forEach(n=>{
-      const v=perHead?T[n]:flat;
+    const to={};
+    names.forEach(n=>{ const v=perHead?T[n]:flat; to[n]=v;
       s.querySelector(`.throw[data-h="${n}"]`).setAttribute('fill-opacity',(0.025+0.2*(v/mx)**2.4).toFixed(3));
-      s.querySelector(`[data-t="${n}"]`).textContent=ms(v);
       bars.querySelector(`[data-b="${n}"]`).style.width=(v/mx*100)+'%';
-      bars.querySelector(`[data-v="${n}"]`).textContent=ms(v);
     });
+    tween(to);
   }
   $('#mHead').onclick=()=>mode(true); $('#mFlat').onclick=()=>mode(false);
-  requestAnimationFrame(()=>mode(true));
+  if(STILL||OG) mode(true);
+  else onReveal($('#scGrid').firstElementChild,()=>{ mode(false); setTimeout(()=>mode(true),1700); });
 })();
+
+/* ---------- Slack typing */
+onReveal($('#msg'),()=>setTimeout(()=>$('#msg').classList.add('done'),1300));
+if(STILL||OG) $('#msg').classList.add('done');
 
 /* ---------- 8th green arcs */
 const G8=__G8__;
@@ -828,67 +1059,83 @@ const G8=__G8__;
   const poly=G8.green.map(p=>p.join(',')).join(' ');
   const cx=G8.green.reduce((a,p)=>a+p[0],0)/G8.green.length, cy=G8.green.reduce((a,p)=>a+p[1],0)/G8.green.length;
   const R=16;
+  const full=hd=>`M${hd.x-R} ${hd.y} a${R} ${R} 0 1 0 ${2*R} 0 a${R} ${R} 0 1 0 ${-2*R} 0Z`;
+  const half=hd=>{const a=Math.atan2(cy-hd.y,cx-hd.x), q=k=>[(hd.x+R*Math.cos(a+k)).toFixed(2),(hd.y+R*Math.sin(a+k)).toFixed(2)];
+    return `M${hd.x} ${hd.y} L${q(-Math.PI/2)} A${R} ${R} 0 0 1 ${q(0)} A${R} ${R} 0 0 1 ${q(Math.PI/2)}Z`};
   let g=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="#DCEBD5" rx="3"/>`;
   (G8.appr||[]).forEach(a=>g+=`<polygon points="${a.map(p=>p.join(',')).join(' ')}" fill="#B5D3A8"/>`);
   g+=`<polygon points="${poly}" fill="#2E6A46"/>`;
-  G8.bunkers.forEach((b,i)=>g+=`<polygon class="bk" data-b="${i}" points="${b.map(p=>p.join(',')).join(' ')}"/>`);
-  G8.heads.forEach(hd=>g+=`<path class="wet" data-h="${hd.n}"/>`);
+  G8.bunkers.forEach((b,i)=>g+=`<polygon class="bk" points="${b.map(p=>p.join(',')).join(' ')}"/>`);
+  G8.heads.forEach(hd=>{ const part=G8.part.includes(hd.n);
+    g+=`<path class="wet full" data-h="${hd.n}" d="${full(hd)}"/>`;
+    if(part) g+=`<path class="wet part off" data-h="${hd.n}" d="${half(hd)}"/>`;
+  });
   G8.heads.forEach(hd=>{
     const dx=hd.x-cx, dy=hd.y-cy, L=Math.hypot(dx,dy)||1;
+    if(!(STILL||OG)) g+=`<circle class="tick" cx="${hd.x}" cy="${hd.y}" r="3"/>`;
     g+=`<circle class="hd" cx="${hd.x}" cy="${hd.y}" r="1.2"/><text class="hn" x="${(hd.x+dx/L*4.5).toFixed(1)}" y="${(hd.y+dy/L*4.5+1.2).toFixed(1)}">${hd.n}</text>`;
   });
   s.innerHTML=g;
-  const sector=(hd,part)=>{
-    if(!part) return `M${hd.x-R} ${hd.y} a${R} ${R} 0 1 0 ${2*R} 0 a${R} ${R} 0 1 0 ${-2*R} 0Z`;
-    const a=Math.atan2(cy-hd.y,cx-hd.x), q=k=>[(hd.x+R*Math.cos(a+k)).toFixed(2),(hd.y+R*Math.sin(a+k)).toFixed(2)];
-    const p0=q(-Math.PI/2), pm=q(0), p1=q(Math.PI/2);
-    return `M${hd.x} ${hd.y} L${p0} A${R} ${R} 0 0 1 ${pm} A${R} ${R} 0 0 1 ${p1}Z`;
-  };
-  const inside=(pt,hd,part)=>{const dx=pt[0]-hd.x,dy=pt[1]-hd.y; if(Math.hypot(dx,dy)>R) return false; if(!part) return true; return (dx*(cx-hd.x)+dy*(cy-hd.y))>=0};
+  const capPart='The 8th green. Four of its heads went to part circle in October, so they water the green and stop soaking the bunker faces. 8G3 is still full circle. Head positions are drawn for the diagram.';
+  const capFull='The 8th green as it was, every head full circle, throwing as much water onto the bunkers and surround as onto the green. Head positions are drawn for the diagram.';
   function mode(isPart){
     $('#aPart').setAttribute('aria-pressed',isPart); $('#aFull').setAttribute('aria-pressed',!isPart);
-    G8.heads.forEach(hd=>s.querySelector(`.wet[data-h="${hd.n}"]`).setAttribute('d',sector(hd,isPart&&G8.part.includes(hd.n))));
-    $('#cap8').textContent=isPart?'The 8th green. Four of its heads went to part circle in October, so they water the green and stop soaking the bunker faces. 8G3 is still full circle. Head positions are drawn for the diagram.':'The 8th green as it was, every head full circle, throwing as much water onto the bunkers and surround as onto the green. Head positions are drawn for the diagram.';
+    G8.part.forEach(n=>{ s.querySelector(`.wet.full[data-h="${n}"]`).classList.toggle('off',isPart); s.querySelector(`.wet.part[data-h="${n}"]`).classList.toggle('off',!isPart); });
+    $('#cap8').textContent=isPart?capPart:capFull;
   }
   $('#aPart').onclick=()=>mode(true); $('#aFull').onclick=()=>mode(false);
-  mode(true);
+  if(STILL||OG) mode(true);
+  else { mode(false); onReveal($('#arcWrap'),()=>setTimeout(()=>mode(true),1600)); }
+})();
+
+/* ---------- phone rail dots (mobile) */
+(function(){ const r=$('#rail'), dots=$$('#railDots i'); if(!r) return;
+  r.addEventListener('scroll',()=>{ const kids=[...r.children], mid=r.scrollLeft+r.clientWidth/2; let best=0,bd=1e9;
+    kids.forEach((k,i)=>{const c=k.offsetLeft+k.offsetWidth/2, d=Math.abs(c-mid); if(d<bd){bd=d;best=i}}); dots.forEach((d,i)=>d.classList.toggle('on',i===best)); },{passive:true});
+  onReveal(r,()=>{ if(mqMobile.matches&&!STILL) setTimeout(()=>{ r.scrollTo({left:60,behavior:'smooth'}); setTimeout(()=>r.scrollTo({left:0,behavior:'smooth'}),700); },900); });
 })();
 
 /* ---------- seeing ahead */
 const SNAP=__FWD__;
 const CAT={Spray:'#2E6A46',Disease:'#C2372C',Cover:'#C07A17',PGR:'#1C74C4',Planned:'#13304A',Weather:'#2B7A78',Cultural:'#768A98'};
-const dd=s=>{const d=new Date(s+'T00:00');return d};
+const dd=s=>new Date(s+'T00:00');
 const dlabel=s=>dd(s).toLocaleDateString('en-AU',{weekday:'short'});
 const dnum=s=>dd(s).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
-function gauge(frac,color,label){const r=30,c=2*Math.PI*r;return `<svg class="gauge" viewBox="0 0 72 72" aria-hidden="true"><circle class="t" cx="36" cy="36" r="${r}"/><circle class="v" cx="36" cy="36" r="${r}" stroke="${color}" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.max(0,Math.min(1,frac)))}"/><text x="36" y="37">${label}</text></svg>`}
+let aheadShown=false;
+function gauge(frac,color,label){const r=30,c=2*Math.PI*r,f=Math.max(0,Math.min(1,frac));return `<svg class="gauge" viewBox="0 0 72 72" aria-hidden="true"><circle class="t" cx="36" cy="36" r="${r}"/><circle class="v" cx="36" cy="36" r="${r}" stroke="${color}" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(aheadShown?c*(1-f):c).toFixed(1)}" data-off="${(c*(1-f)).toFixed(1)}"/><text x="36" y="37">${label}</text></svg>`}
+function fillGauges(){ $$('#tiles .gauge .v').forEach(v=>requestAnimationFrame(()=>v.setAttribute('stroke-dashoffset',v.dataset.off))); }
 function renderAhead(F,isLive){
-  const t=[];
-  const wa=F.wa||{};
-  if(wa.effectiveness!=null) t.push(`<div class="tile">${gauge(wa.effectiveness,'#1C74C4',Math.round(wa.effectiveness*100)+'%')}<div><h3>Wetting agent, greens</h3><p>${esc(wa.product)} went on ${dnum(wa.last_app)}. After ${Math.round(wa.cum_et_mm)} mm of ET it's still working at ${Math.round(wa.effectiveness*100)}%. Due again around ${dlabel(wa.due_date)} ${dnum(wa.due_date)}.</p></div></div>`);
-  const fw=F.fw||{};
-  if(fw.need_holes!=null) t.push(`<div class="tile">${gauge(fw.need_holes/18,'#C07A17',fw.need_holes+'/18')}<div><h3>Fairways tonight</h3><p>${fw.need_holes} of 18 fairways are at or under the trigger by tomorrow, about ${Math.round(fw.need_kl).toLocaleString('en-AU')} kL to top them up. Today's ET ${fw.et_today_mm} mm.</p></div></div>`);
+  const t=[], wa=F.wa||{}, fw=F.fw||{};
+  if(wa.effectiveness!=null) t.push(`<div class="tile" data-r>${gauge(wa.effectiveness,'#1C74C4',Math.round(wa.effectiveness*100)+'%')}<div><h3>Wetting agent, greens</h3><p>${esc(wa.product)} went on ${dnum(wa.last_app)}. After ${Math.round(wa.cum_et_mm)} mm of ET it's still working at ${Math.round(wa.effectiveness*100)}%. Due again around ${dlabel(wa.due_date)} ${dnum(wa.due_date)}.</p></div></div>`);
+  if(fw.need_holes!=null) t.push(`<div class="tile" data-r>${gauge(fw.need_holes/18,'#C07A17',fw.need_holes+'/18')}<div><h3>Fairways tonight</h3><p>${fw.need_holes} of 18 fairways are at or under the trigger by tomorrow, about ${Math.round(fw.need_kl).toLocaleString('en-AU')} kL to top them up. Today's ET ${fw.et_today_mm} mm.</p></div></div>`);
   const pgr=(F.clocks||[]).find(c=>c.clock==='Trinexapac'&&c.area==='Greens');
-  if(pgr) t.push(`<div class="tile">${gauge(pgr.gdd/pgr.target_gdd,'#2E6A46',Math.round(pgr.gdd))}<div><h3>PGR clock, greens</h3><p>${Math.round(pgr.gdd)} of ${pgr.target_gdd} growing degree days since the last trinexapac on ${dnum(pgr.last_app)}. It's re-applied on the GDD count, not the calendar.</p></div></div>`);
+  if(pgr) t.push(`<div class="tile" data-r>${gauge(pgr.gdd/pgr.target_gdd,'#2E6A46',Math.round(pgr.gdd))}<div><h3>PGR clock, greens</h3><p>${Math.round(pgr.gdd)} of ${pgr.target_gdd} growing degree days since the last trinexapac on ${dnum(pgr.last_app)}. It's re-applied on the GDD count, not the calendar.</p></div></div>`);
   $('#tiles').innerHTML=t.join('');
-  const items=(F.week||[]); if(!items.length){$('#week').innerHTML='<p class="empty">Nothing coming up.</p>';return}
-  const first=dd(items[0].date), last=dd(items[items.length-1].date), cols=[];
-  for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
-    const k=d.toISOString().slice(0,10).replace(/T.*/,''); const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const its=items.filter(x=>x.date===iso);
-    cols.push(`<div class="day${iso===items[0].date?' today':''}"><h4>${dlabel(iso)}<small>${dnum(iso)}</small></h4>${its.length?its.map(x=>`<span class="chip" style="--c:${CAT[x.cat]||'#13304A'}"><b>${esc(x.cat)}</b>${esc(x.label)}${x.cat==='Planned'?'':`<span>${esc(x.detail)}</span>`}</span>`).join(''):'<p class="empty">Nothing due</p>'}</div>`);
-  }
-  $('#week').innerHTML=cols.join('');
+  const items=(F.week||[]);
+  if(items.length){
+    const first=dd(items[0].date), last=dd(items[items.length-1].date), cols=[]; let ci=0;
+    for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
+      const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const its=items.filter(x=>x.date===iso);
+      cols.push(`<div class="day${iso===items[0].date?' today':''}" data-r style="--rd:${(ci++*.07).toFixed(2)}s"><h4>${dlabel(iso)}<small>${dnum(iso)}</small></h4>${its.length?its.map(x=>`<span class="chip" style="--c:${CAT[x.cat]||'#13304A'}"><b>${esc(x.cat)}</b>${esc(x.label)}${x.cat==='Planned'?'':`<span>${esc(x.detail)}</span>`}</span>`).join(''):'<p class="empty">Nothing due</p>'}</div>`);
+    }
+    $('#week').innerHTML=cols.join('');
+  } else $('#week').innerHTML='<p class="empty">Nothing coming up.</p>';
   const tag=$('#liveTag'); tag.textContent=isLive?`Live from the greens dashboard, built ${F.built}`:`Snapshot from ${F.built||'19 Oct 2026'}`; tag.classList.toggle('on',!!isLive);
+  const fresh=$$('#tiles [data-r],#week [data-r]');
+  if(STILL||OG||aheadShown){ fresh.forEach(e=>e.classList.add('in')); fillGauges(); }
+  else fresh.forEach(e=>io.observe(e));
 }
 renderAhead(SNAP,false);
+onReveal($('#tiles'),()=>{ aheadShown=true; setTimeout(fillGauges,250); });
 function fromData(D){
   const wa=(D.wetting_agent||[]).find(w=>w.zone==='greens')||{}, fp=(D.fairway_params||[])[0]||{};
   return {built:D._built,week:(D.week_ahead||[]).map(w=>({date:w.date,cat:w.cat,label:w.label,detail:w.detail})),wa,fw:fp,clocks:D.clocks||[]};
 }
-const ah=$('#ahead'); let fetched=false;
+let fetched=false;
 const go=()=>{if(fetched)return;fetched=true;fetch('../data.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()).then(D=>{try{renderAhead(fromData(D),true)}catch(e){renderAhead(SNAP,false)}}).catch(()=>{})};
-if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){go();io.disconnect()}},{rootMargin:'600px'});io.observe(ah)}else go();
+const io2=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){go();io2.disconnect()}},{rootMargin:'900px'}); io2.observe($('#ahead'));
 })();
 </script>
 </body>
