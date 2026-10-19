@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
 /* Ranfurlie Tank Mix template v1.6 (19 Oct 2026). Built by spray/_build/build.py from a recipe + products.json + config.json.
+   v1.7 (19 Oct): the pre-start and PPE steps stand alone (no recipe, tank gauge or setup chips until they're done).
    v1.6: handgun rigs (recipe checks, facts and post-app fields), several tanks open at once (each mix is its own run),
    a Today's tanks card, and Mix another tank after the checklist.
    Two views: the mixing guide (front and centre on a spray day until the mix is signed) and the spraying dashboard
@@ -245,6 +246,20 @@ details.more[open] .morebody{animation:open .3s var(--ease)}
 .small{font-size:14.5px;color:var(--muted)}
 .stopmsg{padding:12px 14px;border-radius:var(--r2);background:var(--poison-bg);font-weight:600;animation:inF .3s var(--ease);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
 .stopmsg b{color:var(--poison)}
+/* pre-start gate: nothing about the mix shows until the check and PPE are done */
+body.gate #mixView .side, body.gate #mixView .tankread, body.gate #mixView .top .facts{display:none}
+@media (min-width:920px){body.gate .main.mix .wrap{grid-template-columns:minmax(0,760px);justify-content:center}}
+.gatebar{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding:14px 16px;border-radius:var(--r2);background:var(--caution-bg);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
+.gatebar svg{width:30px;height:30px;fill:none;stroke:var(--caution);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gatebar b{display:block;font-family:var(--display);font-weight:800;font-size:22px;line-height:1.05}
+.gatebar span{display:block;font-size:15px;color:var(--muted);margin-top:2px}
+.gatesteps{display:flex;gap:8px;flex-wrap:wrap;font-family:var(--display);font-weight:700;font-size:15px}
+.gatesteps span{padding:5px 11px;border-radius:999px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
+.gatesteps span.on{background:var(--tank-soft);color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--tank)}
+.gatesteps span.ok{color:var(--go)}
+.gatecount{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:17px}
+.gatecount .bar{flex:1;height:8px;border-radius:8px;background:var(--line);overflow:hidden}
+.gatecount .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--go),var(--go2));border-radius:8px;transition:width .25s var(--ease)}
 .phok{padding:10px 14px;border-radius:var(--r2);background:var(--go-soft);font-weight:600}
 .phok b{color:var(--go);font-family:var(--display);font-size:18px}
 
@@ -467,6 +482,7 @@ var SHORT={overalls:"Overalls",suit:"Spray suit",hat:"Hat",gloves:"Elbow gloves"
 var FULL={overalls:"Cotton overalls, buttoned neck and wrist",suit:"Chemical-resistant spray suit, buttoned neck and wrist",hat:"Washable hat",gloves:"Elbow-length PVC gloves",goggles:"Goggles",shield:"Face shield",mask:"Disposable mist mask over mouth and nose",resp:"Half-face respirator with organic vapour cartridges",apron:"Chemical apron",boots:"Impervious safety boots"};
 var PPE_ORDER=["suit","overalls","hat","gloves","goggles","shield","resp","mask","apron","boots"];
 var TICK='<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>';
+var LOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg>';
 var WARN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>';
 var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
@@ -533,6 +549,10 @@ function ppeRow(keys,req){return '<div class="ppe'+(req?' req':'')+'">'+keys.map
 function checkBtn(group,id,lbl,sub){var on=!!st[group][id];return '<button class="check" type="button" data-g="'+group+'" data-id="'+id+'" aria-pressed="'+on+'"><span class="box">'+TICK+'</span><span class="lbl">'+lbl+(sub?'<span class="sub">'+sub+'</span>':'')+'</span></button>'}
 function tileBtn(k){var on=!!st.ppe[k];return '<button class="tile" type="button" data-g="ppe" data-id="'+k+'" aria-pressed="'+on+'" title="'+FULL[k]+'"><span class="box">'+TICK+'</span>'+ic(k,"i")+'<span>'+SHORT[k]+'</span></button>'}
 function allOn(group,list){return list.every(function(r){return st[group][typeof r==="string"?r:r[0]]})}
+function gateHead(k){var n=k==='check'?1:2;return '<div class="gatebar">'+LOCK+'<div><b>'+(k==='check'?'Pre-start first':'PPE on before any chemical')+'</b><span>'+(k==='check'?'Tick every item. The mixing guide opens once the pre-start and PPE are done.':'Tap each one once it’s on. The mixing guide opens after this.')+'</span></div></div>'+
+  '<div class="gatesteps"><span class="'+(n===1?'on':'ok')+'">'+(n===1?'1':'✓')+' '+esc(CHECK_T)+'</span><span class="'+(n===2?'on':'')+'">2 PPE</span><span>3 Mix</span></div>'}
+function gateCount(group,list){var d=list.filter(function(r){return st[group][typeof r==="string"?r:r[0]]}).length;return '<div class="gatecount" id="gateCount"><span>'+d+' of '+list.length+' ticked</span><span class="bar"><i style="width:'+(d/list.length*100)+'%"></i></span></div>'}
+function gateBtn(group,list,doneTxt){var all=allOn(group,list);return '<button class="btn go" type="button" data-act="next" '+(all?'':'disabled')+'>'+(all?doneTxt:'Tick all '+list.length+' to continue')+'</button>'}
 function back(){return st.i>0?'<button class="btn ghost" type="button" data-act="back">Back</button>':'<span></span>'}
 function dec(s){var i=s.indexOf(".");return i<0?0:s.length-i-1}
 function big(show,u){return '<div class="big'+((String(show).length+String(u).length)>=5?' long':'')+'"><span class="cnt" data-to="'+parseFloat(show)+'" data-dec="'+dec(show)+'">'+show+'</span><u>'+u+'</u></div>'}
@@ -606,16 +626,16 @@ var lastI=null, shownL=0;
 function render(){
   var s=S[st.i], h="";
   if(s.k==="check"){
-    h='<h2 class="pname">'+esc(CHECK_T)+'</h2>'+
+    h=gateHead("check")+'<h2 class="pname">'+esc(CHECK_T)+'</h2>'+gateCount("checks",CHECKS)+
       '<div class="checks">'+CHECKS.map(function(r){return checkBtn("checks",r[0],r[1],r[2])}).join("")+'</div>'+
       '<div id="stopMsg" hidden class="stopmsg"><b>Stop.</b> No chemical. Post the fault in #machinery and tell Ben or Andy.</div>'+
-      '<div class="actions"><button class="btn stop" type="button" data-act="problem">Problem</button><button class="btn go" type="button" data-act="next" '+(allOn("checks",CHECKS)?"":"disabled")+'>All checked</button></div>';
+      '<div class="actions"><button class="btn stop" type="button" data-act="problem">Problem</button>'+gateBtn("checks",CHECKS,"All checked · PPE next")+'</div>';
   }
   else if(s.k==="ppe"){
-    h='<div><h2 class="pname">PPE on</h2><p class="small" style="margin:6px 0 0">Tap each one once it’s on.</p></div>'+
+    h=gateHead("ppe")+'<h2 class="pname">PPE on</h2>'+gateCount("ppe",TANK_PPE)+
       '<div class="tiles">'+TANK_PPE.map(tileBtn).join("")+'</div>'+
       '<div class="sos">Splash: flush 15 min. Poisons <b>13 11 26</b>. Emergency <b>000</b>.</div>'+
-      '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="next" '+(allOn("ppe",TANK_PPE)?"":"disabled")+'>All on</button></div>'+
+      '<div class="actions">'+back()+gateBtn("ppe",TANK_PPE,"All on · Open the mix")+'</div>'+
       '<details class="more"><summary>Why all of it</summary><div class="morebody"><p style="margin:0">Together the '+N+' labels and SDSs ask for: '+TANK_PPE.map(function(k){return FULL[k].toLowerCase()}).join("; ")+'. '+(R.ppe_note||"")+'</p></div></details>';
   }
   else if(s.k==="fill"){
@@ -662,6 +682,7 @@ function render(){
       (PREVIEW?'<div class="small">Preview copy: sign-offs only send from the crew link.</div>':'')+
       '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="sign-mix" id="signMixBtn" disabled>Sign and send</button></div>';
   }
+  document.body.classList.toggle("gate",s.k==="check"||s.k==="ppe");
   var stage=$("stage");stage.innerHTML=h;
   if(lastI!==null&&lastI!==st.i&&!RM){stage.classList.remove("in-f","in-b");void stage.offsetWidth;stage.classList.add(st.i>lastI?"in-f":"in-b")}
   var isNew=lastI!==st.i; lastI=st.i;
@@ -900,7 +921,7 @@ function finishText(){var pd=st.pd||{};var parts=[];if(pd.finish)parts.push(pd.f
 /* ---------- views + fab ---------- */
 var VIEW="mix";
 function setView(v,anim){
-  VIEW=v;$("mixView").hidden=v!=="mix";$("dashView").hidden=v!=="dash";
+  VIEW=v;if(v!=="mix")document.body.classList.remove("gate");$("mixView").hidden=v!=="mix";$("dashView").hidden=v!=="dash";
   if(v==="dash"){renderDash();if(!DATA&&!DATAERR)loadData();if(TANKS===null){TANKS=[];loadTanks()}}else{render()}
   renderFab();renderPostbar();
   try{window.scrollTo({top:0,behavior:"auto"})}catch(e){window.scrollTo(0,0)}
@@ -959,6 +980,9 @@ document.addEventListener("click",function(e){
     c.classList.remove("pop");void c.offsetWidth;if(st[g][id])c.classList.add("pop");
     if(g==="post"){refreshSignPost();return}
     var s=S[st.i],btn=document.querySelector('#stage [data-act="next"]');
+    var gl=s.k==="check"?CHECKS:TANK_PPE,gg=s.k==="check"?"checks":"ppe",gc=$("gateCount");
+    if(gc)gc.outerHTML=gateCount(gg,gl);
+    if(btn){btn.textContent=allOn(gg,gl)?(s.k==="check"?"All checked · PPE next":"All on · Open the mix"):"Tick all "+gl.length+" to continue";}
     if(btn){var was=btn.disabled;btn.disabled=!(s.k==="check"?allOn("checks",CHECKS):allOn("ppe",TANK_PPE));
       if(was&&!btn.disabled&&!RM){btn.classList.remove("ready");void btn.offsetWidth;btn.classList.add("ready")}}
     return}
