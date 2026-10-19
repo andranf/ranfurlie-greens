@@ -23,11 +23,6 @@
   "weather": "Delta T 2–8 · wind 3–20 km/h · gusts under 30 · no rain for 48 h",
   "extra_checks": [
     [
-      "catch",
-      "Catch test: the boom puts out 600 L/ha at 3 bar and 7.8 km/h",
-      "Well under? Stop and call Andy before you fill"
-    ],
-    [
       "boxout",
       "No GPS on the 5800: box out each green, then fill in",
       "Surrounds don't need spraying. Every part of the green does"
@@ -103,10 +98,10 @@
       "s": "APVMA 49822 eLabel · Turf Data reference notes 18 Oct"
     },
     {
-      "c": "red",
-      "t": "Boom setup won't give 600 L/ha",
-      "d": "Blue AIC (03) at 3 bar is about 1.2 L/min a nozzle. On the 5800's 50 cm spacing at 7.8 km/h that's about 180 L/ha if they're TeeJet 03s, not 600. 600 L/ha at 3 bar: white AIC (08) at about 6.2 km/h, or grey (06) at about 4.7 km/h. The catch test on the sprayer check settles it.",
-      "s": "TeeJet AIC flow at 4 bar · 50 cm nozzle spacing"
+      "c": "info",
+      "t": "Boom setup checks out: about 600 L/ha",
+      "d": "Toro's Multi Pro nozzles use Toro's own colour code, not the ISO one: Blue is the 1.0 gpm size (AIC part 120-0705). At 3 bar that's 3.95 L/min a nozzle; on 50 cm spacing at 7.8 km/h it's about 608 L/ha (Toro's chart: 593 L/ha at 8 km/h, 677 at 7). Keep the speed steady at 7.8.",
+      "s": "Toro Multi Pro Spray Nozzle Selection Guide (metric, 50 cm spacing)"
     },
     {
       "c": "",

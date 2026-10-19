@@ -23,19 +23,14 @@
   "weather": "Delta T 2–8 · wind 3–20 km/h · gusts under 30",
   "extra_checks": [
     [
-      "catch",
-      "Catch test: the boom puts out 600 L/ha at 3 bar and 7.8 km/h",
-      "Well under? Stop and call Andy before you fill"
-    ],
-    [
       "boxout",
       "No GPS on the 5800: box out each green, then fill in",
       "Surrounds don't need spraying. Every part of the green does"
     ],
     [
       "waterin",
-      "Watering in lined up behind the sprayer",
-      "About 6 mm on each green (3 mm, soak, 3 mm), starting within 1 h"
+      "Josh lined up to water in behind the sprayer",
+      "3 mm, soak, then 3 mm on each green before golf gets there"
     ]
   ],
   "products": [
@@ -85,14 +80,14 @@
   "spray_rules": [
     "No GPS on this sprayer: box out each green (a lap round the edge), then fill in. Surrounds don't need it, but every part of the green does",
     "Get on at first light. Gusts are 30 km/h by 6am and 34 by 9am: stop if it's blowing off target, and aim to be off by 9",
-    "Water in about 6 mm behind each green (3 mm, soak, 3 mm), starting within 1 h. Don't let it dry on the leaf",
+    "Josh waters in behind you: 3 mm, soak, then another 3 mm on each green before golf gets there. Don't let it dry on the leaf",
     "Back nine is clear of golf until about 9:00. Keep people off each green until it's watered in"
   ],
   "spray_more": "Evolution Advance label: wind 3–20 km/h, medium droplets or coarser, no spraying in an inversion, don't apply if rain is expected within 48 h (none forecast today). Zeemil label: beware of solvent vapours near the open tank.",
   "post_checks": [
     [
       "waterin",
-      "Every green watered in, about 6 mm (3 + 3), within 1 h of spraying",
+      "Every green watered in, 3 mm then 3 mm, before golf reached it",
       "Soil pass: it must not dry on the leaf"
     ]
   ],
@@ -104,10 +99,10 @@
       "s": "APVMA 49822 eLabel · Turf Data reference notes"
     },
     {
-      "c": "red",
-      "t": "Boom setup won't give 600 L/ha",
-      "d": "Blue AIC (03) at 3 bar is about 1.2 L/min a nozzle. On the 5800's 50 cm spacing at 7.8 km/h that's about 180 L/ha if they're TeeJet 03s, not 600. 600 L/ha at 3 bar: white AIC (08) at about 6.2 km/h, or grey (06) at about 4.7 km/h. The catch test on the sprayer check settles it.",
-      "s": "TeeJet AIC flow at 4 bar · 50 cm nozzle spacing"
+      "c": "info",
+      "t": "Boom setup checks out: about 600 L/ha",
+      "d": "Toro's Multi Pro nozzles use Toro's own colour code, not the ISO one: Blue is the 1.0 gpm size (AIC part 120-0705). At 3 bar that's 3.95 L/min a nozzle; on 50 cm spacing at 7.8 km/h it's about 608 L/ha (Toro's chart: 593 L/ha at 8 km/h, 677 at 7). Keep the speed steady at 7.8.",
+      "s": "Toro Multi Pro Spray Nozzle Selection Guide (metric, 50 cm spacing)"
     },
     {
       "c": "",
@@ -124,8 +119,8 @@
     {
       "c": "",
       "t": "Wash in straight away: 600 L/ha is under label volume",
-      "d": "The label's root-disease use is about 1000 L/ha with 6–10 mm of irrigation within 1 hour; the sheet asks for about 6 mm. Cirrus group #24 back nine programs are set to about 3 mm a pass (per head, from Sunday's TurfRad scan), so run each hole twice with a soak between. Not in those programs: the 10th (only 10G2), the 17th (only 17G2), 12G3, 12G4, 12G6, 14G1, 14G2 and 18G5, plus the nursery and Himalayan. Those need manual runs or the hose.",
-      "s": "APVMA 93144 label · Cirrus Pro group #24"
+      "d": "The label's root-disease use is about 1000 L/ha with 6–10 mm of irrigation within 1 hour; the sheet asks for about 6 mm. Josh waters in with the same Cirrus programs as yesterday (group #24 back nine, about 3 mm a run, per head): 3 mm, soak, then 3 mm before golf gets to each green. Not in those programs: most of the 10th and 17th, 12G3, 12G4, 12G6, 14G1, 14G2 (manual runs), 17G4 and 18G5 (suspended), and the nursery and Himalayan (hose).",
+      "s": "APVMA 93144 label · Cirrus Pro group #24 · Andy 20 Oct"
     },
     {
       "c": "",
