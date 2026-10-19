@@ -388,6 +388,25 @@ p{margin:0 0 1em}
   .shot h3{font-size:26px}
 }
 
+/* ---------- parts blowup */
+.x3s{grid-column:span 12;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(22px,4vw,56px);align-items:center;margin-top:clamp(12px,3vw,30px)}
+.x3stage{position:relative;aspect-ratio:1;border-radius:22px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#fff 0%,#eceee9 70%,#e2e4de 100%);border:1px solid var(--rule);box-shadow:0 30px 60px -34px rgba(19,48,74,.5);touch-action:pan-y}
+.x3wrap{position:absolute;inset:3%;transform-origin:50% 50%}
+.x3base,.x3lyr{position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat}
+.x3lyr{will-change:transform}
+.x3lbl{position:absolute;left:0;top:0;transform:translate(-50%,-50%);white-space:nowrap;font:600 clamp(11px,1.15vw,14px)/1 var(--body);color:var(--ink);background:rgba(255,255,255,.94);border:1px solid var(--rule);border-radius:999px;padding:5px 9px;box-shadow:0 4px 12px -6px rgba(19,48,74,.45);opacity:0;pointer-events:none;z-index:40}
+.x3credit{position:absolute;right:12px;bottom:8px;font-size:11px;color:#8a8b85;z-index:41}
+.x3bar{display:flex;align-items:center;gap:12px;margin-top:14px;font-size:14px;color:var(--ink-2)}
+.x3bar input{flex:1;min-width:0;height:44px;accent-color:var(--ink);cursor:pointer}
+.x3bar .btn{min-height:40px;padding:0 16px;font-size:14px}
+.x3copy h3{font-size:44px;margin-bottom:14px}
+.x3copy p{color:var(--ink-2);font-size:17px}
+.x3copy ul{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:10px}
+.x3copy li{padding-left:28px;position:relative;font-size:16px;color:var(--ink-2)}
+.x3copy li b{color:var(--ink)}
+.x3copy li::before{content:"";position:absolute;left:2px;top:6px;width:14px;height:14px;border-radius:4px;background:var(--dry);transform:rotate(45deg) scale(.8)}
+@media (max-width:980px){.x3s{grid-template-columns:minmax(0,1fr)}.x3s>*{min-width:0}.x3copy{order:-1}.x3copy h3{font-size:36px}.x3wrap{inset:1%}}
+
 /* ---------- ahead */
 .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-bottom:28px}
 .tile{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:20px 20px 18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
@@ -690,7 +709,7 @@ html.og .stack .lbl{display:block}
     </div>
     <div class="bento">
       <figure class="shot s8">
-        <div class="frame" data-r="wipe"><div class="bar">ranfurlie-greens/irrigation</div><div class="pic"><img src="img/irrigation-3d.webp" srcset="img/irrigation-3d-800.webp 800w, img/irrigation-3d.webp 1600w" sizes="(max-width:980px) 100vw, 62vw" width="1600" height="1279" loading="lazy" decoding="async" alt="The irrigation dashboard in 3D: the course with open sprinkler jobs as pins"></div></div>
+        <div class="frame" data-r="wipe"><div class="bar">Irrigation board</div><div class="pic"><img src="img/irrigation-3d.webp" srcset="img/irrigation-3d-800.webp 800w, img/irrigation-3d.webp 1600w" sizes="(max-width:980px) 100vw, 62vw" width="1600" height="1279" loading="lazy" decoding="async" alt="The irrigation dashboard in 3D: the course with open sprinkler jobs as pins"></div></div>
       </figure>
       <div class="side-note s4" data-r>
         <h3>Irrigation</h3>
@@ -699,15 +718,15 @@ html.og .stack .lbl{display:block}
         <a class="go" href="../irrigation/">Open the irrigation board</a>
       </div>
       <figure class="shot s6">
-        <div class="frame" data-r="wipe"><div class="bar">ranfurlie-greens/drainage</div><div class="pic"><img src="img/drainage-3d.webp" srcset="img/drainage-3d-800.webp 800w, img/drainage-3d.webp 1600w" sizes="(max-width:980px) 100vw, 48vw" width="1600" height="1386" loading="lazy" decoding="async" alt="The drainage dashboard showing pipes and pits under the course in 3D"></div></div>
+        <div class="frame" data-r="wipe"><div class="bar">Drainage board</div><div class="pic"><img src="img/drainage-3d.webp" srcset="img/drainage-3d-800.webp 800w, img/drainage-3d.webp 1600w" sizes="(max-width:980px) 100vw, 48vw" width="1600" height="1386" loading="lazy" decoding="async" alt="The drainage dashboard showing pipes and pits under the course in 3D"></div></div>
         <figcaption data-r><h3>Drainage</h3><p>Pits, pipes and outfalls from the drainage plans, shown underground in 3D, with every reported blockage on top.</p><a class="go" href="../drainage/">Open the drainage board</a></figcaption>
       </figure>
       <figure class="shot s6">
-        <div class="frame" data-r="wipe" style="--rd:.15s"><div class="bar">ranfurlie-greens/bunkers</div><div class="pic"><img src="img/bunkers-3d.webp" srcset="img/bunkers-3d-800.webp 800w, img/bunkers-3d.webp 1600w" sizes="(max-width:980px) 100vw, 48vw" width="1600" height="1358" loading="lazy" decoding="async" alt="The bunker dashboard with every bunker on the course in 3D"></div></div>
+        <div class="frame" data-r="wipe" style="--rd:.15s"><div class="bar">Bunker board</div><div class="pic"><img src="img/bunkers-3d.webp" srcset="img/bunkers-3d-800.webp 800w, img/bunkers-3d.webp 1600w" sizes="(max-width:980px) 100vw, 48vw" width="1600" height="1358" loading="lazy" decoding="async" alt="The bunker dashboard with every bunker on the course in 3D"></div></div>
         <figcaption data-r><h3>Bunkers</h3><p>All 90 bunkers numbered and audited: washouts, exposed liner, sand top-ups and the sand used. A map video of the open work goes to the crew when it changes.</p><a class="go" href="../bunkers/">Open the bunker board</a></figcaption>
       </figure>
       <figure class="shot s5">
-        <div class="frame" data-r="wipe"><div class="bar">ranfurlie-greens</div><div class="pic"><img src="img/greens-map.webp" srcset="img/greens-map-800.webp 800w, img/greens-map.webp 1600w" sizes="(max-width:980px) 100vw, 40vw" width="1600" height="1310" loading="lazy" decoding="async" alt="The greens dashboard course map coloured by moisture from the latest TurfRad scan"></div></div>
+        <div class="frame" data-r="wipe"><div class="bar">Greens Live</div><div class="pic"><img src="img/greens-map.webp" srcset="img/greens-map-800.webp 800w, img/greens-map.webp 1600w" sizes="(max-width:980px) 100vw, 40vw" width="1600" height="1310" loading="lazy" decoding="async" alt="The greens dashboard course map coloured by moisture from the latest TurfRad scan"></div></div>
         <figcaption data-r><h3>Greens Live</h3><p>Moisture, growth, clippings, soil probes, disease cover, PGR clocks and the next three days of spray windows on one page. The monthly Greens Report for the committee is built from the same data.</p></figcaption>
       </figure>
       <div class="stackcol s7">
@@ -715,13 +734,31 @@ html.og .stack .lbl{display:block}
         <div class="frame" data-r="wipe" style="--rd:.2s"><div class="pic"><img src="img/greens-moisture-heat.webp" srcset="img/greens-moisture-heat-800.webp 800w, img/greens-moisture-heat.webp 1600w" sizes="(max-width:980px) 100vw, 56vw" width="1600" height="521" loading="lazy" decoding="async" alt="Moisture by green and by day, with the dry days outlined"></div></div>
       </div>
       <figure class="shot s7">
-        <div class="frame" data-r="wipe"><div class="bar">ranfurlie-greens/machinery</div><div class="pic"><img src="img/machinery-top.webp" srcset="img/machinery-top-800.webp 800w, img/machinery-top.webp 1600w" sizes="(max-width:980px) 100vw, 56vw" width="1600" height="606" loading="lazy" decoding="async" alt="The machinery dashboard: overdue services, open faults and the job to do first"></div></div>
+        <div class="frame" data-r="wipe"><div class="bar">Machinery</div><div class="pic"><img src="img/machinery-top.webp" srcset="img/machinery-top-800.webp 800w, img/machinery-top.webp 1316w" sizes="(max-width:980px) 100vw, 56vw" width="1316" height="606" loading="lazy" decoding="async" alt="The machinery dashboard: overdue services, open faults and the job to do first"></div></div>
         <figcaption data-r><h3>Machinery</h3><p>79 machines in service. Hours from Toro telematics, faults from Slack, and services projected from how much each machine actually gets used. The mechanic's list is waiting at 5:35 on weekday mornings, safety faults first.</p></figcaption>
       </figure>
       <figure class="shot s5">
         <div class="frame" data-r="wipe" style="--rd:.15s"><div class="pic"><img src="img/machinery-plan.webp" srcset="img/machinery-plan-800.webp 800w, img/machinery-plan.webp 1600w" sizes="(max-width:980px) 100vw, 40vw" width="1600" height="938" loading="lazy" decoding="async" alt="The next eight weeks of servicing, one row per machine"></div></div>
         <figcaption data-r><p>The next eight weeks of servicing, one row per machine. Red is overdue.</p></figcaption>
       </figure>
+      <div class="x3s" id="x3s">
+        <div class="x3copy" data-r>
+          <h3>Parts blowup</h3>
+          <p>The mechanic shouldn't need a parts book open to order a part. On the machinery board, 12 of our machine models come apart like this: tap any part and it shows the part numbers from the parts book, what's on the shelf, and where to order it.</p>
+          <ul>
+            <li><b>Genuine and aftermarket</b> side by side, so we pick the best value, not just the dealer's price.</li>
+            <li><b>Cutting units come out on their own</b>, with the bedknife, reel and bearing parts listed against them.</li>
+            <li><b>Stock counts update every hour</b> from the shed stocktake.</li>
+          </ul>
+        </div>
+        <div data-r="pop">
+          <div class="x3stage" id="x3stage" role="img" aria-label="A Toro Greensmaster eTriFlex 3370 greens mower that comes apart into its labelled parts: ROPS, seat, steering, battery covers, rear body, frame, lift arms, three cutting units, baskets and tyres.">
+            <div class="x3wrap" id="x3wrap"></div>
+            <span class="x3credit">Photo: Toro product image</span>
+          </div>
+          <div class="x3bar"><span>Assembled</span><input type="range" id="x3range" min="0" max="100" value="0" aria-label="Blow the mower apart"><span>Apart</span></div>
+        </div>
+      </div>
       <div class="phones s12">
         <div class="side-note" data-r>
           <h3>Spray mixes</h3>
@@ -745,7 +782,7 @@ html.og .stack .lbl{display:block}
   <div class="wrap">
     <div class="head">
       <h2 data-split>Seeing it before it shows.</h2>
-      <p class="lede" data-r>The best day on a course is the one where nothing goes wrong because we saw it coming. The greens dashboard keeps a running list of what's due, what's about to lapse and what the weather is going to do. This is that list, read straight from the live data.</p>
+      <p class="lede" data-r>The best day on a course is the one where nothing goes wrong because we saw it coming. The greens dashboard keeps a running list of what's due, what's about to lapse and what the weather is going to do. This is that list as it stood when this page was built.</p>
       <p><span class="live" id="liveTag">Snapshot</span></p>
     </div>
     <div class="tiles" id="tiles" data-stagger></div>
@@ -809,7 +846,7 @@ html.og .stack .lbl{display:block}
 </main>
 <footer>
   <div class="wrap">
-    <span>Built from the live data in this site's repository. Figures as of 19 October 2026 unless marked live.</span>
+    <span>Built from the crew dashboards' own data. Figures as of 19 October 2026.</span>
     <span>Made with Claude.</span>
   </div>
 </footer>
@@ -1095,6 +1132,48 @@ const G8={"green":[[-9.0,9.3],[-11.0,6.7],[-12.2,2.5],[-11.3,-3.1],[-9.5,-6.6],[
   onReveal(r,()=>{ if(mqMobile.matches&&!STILL) setTimeout(()=>{ r.scrollTo({left:60,behavior:'smooth'}); setTimeout(()=>r.scrollTo({left:0,behavior:'smooth'}),700); },900); });
 })();
 
+/* ---------- parts blowup */
+const X3={"w":554,"h":554,"parts":[{"l":"ROPS","ex":[25,-55],"poly":[[322,32],[338,18],[428,17],[470,38],[500,70],[506,92],[492,100],[484,140],[476,210],[470,268],[462,302],[449,300],[456,250],[466,150],[474,100],[468,74],[430,34],[346,32],[334,48],[352,72],[372,88],[378,98],[364,110],[357,140],[346,210],[338,213],[338,180],[348,120],[356,98],[338,80],[324,58]]},{"l":"Rear tyre","ex":[50,25],"poly":[[528.0,392.0],[527.5,399.6],[525.9,407.0],[523.4,414.0],[520.0,420.3],[515.9,425.7],[511.0,430.1],[505.6,433.3],[499.9,435.3],[494.0,436.0],[488.1,435.3],[482.4,433.3],[477.0,430.1],[472.1,425.7],[468.0,420.3],[464.6,414.0],[462.1,407.0],[460.5,399.6],[460.0,392.0],[460.5,384.4],[462.1,377.0],[464.6,370.0],[468.0,363.7],[472.1,358.3],[477.0,353.9],[482.4,350.7],[488.1,348.7],[494.0,348.0],[499.9,348.7],[505.6,350.7],[511.0,353.9],[515.9,358.3],[520.0,363.7],[523.4,370.0],[525.9,377.0],[527.5,384.4]]},{"l":"Rear body","ex":[55,-15],"poly":[[426,222],[462,216],[498,222],[540,256],[546,298],[530,322],[504,332],[468,338],[462,300],[440,290],[430,260]]},{"l":"Battery covers","ex":[40,10],"poly":[[262,284],[300,280],[420,284],[462,298],[468,330],[420,330],[350,326],[300,318],[262,312]]},{"l":"Seat","ex":[10,-45],"poly":[[352,165],[420,160],[428,175],[424,220],[416,262],[404,276],[300,276],[289,262],[292,248],[340,244],[346,200]]},{"l":"Steering","ex":[-45,-40],"poly":[[254,165],[275,155],[302,160],[326,180],[332,212],[318,236],[300,246],[244,244],[222,236],[214,226],[186,300],[178,322],[160,322],[172,286],[204,212],[216,196],[242,190],[254,178]]},{"l":"Frame and footplate","ex":[15,15],"poly":[[300,330],[360,326],[440,346],[476,344],[484,404],[452,412],[402,398],[334,392],[306,372]]},{"l":"Lift arms","ex":[-30,-5],"poly":[[140,318],[182,322],[218,334],[300,348],[306,370],[256,374],[218,360],[170,346],[140,334]]},{"l":"Cutting unit #1 centre","ex":[-10,30],"poly":[[196,372],[256,374],[306,374],[332,392],[330,424],[292,420],[232,406],[198,412]]},{"l":"Cutting unit #2","ex":[-45,15],"poly":[[95,356],[160,350],[198,368],[196,414],[150,420],[142,394],[112,380],[95,376]]},{"l":"Basket #2","ex":[-70,30],"poly":[[12,402],[40,382],[110,380],[142,396],[150,412],[148,472],[130,478],[26,466],[12,432]]},{"l":"Front tyre","ex":[40,40],"poly":[[459.0,444.0],[458.2,454.8],[455.7,465.2],[451.8,475.0],[446.4,483.9],[439.7,491.5],[432.0,497.7],[423.5,502.3],[414.4,505.1],[405.0,506.0],[395.6,505.1],[386.5,502.3],[378.0,497.7],[370.3,491.5],[363.6,483.9],[358.2,475.0],[354.3,465.2],[351.8,454.8],[351.0,444.0],[351.8,433.2],[354.3,422.8],[358.2,413.0],[363.6,404.1],[370.3,396.5],[378.0,390.3],[386.5,385.7],[395.6,382.9],[405.0,382.0],[414.4,382.9],[423.5,385.7],[432.0,390.3],[439.7,396.5],[446.4,404.1],[451.8,413.0],[455.7,422.8],[458.2,433.2]]},{"l":"Cutting unit #3","ex":[-20,40],"poly":[[244,396],[326,394],[350,446],[382,466],[380,526],[322,538],[296,528],[300,436],[286,410]]},{"l":"Basket #3","ex":[-55,55],"poly":[[150,424],[182,408],[286,412],[300,436],[300,502],[288,524],[168,506],[150,472]]}]};
+(function(){
+  const stage=$('#x3stage'), wrap=$('#x3wrap'), range=$('#x3range'); if(!stage) return;
+  const IMG='img/blowup-3370.webp', W=X3.w, Hh=X3.h, FX=matchMedia('(hover:hover) and (min-width:981px)').matches;
+  const base=document.createElement('div'); base.className='x3base'; base.style.backgroundImage=`url(${IMG})`; wrap.appendChild(base);
+  const L=X3.parts.map((p,i)=>{
+    const d=document.createElement('div'); d.className='x3lyr'; d.style.backgroundImage=`url(${IMG})`; d.style.zIndex=2+i;
+    d.style.clipPath='polygon('+p.poly.map(q=>(q[0]/W*100).toFixed(2)+'% '+(q[1]/Hh*100).toFixed(2)+'%').join(',')+')';
+    let cx=0,cy=0; p.poly.forEach(q=>{cx+=q[0];cy+=q[1]}); cx/=p.poly.length; cy/=p.poly.length;
+    d.style.transformOrigin=`${(cx/W*100).toFixed(2)}% ${(cy/Hh*100).toFixed(2)}%`;
+    wrap.appendChild(d);
+    const lb=document.createElement('span'); lb.className='x3lbl'; lb.textContent=p.l; wrap.appendChild(lb);
+    return {p,d,lb,cx,cy};
+  });
+  let t=0, goal=0, raf=null, auto=!(STILL||OG), seq=null, inView=false;
+  const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+  function paint(){
+    const e=ease(t);
+    wrap.style.transform=`scale(${(1-.16*e).toFixed(3)})`;
+    base.style.opacity=(1-.72*e).toFixed(3);
+    if(FX) base.style.filter=`grayscale(${e.toFixed(2)}) blur(${(e*1.4).toFixed(2)}px)`;
+    L.forEach(x=>{
+      const dx=x.p.ex[0]/W*100*e*1.15, dy=x.p.ex[1]/Hh*100*e*1.15, sc=1+.05*e;
+      x.d.style.transform=`translate(${dx.toFixed(2)}%,${dy.toFixed(2)}%) scale(${sc.toFixed(3)})`;
+      if(FX) x.d.style.filter=e>.02?`drop-shadow(0 ${(10*e).toFixed(1)}px ${(14*e).toFixed(1)}px rgba(0,0,0,${(.32*e).toFixed(2)}))`:'none';
+      x.lb.style.left=((x.cx+x.p.ex[0]*e*1.15)/W*100).toFixed(2)+'%';
+      x.lb.style.top=((x.cy+x.p.ex[1]*e*1.15)/Hh*100).toFixed(2)+'%';
+      x.lb.style.opacity=Math.max(0,Math.min(1,(e-.45)*3)).toFixed(2);
+    });
+  }
+  function frame(){ t+=(goal-t)*.085; if(Math.abs(goal-t)<.002) t=goal; paint(); if(auto) range.value=Math.round(t*100);
+    raf=(t!==goal)?requestAnimationFrame(frame):null; }
+  const kick=()=>{ if(!raf) raf=requestAnimationFrame(frame); };
+  function loop(){ if(!auto||!inView) return; clearTimeout(seq);
+    seq=setTimeout(()=>{ goal=1; kick(); seq=setTimeout(()=>{ goal=0; kick(); seq=setTimeout(loop,2200); },3800); },900); }
+  range.addEventListener('input',()=>{ auto=false; clearTimeout(seq); goal=range.value/100; kick(); });
+  if(STILL||OG){ t=goal=1; range.value=100; paint(); return; }
+  paint();
+  new IntersectionObserver(es=>es.forEach(en=>{ inView=en.isIntersecting; if(inView) loop(); else clearTimeout(seq); }),{threshold:.35}).observe(stage);
+})();
+
 /* ---------- seeing ahead */
 const SNAP={"built":"Mon 19 Oct 2026, 6:27 AM","week":[{"date":"2026-10-19","cat":"Cultural","label":"Dusting interval (7 days)","detail":"last dust 2026-10-06"},{"date":"2026-10-19","cat":"Disease","label":"Fairy Ring moderate risk","detail":"no cover on approach, fairways, tees"},{"date":"2026-10-19","cat":"Planned","label":"5800 600L/Ha - Fairy Ring + Root Disease to Greens","detail":"Zeemil, Terreplex, Quali-Pro Evolution Advance (AU), Companion, HydroForce Ultra (AU)"},{"date":"2026-10-19","cat":"Spray","label":"Best spray day","detail":"4 good daylight hours (6:00-10:00)"},{"date":"2026-10-21","cat":"Cover","label":"Fairy Ring cover lapses","detail":"Velista (AU) \u00b7 greens"},{"date":"2026-10-21","cat":"Cover","label":"Pythium Root Rot cover lapses","detail":"Magellan \u00b7 greens"},{"date":"2026-10-22","cat":"Disease","label":"Anthracnose moderate risk","detail":"no cover on approach, greens"},{"date":"2026-10-22","cat":"Planned","label":"JD 500L/Ha - Tees - PGR + Fert","detail":"Shadow Ultra (AU), Grass Roots Iron (0-0-0), Liquimaxx Greenmaxx 20-0-0 AU (20-0-0)"},{"date":"2026-10-24","cat":"Weather","label":"Rain 27 mm","detail":"59% chance (Open-Meteo)"},{"date":"2026-10-26","cat":"Weather","label":"Rain 8 mm","detail":"56% chance (Open-Meteo)"},{"date":"2026-10-27","cat":"PGR","label":"Trinexapac due","detail":"200 GDD0 (now 67) \u00b7 last 2026-10-14"},{"date":"2026-10-27","cat":"Planned","label":"JD 300L/Ha - Fairways - Wetting Agent + LuxiMax","detail":"Pervade, Luximax"},{"date":"2026-10-27","cat":"Planned","label":"JD 600L/Ha - Tees - Wetting Agent","detail":"Pervade"},{"date":"2026-10-28","cat":"PGR","label":"Ethephon window opens","detail":"day 14 of the 14-28 day label interval"},{"date":"2026-10-30","cat":"PGR","label":"Paclobutrazol due","detail":"350 GDD0 (now 178) \u00b7 last 2026-10-07"}],"wa":{"effectiveness":0.629,"due_date":"2026-11-07","last_app":"2026-09-24","cum_et_mm":80.4,"product":"HydroForce Ultra (AU)"},"fw":{"need_holes":10,"need_kl":836.3,"as_of":"2026-10-19","course_now":18.2,"et_today_mm":5.66},"disease":[{"label":"Anthracnose","level_today":"none","level_peak":"moderate","peak_date":"2026-10-22"},{"label":"Fairy Ring","level_today":"moderate","level_peak":"moderate","peak_date":"2026-10-19"}],"clocks":[{"clock":"Trinexapac","area":"Greens","gdd":67.0,"target_gdd":200,"last_app":"2026-10-14","window_open_day":null,"days_since":5},{"clock":"Paclobutrazol","area":"Greens","gdd":178.0,"target_gdd":350,"last_app":"2026-10-07","window_open_day":null,"days_since":12},{"clock":"Ethephon","area":"Greens","gdd":67.0,"target_gdd":null,"last_app":"2026-10-14","window_open_day":14,"days_since":5},{"clock":"Couch TE","area":"Fairways","gdd":107.0,"target_gdd":252,"last_app":"2026-09-29","window_open_day":null,"days_since":20}]};
 const CAT={Spray:'#2E6A46',Disease:'#C2372C',Cover:'#C07A17',PGR:'#1C74C4',Planned:'#13304A',Weather:'#2B7A78',Cultural:'#768A98'};
@@ -1122,20 +1201,14 @@ function renderAhead(F,isLive){
     }
     $('#week').innerHTML=cols.join('');
   } else $('#week').innerHTML='<p class="empty">Nothing coming up.</p>';
-  const tag=$('#liveTag'); tag.textContent=isLive?`Live from the greens dashboard, built ${F.built}`:`Snapshot from ${F.built||'19 Oct 2026'}`; tag.classList.toggle('on',!!isLive);
+  const tag=$('#liveTag'); tag.textContent=`From the greens dashboard, ${F.built||'19 Oct 2026'}`; tag.classList.add('on');
   const fresh=$$('#tiles [data-r],#week [data-r]');
   if(STILL||OG||aheadShown){ fresh.forEach(e=>e.classList.add('in')); fillGauges(); }
   else fresh.forEach(e=>io.observe(e));
 }
 renderAhead(SNAP,false);
 onReveal($('#tiles'),()=>{ aheadShown=true; setTimeout(fillGauges,250); });
-function fromData(D){
-  const wa=(D.wetting_agent||[]).find(w=>w.zone==='greens')||{}, fp=(D.fairway_params||[])[0]||{};
-  return {built:D._built,week:(D.week_ahead||[]).map(w=>({date:w.date,cat:w.cat,label:w.label,detail:w.detail})),wa,fw:fp,clocks:D.clocks||[]};
-}
-let fetched=false;
-const go=()=>{if(fetched)return;fetched=true;fetch('../data.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()).then(D=>{try{renderAhead(fromData(D),true)}catch(e){renderAhead(SNAP,false)}}).catch(()=>{})};
-const io2=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){go();io2.disconnect()}},{rootMargin:'900px'}); io2.observe($('#ahead'));
+
 })();
 </script>
 </body>

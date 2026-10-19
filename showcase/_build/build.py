@@ -378,6 +378,13 @@ def forward_snapshot():
     }
 
 
+# ---------------------------------------------------------------- machinery parts blowup (3370)
+_x3 = json.load(open(os.path.join(ROOT, 'machinery', 'photo3370.json')))
+X3 = {'w': _x3['w'], 'h': _x3['h'],
+      'parts': [{'l': p['label'], 'ex': p['ex'], 'poly': p['poly']} for p in _x3['parts']]}
+_src = open(os.path.join(ROOT, 'machinery', 'index.html')).read()
+X3_MODELS = len(re.findall(r"'[a-z0-9]+': gh \? 'photo", _src))
+
 # ---------------------------------------------------------------- go
 hero, pin_counts = hero_svg()
 tpl = open(os.path.join(HERE, 'template.html')).read()
@@ -388,6 +395,8 @@ repl = {
     '__G18__': json.dumps(G18, separators=(',', ':')),
     '__G8__': json.dumps(G8, separators=(',', ':')),
     '__FWD__': json.dumps(forward_snapshot(), separators=(',', ':')),
+    '__X3__': json.dumps(X3, separators=(',', ':')),
+    '{{X3_MODELS}}': str(X3_MODELS),
     '{{WEEKDAY_RUNS}}': str(WEEKDAY_RUNS),
     '{{TASK_COUNT}}': str(len(TASKS)),
     '{{MACHINES_ACTIVE}}': str(json.load(open(os.path.join(ROOT, 'machinery', 'data.json')))['m_summary'][0]['active']),
