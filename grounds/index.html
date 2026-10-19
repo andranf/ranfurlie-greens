@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ranfurlie Grounds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Ranfurlie Grounds & Facilities v1 (20 Oct 2026). Same house style as the bunkers, drainage and machinery pages.
+   Jobs and consumables from #amstelgrounds, #ranfurlieclubhouse and #sandcounter. Built hourly from Notion by the Grounds Live task. */
+:root{
+  color-scheme:dark;
+  --bg:#10140f; --bg2:#151b14; --panel:#192118; --panel2:#1e281d; --line:#2b3829; --line2:#3b4b38;
+  --fg:#eef0e4; --muted:#a6ae98; --faint:#717b68;
+  --acc:#e3bf72;
+  --bad:#ff6b5b; --warn:#f5b841; --ok:#5bd68a; --info:#8fa9ff;
+  --amstel:#43a063; --clubhouse:#6f84de; --sand:#b88a32;
+  --display:"Barlow Condensed","Avenir Next Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --bg:#f3f1e9; --bg2:#ebe8dc; --panel:#ffffff; --panel2:#f8f6ef; --line:#ddd8c6; --line2:#c9c1a6;
+  --fg:#1f2619; --muted:#5b6450; --faint:#878f7a; --acc:#9a6f14;
+  --bad:#d64533; --warn:#b77a06; --ok:#1f9d55; --info:#4b63d6;
+  --amstel:#2f8f55; --clubhouse:#4b63c9; --sand:#a87a1a;
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f3f1e9; --bg2:#ebe8dc; --panel:#ffffff; --panel2:#f8f6ef; --line:#ddd8c6; --line2:#c9c1a6;
+  --fg:#1f2619; --muted:#5b6450; --faint:#878f7a; --acc:#9a6f14;
+  --bad:#d64533; --warn:#b77a06; --ok:#1f9d55; --info:#4b63d6;
+  --amstel:#2f8f55; --clubhouse:#4b63c9; --sand:#a87a1a;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;margin:0;overflow-x:hidden}
+.wrap{max-width:1280px;margin:0 auto;padding:18px 16px 56px;display:flex;flex-direction:column;gap:18px}
+@media (min-width:720px){.wrap{padding-inline:28px}}
+h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:.01em;margin:0;text-wrap:balance}
+h1{font-size:clamp(30px,6vw,46px);line-height:1}
+h2{font-size:22px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--acc)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button{font:inherit;color:inherit}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 18px;padding-top:6px}
+header .sub{color:var(--muted);font-size:14px;margin-top:6px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none;position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 80%,transparent);margin:0 -2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--line2);background:var(--panel);border-radius:999px;padding:8px 14px;cursor:pointer;display:flex;gap:8px;align-items:center;min-height:40px;transition:border-color .2s,background .2s}
+.chip .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.chip .sw{width:10px;height:10px;border-radius:3px}
+.chip[aria-pressed="true"]{border-color:var(--acc);background:var(--panel2)}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:720px){.kpis{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;min-width:0}
+.kpi .v{font-family:var(--display);font-size:34px;font-weight:600;line-height:1.05}
+.kpi .l{color:var(--muted);font-size:13px}
+.kpi.alert .v{color:var(--bad)}
+.kpi.warn .v{color:var(--warn)}
+.grid{display:grid;gap:18px}
+@media (min-width:980px){.grid{grid-template-columns:1.35fr 1fr;align-items:start}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0}
+.panel>.hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.panel>.hd .meta{color:var(--muted);font-size:13px}
+.group{margin-top:6px}
+.group h3{font-size:15px;color:var(--muted);font-family:var(--mono);font-weight:400;letter-spacing:.08em;text-transform:uppercase;margin:12px 0 6px}
+.job{display:grid;grid-template-columns:4px 1fr auto;gap:0 12px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
+.job:first-of-type{border-top:0}
+.job .bar{border-radius:4px;align-self:stretch}
+.job .t{font-weight:600;overflow-wrap:anywhere}
+.job .t .p{font-weight:400;color:var(--muted)}
+.job .m{color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:2px}
+.job .r{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;white-space:nowrap}
+.job .r a{display:inline-block;margin-top:4px;text-decoration:none;padding:4px 0}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;border:1px solid var(--line2);border-radius:999px;padding:1px 8px;color:var(--muted)}
+.tag.high{border-color:color-mix(in srgb,var(--bad) 55%,transparent);color:var(--bad)}
+.tag.wait{border-color:color-mix(in srgb,var(--warn) 55%,transparent);color:var(--warn)}
+.tag.prog{border-color:color-mix(in srgb,var(--info) 55%,transparent);color:var(--info)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.empty{color:var(--muted);padding:14px 0}
+.stock{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.item{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel2);display:flex;flex-direction:column;gap:6px;min-width:0}
+.item.low{border-color:color-mix(in srgb,var(--bad) 60%,transparent)}
+.item .nm{font-weight:600;overflow-wrap:anywhere}
+.item .oh{font-family:var(--display);font-size:30px;font-weight:600;line-height:1}
+.item .oh small{font-family:var(--body);font-size:14px;color:var(--muted);font-weight:400;margin-left:4px}
+.item .sub{color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.meter{position:relative;height:8px;border-radius:4px;background:var(--line);overflow:visible}
+.meter i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.meter b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--fg);opacity:.7;border-radius:1px}
+.spark{width:100%;height:34px;display:block}
+.status{font-size:12px;font-weight:600;display:inline-flex;gap:4px;align-items:center}
+.status.low{color:var(--bad)}
+.feed{list-style:none;margin:0;padding:0}
+.feed li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:8px 0;border-top:1px solid var(--line);align-items:baseline}
+.feed li:first-child{border-top:0}
+.feed .d{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.feed .w{font-size:13px;color:var(--muted);white-space:nowrap}
+.mv{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;padding:1px 6px;border:1px solid var(--line2);margin-right:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 6px;border-top:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400;border-top:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.how{color:var(--muted);font-size:14px}
+.how ul{margin:6px 0 0;padding-left:18px}
+.foot{color:var(--faint);font-size:12px;font-family:var(--mono)}
+.rise{opacity:0;transform:translateY(10px);animation:rise .6s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.rise{animation:none;opacity:1;transform:none}.meter i{transition:none}}
+.tip{position:fixed;pointer-events:none;background:var(--fg);color:var(--bg);font-size:12px;padding:4px 8px;border-radius:6px;z-index:20;transform:translate(-50%,-130%);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="rise">
+    <div>
+      <div class="eyebrow">Ranfurlie · Amstel · live from Slack</div>
+      <h1>Grounds &amp; Facilities</h1>
+      <div class="sub" id="updated"></div>
+    </div>
+  </header>
+  <nav class="chips" id="chips" aria-label="Channel"></nav>
+  <section class="kpis" id="kpis" aria-label="Summary"></section>
+  <div class="grid">
+    <section class="panel rise" style="animation-delay:.08s">
+      <div class="hd"><h2>Open jobs</h2><span class="meta" id="jobsMeta"></span></div>
+      <div id="jobs"></div>
+    </section>
+    <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+      <section class="panel rise" style="animation-delay:.14s">
+        <div class="hd"><h2>Stock on hand</h2><span class="meta" id="stockMeta"></span></div>
+        <div class="stock" id="stock"></div>
+      </section>
+      <section class="panel rise" style="animation-delay:.2s" id="ordersPanel">
+        <div class="hd"><h2>On order</h2></div>
+        <ul class="feed" id="orders"></ul>
+      </section>
+    </div>
+  </div>
+  <div class="grid">
+    <section class="panel rise" style="animation-delay:.24s">
+      <div class="hd"><h2>In and out, last 30 days</h2></div>
+      <div style="overflow-x:auto"><table id="flow"></table></div>
+    </section>
+    <section class="panel rise" style="animation-delay:.28s">
+      <div class="hd"><h2>Recent movements</h2></div>
+      <ul class="feed" id="moves"></ul>
+    </section>
+  </div>
+  <section class="panel rise" style="animation-delay:.32s">
+    <div class="hd"><h2>Done, last 30 days</h2><span class="meta" id="doneMeta"></span></div>
+    <ul class="feed" id="done"></ul>
+  </section>
+  <section class="panel how rise" style="animation-delay:.36s">
+    <h2 style="color:var(--fg)">How it works</h2>
+    <ul>
+      <li>Post a job in the channel: where it is, what it needs, a photo. It gets a card with a number (AMS, RCH or SND).</li>
+      <li>✅ the card when it's done. Reply on the card with anything else.</li>
+      <li>Say what you used ("used 6 bags of mulch"), what arrived ("10 bags dropped off") or what's left ("3 boxes left"). Stock here follows.</li>
+      <li>Out of something? Say so in the channel and it goes on order.</li>
+    </ul>
+  </section>
+  <div class="foot" id="foot"></div>
+</div>
+<div class="tip" id="tip" hidden></div>
+<script>
+const DATA = {"today":"2026-10-20","generated":"2026-10-20T07:52","channels":[{"key":"amstel","label":"Amstel grounds","slack":"#amstelgrounds","prefix":"AMS","id":"C06G6PGEJ80","emoji":"🌳"},{"key":"clubhouse","label":"Ranfurlie clubhouse","slack":"#ranfurlieclubhouse","prefix":"RCH","id":"C06FWKZN5BK","emoji":"🏡"},{"key":"sand","label":"Sand counter","slack":"#sandcounter","prefix":"SND","id":"C087R8YRB28","emoji":"🧮"}],"jobs":[{"ref":"AMS-6","ch":"amstel","title":"Assembly point area needs beautification","place":"Car park emergency assembly point","status":"Needs confirming","priority":"Low","area":"Gardens & beds","reported":"2026-09-28","by":"Tremayne","done":null,"done_by":"","due":null,"card":"https://ranfurliegolfclub.slack.com/archives/C06G6PGEJ80/p1792443071202009?thread_ts=1792443062.998679&cid=C06G6PGEJ80"},{"ref":"RCH-9","ch":"clubhouse","title":"Small bin at driving range entrance","place":"Very entrance of the driving range","status":"Needs confirming","priority":"Low","area":"Bins & rubbish","reported":"2026-06-26","by":"Michael","done":null,"done_by":"","due":null,"card":null},{"ref":"AMS-4","ch":"amstel","title":"Security job, details in Slack","place":"","status":"Needs confirming","priority":"Medium","area":"Security & vandalism","reported":"2026-07-09","by":"Tremayne","done":null,"done_by":"","due":null,"card":"https://ranfurliegolfclub.slack.com/archives/C06G6PGEJ80/p1792443066219239?thread_ts=1792443062.998679&cid=C06G6PGEJ80"},{"ref":"AMS-5","ch":"amstel","title":"Outdoor seating boards opening up","place":"Outdoor sitting area","status":"Needs confirming","priority":"Medium","area":"Buildings & outdoor furniture","reported":"2026-08-25","by":"Tremayne","done":null,"done_by":"","due":null,"card":"https://ranfurliegolfclub.slack.com/archives/C06G6PGEJ80/p1792443068591459?thread_ts=1792443062.998679&cid=C06G6PGEJ80"},{"ref":"AMS-7","ch":"amstel","title":"Photo only, outdoor courtyard","place":"Outdoor courtyard","status":"Needs confirming","priority":"Low","area":"Other","reported":"2026-10-13","by":"Tremayne","done":null,"done_by":"","due":null,"card":null},{"ref":"RCH-8","ch":"clubhouse","title":"New plastic bins wanted","place":"","status":"Needs confirming","priority":"Low","area":"Bins & rubbish","reported":"2026-06-26","by":"Michael","done":null,"done_by":"","due":null,"card":null}],"stock":[],"log":[],"orders":[]};
+(function(){
+  const D = DATA || {today:"",generated:"",channels:[],jobs:[],stock:[],log:[],orders:[]};
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const CH = Object.fromEntries(D.channels.map((c) => [c.key, c]));
+  const COLOR = {amstel:"var(--amstel)", clubhouse:"var(--clubhouse)", sand:"var(--sand)"};
+  const SHORT = {amstel:"Amstel", clubhouse:"Clubhouse", sand:"Sand"};
+  const LIVE = ["Open","In progress","Waiting on materials"];
+  const PRI = {High:0, Medium:1, Low:2};
+  const today = D.today ? new Date(D.today + "T00:00:00") : new Date();
+  const daysAgo = (d) => d ? Math.round((today - new Date(d + "T00:00:00")) / 864e5) : null;
+  const fmtDay = (d) => d ? new Date(d + "T00:00:00").toLocaleDateString("en-AU", {weekday:"short", day:"numeric", month:"short"}) : "";
+  const fmtN = (n) => n == null ? "–" : (Number.isInteger(n) ? String(n) : n.toFixed(1));
+  const slackUrl = (k) => `https://ranfurliegolfclub.slack.com/archives/${CH[k]?.id ?? ""}`;
+  let sel = "all";
+  try { const h = (location.hash || "").slice(1); if (CH[h]) sel = h; else { const s = localStorage.getItem("grounds.ch"); if (s && (CH[s] || s === "all")) sel = s; } } catch (e) {}
+
+  if (D.generated) { const g = new Date(D.generated); $("updated").textContent = "Updated " + (isNaN(g) ? D.generated : g.toLocaleString("en-AU", {weekday:"short", day:"numeric", month:"short", hour:"numeric", minute:"2-digit"})); }
+  $("foot").textContent = `Built ${D.generated || ""} from Notion Grounds Jobs, Grounds Stock and the Consumables Log. No prices on this page.`;
+
+  const inSel = (k) => sel === "all" || k === sel || (Array.isArray(k) && k.includes(sel));
+  function chips(){
+    const open = (k) => D.jobs.filter((j) => LIVE.includes(j.status) && (k === "all" || j.ch === k)).length;
+    const items = [{key:"all", label:"All channels"}, ...D.channels];
+    $("chips").innerHTML = items.map((c) => `<button class="chip" type="button" data-k="${c.key}" aria-pressed="${sel === c.key}">${c.key === "all" ? "" : `<span class="sw" style="background:${COLOR[c.key]}"></span>`}<span>${esc(c.key === "all" ? c.label : c.emoji + " " + c.label)}</span><span class="n">${open(c.key)}</span></button>`).join("");
+    $("chips").querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => {
+      sel = b.dataset.k; try { localStorage.setItem("grounds.ch", sel); } catch (e) {}
+      try { history.replaceState(null, "", sel === "all" ? location.pathname : "#" + sel); } catch (e) {}
+      render();
+    }));
+  }
+  function countUp(el, to){
+    const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || !to) { el.textContent = to; return; }
+    const t0 = performance.now(), dur = 700;
+    const step = (t) => { const p = Math.min(1, (t - t0) / dur); el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
+  function kpis(){
+    const J = D.jobs.filter((j) => inSel(j.ch));
+    const live = J.filter((j) => LIVE.includes(j.status));
+    const k = [
+      {l:"Open jobs", v:live.length},
+      {l:"High priority", v:live.filter((j) => j.priority === "High").length, cls:"alert"},
+      {l:"Waiting on materials", v:live.filter((j) => j.status === "Waiting on materials").length, cls:"warn"},
+      {l:"Done, last 7 days", v:J.filter((j) => j.status === "Done" && daysAgo(j.done) !== null && daysAgo(j.done) <= 7).length},
+      {l:"Low stock", v:D.stock.filter((s) => inSel(s.ch) && s.low).length, cls:"alert"},
+    ];
+    $("kpis").innerHTML = k.map((x, i) => `<div class="kpi rise ${x.v ? (x.cls || "") : ""}" style="animation-delay:${0.04 * i}s"><div class="v num" data-v="${x.v}">0</div><div class="l">${x.l}</div></div>`).join("");
+    $("kpis").querySelectorAll(".v").forEach((el) => countUp(el, Number(el.dataset.v)));
+  }
+  function jobRow(j){
+    const age = daysAgo(j.reported);
+    const tags = [];
+    if (j.priority === "High") tags.push(`<span class="tag high"><span class="dot" style="background:var(--bad)"></span>High</span>`);
+    if (j.status === "Waiting on materials") tags.push(`<span class="tag wait">⏳ Waiting on materials</span>`);
+    if (j.status === "In progress") tags.push(`<span class="tag prog">◐ In progress</span>`);
+    if (j.due) tags.push(`<span class="tag wait">Due ${esc(fmtDay(j.due))}</span>`);
+    const meta = [sel === "all" ? `<span>${esc(SHORT[j.ch])}</span>` : "", j.by ? `<span>${esc(j.by)}</span>` : "", age !== null ? `<span>${age === 0 ? "today" : age + " d"}</span>` : "", ...tags].filter(Boolean).join("");
+    const place = j.place ? `${esc(j.place[0].toUpperCase() + j.place.slice(1))} <span class="p">· ${esc(j.title)}</span>` : esc(j.title);
+    return `<div class="job"><span class="bar" style="background:${COLOR[j.ch]}"></span><div><div class="t">${place}</div><div class="m">${meta}</div></div><div class="r">${esc(j.ref)}${j.card ? `<br><a href="${esc(j.card)}" target="_blank" rel="noopener">Card ↗</a>` : ""}</div></div>`;
+  }
+  function jobs(){
+    const live = D.jobs.filter((j) => inSel(j.ch) && LIVE.includes(j.status)).sort((a, b) => (PRI[a.priority] ?? 1) - (PRI[b.priority] ?? 1) || String(a.reported).localeCompare(String(b.reported)));
+    $("jobsMeta").textContent = live.length ? `${live.length} open` : "";
+    if (!live.length) { $("jobs").innerHTML = `<div class="empty">Nothing open. Post a job in ${sel === "all" ? "the channel" : esc(CH[sel].slack)} and it shows up here.</div>`; return; }
+    const groups = ["High", "Medium", "Low"].map((p) => [p, live.filter((j) => (j.priority || "Medium") === p)]).filter(([, l]) => l.length);
+    $("jobs").innerHTML = groups.map(([p, l]) => `<div class="group"><h3>${p} · ${l.length}</h3>${l.map(jobRow).join("")}</div>`).join("");
+  }
+  function spark(sid){
+    const pts = D.log.filter((l) => l.sid === sid && l.after != null && l.date).sort((a, b) => a.date.localeCompare(b.date));
+    if (pts.length < 2) return "";
+    const W = 200, H = 34, P = 4;
+    const t0 = new Date(pts[0].date) - 0, t1 = new Date(pts[pts.length - 1].date) - 0 || t0 + 1;
+    const vmax = Math.max(...pts.map((p) => p.after), 1);
+    const x = (p) => P + (W - 2 * P) * ((new Date(p.date) - t0) / Math.max(1, t1 - t0));
+    const y = (p) => H - P - (H - 2 * P) * (p.after / vmax);
+    const d = pts.map((p, i) => `${i ? "L" : "M"}${x(p).toFixed(1)},${y(p).toFixed(1)}`).join("");
+    return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="var(--muted)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>${pts.map((p) => `<circle cx="${x(p).toFixed(1)}" cy="${y(p).toFixed(1)}" r="9" fill="transparent" data-tip="${esc(fmtDay(p.date))}: ${esc(fmtN(p.after))}"/>`).join("")}</svg>`;
+  }
+  function stock(){
+    const S = D.stock.filter((s) => inSel(s.ch)).sort((a, b) => (b.low - a.low) || a.item.localeCompare(b.item));
+    $("stockMeta").textContent = S.length ? `${S.length} item${S.length === 1 ? "" : "s"}` : "";
+    if (!S.length) { $("stock").innerHTML = `<div class="empty">No stock logged yet. Post a delivery or a count in the channel.</div>`; return; }
+    $("stock").innerHTML = S.map((s) => {
+      const top = Math.max(s.on_hand ?? 0, (s.reorder ?? 0) * 2, 1);
+      const w = s.on_hand == null ? 0 : Math.min(100, 100 * s.on_hand / top);
+      const mk = s.reorder != null ? `<b style="left:${Math.min(100, 100 * s.reorder / top)}%" title="Re-order at ${esc(fmtN(s.reorder))}"></b>` : "";
+      const col = s.low ? "var(--bad)" : COLOR[s.ch[0]];
+      return `<div class="item ${s.low ? "low" : ""}"><div class="nm">${esc(s.item)}</div>
+        <div class="oh num">${s.on_hand == null ? "–" : esc(fmtN(s.on_hand))}<small>${esc(s.unit || "")}</small></div>
+        <div class="meter" title="${s.on_hand == null ? "Not counted yet" : esc(fmtN(s.on_hand) + " " + (s.unit || "") + " on hand")}"><i data-w="${w}" style="background:${col}"></i>${mk}</div>
+        ${spark(s.id)}
+        <div class="sub"><span>${s.low ? `<span class="status low">▲ Low</span>` : (s.on_hand == null ? "Not counted yet" : (s.counted ? "Counted " + esc(fmtDay(s.counted)) : "From deliveries and use"))}</span><span>${sel === "all" ? esc(s.ch.map((c) => SHORT[c]).join(", ")) : ""}</span></div></div>`;
+    }).join("");
+    requestAnimationFrame(() => requestAnimationFrame(() => $("stock").querySelectorAll(".meter i").forEach((i) => { i.style.width = i.dataset.w + "%"; })));
+  }
+  const MVC = {Received:"var(--ok)", Used:"var(--warn)", Counted:"var(--info)", "To order":"var(--bad)", Ordered:"var(--muted)"};
+  function moveRow(l){
+    const q = l.qty != null ? `${fmtN(l.qty)}${l.unit ? " " + l.unit : ""} ` : "";
+    return `<li><span class="d">${esc(fmtDay(l.date))}</span><span><span class="mv" style="color:${MVC[l.mv] || "var(--muted)"}">${esc(l.mv)}</span>${esc(q)}${esc(l.item)}${l.job ? ` <span class="w">· ${esc(l.job)}</span>` : ""}</span><span class="w">${esc(l.by)}${sel === "all" ? " · " + esc(SHORT[l.ch]) : ""}</span></li>`;
+  }
+  function orders(){
+    const O = D.orders.filter((o) => inSel(o.ch));
+    $("ordersPanel").hidden = !O.length;
+    $("orders").innerHTML = O.map(moveRow).join("");
+  }
+  function flow(){
+    const rows = {};
+    D.log.filter((l) => inSel(l.ch) && l.qty != null && daysAgo(l.date) !== null && daysAgo(l.date) <= 30 && (l.mv === "Received" || l.mv === "Used")).forEach((l) => {
+      const k = l.item + "|" + (l.unit || "");
+      rows[k] = rows[k] || {item:l.item, unit:l.unit || "", in:0, out:0};
+      if (l.mv === "Received") rows[k].in += l.qty; else rows[k].out += l.qty;
+    });
+    const R = Object.values(rows).sort((a, b) => a.item.localeCompare(b.item));
+    $("flow").innerHTML = R.length
+      ? `<thead><tr><th>Item</th><th class="n">In</th><th class="n">Out</th><th>Unit</th></tr></thead><tbody>${R.map((r) => `<tr><td>${esc(r.item)}</td><td class="n">${esc(fmtN(r.in))}</td><td class="n">${esc(fmtN(r.out))}</td><td>${esc(r.unit)}</td></tr>`).join("")}</tbody>`
+      : `<tbody><tr><td class="empty" style="border:0">Nothing delivered or used in the last 30 days yet.</td></tr></tbody>`;
+  }
+  function moves(){
+    const L = D.log.filter((l) => inSel(l.ch)).slice(0, 25);
+    $("moves").innerHTML = L.length ? L.map(moveRow).join("") : `<li class="empty" style="display:block">No movements yet.</li>`;
+  }
+  function done(){
+    const J = D.jobs.filter((j) => inSel(j.ch) && j.status === "Done" && daysAgo(j.done) !== null && daysAgo(j.done) <= 30).sort((a, b) => String(b.done).localeCompare(String(a.done)));
+    $("doneMeta").textContent = J.length ? `${J.length} job${J.length === 1 ? "" : "s"}` : "";
+    $("done").innerHTML = J.length ? J.map((j) => `<li><span class="d">${esc(fmtDay(j.done))}</span><span>${j.place ? esc(j.place[0].toUpperCase() + j.place.slice(1)) + " · " : ""}${esc(j.title)} <span class="w">${esc(j.ref)}</span></span><span class="w">${esc(j.done_by)}</span></li>`).join("") : `<li class="empty" style="display:block">Nothing closed yet.</li>`;
+  }
+  function render(){ chips(); kpis(); jobs(); stock(); orders(); flow(); moves(); done(); }
+  render();
+  const tip = $("tip");
+  document.addEventListener("pointerover", (e) => { const t = e.target.closest && e.target.closest("[data-tip]"); if (!t) { tip.hidden = true; return; } tip.textContent = t.dataset.tip; tip.hidden = false; });
+  document.addEventListener("pointermove", (e) => { if (!tip.hidden) { tip.style.left = e.clientX + "px"; tip.style.top = e.clientY + "px"; } });
+})();
+</script>
+</body>
+</html>
