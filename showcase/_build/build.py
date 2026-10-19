@@ -10,7 +10,7 @@ from datetime import date, datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
-OUT = os.path.join(ROOT, 'showcase', 'index.html')
+OUT = os.environ.get('SHOWCASE_OUT', os.path.join(os.path.dirname(ROOT), 'ranfurlie-showcase', 'index.html'))
 
 D = json.load(open(os.path.join(ROOT, 'data.json')))
 IRR = json.load(open(os.path.join(ROOT, 'irrigation', 'data.json')))
@@ -242,7 +242,7 @@ def hero_svg():
         if key in seen:
             continue
         seen.add(key)
-        pulse = ' pulse' if n % 4 == 0 else ''
+        pulse = ' pulse' if n % 5 == 0 else ''
         pg.append(f'<g class="pin {kind}{pulse}" style="--n:{n};--d:{(n % 7) * .45:.2f}s">'
                   f'<line x1="{sx:.1f}" y1="{sy:.1f}" x2="{sx:.1f}" y2="{sy-16:.1f}"/>'
                   f'<circle class="ring" cx="{sx:.1f}" cy="{sy-16:.1f}" r="5"/>'
@@ -385,6 +385,28 @@ X3 = {'w': _x3['w'], 'h': _x3['h'],
 _src = open(os.path.join(ROOT, 'machinery', 'index.html')).read()
 X3_MODELS = len(re.findall(r"'[a-z0-9]+': gh \? 'photo", _src))
 
+# ---------------------------------------------------------------- one real day in Slack (Mon 19 Oct 2026)
+# Trimmed from the automated posts in each channel that day. No names, no money.
+FEED = [
+    ('04:58', 2, '#dailycoursesetup', 'Trim day. Pins carry over from Sunday, field off the 10th tee, 14th and 18th flagged for a look.'),
+    ('05:08', 1, '#spraying', 'Greens tank updated: Zeemil now 1.25 L (2.0 L/ha). 600 L/ha, Blue AIC nozzles, 3 bar, 7.8 km/h.'),
+    ('05:40', 3, '#machinery', "Mechanic's list: 14 jobs, 4 repairs and 10 services. Do first: set the greens mowers to 2.2 mm."),
+    ('06:00', 0, '#irrigation', 'Irrigation list: 34 open, 4 high priority, 7 new overnight from Cirrus Pro alarms.'),
+    ('06:04', 1, '#topdressing', 'Sand call: one pass at 0.2 mm, about 3 t of kiln-dried sand.'),
+    ('06:12', 4, '#safe-work-procedures', 'Pre-starts not done yet on 3 machines, including Greens Mower 1.'),
+    ('06:12', 0, '#drainage', 'Drainage list: 10 open, none high priority.'),
+    ('06:16', 1, '#spraying', 'Turf Watch: greens tank is a GO 8 to 10am. Pythium root rot risk high to 30 Oct.'),
+    ('06:16', 0, '#bunkers', 'Bunker list: 16 open, 1 high: 1st back-left greenside, liner exposed.'),
+    ('08:49', 3, '#machinery', 'Done: greens mowers set to 2.2 mm.'),
+    ('09:13', 4, '#ohs', 'The Safety Cut: fuel and chem shed. Engines off to refuel, labelled containers, spill kit clear.'),
+    ('09:48', 4, '#ohs', 'OHS-04 Lightning and Severe Weather: 11 of 16 signed, 5 to go.'),
+    ('10:52', 1, '#spraying', 'Tank mixed and signed: front 9 greens, fairy ring and root disease, 375 L.'),
+    ('17:15', 0, '#spatially-claude', 'Greens brief: per head plus wash-in, 60 heads, avg 4.3 mm. Program left off for checking.'),
+    ('17:46', 0, '#spatially-claude', 'Course brief: top-ups on 261 of 590 heads, about 268 kL. All five programs left off.'),
+    ('18:12', 2, '#dailycoursesetup', 'Tomorrow: change day, Stableford off the yellow tees. Pins: 4 of 18 set, 14 to go.'),
+]
+FEED_JSON = [{'t': t, 'r': r, 'c': c, 'x': x} for t, r, c, x in FEED]
+
 # ---------------------------------------------------------------- go
 hero, pin_counts = hero_svg()
 tpl = open(os.path.join(HERE, 'template.html')).read()
@@ -396,6 +418,7 @@ repl = {
     '__G8__': json.dumps(G8, separators=(',', ':')),
     '__FWD__': json.dumps(forward_snapshot(), separators=(',', ':')),
     '__X3__': json.dumps(X3, separators=(',', ':')),
+    '__FEED__': json.dumps(FEED_JSON, separators=(',', ':')),
     '{{X3_MODELS}}': str(X3_MODELS),
     '{{WEEKDAY_RUNS}}': str(WEEKDAY_RUNS),
     '{{TASK_COUNT}}': str(len(TASKS)),
