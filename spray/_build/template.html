@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
 /* Ranfurlie Tank Mix template v1.6 (19 Oct 2026). Built by spray/_build/build.py from a recipe + products.json + config.json.
+   v1.8 (20 Oct): the post-application checklist asks Finished or Not finished first; Not finished saves what's left in
+   the tank (no ticking jobs that weren't done) and the tank stays open, with a Not finished strip on other tank pages.
    v1.7 (19 Oct): the pre-start and PPE steps stand alone (no recipe, tank gauge or setup chips until they're done).
    v1.6: handgun rigs (recipe checks, facts and post-app fields), several tanks open at once (each mix is its own run),
    a Today's tanks card, and Mix another tank after the checklist.
@@ -257,6 +259,20 @@ body.gate #mixView .side, body.gate #mixView .tankread, body.gate #mixView .top 
 .gatesteps span{padding:5px 11px;border-radius:999px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
 .gatesteps span.on{background:var(--tank-soft);color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--tank)}
 .gatesteps span.ok{color:var(--go)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode{display:grid;justify-items:start;gap:2px;text-align:left;padding:14px 14px 12px;border-radius:var(--r2);border:0;cursor:pointer;background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);transition:background .2s,box-shadow .2s}
+.mode b{font-family:var(--display);font-weight:800;font-size:21px;line-height:1.05}
+.mode span{font-size:14px;color:var(--muted)}
+.mode svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;margin-bottom:4px;color:var(--muted)}
+.mode[aria-pressed="true"][data-m="done"]{background:var(--go-soft);box-shadow:inset 0 0 0 2px var(--go)}
+.mode[aria-pressed="true"][data-m="done"] svg{color:var(--go)}
+.mode[aria-pressed="true"][data-m="pause"]{background:var(--caution-bg);box-shadow:inset 0 0 0 2px var(--caution)}
+.mode[aria-pressed="true"][data-m="pause"] svg{color:var(--caution)}
+#openStrip{grid-column:1/-1;display:grid;gap:8px}#openStrip:empty{display:none}
+.openstrip svg{width:22px;height:22px;fill:none;stroke:var(--caution);stroke-width:2.6;stroke-linecap:round}
+.openstrip{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;margin:0;padding:10px 14px;border-radius:var(--r2);background:var(--caution-bg);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);font-size:15px}
+.openstrip b{font-family:var(--display);font-size:17px}
+.openstrip a{white-space:nowrap}
 .gatecount{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:17px}
 .gatecount .bar{flex:1;height:8px;border-radius:8px;background:var(--line);overflow:hidden}
 .gatecount .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--go),var(--go2));border-radius:8px;transition:width .25s var(--ease)}
@@ -411,6 +427,7 @@ body.gate #mixView .side, body.gate #mixView .tankread, body.gate #mixView .top 
 </div>
 <main class="main mix">
   <div class="wrap gut">
+    <div id="openStrip"></div>
     <section class="card stage" id="stage" aria-live="polite"></section>
     <aside class="side">
       <section class="card panel">
@@ -482,6 +499,7 @@ var SHORT={overalls:"Overalls",suit:"Spray suit",hat:"Hat",gloves:"Elbow gloves"
 var FULL={overalls:"Cotton overalls, buttoned neck and wrist",suit:"Chemical-resistant spray suit, buttoned neck and wrist",hat:"Washable hat",gloves:"Elbow-length PVC gloves",goggles:"Goggles",shield:"Face shield",mask:"Disposable mist mask over mouth and nose",resp:"Half-face respirator with organic vapour cartridges",apron:"Chemical apron",boots:"Impervious safety boots"};
 var PPE_ORDER=["suit","overalls","hat","gloves","goggles","shield","resp","mask","apron","boots"];
 var TICK='<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>';
+var PAUSE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>';
 var LOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2.5"/></svg>';
 var WARN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>';
 var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -513,6 +531,12 @@ var CHECKS=(R.checks||[
 var CHECK_T=R.check_title||"Sprayer check";
 var FACTS=R.facts||[R.mix_l+" L",R.area_ha.toFixed(2)+" ha",R.rate_lha+" L/ha",R.nozzles,R.speed,R.pressure];
 var POSTF=R.post_fields||[];
+var PAUSEC=R.pause_checks||[
+ ["secure","Lid closed, valves off, "+(R.method==="handgun"?"gun locked":"boom folded and locked"),""],
+ ["park","Rig parked in the chem shed or a bunded area, away from drains and water",""],
+ ["tag","Rig tagged: mix in the tank, today's date and the products","So nobody fills it or washes it out by mistake"],
+ ["ppe","PPE cleaned and put away for the day",""]];
+var WHEN=["Later today","Tomorrow","Spray out on the target area","Andy to decide"];
 var POSTC=(R.post_checks||[]);
 var TANK_PPE=PPE_ORDER.filter(function(k){return P.some(function(p){return p.ppe.indexOf(k)>=0})});
 if(TANK_PPE.indexOf("suit")>=0)TANK_PPE=TANK_PPE.filter(function(k){return k!=="overalls"});
@@ -526,7 +550,7 @@ var TK=TESTMODE?"-test":"";
 var KEY="ranfurlie-tankmix-"+R.slug+TK, MEKEY="ranfurlie-spray-me"+TK, OUTKEY="ranfurlie-spray-outbox"+TK;
 var st=load()||fresh();
 function rid(){var a="abcdefghjkmnpqrstuvwxyz23456789",o="";for(var i=0;i<5;i++)o+=a[Math.floor(Math.random()*a.length)];return o}
-function fresh(){return {i:0,checks:{},ppe:{},post:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixSig:null,postSig:null,postDue:false,pd:{},run:rid()}}
+function fresh(){return {i:0,checks:{},ppe:{},post:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixSig:null,postSig:null,postDue:false,pd:{},run:rid(),pz:{},paused:null}}
 function load(){try{var s=localStorage.getItem(KEY);if(!s)return null;var o=JSON.parse(s);var legacy=!("run" in o)&&!!o.mixSig;var f=fresh();for(var k in f)if(!(k in o))o[k]=f[k];if(legacy)o.run="";if(o.i>=S.length)o.i=S.length-1;return o}catch(e){return null}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
 function getMe(){try{return JSON.parse(localStorage.getItem(MEKEY)||"null")}catch(e){return null}}
@@ -617,7 +641,7 @@ function flush(){
   var body=new URLSearchParams();Object.keys(item).forEach(function(k){body.append(k,item[k]==null?"":String(item[k]))});
   fetch(R.webhook,{method:"POST",mode:"no-cors",body:body}).then(function(){var b=outbox();b.shift();setOutbox(b);flushing=false;markSent(item);flush()},function(){flushing=false;if(VIEW==="dash")renderDash()});
 }
-function markSent(item){if(item.slug!==R.slug||(item.run||"")!==(st.run||""))return;if(item.kind==="mix"&&st.mixSig)st.mixSig.sent=true;if(item.kind==="post"&&st.postSig)st.postSig.sent=true;save();if(VIEW==="dash")renderDash()}
+function markSent(item){if(item.slug!==R.slug||(item.run||"")!==(st.run||""))return;if(item.kind==="mix"&&st.mixSig)st.mixSig.sent=true;if(item.kind==="post"&&st.postSig)st.postSig.sent=true;if(item.kind==="pause"&&st.paused)st.paused.sent=true;save();if(VIEW==="dash")renderDash()}
 window.addEventListener("online",flush);setInterval(flush,30000);
 function pendingCount(){return outbox().length}
 
@@ -683,6 +707,7 @@ function render(){
       '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="sign-mix" id="signMixBtn" disabled>Sign and send</button></div>';
   }
   document.body.classList.toggle("gate",s.k==="check"||s.k==="ppe");
+  var os=$("openStrip");if(os){try{os.innerHTML=openStrip()}catch(e){}}
   var stage=$("stage");stage.innerHTML=h;
   if(lastI!==null&&lastI!==st.i&&!RM){stage.classList.remove("in-f","in-b");void stage.offsetWidth;stage.classList.add(st.i>lastI?"in-f":"in-b")}
   var isNew=lastI!==st.i; lastI=st.i;
@@ -728,13 +753,14 @@ function recordText(signer){
 
 /* ---------- dashboard ---------- */
 var DATA=null, DATAERR=false, SWSEL=null, TANKS=null;
-function loadTanks(){if(!R.tanks_url)return;fetch(R.tanks_url+"?v="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){TANKS=d.tanks||[];if(VIEW==="dash")renderDash()},function(){})}
+function loadTanks(){if(!R.tanks_url)return;fetch(R.tanks_url+"?v="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){TANKS=d.tanks||[];if(VIEW==="dash")renderDash();else{var os=$("openStrip");if(os)try{os.innerHTML=openStrip()}catch(e){}}},function(){})}
 function loadData(){
   if(!R.data_url){DATAERR=true;renderDash();return}
   fetch(R.data_url+(R.data_url.indexOf("?")<0?"?v=":"&v=")+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(d){DATA=d;DATAERR=false;renderDash()},function(){DATAERR=true;renderDash()});
 }
 function statusChips(){
   if(st.postSig)return '<span class="chip ok">Post-app done · '+esc(st.postSig.name)+' '+hm(st.postSig.at)+'</span>';
+  if(st.mixSig&&st.paused)return '<span class="chip ok">Mixed · '+esc(st.mixSig.name)+' '+hm(st.mixSig.at)+'</span><span class="chip warn">Not finished · '+esc(st.paused.left)+'\u00a0L left · '+whenAt(st.paused.at)+'</span>';
   if(st.mixSig)return '<span class="chip ok">Mixed · '+esc(st.mixSig.name)+' '+hm(st.mixSig.at)+'</span><span class="chip warn">Post-app checklist due</span>';
   var started=st.fillAt||Object.keys(st.checks).length;
   return started?'<span class="chip warn">Mixing · step '+(st.i+1)+' of '+S.length+'</span>':'<span class="chip">Not mixed on this phone</span>';
@@ -761,6 +787,19 @@ function todayCard(){
     (FLAGS.length?'<details class="more"><summary>Label checks on this sheet ('+FLAGS.length+')</summary><div class="morebody flags">'+FLAGS.map(function(f){return '<details class="flag '+(f.c||"")+'"><summary>'+f.t+'</summary><p>'+f.d+'</p><span class="s">'+f.s+'</span></details>'}).join("")+'</div></details>':'')+
     (st.mixSig&&st.mixSig.sig?'<details class="more"><summary>Signatures</summary><div class="morebody"><div class="small">Mix: '+esc(st.mixSig.name)+', '+hm(st.mixSig.at)+(st.mixSig.sent?' · sent':'')+'</div>'+sigSvg(st.mixSig.sig)+(st.postSig&&st.postSig.sig?'<div class="small">Post-application: '+esc(st.postSig.name)+', '+hm(st.postSig.at)+(st.postSig.sent?' · sent':'')+'</div>'+sigSvg(st.postSig.sig):'')+'</div></details>':'')+
   '</section>';
+}
+function openTanks(){
+  var out=[],pre="ranfurlie-tankmix-";
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(!k||k.indexOf(pre)!==0)continue;var slug=k.slice(pre.length);
+    if(TK){if(slug.slice(-TK.length)!==TK)continue;slug=slug.slice(0,-TK.length)}else if(/-test$/.test(slug))continue;
+    if(slug===R.slug)continue;var o=JSON.parse(localStorage.getItem(k)||"null");
+    if(o&&o.mixSig&&!o.postSig)out.push({slug:slug,paused:o.paused,mixSig:o.mixSig})}}catch(e){}
+  return out;
+}
+function tankTitle(slug){var t=(TANKS||[]).filter(function(x){return x.slug===slug})[0];return t?t.title:slug.replace(/^\d{4}-\d{2}-\d{2}-/,"").replace(/-/g," ")}
+function openStrip(){
+  var o=openTanks();if(!o.length)return "";
+  return o.map(function(x){return '<div class="openstrip">'+PAUSE+'<span><b>Not finished on this phone:</b> '+esc(tankTitle(x.slug))+(x.paused?' · '+esc(x.paused.left)+'\u00a0L left':' · checklist due')+'</span><a class="btn soft sm" href="'+esc(R.page_url+x.slug+"/#post")+'">Open</a></div>'}).join("");
 }
 function tanksCard(){
   var all=(TANKS||[]).filter(function(t){return t.date_iso===TODAY&&t.slug!==R.slug});
@@ -867,7 +906,7 @@ function watchCard(){
 function renderDash(){
   $("dWhen").textContent="Ranfurlie · "+dLabel(TODAY);
   var h=todayCard();
-  try{h+=tanksCard()}catch(e){}
+  try{h=openStrip().replace(/openstrip/g,"openstrip span2")+h+tanksCard()}catch(e){}
   if(DATA){
     $("dAsOf").textContent="Course data built "+(DATA._built||"");
     [windowCard,clocksCard,gvxCard,diseaseCard,coverCard,aheadCard,appsCard,watchCard].forEach(function(fn){try{h+=fn()}catch(e){}});
@@ -884,37 +923,63 @@ function renderDash(){
 function renderPostbar(){
   var due=VIEW==="dash"&&(st.mixSig||st.postDue)&&!st.postSig&&$("sheet").hidden;
   var b=$("postbar");
-  if(due){b.innerHTML='<div class="pt"><b>Post-app checklist due</b><span>'+(st.mixSig?'Mixed by '+esc(st.mixSig.name)+' · '+hm(st.mixSig.at):esc(R.title))+'</span></div><button class="btn go" type="button" data-act="open-post">Complete</button>';b.hidden=false;document.body.classList.add("has-postbar")}
+  if(due&&st.paused){b.innerHTML='<div class="pt"><b>Tank not finished</b><span>'+esc(st.paused.left)+'\u00a0L left · saved '+whenAt(st.paused.at)+'</span></div><button class="btn go" type="button" data-act="open-post">Update</button>';b.hidden=false;document.body.classList.add("has-postbar")}
+  else if(due){b.innerHTML='<div class="pt"><b>Post-app checklist due</b><span>'+(st.mixSig?'Mixed by '+esc(st.mixSig.name)+' · '+hm(st.mixSig.at):esc(R.title))+'</span></div><button class="btn go" type="button" data-act="open-post">Complete</button>';b.hidden=false;document.body.classList.add("has-postbar")}
   else{b.hidden=true;document.body.classList.remove("has-postbar")}
 }
+function whenAt(t){var d=melbParts(new Date(t)).date;return (d===TODAY?'':dShort(d)+' ')+hm(t)}
 function nowHM(){var d=new Date();return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2)}
 function openPost(){
   var pd=st.pd||(st.pd={});if(!pd.finish)pd.finish=nowHM();
   var preset=st.mixSig?{name:st.mixSig.name,slack:st.mixSig.slack}:null;
   var dirs=["","N","NE","E","SE","S","SW","W","NW"];
-  $("sheet").innerHTML='<div class="sheet-card"><div class="grab"></div>'+
-    '<div class="sheet-head"><div><div class="small">'+esc(R.title)+'</div><h2 id="sheetTitle">Post-application checklist</h2></div><button class="btn soft sm" type="button" data-act="sheet-close">Close</button></div>'+
-    '<div class="checks">'+POSTC.map(function(r){return checkBtn("post",r[0],r[1],r[2])}).join("")+'</div>'+
+  var m=pd.mode||"";
+  var head='<div class="sheet-head"><div><div class="small">'+esc(R.title)+'</div><h2 id="sheetTitle">'+(m==="pause"?'Tank not finished':'Post-application checklist')+'</h2></div><button class="btn soft sm" type="button" data-act="sheet-close">Close</button></div>'+
+    (st.paused?'<div class="haz soft">'+WARN+'<span>Saved as not finished '+whenAt(st.paused.at)+' by '+esc(st.paused.name)+': '+esc(st.paused.left)+'\u00a0L left'+(st.paused.when?' · '+esc(st.paused.when):'')+'.</span></div>':'')+
+    '<div class="field"><label>Is the tank sprayed out?</label><div class="modes">'+
+      '<button class="mode" type="button" data-act="pmode" data-m="done" aria-pressed="'+(m==="done")+'">'+TICK+'<b>Finished</b><span>Tank sprayed out</span></button>'+
+      '<button class="mode" type="button" data-act="pmode" data-m="pause" aria-pressed="'+(m==="pause")+'">'+PAUSE+'<b>Not finished</b><span>Product left in the tank</span></button>'+
+    '</div></div>';
+  var body="";
+  if(m==="done"){
+    body='<div class="checks">'+POSTC.map(function(r){return checkBtn("post",r[0],r[1],r[2])}).join("")+'</div>'+
     '<div class="fields">'+
       '<div class="field"><label for="pdFinish">Finish time</label><input id="pdFinish" type="time" value="'+esc(pd.finish)+'"></div>'+
       '<div class="field"><label for="pdWind">Wind (km/h)</label><input id="pdWind" inputmode="decimal" value="'+esc(pd.wind||"")+'" placeholder="e.g. 8"></div>'+
       '<div class="field"><label for="pdDir">Wind from</label><select id="pdDir">'+dirs.map(function(d){return '<option'+(pd.dir===d?' selected':'')+' value="'+d+'">'+(d||"–")+'</option>'}).join("")+'</select></div>'+
       '<div class="field"><label for="pdTemp">Temp (°C)</label><input id="pdTemp" inputmode="decimal" value="'+esc(pd.temp||"")+'" placeholder="e.g. 18"></div>'+
     '</div>'+
-    POSTF.map(function(f){return '<div class="field"><label for="pdx-'+f[0]+'">'+esc(f[1])+'</label>'+(f[3]==="text"?'<textarea id="pdx-'+f[0]+'" data-pdx="'+f[0]+'" placeholder="'+esc(f[2]||"")+'">'+esc(pd["x_"+f[0]]||"")+'</textarea>':'<input id="pdx-'+f[0]+'" data-pdx="'+f[0]+'" inputmode="'+(f[3]==="num"?"decimal":"text")+'" value="'+esc(pd["x_"+f[0]]||"")+'" placeholder="'+esc(f[2]||"")+'">')+'</div>'}).join("")+
+    POSTF.map(pdxField).join("")+
     '<div class="field"><label for="pdIssues">Anything to report? (optional)</label><textarea id="pdIssues" placeholder="Drift, blocked nozzles, mix left over, areas missed">'+esc(pd.issues||"")+'</textarea></div>'+
     whoField("post",preset)+
     '<p class="decl">I sprayed this tank out, cleaned up as above and recorded the application.</p>'+
     sigPad("post")+
     (PREVIEW?'<div class="small">Preview copy: sign-offs only send from the crew link.</div>':'')+
-    '<button class="btn go" type="button" data-act="sign-post" id="signPostBtn" disabled>Sign and send</button>'+
-  '</div>';
+    '<button class="btn go" type="button" data-act="sign-post" id="signPostBtn" disabled>Sign and send</button>';
+  } else if(m==="pause"){
+    body='<p class="small" style="margin:0">Tick only what you’ve done. The tank stays open and the full checklist comes when it’s sprayed out. Agitate well before you start again: suspensions settle.</p>'+
+    '<div class="checks">'+PAUSEC.map(function(r){return checkBtn("pz",r[0],r[1],r[2])}).join("")+'</div>'+
+    pdxField(["left","Litres left in the tank","e.g. 300","num"])+
+    pdxField(["areas","Areas done so far","e.g. 10 to 14 done, 15 to 18 to go","text"])+
+    '<div class="field"><label for="pdx-when">Finishing</label><select id="pdx-when" data-pdx="when"><option value="">Choose</option>'+WHEN.map(function(w){return '<option'+(pd.x_when===w?' selected':'')+'>'+esc(w)+'</option>'}).join("")+'</select></div>'+
+    '<div class="field"><label for="pdIssues">Anything to report? (optional)</label><textarea id="pdIssues" placeholder="Why it stopped: wind, golf, rain, breakdown">'+esc(pd.issues||"")+'</textarea></div>'+
+    whoField("post",preset)+
+    '<p class="decl">I’ve left the tank safe as above and recorded what’s left in it.</p>'+
+    sigPad("post")+
+    (PREVIEW?'<div class="small">Preview copy: sign-offs only send from the crew link.</div>':'')+
+    '<button class="btn go" type="button" data-act="sign-post" id="signPostBtn" disabled>Save as not finished</button>';
+  } else {
+    body='<p class="small" style="margin:0">Choose one to continue. Not finished saves what’s left in the tank without ticking jobs you haven’t done.</p>';
+  }
+  $("sheet").innerHTML='<div class="sheet-card"><div class="grab"></div>'+head+body+'</div>';
   $("sheet").hidden=false;renderPostbar();$("fab").hidden=true;
   document.documentElement.style.overflow="hidden";
-  initPad("post",refreshSignPost);refreshSignPost();
+  if(m){initPad("post",refreshSignPost);refreshSignPost()}
 }
+function pdxField(f){var pd=st.pd||{};return '<div class="field"><label for="pdx-'+f[0]+'">'+esc(f[1])+'</label>'+(f[3]==="text"?'<textarea id="pdx-'+f[0]+'" data-pdx="'+f[0]+'" placeholder="'+esc(f[2]||"")+'">'+esc(pd["x_"+f[0]]||"")+'</textarea>':'<input id="pdx-'+f[0]+'" data-pdx="'+f[0]+'" inputmode="'+(f[3]==="num"?"decimal":"text")+'" value="'+esc(pd["x_"+f[0]]||"")+'" placeholder="'+esc(f[2]||"")+'">')+'</div>'}
+function leftOK(){var v=parseFloat(String((st.pd||{}).x_left||"").replace(",","."));return !isNaN(v)&&v>=0&&v<=SHEET.cap}
 function closePost(){$("sheet").hidden=true;document.documentElement.style.overflow="";renderFab();renderPostbar()}
-function refreshSignPost(){var b=$("signPostBtn");if(!b)return;var was=b.disabled;b.disabled=!(allOn("post",POSTC)&&readWho("post").name&&padHas("post"));if(was&&!b.disabled&&!RM){b.classList.remove("ready");void b.offsetWidth;b.classList.add("ready")}}
+function refreshSignPost(){var b=$("signPostBtn");if(!b)return;var was=b.disabled;var m=(st.pd||{}).mode;b.disabled=!((m==="pause"?allOn("pz",PAUSEC)&&leftOK():allOn("post",POSTC))&&readWho("post").name&&padHas("post"));if(was&&!b.disabled&&!RM){b.classList.remove("ready");void b.offsetWidth;b.classList.add("ready")}}
 function extraText(){var pd=st.pd||{};return POSTF.map(function(f){var v=String(pd["x_"+f[0]]||"").trim();return v?f[1]+": "+v:""}).filter(Boolean).join("\n")}
 function finishText(){var pd=st.pd||{};var parts=[];if(pd.finish)parts.push(pd.finish);if(pd.wind)parts.push("wind "+pd.wind+" km/h"+(pd.dir?" from "+pd.dir:""));if(pd.temp)parts.push(pd.temp+" °C");return parts.join(" · ")}
 
@@ -963,7 +1028,20 @@ function signMix(){
   buzz();toast(PREVIEW?"Signed (preview copy, not sent)":"Mix signed. Sent to #spraying");
   setTimeout(function(){setView("dash",true)},350);
 }
+function signPause(){
+  var who=readWho("post");if(!who.name||!padHas("post")||!allOn("pz",PAUSEC)||!leftOK())return;
+  saveMe(who);var sig=padPath("post"),pd=st.pd||{};
+  var left=String(parseFloat(String(pd.x_left).replace(",",".")));
+  st.paused={at:Date.now(),name:who.name,slack:who.slack,left:left,when:pd.x_when||"",areas:pd.x_areas||"",sent:false};
+  var checks="Not finished. Left safe:\n"+PAUSEC.map(function(r){return "✓ "+r[1]}).join("\n");
+  var extra=(pd.x_areas?"Areas done so far: "+pd.x_areas:"");
+  send({kind:"pause",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,left:left,when:pd.x_when||"",checks:checks,extra:extra,issues:pd.issues||"",sig:sig});
+  st.pz={};pd.mode="";pd.issues="";st.postDue=true;PADS.post={strokes:[]};save();
+  buzz();closePost();renderDash();toast(PREVIEW?"Saved as not finished (preview copy, not sent)":"Saved as not finished. Come back here to finish the tank");
+}
 function signPost(){
+  if((st.pd||{}).mode==="pause"){signPause();return}
+  if((st.pd||{}).mode!=="done")return;
   var who=readWho("post");if(!who.name||!padHas("post")||!allOn("post",POSTC))return;
   saveMe(who);var sig=padPath("post");
   st.postSig={at:Date.now(),name:who.name,slack:who.slack,sig:sig,sent:false};save();
@@ -978,7 +1056,7 @@ document.addEventListener("click",function(e){
   if(c){var g=c.getAttribute("data-g"),id=c.getAttribute("data-id");st[g][id]=!st[g][id];save();
     c.setAttribute("aria-pressed",String(!!st[g][id]));buzz();
     c.classList.remove("pop");void c.offsetWidth;if(st[g][id])c.classList.add("pop");
-    if(g==="post"){refreshSignPost();return}
+    if(g==="post"||g==="pz"){refreshSignPost();return}
     var s=S[st.i],btn=document.querySelector('#stage [data-act="next"]');
     var gl=s.k==="check"?CHECKS:TANK_PPE,gg=s.k==="check"?"checks":"ppe",gc=$("gateCount");
     if(gc)gc.outerHTML=gateCount(gg,gl);
@@ -1002,6 +1080,7 @@ document.addEventListener("click",function(e){
   else if(a==="fab")setView(VIEW==="mix"?"dash":"mix",true);
   else if(a==="to-mix")setView("mix",true);
   else if(a==="open-post")openPost();
+  else if(a==="pmode"){st.pd=st.pd||{};st.pd.mode=b.getAttribute("data-m");save();var sc=document.querySelector("#sheet .sheet-card"),y=sc?sc.scrollTop:0;openPost();var sc2=document.querySelector("#sheet .sheet-card");if(sc2)sc2.scrollTop=y}
   else if(a==="sheet-close")closePost();
   else if(a==="sign-post")signPost();
   else if(a==="copy")copyText(recordText(st.mixSig?st.mixSig.name:""));
@@ -1014,7 +1093,7 @@ document.addEventListener("click",function(e){
 document.addEventListener("input",function(e){
   var t=e.target;
   if(t.hasAttribute("data-batch")){st.batch[t.getAttribute("data-batch")]=t.value;save()}
-  else if(t.hasAttribute("data-pdx")){st.pd=st.pd||{};st.pd["x_"+t.getAttribute("data-pdx")]=t.value;save()}
+  else if(t.hasAttribute("data-pdx")){st.pd=st.pd||{};st.pd["x_"+t.getAttribute("data-pdx")]=t.value;save();refreshSignPost()}
   else if(t.id==="ph"){st.ph=t.value.trim();save();$("phMsg").innerHTML=phBox()}
   else if(t.id==="pdFinish"||t.id==="pdWind"||t.id==="pdTemp"||t.id==="pdIssues"||t.id==="pdDir"){var k={pdFinish:"finish",pdWind:"wind",pdTemp:"temp",pdIssues:"issues",pdDir:"dir"}[t.id];st.pd=st.pd||{};st.pd[k]=t.value;save()}
   else if(t.id&&t.id.indexOf("whoOther-")===0){var id=t.id.slice(9);if(id==="mix")refreshSignMix();else refreshSignPost()}
@@ -1023,6 +1102,7 @@ document.addEventListener("change",function(e){
   var t=e.target;
   if(t.hasAttribute&&t.hasAttribute("data-who")){var id=t.getAttribute("data-who");var o=$("whoOther-"+id);if(o){o.hidden=t.value!=="other";if(!o.hidden)o.focus()}if(id==="mix")refreshSignMix();else refreshSignPost()}
   else if(t.id==="pdDir"){st.pd=st.pd||{};st.pd.dir=t.value;save()}
+  else if(t.hasAttribute&&t.hasAttribute("data-pdx")){st.pd=st.pd||{};st.pd["x_"+t.getAttribute("data-pdx")]=t.value;save();refreshSignPost()}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("sheet").hidden)closePost()});
 window.addEventListener("hashchange",function(){if(location.hash==="#mix"||location.hash==="#dash")setView(location.hash.slice(1),true);else if(location.hash==="#post"){setView("dash",false);fromSlack()}});
@@ -1034,6 +1114,7 @@ document.addEventListener("visibilitychange",function(){if(document.visibilitySt
 wake();
 
 shownL=litres();
+if(openTanks().length){TANKS=[];loadTanks()}
 renderFlags();renderReset();
 setView(defaultView(),false);
 fromSlack();
