@@ -1,0 +1,165 @@
+{
+  "slug": "2026-10-21-greens-fert-pgr",
+  "title": "Fert + PGR, Greens",
+  "sheet_name": "5800 - 300L/Ha - Fert + PGR to Greens",
+  "sprayer": "Toro 5800",
+  "applicator": [
+    "Brodie Macdonald",
+    "U0839HLQA8G"
+  ],
+  "date": "Wed 21 Oct",
+  "date_long": "Wed 21 Oct 2026",
+  "date_iso": "2026-10-21",
+  "area_ha": 2.2,
+  "rate_lha": 300,
+  "mix_l": 660,
+  "tank_cap_l": 1200,
+  "fill_l": 450,
+  "nozzles": "Red AIC",
+  "speed": "6.9 km/h",
+  "pressure": "4 bar",
+  "last_load": "Fairy Ring + Root Disease, Back 9 Greens, Tue 20 Oct (had HydroForce in it: rinse the boom first)",
+  "site_check": "Spray signs out on every green. Greens mown, clippings and debris cleared",
+  "weather": "Delta T 2–8 · wind under 15 km/h · under 25 °C · finished by 11am",
+  "extra_checks": [
+    [
+      "rinse",
+      "Clean water run through the boom first",
+      "Yesterday's tank had HydroForce (wetting agent) in it"
+    ],
+    [
+      "dry",
+      "Greens mown, dew off, clippings and debris cleared",
+      "Poachek goes on dry leaf only"
+    ],
+    [
+      "boxout",
+      "No GPS on the 5800: box out each green, then fill in",
+      "Every part of the green. Surrounds don't need it"
+    ]
+  ],
+  "products": [
+    {
+      "id": "companion",
+      "rate": "300 mL/ha",
+      "rate_lha": 0.3,
+      "unit": "mL",
+      "sheet": 1,
+      "why": "The label says Companion goes in first, before anything else. There's no copper in this tank, so its copper restraint is clear."
+    },
+    {
+      "id": "shadow",
+      "rate": "0.5 L/ha",
+      "rate_lha": 0.5,
+      "unit": "L",
+      "sheet": 2
+    },
+    {
+      "id": "iron",
+      "rate": "10 L/ha",
+      "rate_lha": 10,
+      "unit": "L",
+      "sheet": 3,
+      "why": "Acidic (pH about 2). Big volume, goes in once the PGR is spread through the tank."
+    },
+    {
+      "id": "greenmaxx",
+      "rate": "35 L/ha",
+      "rate_lha": 35,
+      "unit": "L",
+      "sheet": 4
+    },
+    {
+      "id": "poachek",
+      "rate": "0.75 L/ha",
+      "rate_lha": 0.75,
+      "unit": "L",
+      "sheet": 5
+    },
+    {
+      "id": "phozfight",
+      "rate": "10 L/ha",
+      "rate_lha": 10,
+      "unit": "L",
+      "sheet": 6
+    }
+  ],
+  "ppe_note": "Poachek is a Schedule 6 poison and fatal if breathed in: mist mask, face shield and elbow gloves when you pour it, and the mist mask stays on while you spray. Grass Roots Iron and GreenMaxx are strong acids: goggles and apron. Eyewash on the rig.",
+  "spray_ppe": [
+    "overalls",
+    "gloves",
+    "mask"
+  ],
+  "spray_rules": [
+    "No GPS on this sprayer: box out each green (a lap round the edge), then fill in. Every part of the green, surrounds don't need it",
+    "Greens mown, dew off, clippings and debris cleared. Dry leaf only",
+    "Get on now and be finished by 11. Poachek's label says not over 25 °C, and it gets to about 25 °C by 11 and 27 °C this afternoon",
+    "Spray when Delta T is 2 to 8. Stop if it's blowing off target",
+    "Foliar pass: do NOT water in. No irrigation or hand watering on the greens for 24 h",
+    "Ladies Foursomes Champs is off the 1st and 10th from 8:15am. Stay ahead of the field, never spray a green with golfers on or near it, and keep people off each green until it's dry"
+  ],
+  "spray_more": "Poachek label: fine spray in 500–1000 L/ha, don't spray above 25 °C, apply to dry turf and keep it dry for 24 h after, not on kikuyu or red fescue. Shadow Ultra: no rain or irrigation within 1 h, and no entry without protective clothing until the spray has dried. Phoz Fight: check compatibility before tank mixing.",
+  "post_checks": [
+    [
+      "irrig",
+      "Greens irrigation off for 24 h and nobody hand watering the greens",
+      "Foliar pass: it has to stay on the leaf"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "Poachek: 25 °C label limit, 27 °C today",
+      "d": "Label: don't spray above 25 °C. 16 °C at dawn, about 25 °C by 11am, 27 °C peak. Delta T 2.5 and calm at 4:45am, so the window is now: finish by 11, earlier if it warms faster. The label also wants dry turf, so greens mown and dew off before the boom goes on.",
+      "s": "Poachek label APVMA 47841 · #dailycoursesetup brief 21 Oct"
+    },
+    {
+      "c": "red",
+      "t": "No water on the greens for 24 h",
+      "d": "Foliar pass, and Poachek's label says keep the turf dry for 24 h after. Tonight's greens irrigation needs holding, and today's brief tells the crew to hand water dry spots after the greens work: keep that off the greens. 27 °C, 0 mm in 24 h and greens at 2.2 mm, so check the hot spots first thing Thursday.",
+      "s": "Poachek label · GreenKeeper sheet notes · #dailycoursesetup brief 21 Oct"
+    },
+    {
+      "c": "",
+      "t": "Ladies Foursomes Champs is off at 8:15am, not 3:30pm",
+      "d": "This morning's brief corrected it from the booking site: Round 2 is off the 1st and 10th, 8:15–8:45am, with no clear nine. The 3:30pm two-tee start is twilight. The sprayer has to stay ahead of the field, or work in behind it with people kept off each green until dry.",
+      "s": "#dailycoursesetup brief 21 Oct 4:59am"
+    },
+    {
+      "c": "",
+      "t": "Water volume is under Poachek's label",
+      "d": "Label: 150 mL per 1000 m² as a fine mist spray in 50–100 L per 1000 m² (500–1000 L/ha). This tank is 300 L/ha through Red AIC, a coarse air-induction nozzle. The sheet rate of 0.75 L/ha is half the label's 1.5 L/ha.",
+      "s": "Poachek label APVMA 47841"
+    },
+    {
+      "c": "",
+      "t": "Phoz Fight going into an acid iron tank",
+      "d": "Phoz Fight is pH 6.6–7.2 and its SDS says keep it from strong acids. Grass Roots Iron (pH about 2) and GreenMaxx (pH 2–3, 6% Fe) are in first, and phosphite and iron can drop out together. It stays last as on the sheet, into a diluted tank with the agitator running; its label says check compatibility first. Jar test per 1 L of mix, in page order: 680 mL water, 1 mL Companion, 1.7 mL Shadow Ultra, 33 mL iron, 117 mL GreenMaxx, 2.5 mL Poachek, 33 mL Phoz Fight, top up to 1 L. Look for cloud or sludge after 10 minutes.",
+      "s": "Phoz Fight label + SDS · Grass Roots Iron SDS May 2025 · GreenMaxx SDS Dec 2024"
+    },
+    {
+      "c": "info",
+      "t": "Boom setup: about 317 L/ha at 4 bar",
+      "d": "Toro's own colour code: Red is the 0.4 gpm size (1.51 L/min at 2.76 bar). At 4 bar that's about 1.82 L/min a nozzle; on 50 cm spacing at 6.9 km/h it's about 317 L/ha. The rate controller will sit near 3.6 bar to hold 300 L/ha.",
+      "s": "Toro Multi Pro Spray Nozzle Selection Guide (metric, 50 cm spacing)"
+    },
+    {
+      "c": "info",
+      "t": "Companion's copper restraint is clear",
+      "d": "Companion's label says don't use it with copper products. ASTRON (0.15% Cu) is off this tank, and nothing else here carries copper.",
+      "s": "APVMA 51664 label · ASTRON SDS Apr 2024"
+    },
+    {
+      "c": "info",
+      "t": "Rinse the boom before filling",
+      "d": "Yesterday's tank had HydroForce Ultra through it. Run clean water through the boom first so no wetting agent carries into a foliar pass.",
+      "s": "Recipe 2026-10-20 back 9 greens"
+    },
+    {
+      "c": "info",
+      "t": "Nitrogen: about 9 kg N/ha",
+      "d": "GreenMaxx at 35 L/ha is about 9 kg N/ha (SG 1.31, 20% w/w) as stabilised urea, plus 1% Mg. If its 20% is w/v, it's 7 kg N/ha.",
+      "s": "GreenMaxx SDS Dec 2024 · Greenway brochure"
+    }
+  ]
+}

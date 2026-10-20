@@ -1,479 +1,525 @@
 {
-  "_about": "Ranfurlie tank-mix product library. One record per product, read off the current AU label / maker SDS. {amt} in 'how' is replaced with the tank amount. 'why' is the default reason for its place in the order; a recipe can override it. PPE keys: overalls, hat, gloves, goggles, shield, mask, apron, boots. Checked 14-15 Oct 2026.",
-  "companion": {
-    "name": "Companion",
-    "gk_name": "Companion",
-    "sig": "CAUTION",
-    "sigc": "caution",
-    "form": "Adjuvant",
-    "what": "Acidifying and penetrating surfactant (soya phospholipids + propionic acid)",
-    "haz": "Damages eyes. Irritates skin.",
-    "hazFull": "Will damage eyes. Will irritate the skin. Avoid contact with eyes and skin. Label: DO NOT use with copper products.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "shield"
-    ],
-    "how": [
-      "Measure {amt}",
-      "Pour in before anything else"
-    ],
-    "why": "The label says Companion goes in first, before the other products. It holds the tank pH down for the ethephon.",
-    "src": "Label APVMA 51664 (Apr 2023) · <a href=\"https://elabels.apvma.gov.au/51664ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
-  },
-  "chlorostick": {
-    "name": "Chlorostick 720 SC",
-    "gk_name": "Chlorostick 720",
-    "sig": "POISON",
-    "sigc": "poison",
-    "form": "Suspension concentrate (SC)",
-    "what": "Chlorothalonil 720 g/L fungicide, Group M5",
-    "haz": "Attacks eyes and skin. Don't breathe the mist.",
-    "hazFull": "Attacks eyes and skin. Don't inhale spray mist. Repeated exposure may cause allergies. If clothing gets product or spray on it, take it off straight away. Label: DO NOT mix spraying oils or wetting agents with this product.",
-    "ppe": [
-      "overalls",
-      "hat",
-      "gloves",
-      "goggles",
-      "mask"
-    ],
-    "how": [
-      "Shake and turn each drum over",
-      "Pour with the agitator running",
-      "Rinse each drum 3 times into the tank"
-    ],
-    "why": "A suspension goes in early so it spreads through plenty of moving water.",
-    "src": "Label APVMA 69652 · SDS Feb 2025 · <a href=\"https://elabels.apvma.gov.au/69652ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2026/04/CHLOROSTICK-720-SC-FUNGICIDE_2025_SDS.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
-  },
-  "shadow": {
-    "name": "Shadow Ultra",
-    "gk_name": "Shadow Ultra (AU)",
-    "sig": "CAUTION",
-    "sigc": "caution",
-    "form": "Micro-emulsion (ME)",
-    "what": "Trinexapac-ethyl 120 g/L growth regulator",
-    "haz": "Harmful if breathed in.",
-    "hazFull": "Harmful if inhaled (SDS). Avoid contact with eyes and skin. Don't breathe spray mist. No rain or irrigation within 1 h of spraying. No entry without protective clothing until the spray has dried.",
-    "ppe": [
-      "overalls",
-      "gloves"
-    ],
-    "how": [
-      "Measure {amt} in a jug",
-      "Pour straight in, no pre-mix",
-      "Rinse the jug into the tank"
-    ],
-    "why": "The label says add it to a tank at least two-thirds full of water. You're at {before} L.",
-    "src": "Label APVMA 88267 · <a href=\"https://elabels.apvma.gov.au/88267ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
-  },
-  "promote": {
-    "name": "Promote Plus 900",
-    "gk_name": "Promote Plus 900",
-    "sig": "POISON",
-    "sigc": "poison",
-    "form": "Soluble liquid (SL)",
-    "what": "Ethephon 900 g/L growth regulator",
-    "haz": "Corrosive. Burns skin and eyes.",
-    "hazFull": "Corrosive (SDS: causes severe skin burns and eye damage). Splash in the eye: flush with water for at least 15 minutes and get medical help. Don't use alkaline water. Don't let the mix stand in metal for more than 2 hours. No rain expected within 8 hours.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles",
-      "shield",
-      "apron"
-    ],
-    "how": [
-      "Measure {amt}",
-      "Pour slowly, low to the opening",
-      "Rinse the jug and drums into the tank"
-    ],
-    "why": "Goes in after Companion so it lands in acidified water. The label says don't use alkaline water.",
-    "src": "Label APVMA 69487 · SDS ADAMA Jun 2023 · <a href=\"https://elabels.apvma.gov.au/69487ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.adama.com/australia/en/media/2596/download?attachment\" target=\"_blank\" rel=\"noopener\">SDS</a>"
-  },
-  "astron": {
-    "name": "ASTRON",
-    "gk_name": "ASTRON (0-0-0)",
-    "sig": "Eye damage",
-    "sigc": "",
-    "form": "Liquid nutrient",
-    "what": "Floratine foliar biostimulant (Ca, Mg, Fe, Zn, Cu, B)",
-    "haz": "Causes serious eye damage.",
-    "soft": true,
-    "hazFull": "SDS signal word DANGER: causes serious eye damage, causes skin irritation. Contains a copper salt (0.15% Cu). Chemical goggles and impervious gloves.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles"
-    ],
-    "how": [
-      "Shake the drums hard",
-      "Lift the fill strainer out",
-      "Pour {amt}"
-    ],
-    "why": "Floratine's mixing order is ASTRON, then Perk Up, then GlycoFuze. It's high in solids, so the strainer comes out.",
-    "src": "Floratine info sheet + SDS Apr 2024 · <a href=\"https://turfcareaus.com.au/wp-content/uploads/2026/03/Astron_SDS_2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
-  },
-  "perkup": {
-    "name": "Perk Up",
-    "gk_name": "Perk Up (0-0-0)",
-    "sig": "Eye damage",
-    "sigc": "",
-    "form": "Liquid nutrient",
-    "what": "Floratine calcium (8% Ca) + carbohydrates",
-    "haz": "Causes serious eye damage.",
-    "soft": true,
-    "hazFull": "SDS signal word DANGER: causes serious eye damage. Chemical goggles; impervious gloves for long contact.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles"
-    ],
-    "how": [
-      "Shake well",
-      "Pour {amt}, strainer still out",
-      "Put the strainer back in"
-    ],
-    "why": "Floratine's order puts Perk Up before GlycoFuze.",
-    "src": "Floratine info sheet + SDS Apr 2024 · <a href=\"https://turfcareaus.com.au/wp-content/uploads/2026/03/Perk-Up_SDS_2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
-  },
-  "glyco": {
-    "name": "GlycoFuze 2-1-2",
-    "gk_name": "GlycoFuze (2-1-2)",
-    "sig": "Not hazardous",
-    "sigc": "",
-    "form": "Liquid nutrient",
-    "what": "Floratine carbohydrate + N-P-K",
-    "haz": "",
-    "hazFull": "Not classified as hazardous (SDS). Goggles and gloves if handling for long.",
-    "ppe": [
-      "gloves",
-      "goggles"
-    ],
-    "how": [
-      "Pour {amt}"
-    ],
-    "why": "Last of the Floratine products, by their order.",
-    "src": "Floratine info sheet + SDS Apr 2024 · <a href=\"https://turfcareaus.com.au/wp-content/uploads/2026/03/GlycoFuze_SDS_2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
-  },
-  "iron": {
-    "name": "Grass Roots Iron",
-    "gk_name": "Grass Roots Iron (0-0-0)",
-    "sig": "Eye irritant",
-    "sigc": "",
-    "form": "Liquid nutrient",
-    "what": "Oasis Turf liquid iron, 6% Fe, pH about 2",
-    "haz": "Eye irritant. Strongly acidic.",
-    "soft": true,
-    "hazFull": "SDS signal word WARNING: eye irritation. Safety glasses, PVC gloves, overalls, apron and safety boots; eyewash nearby. Label rate 10-20 L/ha.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles",
-      "apron",
-      "boots"
-    ],
-    "how": [
-      "Agitate the drums",
-      "Pour {amt}"
-    ],
-    "why": "Big volume and no mixing restrictions on its label, so it goes in late.",
-    "src": "Label + SDS May 2025 (Oasis Turf) · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2024/03/OT-Iron.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2025/05/IRON-SDS-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
-  },
-  "prokelp": {
-    "name": "Pro Kelp",
-    "gk_name": "Pro Kelp (0-0-0)",
-    "sig": "Alkaline",
-    "sigc": "",
-    "form": "Liquid kelp extract",
-    "what": "Grass Roots Pro Kelp 25: Tasmanian bull kelp extracted with caustic potash, pH 10-12.5",
-    "haz": "Strongly alkaline. Keep it apart from the iron and GreenMaxx neat.",
-    "soft": true,
-    "hazFull": "Not classified as hazardous (SDS Nov 2025). pH above 10, contains potassium hydroxide under 5%. Impervious gloves, safety glasses with side shields, cotton overalls; apron for large volumes. Label: 20-50 L/ha in 700 L water/ha; check compatibility before tank mixing.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles"
-    ],
-    "how": [
-      "Agitate the drums",
-      "Pour {amt} into the tank water",
-      "Rinse the drums into the tank"
-    ],
-    "why": "It's strongly alkaline. Going in early, into plain water, means it never meets the acidic products neat.",
-    "src": "Oasis Turf label + SDS Nov 2025 · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2021/09/OT_GR_PRO_KELP_25_BACK_LABEL.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2026/01/Pro-Kelp-SDS-Nov-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
-  },
-  "greenmaxx": {
-    "name": "GreenMaxx 20-0-0",
-    "gk_name": "Liquimaxx Greenmaxx 20-0-0 AU (20-0-0)",
-    "sig": "Irritant",
-    "sigc": "",
-    "form": "Liquid fertiliser",
-    "what": "LiquiMaxx GreenMaxx: stabilised urea N 20%, with 6% Fe and 1% Mg as sulphates, pH 2-3",
-    "haz": "Irritates skin and eyes.",
-    "soft": true,
-    "hazFull": "SDS signal word WARNING: harmful if swallowed, skin and eye irritant, may irritate airways. PVC gloves, overalls and apron, safety glasses or goggles; eyewash nearby. Strong bases listed as incompatible. May settle in the IBC, so stir before drawing. Label rate 20-50 L/ha.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles",
-      "apron"
-    ],
-    "how": [
-      "Stir the IBC first",
-      "Draw {amt}",
-      "Pour with the agitator running"
-    ],
-    "why": "Acidic, like the iron. Goes in late with the other fertiliser.",
-    "src": "SDS Dec 2024 (Indigo / Greenway) · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/AAC-Liquimaxx-GreenMaxx-SDS-2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a> · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/GTS-Greenmaxx-Brochure.pdf\" target=\"_blank\" rel=\"noopener\">brochure</a>"
-  },
-  "evoadv": {
-    "name": "Evolution Advance",
-    "gk_name": "Quali-Pro Evolution Advance (AU)",
-    "sig": "CAUTION",
-    "sigc": "caution",
-    "form": "Suspension concentrate (SC)",
-    "what": "Fungicide: tebuconazole 370 g/L + azoxystrobin 222 g/L (Group 3 + 11)",
-    "haz": "May irritate eyes.",
-    "soft": true,
-    "hazFull": "Harmful if swallowed. May irritate the eyes. Avoid contact with eyes. Label PPE: cotton overalls buttoned to the neck and wrist when opening, mixing and spraying. Don't apply if rain is expected within 48 h. Wind 3–20 km/h, medium droplets or coarser.",
-    "ppe": [
-      "overalls"
-    ],
-    "how": [
-      "Shake the drum hard",
-      "Measure {amt}",
-      "Pour into moving water, agitator on",
-      "Rinse the drum 3 times into the tank"
-    ],
-    "why": "A suspension concentrate goes in before the EC and the wetting agent so it disperses properly. You're at {before} L.",
-    "src": "Label APVMA 93144 · <a href=\"https://www.adama.com/australia/en/media/7016/download\" target=\"_blank\" rel=\"noopener\">label</a>"
-  },
-  "zeemil": {
-    "name": "Zeemil 250 EC",
-    "gk_name": "Zeemil",
-    "sig": "CAUTION",
-    "sigc": "caution",
-    "form": "Emulsifiable concentrate (EC)",
-    "what": "Fungicide: metalaxyl 250 g/L (Group 4) for Pythium. Off-label on turf",
-    "haz": "Irritates eyes and skin. Don't breathe the solvent vapour.",
-    "soft": true,
-    "hazFull": "Label: avoid contact with eyes and skin. Do not inhale spray mist. Beware of solvent vapours when handling the concentrate and near an open spray tank. Registered for pineapples only (2 L/ha).",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles"
-    ],
-    "how": [
-      "Measure {amt}",
-      "Pour straight in and mix well",
-      "Stand upwind of the open lid",
-      "Rinse the drum 3 times into the tank"
-    ],
-    "why": "An EC goes in after the suspension so it doesn't stop it dispersing. You're at {before} L.",
-    "src": "Label APVMA 49822 · <a href=\"https://elabels.apvma.gov.au/49822ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
-  },
-  "terreplex": {
-    "name": "Terreplex",
-    "gk_name": "Terreplex Carbon Rich Accidifier (0-0-0)",
-    "sig": "",
-    "sigc": "",
-    "form": "Liquid, low pH (lignosulfonic acid)",
-    "what": "Carbon-rich acidifier: 55% plant-derived organic acid",
-    "haz": "Low pH. Irritates eyes and skin.",
-    "soft": true,
-    "hazFull": "Eye and skin irritant. Harmful if swallowed. Wear eye protection, gloves and appropriate clothing. Don't mix with high-pH products unless the tank goes out straight away.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles"
-    ],
-    "how": [
-      "Measure {amt}",
-      "Pour into moving water, agitator on",
-      "Rinse the drum 3 times into the tank"
-    ],
-    "why": "An acidifier, so it goes in early with the Companion and conditions the water before the fungicides. You're at {before} L.",
-    "src": "Mitchell Products label · <a href=\"https://tricure.com/wp-content/uploads/2022/08/Terreplex-Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
-  },
-  "hydroforce": {
-    "name": "HydroForce Ultra",
-    "gk_name": "HydroForce Ultra (AU)",
-    "sig": "",
-    "sigc": "",
-    "form": "Soil surfactant (block co-polymer)",
-    "what": "Wetting agent: carries the fungicides into the thatch and root zone",
-    "haz": "",
-    "hazFull": "No hazard statements on the tech sheet. Can foam: add slowly. Irrigate after application to move it into the root zone.",
-    "ppe": [
-      "gloves"
-    ],
-    "how": [
-      "Shake well",
-      "Measure {amt}",
-      "Pour in slowly, agitator on. It can foam",
-      "Rinse the drum 3 times into the tank"
-    ],
-    "why": "Wetting agents go in last so they don't foam the tank or coat the other products. You're at {before} L.",
-    "src": "Indigo tech sheet · <a href=\"https://gilbasolutions.com/wp-content/uploads/2022/05/HydroForce-Ultra_Tech.pdf\" target=\"_blank\" rel=\"noopener\">tech sheet</a>"
-  },
-  "quinstar": {
-    "name": "Quinstar 200 SC",
-    "gk_name": "Quinstar (AU)",
-    "sig": "CAUTION",
-    "sigc": "caution",
-    "form": "Suspension concentrate (SC)",
-    "what": "Herbicide: quinclorac 200 g/L (summer grass, white clover, kikuyu suppression)",
-    "haz": "May irritate eyes and skin.",
-    "soft": true,
-    "hazFull": "Schedule 5. Label rate 4.1 L/ha in 400 L water. Tolerant turf: common and seeded couch, zoysia, Kentucky bluegrass, perennial ryegrass, bentgrass (with a caution). Not tolerant: Qld blue couch, buffalo, kikuyu (suppressed). Tall fescue isn't listed. Kikuyu suppression is 2 applications 14–21 days apart, autumn best. Don't mow 2 days before or after. Avoid rain within 48 h and irrigation within 8 h.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles"
-    ],
-    "how": [
-      "Shake the drum hard",
-      "Measure {amt}",
-      "Pour into moving water, agitator on",
-      "Rinse the drum 3 times into the tank"
-    ],
-    "why": "A suspension concentrate goes in first after Companion, so it disperses before the oils and salts. You're at {before} L.",
-    "src": "ADAMA Quinstar product guide · <a href=\"https://www.adama.com/australia/en/media/8771/download\" target=\"_blank\" rel=\"noopener\">guide</a>"
-  },
-  "firepower": {
-    "name": "Firepower 900",
-    "gk_name": "Firepower 900",
-    "sig": "POISON",
-    "sigc": "poison",
-    "form": "Emulsifiable concentrate (EC)",
-    "what": "Grass herbicide: haloxyfop-R methyl ester 900 g/L (Group 1)",
-    "haz": "Harmful if swallowed. Irritates eyes and skin. Kills bent, couch, kikuyu and most grasses.",
-    "hazFull": "Schedule 6. Harmful if swallowed, very toxic to aquatic life. SDS PPE: impervious elbow-length gloves, protective clothing and eye or face protection. Registered for forestry and industrial grass control, not turf. Kills green couch, Qld blue couch, zoysia, buffalo, kikuyu and paspalum.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "goggles",
-      "shield"
-    ],
-    "how": [
-      "Measure {amt} (small measure: it's 900 g/L)",
-      "Pour into moving water",
-      "Rinse the measure and drum 3 times into the tank"
-    ],
-    "why": "An EC goes in after the suspension concentrate and before the soluble hormone herbicides. You're at {before} L.",
-    "src": "ADAMA SDS · <a href=\"https://www.adama.com/australia/sites/adama_australia/files/downloads/Firepower%20900%20SDS%20Dec%2020.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a> · <a href=\"https://www.adama.com/australia/sites/adama_australia/files/product-documents/2025-04/ADAMA_Firepower_TN_v4.pdf\" target=\"_blank\" rel=\"noopener\">tech note</a>"
-  },
-  "fusilade": {
-    "name": "Fusilade Forte",
-    "gk_name": "Fusilade Forte 128 EC",
-    "sig": "POISON",
-    "sigc": "poison",
-    "form": "Emulsifiable concentrate (EC)",
-    "what": "Grass herbicide: fluazifop-P (butyl ester) 128 g/L (Group 1)",
-    "haz": "Poison. Kills bent, couch, kikuyu and ryegrass. Face shield and elbow gloves.",
-    "hazFull": "Label signal POISON (APVMA 58521). Label PPE when mixing and spraying: elbow-length PVC gloves and a face shield. Registered for horticulture, ornamentals and plantations, not turf. Controls couch, kikuyu, paspalum and ryegrass; Poa and silver grass aren't controlled. Rainfast in 1 hour. Label: DO NOT tank mix with other pesticides without prior reference to Syngenta. No adjuvant needed.",
-    "ppe": [
-      "overalls",
-      "gloves",
-      "shield"
-    ],
-    "how": [
-      "Measure {amt}",
-      "Pour into moving water",
-      "Rinse the drum 3 times into the tank"
-    ],
-    "why": "The second EC, before the soluble hormone herbicides. You're at {before} L.",
-    "src": "Label APVMA 58521 · <a href=\"https://nuturf.com.au/media/catalog/product/file/FUSILADE%20FORTE%20Label%20-%2058521%20-%20134241.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
-  },
-  "sportsground": {
-    "name": "Sportsground",
-    "gk_name": "Sportsground (AU)",
-    "sig": "POISON",
-    "sigc": "poison",
-    "form": "Soluble concentrate (amine salts)",
-    "what": "Broadleaf herbicide: mecoprop 336 + dicamba 40 g/L + a third phenoxy (Campbell three-way, Group 4)",
-    "haz": "Poison. Respirator, goggles and elbow gloves when mixing.",
-    "hazFull": "Campbell Sportsground Herbicide, APVMA 31538. The registered label wasn't readable online; the retailer lists mecoprop 336, MCPA 80 and dicamba 40 g/L, and avoid Qld blue couch, carpet grass, kikuyu and centipede. PPE here follows the Campbell Tri-Kombi label (same three-way family). Label PPE (Tri-Kombi): opening and mixing, waterproof protective clothing, washable hat, elbow-length chemical-resistant gloves, impervious footwear, goggles and a half-face respirator with organic vapour cartridges. Hand-held spraying: chemical-resistant clothing buttoned at neck and wrist, washable hat, elbow-length gloves and the half-face respirator.",
-    "ppe": [
-      "suit",
-      "hat",
-      "gloves",
-      "goggles",
-      "resp",
-      "boots"
-    ],
-    "how": [
-      "Measure {amt}",
-      "Pour into moving water",
-      "Rinse the drum 3 times into the tank"
-    ],
-    "why": "Soluble amine salts go in after the ECs. You're at {before} L.",
-    "src": "Retailer listing (Pestrol) · <a href=\"https://www.pestrol.com.au/buy-online/sportsground-herbicide-10l\" target=\"_blank\" rel=\"noopener\">product page</a>"
-  },
-  "trikombi": {
-    "name": "Methar Tri-Kombi",
-    "gk_name": "Methar Tri-Kombi (AU)",
-    "sig": "POISON",
-    "sigc": "poison",
-    "form": "Soluble concentrate (amine salts)",
-    "what": "Broadleaf herbicide: mecoprop 336 + 2,4-D 80 + dicamba 40 g/L (Group 4)",
-    "haz": "Poison. Respirator, goggles and elbow gloves when mixing and spraying by hand.",
-    "hazFull": "Campbell Methar Tri-Kombi, APVMA 31536. Turf rate 4.2 L in 450 L water per ha (label maximum). Don't use on buffalo. Wind 3–20 km/h, no surface inversions. Don't mow 2 days before or after. No heavy rain or storms within 3 days. Don't irrigate to run-off for 3 days. Not by backpack sprayer. Label PPE (Tri-Kombi): opening and mixing, waterproof protective clothing, washable hat, elbow-length chemical-resistant gloves, impervious footwear, goggles and a half-face respirator with organic vapour cartridges. Hand-held spraying: chemical-resistant clothing buttoned at neck and wrist, washable hat, elbow-length gloves and the half-face respirator.",
-    "ppe": [
-      "suit",
-      "hat",
-      "gloves",
-      "goggles",
-      "resp",
-      "boots"
-    ],
-    "how": [
-      "Measure {amt}",
-      "Pour into moving water",
-      "Rinse the drum 3 times into the tank"
-    ],
-    "why": "The second amine-salt hormone, after the ECs. You're at {before} L.",
-    "src": "Label APVMA 31536 · <a href=\"https://elabels.apvma.gov.au/31536ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
-  },
-  "ecodye": {
-    "name": "Ecodye Blue",
-    "gk_name": "Ecodye Blue",
-    "sig": "MARKER",
-    "sigc": "caution",
-    "form": "Spray marker dye",
-    "soft": true,
-    "what": "Blue marker dye so you can see where you've sprayed",
-    "haz": "Stains skin and clothes.",
-    "hazFull": "Marker dye, not a pesticide. Stains skin, clothing and hard surfaces: keep it off paths and carts.",
-    "ppe": [
-      "gloves"
-    ],
-    "how": [
-      "Measure {amt}",
-      "Pour into moving water"
-    ],
-    "why": "Dye before the oil adjuvant, which goes in last. You're at {before} L.",
-    "src": "Marker dye (not APVMA-registered)"
-  },
-  "hasten": {
-    "name": "Hasten",
-    "gk_name": "Hasten Spray Adjuvant",
-    "sig": "CAUTION",
-    "sigc": "caution",
-    "form": "Oil adjuvant (EC)",
-    "soft": true,
-    "what": "Esterified vegetable oil + non-ionic surfactant",
-    "haz": "May irritate eyes and skin.",
-    "hazFull": "Vicchem Hasten. May irritate the eyes and skin; wear protective clothing. Label: add Hasten last and keep agitating until spraying is finished. General rate 0.5–1.0 L/ha, not under 0.2 L/ha.",
-    "ppe": [
-      "overalls",
-      "gloves"
-    ],
-    "how": [
-      "Measure {amt}",
-      "Pour in last, agitator on until it's sprayed out"
-    ],
-    "why": "Hasten's label says it goes in last. You're at {before} L.",
-    "src": "Vicchem label · <a href=\"https://www.nuturf.com.au/images/product-tech-sds/Hasten_Spray_Adjuvant_Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
-  }
+ "_about": "Ranfurlie tank-mix product library. One record per product, read off the current AU label / maker SDS. {amt} in 'how' is replaced with the tank amount. 'why' is the default reason for its place in the order; a recipe can override it. PPE keys: overalls, hat, gloves, goggles, shield, mask, apron, boots. Checked 14-15 Oct 2026.",
+ "companion": {
+  "name": "Companion",
+  "gk_name": "Companion",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Adjuvant",
+  "what": "Acidifying and penetrating surfactant (soya phospholipids + propionic acid)",
+  "haz": "Damages eyes. Irritates skin.",
+  "hazFull": "Will damage eyes. Will irritate the skin. Avoid contact with eyes and skin. Label: DO NOT use with copper products.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "shield"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour in before anything else"
+  ],
+  "why": "The label says Companion goes in first, before the other products. It holds the tank pH down for the ethephon.",
+  "src": "Label APVMA 51664 (Apr 2023) · <a href=\"https://elabels.apvma.gov.au/51664ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "chlorostick": {
+  "name": "Chlorostick 720 SC",
+  "gk_name": "Chlorostick 720",
+  "sig": "POISON",
+  "sigc": "poison",
+  "form": "Suspension concentrate (SC)",
+  "what": "Chlorothalonil 720 g/L fungicide, Group M5",
+  "haz": "Attacks eyes and skin. Don't breathe the mist.",
+  "hazFull": "Attacks eyes and skin. Don't inhale spray mist. Repeated exposure may cause allergies. If clothing gets product or spray on it, take it off straight away. Label: DO NOT mix spraying oils or wetting agents with this product.",
+  "ppe": [
+   "overalls",
+   "hat",
+   "gloves",
+   "goggles",
+   "mask"
+  ],
+  "how": [
+   "Shake and turn each drum over",
+   "Pour with the agitator running",
+   "Rinse each drum 3 times into the tank"
+  ],
+  "why": "A suspension goes in early so it spreads through plenty of moving water.",
+  "src": "Label APVMA 69652 · SDS Feb 2025 · <a href=\"https://elabels.apvma.gov.au/69652ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2026/04/CHLOROSTICK-720-SC-FUNGICIDE_2025_SDS.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+ },
+ "shadow": {
+  "name": "Shadow Ultra",
+  "gk_name": "Shadow Ultra (AU)",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Micro-emulsion (ME)",
+  "what": "Trinexapac-ethyl 120 g/L growth regulator",
+  "haz": "Harmful if breathed in.",
+  "hazFull": "Harmful if inhaled (SDS). Avoid contact with eyes and skin. Don't breathe spray mist. No rain or irrigation within 1 h of spraying. No entry without protective clothing until the spray has dried.",
+  "ppe": [
+   "overalls",
+   "gloves"
+  ],
+  "how": [
+   "Measure {amt} in a jug",
+   "Pour straight in, no pre-mix",
+   "Rinse the jug into the tank"
+  ],
+  "why": "The label says add it to a tank at least two-thirds full of water. You're at {before} L.",
+  "src": "Label APVMA 88267 · <a href=\"https://elabels.apvma.gov.au/88267ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "promote": {
+  "name": "Promote Plus 900",
+  "gk_name": "Promote Plus 900",
+  "sig": "POISON",
+  "sigc": "poison",
+  "form": "Soluble liquid (SL)",
+  "what": "Ethephon 900 g/L growth regulator",
+  "haz": "Corrosive. Burns skin and eyes.",
+  "hazFull": "Corrosive (SDS: causes severe skin burns and eye damage). Splash in the eye: flush with water for at least 15 minutes and get medical help. Don't use alkaline water. Don't let the mix stand in metal for more than 2 hours. No rain expected within 8 hours.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles",
+   "shield",
+   "apron"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour slowly, low to the opening",
+   "Rinse the jug and drums into the tank"
+  ],
+  "why": "Goes in after Companion so it lands in acidified water. The label says don't use alkaline water.",
+  "src": "Label APVMA 69487 · SDS ADAMA Jun 2023 · <a href=\"https://elabels.apvma.gov.au/69487ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.adama.com/australia/en/media/2596/download?attachment\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+ },
+ "astron": {
+  "name": "ASTRON",
+  "gk_name": "ASTRON (0-0-0)",
+  "sig": "Eye damage",
+  "sigc": "",
+  "form": "Liquid nutrient",
+  "what": "Floratine foliar biostimulant (Ca, Mg, Fe, Zn, Cu, B)",
+  "haz": "Causes serious eye damage.",
+  "soft": true,
+  "hazFull": "SDS signal word DANGER: causes serious eye damage, causes skin irritation. Contains a copper salt (0.15% Cu). Chemical goggles and impervious gloves.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Shake the drums hard",
+   "Lift the fill strainer out",
+   "Pour {amt}"
+  ],
+  "why": "Floratine's mixing order is ASTRON, then Perk Up, then GlycoFuze. It's high in solids, so the strainer comes out.",
+  "src": "Floratine info sheet + SDS Apr 2024 · <a href=\"https://turfcareaus.com.au/wp-content/uploads/2026/03/Astron_SDS_2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+ },
+ "perkup": {
+  "name": "Perk Up",
+  "gk_name": "Perk Up (0-0-0)",
+  "sig": "Eye damage",
+  "sigc": "",
+  "form": "Liquid nutrient",
+  "what": "Floratine calcium (8% Ca) + carbohydrates",
+  "haz": "Causes serious eye damage.",
+  "soft": true,
+  "hazFull": "SDS signal word DANGER: causes serious eye damage. Chemical goggles; impervious gloves for long contact.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Shake well",
+   "Pour {amt}, strainer still out",
+   "Put the strainer back in"
+  ],
+  "why": "Floratine's order puts Perk Up before GlycoFuze.",
+  "src": "Floratine info sheet + SDS Apr 2024 · <a href=\"https://turfcareaus.com.au/wp-content/uploads/2026/03/Perk-Up_SDS_2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+ },
+ "glyco": {
+  "name": "GlycoFuze 2-1-2",
+  "gk_name": "GlycoFuze (2-1-2)",
+  "sig": "Not hazardous",
+  "sigc": "",
+  "form": "Liquid nutrient",
+  "what": "Floratine carbohydrate + N-P-K",
+  "haz": "",
+  "hazFull": "Not classified as hazardous (SDS). Goggles and gloves if handling for long.",
+  "ppe": [
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Pour {amt}"
+  ],
+  "why": "Last of the Floratine products, by their order.",
+  "src": "Floratine info sheet + SDS Apr 2024 · <a href=\"https://turfcareaus.com.au/wp-content/uploads/2026/03/GlycoFuze_SDS_2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+ },
+ "iron": {
+  "name": "Grass Roots Iron",
+  "gk_name": "Grass Roots Iron (0-0-0)",
+  "sig": "Eye irritant",
+  "sigc": "",
+  "form": "Liquid nutrient",
+  "what": "Oasis Turf liquid iron, 6% Fe, pH about 2",
+  "haz": "Eye irritant. Strongly acidic.",
+  "soft": true,
+  "hazFull": "SDS signal word WARNING: eye irritation. Safety glasses, PVC gloves, overalls, apron and safety boots; eyewash nearby. Label rate 10-20 L/ha.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles",
+   "apron",
+   "boots"
+  ],
+  "how": [
+   "Agitate the drums",
+   "Pour {amt}"
+  ],
+  "why": "Big volume and no mixing restrictions on its label, so it goes in late.",
+  "src": "Label + SDS May 2025 (Oasis Turf) · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2024/03/OT-Iron.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2025/05/IRON-SDS-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+ },
+ "prokelp": {
+  "name": "Pro Kelp",
+  "gk_name": "Pro Kelp (0-0-0)",
+  "sig": "Alkaline",
+  "sigc": "",
+  "form": "Liquid kelp extract",
+  "what": "Grass Roots Pro Kelp 25: Tasmanian bull kelp extracted with caustic potash, pH 10-12.5",
+  "haz": "Strongly alkaline. Keep it apart from the iron and GreenMaxx neat.",
+  "soft": true,
+  "hazFull": "Not classified as hazardous (SDS Nov 2025). pH above 10, contains potassium hydroxide under 5%. Impervious gloves, safety glasses with side shields, cotton overalls; apron for large volumes. Label: 20-50 L/ha in 700 L water/ha; check compatibility before tank mixing.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Agitate the drums",
+   "Pour {amt} into the tank water",
+   "Rinse the drums into the tank"
+  ],
+  "why": "It's strongly alkaline. Going in early, into plain water, means it never meets the acidic products neat.",
+  "src": "Oasis Turf label + SDS Nov 2025 · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2021/09/OT_GR_PRO_KELP_25_BACK_LABEL.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2026/01/Pro-Kelp-SDS-Nov-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+ },
+ "greenmaxx": {
+  "name": "GreenMaxx 20-0-0",
+  "gk_name": "Liquimaxx Greenmaxx 20-0-0 AU (20-0-0)",
+  "sig": "Irritant",
+  "sigc": "",
+  "form": "Liquid fertiliser",
+  "what": "LiquiMaxx GreenMaxx: stabilised urea N 20%, with 6% Fe and 1% Mg as sulphates, pH 2-3",
+  "haz": "Irritates skin and eyes.",
+  "soft": true,
+  "hazFull": "SDS signal word WARNING: harmful if swallowed, skin and eye irritant, may irritate airways. PVC gloves, overalls and apron, safety glasses or goggles; eyewash nearby. Strong bases listed as incompatible. May settle in the IBC, so stir before drawing. Label rate 20-50 L/ha.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles",
+   "apron"
+  ],
+  "how": [
+   "Stir the IBC first",
+   "Draw {amt}",
+   "Pour with the agitator running"
+  ],
+  "why": "Acidic, like the iron. Goes in late with the other fertiliser.",
+  "src": "SDS Dec 2024 (Indigo / Greenway) · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/AAC-Liquimaxx-GreenMaxx-SDS-2024.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a> · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/GTS-Greenmaxx-Brochure.pdf\" target=\"_blank\" rel=\"noopener\">brochure</a>"
+ },
+ "evoadv": {
+  "name": "Evolution Advance",
+  "gk_name": "Quali-Pro Evolution Advance (AU)",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Suspension concentrate (SC)",
+  "what": "Fungicide: tebuconazole 370 g/L + azoxystrobin 222 g/L (Group 3 + 11)",
+  "haz": "May irritate eyes.",
+  "soft": true,
+  "hazFull": "Harmful if swallowed. May irritate the eyes. Avoid contact with eyes. Label PPE: cotton overalls buttoned to the neck and wrist when opening, mixing and spraying. Don't apply if rain is expected within 48 h. Wind 3–20 km/h, medium droplets or coarser.",
+  "ppe": [
+   "overalls"
+  ],
+  "how": [
+   "Shake the drum hard",
+   "Measure {amt}",
+   "Pour into moving water, agitator on",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "A suspension concentrate goes in before the EC and the wetting agent so it disperses properly. You're at {before} L.",
+  "src": "Label APVMA 93144 · <a href=\"https://www.adama.com/australia/en/media/7016/download\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "zeemil": {
+  "name": "Zeemil 250 EC",
+  "gk_name": "Zeemil",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Emulsifiable concentrate (EC)",
+  "what": "Fungicide: metalaxyl 250 g/L (Group 4) for Pythium. Off-label on turf",
+  "haz": "Irritates eyes and skin. Don't breathe the solvent vapour.",
+  "soft": true,
+  "hazFull": "Label: avoid contact with eyes and skin. Do not inhale spray mist. Beware of solvent vapours when handling the concentrate and near an open spray tank. Registered for pineapples only (2 L/ha).",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour straight in and mix well",
+   "Stand upwind of the open lid",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "An EC goes in after the suspension so it doesn't stop it dispersing. You're at {before} L.",
+  "src": "Label APVMA 49822 · <a href=\"https://elabels.apvma.gov.au/49822ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "terreplex": {
+  "name": "Terreplex",
+  "gk_name": "Terreplex Carbon Rich Accidifier (0-0-0)",
+  "sig": "",
+  "sigc": "",
+  "form": "Liquid, low pH (lignosulfonic acid)",
+  "what": "Carbon-rich acidifier: 55% plant-derived organic acid",
+  "haz": "Low pH. Irritates eyes and skin.",
+  "soft": true,
+  "hazFull": "Eye and skin irritant. Harmful if swallowed. Wear eye protection, gloves and appropriate clothing. Don't mix with high-pH products unless the tank goes out straight away.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour into moving water, agitator on",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "An acidifier, so it goes in early with the Companion and conditions the water before the fungicides. You're at {before} L.",
+  "src": "Mitchell Products label · <a href=\"https://tricure.com/wp-content/uploads/2022/08/Terreplex-Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "hydroforce": {
+  "name": "HydroForce Ultra",
+  "gk_name": "HydroForce Ultra (AU)",
+  "sig": "",
+  "sigc": "",
+  "form": "Soil surfactant (block co-polymer)",
+  "what": "Wetting agent: carries the fungicides into the thatch and root zone",
+  "haz": "",
+  "hazFull": "No hazard statements on the tech sheet. Can foam: add slowly. Irrigate after application to move it into the root zone.",
+  "ppe": [
+   "gloves"
+  ],
+  "how": [
+   "Shake well",
+   "Measure {amt}",
+   "Pour in slowly, agitator on. It can foam",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "Wetting agents go in last so they don't foam the tank or coat the other products. You're at {before} L.",
+  "src": "Indigo tech sheet · <a href=\"https://gilbasolutions.com/wp-content/uploads/2022/05/HydroForce-Ultra_Tech.pdf\" target=\"_blank\" rel=\"noopener\">tech sheet</a>"
+ },
+ "quinstar": {
+  "name": "Quinstar 200 SC",
+  "gk_name": "Quinstar (AU)",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Suspension concentrate (SC)",
+  "what": "Herbicide: quinclorac 200 g/L (summer grass, white clover, kikuyu suppression)",
+  "haz": "May irritate eyes and skin.",
+  "soft": true,
+  "hazFull": "Schedule 5. Label rate 4.1 L/ha in 400 L water. Tolerant turf: common and seeded couch, zoysia, Kentucky bluegrass, perennial ryegrass, bentgrass (with a caution). Not tolerant: Qld blue couch, buffalo, kikuyu (suppressed). Tall fescue isn't listed. Kikuyu suppression is 2 applications 14–21 days apart, autumn best. Don't mow 2 days before or after. Avoid rain within 48 h and irrigation within 8 h.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Shake the drum hard",
+   "Measure {amt}",
+   "Pour into moving water, agitator on",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "A suspension concentrate goes in first after Companion, so it disperses before the oils and salts. You're at {before} L.",
+  "src": "ADAMA Quinstar product guide · <a href=\"https://www.adama.com/australia/en/media/8771/download\" target=\"_blank\" rel=\"noopener\">guide</a>"
+ },
+ "firepower": {
+  "name": "Firepower 900",
+  "gk_name": "Firepower 900",
+  "sig": "POISON",
+  "sigc": "poison",
+  "form": "Emulsifiable concentrate (EC)",
+  "what": "Grass herbicide: haloxyfop-R methyl ester 900 g/L (Group 1)",
+  "haz": "Harmful if swallowed. Irritates eyes and skin. Kills bent, couch, kikuyu and most grasses.",
+  "hazFull": "Schedule 6. Harmful if swallowed, very toxic to aquatic life. SDS PPE: impervious elbow-length gloves, protective clothing and eye or face protection. Registered for forestry and industrial grass control, not turf. Kills green couch, Qld blue couch, zoysia, buffalo, kikuyu and paspalum.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles",
+   "shield"
+  ],
+  "how": [
+   "Measure {amt} (small measure: it's 900 g/L)",
+   "Pour into moving water",
+   "Rinse the measure and drum 3 times into the tank"
+  ],
+  "why": "An EC goes in after the suspension concentrate and before the soluble hormone herbicides. You're at {before} L.",
+  "src": "ADAMA SDS · <a href=\"https://www.adama.com/australia/sites/adama_australia/files/downloads/Firepower%20900%20SDS%20Dec%2020.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a> · <a href=\"https://www.adama.com/australia/sites/adama_australia/files/product-documents/2025-04/ADAMA_Firepower_TN_v4.pdf\" target=\"_blank\" rel=\"noopener\">tech note</a>"
+ },
+ "fusilade": {
+  "name": "Fusilade Forte",
+  "gk_name": "Fusilade Forte 128 EC",
+  "sig": "POISON",
+  "sigc": "poison",
+  "form": "Emulsifiable concentrate (EC)",
+  "what": "Grass herbicide: fluazifop-P (butyl ester) 128 g/L (Group 1)",
+  "haz": "Poison. Kills bent, couch, kikuyu and ryegrass. Face shield and elbow gloves.",
+  "hazFull": "Label signal POISON (APVMA 58521). Label PPE when mixing and spraying: elbow-length PVC gloves and a face shield. Registered for horticulture, ornamentals and plantations, not turf. Controls couch, kikuyu, paspalum and ryegrass; Poa and silver grass aren't controlled. Rainfast in 1 hour. Label: DO NOT tank mix with other pesticides without prior reference to Syngenta. No adjuvant needed.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "shield"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour into moving water",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "The second EC, before the soluble hormone herbicides. You're at {before} L.",
+  "src": "Label APVMA 58521 · <a href=\"https://nuturf.com.au/media/catalog/product/file/FUSILADE%20FORTE%20Label%20-%2058521%20-%20134241.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "sportsground": {
+  "name": "Sportsground",
+  "gk_name": "Sportsground (AU)",
+  "sig": "POISON",
+  "sigc": "poison",
+  "form": "Soluble concentrate (amine salts)",
+  "what": "Broadleaf herbicide: mecoprop 336 + dicamba 40 g/L + a third phenoxy (Campbell three-way, Group 4)",
+  "haz": "Poison. Respirator, goggles and elbow gloves when mixing.",
+  "hazFull": "Campbell Sportsground Herbicide, APVMA 31538. The registered label wasn't readable online; the retailer lists mecoprop 336, MCPA 80 and dicamba 40 g/L, and avoid Qld blue couch, carpet grass, kikuyu and centipede. PPE here follows the Campbell Tri-Kombi label (same three-way family). Label PPE (Tri-Kombi): opening and mixing, waterproof protective clothing, washable hat, elbow-length chemical-resistant gloves, impervious footwear, goggles and a half-face respirator with organic vapour cartridges. Hand-held spraying: chemical-resistant clothing buttoned at neck and wrist, washable hat, elbow-length gloves and the half-face respirator.",
+  "ppe": [
+   "suit",
+   "hat",
+   "gloves",
+   "goggles",
+   "resp",
+   "boots"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour into moving water",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "Soluble amine salts go in after the ECs. You're at {before} L.",
+  "src": "Retailer listing (Pestrol) · <a href=\"https://www.pestrol.com.au/buy-online/sportsground-herbicide-10l\" target=\"_blank\" rel=\"noopener\">product page</a>"
+ },
+ "trikombi": {
+  "name": "Methar Tri-Kombi",
+  "gk_name": "Methar Tri-Kombi (AU)",
+  "sig": "POISON",
+  "sigc": "poison",
+  "form": "Soluble concentrate (amine salts)",
+  "what": "Broadleaf herbicide: mecoprop 336 + 2,4-D 80 + dicamba 40 g/L (Group 4)",
+  "haz": "Poison. Respirator, goggles and elbow gloves when mixing and spraying by hand.",
+  "hazFull": "Campbell Methar Tri-Kombi, APVMA 31536. Turf rate 4.2 L in 450 L water per ha (label maximum). Don't use on buffalo. Wind 3–20 km/h, no surface inversions. Don't mow 2 days before or after. No heavy rain or storms within 3 days. Don't irrigate to run-off for 3 days. Not by backpack sprayer. Label PPE (Tri-Kombi): opening and mixing, waterproof protective clothing, washable hat, elbow-length chemical-resistant gloves, impervious footwear, goggles and a half-face respirator with organic vapour cartridges. Hand-held spraying: chemical-resistant clothing buttoned at neck and wrist, washable hat, elbow-length gloves and the half-face respirator.",
+  "ppe": [
+   "suit",
+   "hat",
+   "gloves",
+   "goggles",
+   "resp",
+   "boots"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour into moving water",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "The second amine-salt hormone, after the ECs. You're at {before} L.",
+  "src": "Label APVMA 31536 · <a href=\"https://elabels.apvma.gov.au/31536ELBL.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "ecodye": {
+  "name": "Ecodye Blue",
+  "gk_name": "Ecodye Blue",
+  "sig": "MARKER",
+  "sigc": "caution",
+  "form": "Spray marker dye",
+  "soft": true,
+  "what": "Blue marker dye so you can see where you've sprayed",
+  "haz": "Stains skin and clothes.",
+  "hazFull": "Marker dye, not a pesticide. Stains skin, clothing and hard surfaces: keep it off paths and carts.",
+  "ppe": [
+   "gloves"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour into moving water"
+  ],
+  "why": "Dye before the oil adjuvant, which goes in last. You're at {before} L.",
+  "src": "Marker dye (not APVMA-registered)"
+ },
+ "hasten": {
+  "name": "Hasten",
+  "gk_name": "Hasten Spray Adjuvant",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Oil adjuvant (EC)",
+  "soft": true,
+  "what": "Esterified vegetable oil + non-ionic surfactant",
+  "haz": "May irritate eyes and skin.",
+  "hazFull": "Vicchem Hasten. May irritate the eyes and skin; wear protective clothing. Label: add Hasten last and keep agitating until spraying is finished. General rate 0.5–1.0 L/ha, not under 0.2 L/ha.",
+  "ppe": [
+   "overalls",
+   "gloves"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour in last, agitator on until it's sprayed out"
+  ],
+  "why": "Hasten's label says it goes in last. You're at {before} L.",
+  "src": "Vicchem label · <a href=\"https://www.nuturf.com.au/images/product-tech-sds/Hasten_Spray_Adjuvant_Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "poachek": {
+  "name": "Poachek",
+  "gk_name": "Poachek (AU)",
+  "sig": "POISON",
+  "sigc": "poison",
+  "form": "Soluble liquid",
+  "what": "Endothal 175 g/L (dipotassium salt): Poa annua control in turf. Colin Campbell (Chemicals)",
+  "haz": "Fatal if breathed in. Harmful on skin.",
+  "hazFull": "Schedule 6 POISON. Fatal if inhaled: wear respiratory protection, elbow-length PVC gloves and a face shield or goggles. Label rate 1.5 L/ha (150 mL per 1000 m2) as a fine spray in 500-1000 L/ha. Don't spray above 25 °C. Apply to dry turf and keep it dry for 24 h after. Not on kikuyu or red fescue.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "shield",
+   "mask"
+  ],
+  "how": [
+   "Mist mask and face shield on before you open it",
+   "Measure {amt} in a jug",
+   "Pour in low, agitator on",
+   "Rinse the jug into the tank"
+  ],
+  "why": "Mixes readily with water. Goes in after the fertilisers, as on the sheet. You're at {before} L.",
+  "src": "Label APVMA 47841 · SDS Campbell Dec 2016 · <a href=\"https://gilbasolutions.com/wp-content/uploads/2022/04/Poachek19.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://cdn.shopify.com/s/files/1/1290/7859/files/MSDSPoachek_1.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+ },
+ "phozfight": {
+  "name": "Phoz Fight 0-22-32",
+  "gk_name": "Phoz Fight (0-22-32)",
+  "sig": "Not hazardous",
+  "sigc": "",
+  "form": "Liquid fertiliser",
+  "what": "Oasis Turf Grass Roots potassium phosphite (mono/di-potassium phosphite): 22% P as phosphite, 32% K, pH 6.6-7.2",
+  "haz": "",
+  "soft": true,
+  "hazFull": "Non-dangerous goods. SDS: keep away from strong acids. Label rate 5-10 L/ha in 700 L water every 14-28 days. Check compatibility before tank mixing.",
+  "ppe": [
+   "gloves"
+  ],
+  "how": [
+   "Agitate the drum",
+   "Measure {amt}",
+   "Pour slowly, agitator on",
+   "Watch the tank: if it goes cloudy or sludgy, stop and call Andy"
+  ],
+  "why": "Near neutral and its SDS says keep it from strong acids, so it goes in last, into a well-diluted tank after the iron and GreenMaxx. You're at {before} L.",
+  "src": "Oasis Turf Grass Roots label + SDS"
+ }
 }

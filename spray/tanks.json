@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-10-21-greens-fert-pgr",
+   "title": "Fert + PGR, Greens",
+   "sprayer": "Toro 5800",
+   "date_iso": "2026-10-21",
+   "date": "Wed 21 Oct",
+   "applicator": "Brodie Macdonald",
+   "method": "boom"
+  },
+  {
    "slug": "2026-10-20-greens-fairy-ring-back9",
    "title": "Fairy Ring + Root Disease, Back 9 Greens, Nursery + Himalayan",
    "sprayer": "Toro 5800",
