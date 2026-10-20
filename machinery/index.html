@@ -1711,11 +1711,11 @@ liftF: { name: 'Front lift arms and cylinders', sys: 'Hydraulics', desc: 'Raise 
 };
 var CU_POS = { cu4: 'front left', cu1: 'front centre', cu5: 'front right', cu2: 'rear left', cu3: 'rear right' };
 Object.keys(CU_POS).forEach(function (k) {
-COMP[k] = { name: 'Cutting unit, ' + CU_POS[k], sys: 'Cutting units', desc: '22 in (559 mm) 5 in DPA cutting unit with its own 48 V electric reel motor. 5 grease fittings per unit at 50 h and after washing. HOC 6 mm on fairways.', parts: ['03623', '137-8427', '147-1257', '119-4151', '140-5510', '114-5430'], cat: CAT_CU };
+COMP[k] = { name: 'Cutting unit, ' + CU_POS[k], sys: 'Cutting units', desc: '22 in (559 mm) 5 in DPA cutting unit with its own 48 V electric reel motor. 5 grease fittings per unit at 50 h and after washing. HOC 5 mm on fairways, approaches and surrounds (from 21 Oct 2026).', parts: ['03623', '137-8427', '147-1257', '119-4151', '140-5510', '114-5430'], cat: CAT_CU };
 });
 var SUB = {
 reel: { name: 'Reel (5 in, 11 blades)', desc: 'Backlap and check reel-to-bedknife contact daily. Grind when the land is over 3 mm: 30 deg relief to 1.3 mm land, end-to-end diameter within 0.25 mm.', parts: ['137-8427', '140-5510', '115-3299'] },
-bedknife: { name: 'Bedknife and bedbar', desc: 'Tournament knife 147-1257 is the only listed knife that covers 6 mm. Bedknife screws 29.8 N.m (8 per knife); bedbar bolts 37-45 N.m. Replace at the lip limit (Tournament 3.4 mm).', parts: ['147-1257', '137-6093', '147-1244', '119-4151'] },
+bedknife: { name: 'Bedknife and bedbar', desc: 'Tournament knife 147-1257 is the only listed knife that covers 5 mm. Bedknife screws 29.8 N.m (8 per knife); bedbar bolts 37-45 N.m. Replace at the lip limit (Tournament 3.4 mm).', parts: ['147-1257', '137-6093', '147-1244', '119-4151'] },
 froller: { name: 'Front roller (Wiehle, grooved)', desc: 'Greasable. Rebuild with the roller kit when the bearings have play.', parts: ['114-5430', '112-5290', '114-3717'] },
 rroller: { name: 'Rear roller', desc: 'Greasable. Same rebuild kit as the front roller.', parts: ['114-5430', '112-5290', '114-3717'] },
 motor: { name: 'Reel motor (48 V electric)', desc: 'Direct electric drive, nine reel speed settings plus onboard backlap. Fused on the 48 V circuit.', parts: ['139-8482'] },
