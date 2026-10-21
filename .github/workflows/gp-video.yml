@@ -1,0 +1,66 @@
+# Growth potential recap video for Greens Live.
+# Rebuilds videos/gp-recap.mp4 (and videos/videos.json, which the Today page reads) every time the
+# dashboard's data.json is pushed from Andy's PC, so the clip always matches the dashboard.
+# Also runs once each morning as a fallback, and can be run by hand from the Actions tab.
+# Builder and design: _video/build.py and _video/gp_recap.html.
+name: Growth potential video
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - data.json
+      - videos/videos.json
+      - _video/**
+      - .github/workflows/gp-video.yml
+  schedule:
+    - cron: '35 20 * * *'   # 7:35am Melbourne in daylight saving (6:35am otherwise)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gp-video
+  cancel-in-progress: true   # newer data replaces a render that is still running
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install renderer
+        run: |
+          pip install --quiet playwright==1.56.0 imageio-ffmpeg==0.6.0 tzdata==2026.5
+          python -m playwright install --with-deps chromium
+
+      - name: Render the video
+        run: python _video/build.py --repo . --crf 25
+
+      - name: Publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add videos/gp-recap.mp4 videos/gp-recap.jpg videos/gp-recap.json videos/videos.json
+          if git diff --cached --quiet; then
+            echo "Video already up to date."
+            exit 0
+          fi
+          git commit -q -m "Growth potential video: data to $(python -c "import json;print(json.load(open('videos/videos.json'))[0]['date'])")"
+          for i in 1 2 3 4 5; do
+            if git pull -q --rebase origin main && git push -q origin HEAD:main; then
+              echo "Published."
+              exit 0
+            fi
+            sleep $((i * 10))
+          done
+          echo "Could not push the new video." >&2
+          exit 1

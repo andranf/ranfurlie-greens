@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Growth potential recap</title>
+<!--
+  Growth potential recap video for Greens Live (PACE Turf model).
+  Rendered frame by frame by _video/build.py: build.py calls window.__setup(payload) once, then
+  window.__render(t) for every frame and screenshots the page. Everything on screen is a pure
+  function of t (seconds), so a render is exact and repeatable. Nothing here uses timers or rAF.
+-->
+<style>
+@font-face{font-family:'Fraunces';src:url(fonts/fraunces-latin-400-normal.woff2) format('woff2');font-weight:400;font-style:normal}
+@font-face{font-family:'Fraunces';src:url(fonts/fraunces-latin-400-italic.woff2) format('woff2');font-weight:400;font-style:italic}
+@font-face{font-family:'Fraunces';src:url(fonts/fraunces-latin-500-normal.woff2) format('woff2');font-weight:500}
+@font-face{font-family:'Fraunces';src:url(fonts/fraunces-latin-600-normal.woff2) format('woff2');font-weight:600}
+@font-face{font-family:'Inter Tight';src:url(fonts/inter-tight-latin-400-normal.woff2) format('woff2');font-weight:400}
+@font-face{font-family:'Inter Tight';src:url(fonts/inter-tight-latin-500-normal.woff2) format('woff2');font-weight:500}
+@font-face{font-family:'Inter Tight';src:url(fonts/inter-tight-latin-600-normal.woff2) format('woff2');font-weight:600}
+@font-face{font-family:'Inter Tight';src:url(fonts/inter-tight-latin-700-normal.woff2) format('woff2');font-weight:700}
+:root{
+  --bg:#0a120d; --ink:#eef2ea; --muted:#9fb1a4; --faint:#6f8274; --line:rgba(238,242,234,.11);
+  --cool:#6fe0a0; --cool2:#37c3b0; --warm:#f4a75a; --warm2:#f07f45; --hot:#ff7a66;
+  --serif:'Fraunces',Georgia,serif; --sans:'Inter Tight',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;isolation:isolate}
+.layer{position:absolute;inset:0}
+.s{position:absolute;inset:0;opacity:0;will-change:opacity,transform}
+svg{overflow:visible}
+.serif{font-family:var(--serif)}
+
+/* background */
+#bg-glow{background:
+  radial-gradient(1100px 760px at var(--gx1,18%) var(--gy1,8%),rgba(55,195,176,.20),transparent 60%),
+  radial-gradient(1000px 800px at var(--gx2,92%) var(--gy2,96%),rgba(244,167,90,.13),transparent 62%),
+  radial-gradient(1400px 900px at 50% 50%,#0e1912 0%,#0a120d 70%)}
+#vignette{background:radial-gradient(1500px 980px at 50% 45%,transparent 55%,rgba(0,0,0,.55) 100%);pointer-events:none;z-index:40}
+#grain{z-index:41;opacity:.07;mix-blend-mode:overlay;background-repeat:repeat}
+
+/* chrome */
+#chrome{z-index:30}
+.brand{position:absolute;left:96px;top:62px;display:flex;align-items:center;gap:16px;font-size:24px;letter-spacing:.22em;font-weight:600;color:var(--muted);text-transform:uppercase}
+.brand i{width:14px;height:14px;border-radius:50%;background:var(--cool);box-shadow:0 0 0 0 rgba(111,224,160,.6)}
+.asof{position:absolute;right:96px;top:58px;font-size:26px;color:var(--muted);letter-spacing:.02em}
+.asof b{color:var(--ink);font-weight:600}
+.credit{position:absolute;right:96px;bottom:56px;font-size:22px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.chap{position:absolute;left:96px;bottom:52px;font-size:24px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:600;display:flex;gap:14px;align-items:center}
+.chap span{color:var(--cool)}
+#prog{position:absolute;left:0;bottom:0;height:6px;width:100%;transform-origin:0 50%;background:linear-gradient(90deg,var(--cool) 0%,var(--cool2) 45%,var(--warm) 100%);box-shadow:0 0 14px rgba(111,224,160,.5)}
+
+/* shared type */
+.kick{font-size:26px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:var(--cool)}
+.h2{font-family:var(--serif);font-weight:400;font-size:76px;line-height:1.04;letter-spacing:-.01em}
+.h2 em{font-style:italic;color:var(--cool)}
+.lead{font-size:36px;line-height:1.3;color:var(--muted)}
+.mask{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
+.mask>span{display:inline-block}
+
+/* title */
+.s-title .wrap{position:absolute;left:0;right:0;top:300px;text-align:center}
+.s-title .kick{display:flex;align-items:center;justify-content:center;gap:26px}
+.s-title .kick .ln{display:block;width:120px;height:2px;background:var(--cool);transform-origin:50% 50%}
+.s-title h1{font-family:var(--serif);font-weight:400;font-size:196px;line-height:1;letter-spacing:-.02em;margin-top:30px}
+.s-title h1 .w2{font-style:italic;color:var(--cool)}
+.s-title .sub{font-size:44px;color:var(--ink);margin-top:34px;opacity:.92}
+.s-title .meta{font-size:30px;color:var(--muted);margin-top:22px;letter-spacing:.04em}
+
+/* today */
+.s-today .left{position:absolute;left:96px;top:190px;width:640px}
+.s-today .date{font-family:var(--serif);font-size:96px;line-height:1;margin-top:26px}
+.s-today .tlab{font-size:30px;color:var(--muted);margin-top:64px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.s-today .temp{font-family:var(--serif);font-size:168px;line-height:1;margin-top:8px}
+.s-today .temp small{font-size:72px;color:var(--muted);margin-left:6px}
+.s-today .tnote{font-size:30px;color:var(--muted);margin-top:18px;line-height:1.35}
+.ring{position:absolute;width:480px;text-align:center}
+.ring svg{display:block;margin:0 auto}
+.ring .val{position:absolute;left:0;right:0;top:160px;font-family:var(--serif);font-size:150px;line-height:1}
+.ring .val small{font-size:62px;color:var(--muted)}
+.ring .nm{font-size:50px;font-weight:600;margin-top:22px}
+.ring .ty{font-size:31px;color:var(--muted);margin-top:6px}
+.ring .opt{font-size:29px;color:var(--faint);margin-top:10px;line-height:1.35}
+.ring .opt b{color:var(--ink);font-weight:600}
+
+/* charts */
+.ax text{font-family:var(--sans);font-size:26px;fill:var(--faint)}
+.grid line{stroke:var(--line);stroke-width:2}
+.pill{font-family:var(--sans);font-weight:600;font-size:30px}
+.halo{paint-order:stroke;stroke:#0a120d;stroke-width:12px;stroke-linejoin:round}
+
+/* model */
+.s-model .head{position:absolute;left:96px;top:170px;width:1500px}
+.s-model .head .h2{margin-top:20px}
+.s-model .head .lead{margin-top:18px}
+
+/* 30 days */
+.s-hist .head{position:absolute;left:96px;top:170px;width:1720px}
+.s-hist .head .h2{margin-top:20px}
+.chips{position:absolute;left:1330px;top:428px;width:500px;display:flex;flex-direction:column;gap:18px}
+.chip{border:2px solid var(--line);border-radius:22px;padding:15px 26px 16px;background:rgba(255,255,255,.025)}
+.chip .l{font-size:26px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.chip .v{font-family:var(--serif);font-size:62px;line-height:1.05;margin-top:2px}
+.chip .v small{font-size:34px;color:var(--muted);font-family:var(--sans);margin-left:8px}
+.chip .d{font-size:27px;color:var(--muted);margin-top:2px}
+.chip .d b{font-weight:600}
+
+/* forecast */
+.s-fc .head{position:absolute;left:96px;top:170px;width:1700px}
+.s-fc .head .h2{margin-top:20px}
+.cols{position:absolute;left:96px;right:96px;top:350px;height:620px;display:flex;gap:18px}
+.col{flex:1;position:relative;border:2px solid var(--line);border-radius:26px;background:rgba(255,255,255,.03);overflow:hidden}
+.col.hot{border-color:rgba(255,122,102,.75);background:linear-gradient(180deg,rgba(255,122,102,.12),rgba(255,255,255,.02) 55%)}
+.col .dw{position:absolute;left:0;right:0;top:22px;text-align:center;font-size:44px;font-weight:600}
+.col .dt{position:absolute;left:0;right:0;top:76px;text-align:center;font-size:26px;color:var(--muted)}
+.col .tp{position:absolute;left:0;right:0;top:116px;text-align:center;font-size:30px;color:var(--ink)}
+.col .tp span{color:var(--faint)}
+.col .badge{position:absolute;right:14px;top:14px;font-size:19px;font-weight:700;letter-spacing:.12em;color:#1a0d0a;background:var(--hot);border-radius:999px;padding:5px 11px}
+.col .bars{position:absolute;left:0;right:0;bottom:62px;height:300px}
+.col .bar{position:absolute;bottom:0;width:58px;border-radius:14px 14px 4px 4px;transform-origin:50% 100%}
+.col .bar.c{background:linear-gradient(180deg,var(--cool),var(--cool2));box-shadow:0 0 22px rgba(111,224,160,.35)}
+.col .bar.w{background:linear-gradient(180deg,var(--warm),var(--warm2));box-shadow:0 0 22px rgba(244,167,90,.3)}
+.col .bl{position:absolute;width:90px;text-align:center;font-size:31px;font-weight:600}
+.col .mn{position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:24px;color:var(--faint)}
+.legend{position:absolute;right:96px;top:176px;display:flex;gap:34px;font-size:27px;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:22px;height:22px;border-radius:6px;margin-right:12px;vertical-align:-3px}
+
+/* takeaways */
+.s-means .head{position:absolute;left:96px;top:170px}
+.s-means .head .h2{margin-top:20px}
+.rows{position:absolute;left:96px;top:390px;width:1700px;display:flex;flex-direction:column;gap:46px}
+.row{display:flex;gap:40px;align-items:flex-start}
+.row .ic{flex:0 0 92px;height:92px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:48px;color:#08100b}
+.row .tx .hd{font-size:52px;font-weight:600;line-height:1.1}
+.row .tx .dt{font-size:34px;color:var(--muted);line-height:1.32;margin-top:10px;max-width:1500px}
+
+/* end */
+.s-end .wrap{position:absolute;left:0;right:0;top:250px;text-align:center}
+.s-end h3{font-family:var(--serif);font-weight:400;font-size:120px;line-height:1;margin-top:28px}
+.s-end h3 em{color:var(--cool)}
+.s-end .ln{width:160px;height:2px;background:var(--cool);margin:44px auto 40px}
+.s-end p{font-size:32px;color:var(--muted);line-height:1.6}
+.s-end p b{color:var(--ink);font-weight:600}
+.s-end .auto{margin-top:34px;font-size:28px;color:var(--cool);letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer" id="bg-glow"></div>
+  <svg class="layer" id="bg-topo" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+  <div class="layer" id="scenes"></div>
+  <div class="layer" id="chrome">
+    <div class="brand"><i id="live"></i>Ranfurlie · Greens Live</div>
+    <div class="asof" id="asof"></div>
+    <div class="chap" id="chap"></div>
+    <div class="credit" id="credit">PACE Turf growth potential</div>
+    <div id="prog"></div>
+  </div>
+  <div class="layer" id="vignette"></div>
+  <div class="layer" id="grain"></div>
+</div>
+<script>
+(function(){
+'use strict';
+var W = 1920, H = 1080, D = null, SC = [], TOTAL = 0;
+var NS = 'http://www.w3.org/2000/svg';
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var clamp = function(x, a, b){ a = a === undefined ? 0 : a; b = b === undefined ? 1 : b; return Math.min(b, Math.max(a, x)); };
+var seg = function(t, a, b){ return clamp((t - a) / (b - a)); };
+var lerp = function(a, b, x){ return a + (b - a) * x; };
+var E = {
+  out3: function(x){ return 1 - Math.pow(1 - x, 3); },
+  out4: function(x){ return 1 - Math.pow(1 - x, 4); },
+  inout3: function(x){ return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; },
+  outExpo: function(x){ return x >= 1 ? 1 : 1 - Math.pow(2, -10 * x); },
+  outBack: function(x){ var c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); }
+};
+function el(tag, cls, html, parent){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; if (parent) parent.appendChild(e); return e; }
+function sv(tag, attrs, parent){ var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function pct(x){ return Math.round(x * 100); }
+function fmt1(x){ return (Math.round(x * 10) / 10).toFixed(1); }
+function gp(t, opt, v){ return Math.exp(-0.5 * Math.pow((t - opt) / v, 2)); }
+// enter: rise + fade; returns 0..1 progress
+function rise(node, t, a, dur, dist){ var p = E.out3(seg(t, a, a + (dur || .7))); node.style.opacity = p; node.style.transform = 'translateY(' + ((1 - p) * (dist == null ? 40 : dist)) + 'px)'; return p; }
+function maskIn(node, t, a, dur){ var p = E.out4(seg(t, a, a + (dur || .9))); node.style.transform = 'translateY(' + ((1 - p) * 110) + '%)'; return p; }
+function drawPath(path, len, p){ path.style.strokeDasharray = len + ' ' + len; path.style.strokeDashoffset = len * (1 - p); }
+function count(node, from, to, p, dec){ var v = lerp(from, to, p); node.textContent = dec ? fmt1(v) : String(Math.round(v)); }
+
+// deterministic noise texture for film grain
+function grain(){
+  var c = document.createElement('canvas'); c.width = c.height = 256; var g = c.getContext('2d'); var im = g.createImageData(256, 256); var s = 1234567;
+  for (var i = 0; i < im.data.length; i += 4){ s = (s * 1103515245 + 12345) & 0x7fffffff; var v = (s >> 16) & 255; im.data[i] = im.data[i+1] = im.data[i+2] = v; im.data[i+3] = 255; }
+  g.putImageData(im, 0, 0); $('#grain').style.backgroundImage = 'url(' + c.toDataURL() + ')';
+}
+// topographic contour rings: the course as a contour map, slowly breathing
+var topo = [];
+function buildTopo(){
+  var svg = $('#bg-topo'), g = sv('g', {}, svg);
+  for (var i = 0; i < 22; i++){
+    var r0 = 90 + i * 64, d = '';
+    for (var k = 0; k <= 180; k++){
+      var a = k / 180 * Math.PI * 2;
+      var r = r0 * (1 + .075 * Math.sin(3 * a + i * .55) + .045 * Math.sin(5 * a - i * .9) + .025 * Math.sin(9 * a + i * 1.7));
+      d += (k ? 'L' : 'M') + (Math.cos(a) * r).toFixed(1) + ' ' + (Math.sin(a) * r * .78).toFixed(1);
+    }
+    var p = sv('path', {d: d + 'Z', fill: 'none', stroke: i % 5 === 0 ? 'rgba(111,224,160,.085)' : 'rgba(170,210,180,.045)', 'stroke-width': i % 5 === 0 ? 2.2 : 1.4}, g);
+    topo.push(p);
+  }
+  topo.g = g;
+}
+
+/* ---------- scenes ---------- */
+function scene(id, dur, build, render, chap){ var root = el('div', 's s-' + id, null, $('#scenes')); var o = {id: id, dur: dur, root: root, render: render, chap: chap}; build(root, o); SC.push(o); return o; }
+
+function sTitle(){
+  scene('title', 4.4, function(r, o){
+    var w = el('div', 'wrap', null, r);
+    o.k = el('div', 'kick', '<span class="ln"></span><span class="kt">PACE Turf model</span><span class="ln"></span>', w);
+    var h = el('h1', '', '<span class="mask"><span>Growth</span></span> <span class="mask"><span class="w2">potential</span></span>', w);
+    o.ws = h.querySelectorAll('.mask>span');
+    o.sub = el('div', 'sub', 'How hard the weather is letting the grass grow', w);
+    o.meta = el('div', 'meta', 'Ranfurlie Golf Club · ' + D.build_label, w);
+    // decorative curve behind the title
+    var svg = sv('svg', {width: W, height: H, viewBox: '0 0 1920 1080', style: 'position:absolute;inset:0;z-index:-1'}, r);
+    var d = ''; for (var x = 0; x <= 1920; x += 8){ var y = 900 - 520 * gp(x, 960, 300); d += (x ? 'L' : 'M') + x + ' ' + y.toFixed(1); }
+    o.deco = sv('path', {d: d, fill: 'none', stroke: 'url(#tg)', 'stroke-width': 3, opacity: .55}, svg);
+    var defs = sv('defs', {}, svg), lg = sv('linearGradient', {id: 'tg', x1: 0, x2: 1, y1: 0, y2: 0}, defs);
+    sv('stop', {offset: '0', 'stop-color': '#37c3b0', 'stop-opacity': 0}, lg); sv('stop', {offset: '.5', 'stop-color': '#6fe0a0'}, lg); sv('stop', {offset: '1', 'stop-color': '#f4a75a', 'stop-opacity': 0}, lg);
+    o.decoLen = o.deco.getTotalLength();
+  }, function(t, o){
+    var lns = o.k.querySelectorAll('.ln'), kt = o.k.querySelector('.kt');
+    var p = E.out3(seg(t, .15, 1.0)); lns.forEach(function(l){ l.style.transform = 'scaleX(' + p + ')'; });
+    kt.style.opacity = seg(t, .25, .8); kt.style.letterSpacing = lerp(.5, .24, E.out3(seg(t, .2, 1.2))) + 'em';
+    maskIn(o.ws[0], t, .35, 1.0); maskIn(o.ws[1], t, .5, 1.0);
+    rise(o.sub, t, 1.15, .8, 26); rise(o.meta, t, 1.45, .8, 20);
+    drawPath(o.deco, o.decoLen, E.inout3(seg(t, 0, 2.6)));
+  });
+}
+
+function sToday(){
+  var L = D.latest;
+  scene('today', 7.8, function(r, o){
+    var left = el('div', 'left', null, r);
+    o.kick = el('div', 'kick', 'Latest day on course', left);
+    o.date = el('div', 'date', L.label, left);
+    o.tlab = el('div', 'tlab', 'Mean temperature', left);
+    o.temp = el('div', 'temp', '<span>0.0</span><small>°C</small>', left);
+    o.tv = o.temp.querySelector('span');
+    o.tnote = el('div', 'tnote', 'Daily mean from the on-course weather station: the number the model runs on.', left);
+    o.rings = [];
+    [['cool', L.cool, 'Greens', 'Bent and Poa · cool season', D.model.cool_opt, L.t - D.model.cool_opt, 830],
+     ['warm', L.warm, 'Couch', 'Fairways · warm season', D.model.warm_opt, L.t - D.model.warm_opt, 1340]].forEach(function(a){
+      var box = el('div', 'ring', null, r); box.style.left = a[6] + 'px'; box.style.top = '210px';
+      var R = 176, C = 2 * Math.PI * R, svg = sv('svg', {width: 480, height: 480, viewBox: '-240 -240 480 480'}, box);
+      var defs = sv('defs', {}, svg), lg = sv('linearGradient', {id: 'rg' + a[0], x1: 0, y1: 0, x2: 1, y2: 1}, defs);
+      sv('stop', {offset: '0', 'stop-color': a[0] === 'cool' ? '#37c3b0' : '#f4c25a'}, lg); sv('stop', {offset: '1', 'stop-color': a[0] === 'cool' ? '#6fe0a0' : '#f07f45'}, lg);
+      sv('circle', {r: R, fill: 'none', stroke: 'rgba(238,242,234,.08)', 'stroke-width': 26}, svg);
+      var ticks = [], tg = sv('g', {}, svg);
+      for (var i = 0; i < 60; i++){ var an = (i / 60) * Math.PI * 2 - Math.PI / 2; ticks.push(sv('line', {x1: Math.cos(an) * 206, y1: Math.sin(an) * 206, x2: Math.cos(an) * (i % 5 ? 218 : 226), y2: Math.sin(an) * (i % 5 ? 218 : 226), stroke: 'rgba(238,242,234,.14)', 'stroke-width': i % 5 ? 3 : 4, 'stroke-linecap': 'round'}, tg)); }
+      var arc = sv('circle', {r: R, fill: 'none', stroke: 'url(#rg' + a[0] + ')', 'stroke-width': 26, 'stroke-linecap': 'round', transform: 'rotate(-90)', style: 'filter:drop-shadow(0 0 16px ' + (a[0] === 'cool' ? 'rgba(111,224,160,.55)' : 'rgba(244,167,90,.5)') + ')'}, svg);
+      var dot = sv('circle', {r: 9, fill: '#fff', style: 'filter:drop-shadow(0 0 10px #fff)'}, svg);
+      var val = el('div', 'val', '<span>0</span><small>%</small>', box);
+      var nm = el('div', 'nm', a[2], box); nm.style.color = a[0] === 'cool' ? 'var(--cool)' : 'var(--warm)';
+      var ty = el('div', 'ty', a[3], box);
+      var diff = a[5], dtx = Math.abs(diff) < .3 ? 'right on it' : fmt1(Math.abs(diff)) + '° ' + (diff > 0 ? 'above' : 'below');
+      var opt = el('div', 'opt', 'Optimum ' + a[4] + ' °C<br><b>' + dtx + '</b>', box);
+      o.rings.push({box: box, C: C, arc: arc, dot: dot, ticks: ticks, v: a[1], val: val.querySelector('span'), nm: nm, ty: ty, opt: opt, kind: a[0], R: R});
+    });
+  }, function(t, o){
+    rise(o.kick, t, .1, .7); rise(o.date, t, .25, .8);
+    rise(o.tlab, t, .55, .7, 24); var pt = rise(o.temp, t, .7, .8, 24);
+    count(o.tv, 0, L.t, E.out3(seg(t, .7, 2.0)), true); rise(o.tnote, t, 1.3, .8, 20);
+    o.rings.forEach(function(g, i){
+      var a = .9 + i * .35, p = E.out4(seg(t, a, a + 2.0)), v = g.v * p;
+      g.box.style.opacity = E.out3(seg(t, a - .3, a + .4)); g.box.style.transform = 'scale(' + lerp(.92, 1, E.out3(seg(t, a - .3, a + .8))) + ')';
+      g.arc.style.strokeDasharray = (g.C * v) + ' ' + g.C;
+      var an = v * Math.PI * 2 - Math.PI / 2; g.dot.setAttribute('cx', Math.cos(an) * g.R); g.dot.setAttribute('cy', Math.sin(an) * g.R); g.dot.style.opacity = v > .01 ? 1 : 0;
+      var lit = Math.round(v * 60), col = g.kind === 'cool' ? '#6fe0a0' : '#f4a75a';
+      g.ticks.forEach(function(tk, j){ tk.setAttribute('stroke', j < lit ? col : 'rgba(238,242,234,.14)'); });
+      count(g.val, 0, pct(g.v), p);
+      rise(g.nm, t, a + .9, .7, 18); rise(g.ty, t, a + 1.05, .7, 18); rise(g.opt, t, a + 1.25, .7, 18);
+    });
+  }, '01 · Latest day');
+}
+
+function sModel(){
+  var M = D.model, L = D.latest;
+  scene('model', 8.6, function(r, o){
+    var hd = el('div', 'head', null, r);
+    o.kick = el('div', 'kick', 'How the model works', hd);
+    o.h = el('div', 'h2', 'Every grass has its <em>own</em> sweet spot', hd);
+    o.lead = el('div', 'lead', 'Growth potential (GP) is how close the day’s mean temperature is to that optimum.', hd);
+    var x0 = 170, x1 = 1750, yb = 930, yt = 530, T0 = 0, T1 = 40;
+    var X = function(T){ return x0 + (T - T0) / (T1 - T0) * (x1 - x0); }, Y = function(v){ return yb - v * (yb - yt); };
+    o.X = X; o.Y = Y;
+    var svg = sv('svg', {width: W, height: H, viewBox: '0 0 1920 1080', style: 'position:absolute;inset:0'}, r);
+    var defs = sv('defs', {}, svg);
+    [['fc', '#6fe0a0'], ['fw', '#f4a75a']].forEach(function(a){ var lg = sv('linearGradient', {id: a[0], x1: 0, y1: 0, x2: 0, y2: 1}, defs); sv('stop', {offset: 0, 'stop-color': a[1], 'stop-opacity': .32}, lg); sv('stop', {offset: 1, 'stop-color': a[1], 'stop-opacity': 0}, lg); });
+    o.grid = sv('g', {class: 'grid'}, svg); o.ax = sv('g', {class: 'ax'}, svg);
+    [0, .5, 1].forEach(function(v){ sv('line', {x1: x0, x2: x1, y1: Y(v), y2: Y(v)}, o.grid); var tx = sv('text', {x: x0 - 22, y: Y(v) + 9, 'text-anchor': 'end'}, o.ax); tx.textContent = pct(v) + '%'; });
+    for (var T = 0; T <= 40; T += 5){ var tx = sv('text', {x: X(T), y: yb + 46, 'text-anchor': 'middle'}, o.ax); tx.textContent = T + '°'; }
+    // forecast band (behind curves)
+    o.band = sv('g', {}, svg);
+    if (D.fc_band){
+      var bx0 = X(D.fc_band[0]), bx1 = X(D.fc_band[1]);
+      o.bandRect = sv('rect', {x: bx0, y: yt - 20, width: Math.max(6, bx1 - bx0), height: yb - yt + 20, rx: 14, fill: 'rgba(238,242,234,.07)', stroke: 'rgba(238,242,234,.22)', 'stroke-dasharray': '8 8', 'stroke-width': 2}, o.band);
+      var btx = 'Next ' + D.forecast.days.length + ' days: ' + Math.round(D.fc_band[0]) + '° to ' + Math.round(D.fc_band[1]) + '° mean', bw2 = btx.length * 15 + 48;
+      sv('rect', {x: (bx0 + bx1) / 2 - bw2 / 2, y: yb + 66, width: bw2, height: 50, rx: 25, fill: 'rgba(238,242,234,.10)', stroke: 'rgba(238,242,234,.3)', 'stroke-width': 2}, o.band);
+      o.bandTx = sv('text', {x: (bx0 + bx1) / 2, y: yb + 101, 'text-anchor': 'middle', class: 'pill', fill: '#e6ece6'}, o.band);
+      o.bandTx.textContent = btx;
+    }
+    function curve(opt, v){ var d = '', f = ''; for (var T = T0; T <= T1 + .001; T += .25){ var x = X(T), y = Y(gp(T, opt, v)); d += (T ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } f = d + 'L' + X(T1) + ' ' + yb + 'L' + X(T0) + ' ' + yb + 'Z'; return [d, f]; }
+    var cc = curve(M.cool_opt, M.cool_var), cw = curve(M.warm_opt, M.warm_var);
+    o.fillC = sv('path', {d: cc[1], fill: 'url(#fc)'}, svg); o.fillW = sv('path', {d: cw[1], fill: 'url(#fw)'}, svg);
+    o.lineC = sv('path', {d: cc[0], fill: 'none', stroke: '#6fe0a0', 'stroke-width': 7, 'stroke-linecap': 'round', style: 'filter:drop-shadow(0 0 12px rgba(111,224,160,.6))'}, svg);
+    o.lineW = sv('path', {d: cw[0], fill: 'none', stroke: '#f4a75a', 'stroke-width': 7, 'stroke-linecap': 'round', style: 'filter:drop-shadow(0 0 12px rgba(244,167,90,.55))'}, svg);
+    o.lenC = o.lineC.getTotalLength(); o.lenW = o.lineW.getTotalLength();
+    function peak(x, y, txt, col){ var g = sv('g', {}, svg); sv('line', {x1: x, x2: x, y1: y + 8, y2: yb, stroke: col, 'stroke-width': 2, 'stroke-dasharray': '4 8', opacity: .55}, g); var w = txt.length * 15.5 + 44; sv('rect', {x: x - w / 2, y: y - 78, width: w, height: 52, rx: 26, fill: 'rgba(10,18,13,.85)', stroke: col, 'stroke-width': 2}, g); var tx = sv('text', {x: x, y: y - 42, 'text-anchor': 'middle', class: 'pill', fill: col}, g); tx.textContent = txt; return g; }
+    o.pkC = peak(X(M.cool_opt), Y(1), 'Bent / Poa · ' + M.cool_opt + '°', '#6fe0a0');
+    o.pkW = peak(X(M.warm_opt), Y(1), 'Couch · ' + M.warm_opt + '°', '#f4a75a');
+    // scanner
+    o.scan = sv('g', {}, svg);
+    o.scanLine = sv('line', {y1: yt - 30, y2: yb, stroke: '#fff', 'stroke-width': 3, opacity: .85}, o.scan);
+    o.scanT = sv('text', {y: yb + 46, 'text-anchor': 'middle', class: 'pill', fill: '#fff'}, o.scan);
+    o.dC = sv('circle', {r: 13, fill: '#0a120d', stroke: '#6fe0a0', 'stroke-width': 6}, o.scan);
+    o.dW = sv('circle', {r: 13, fill: '#0a120d', stroke: '#f4a75a', 'stroke-width': 6}, o.scan);
+    o.lC = sv('text', {class: 'pill halo', fill: '#6fe0a0', 'font-size': 40}, o.scan); o.lW = sv('text', {class: 'pill halo', fill: '#f4a75a', 'font-size': 40}, o.scan);
+    o.scanCap = sv('rect', {y: yb + 14, width: 150, height: 46, rx: 23, fill: '#fff'}, o.scan); o.scan.insertBefore(o.scanCap, o.scanT); o.scanT.setAttribute('fill', '#0a120d');
+  }, function(t, o){
+    rise(o.kick, t, .1, .7); rise(o.h, t, .2, .9); rise(o.lead, t, .45, .9, 24);
+    var pa = E.out3(seg(t, .3, 1.0)); o.grid.style.opacity = pa; o.ax.style.opacity = pa;
+    var pc = E.inout3(seg(t, .6, 2.3)), pw = E.inout3(seg(t, 1.0, 2.7));
+    drawPath(o.lineC, o.lenC, pc); drawPath(o.lineW, o.lenW, pw);
+    o.fillC.style.opacity = E.out3(seg(t, 1.6, 2.6)); o.fillW.style.opacity = E.out3(seg(t, 2.0, 3.0));
+    [[o.pkC, 2.1], [o.pkW, 2.5]].forEach(function(a){ var p = E.outBack(seg(t, a[1], a[1] + .6)); a[0].style.opacity = seg(t, a[1], a[1] + .3); a[0].style.transform = 'translateY(' + (1 - p) * 26 + 'px)'; });
+    // scanner sweeps from 0 deg to the latest mean temperature
+    var ps = E.inout3(seg(t, 3.2, 5.0)), T = lerp(0, D.latest.t, ps), x = o.X(T);
+    o.scan.style.opacity = seg(t, 3.0, 3.3);
+    o.scanLine.setAttribute('x1', x); o.scanLine.setAttribute('x2', x);
+    o.scanT.setAttribute('x', x); o.scanT.textContent = fmt1(T) + '°'; o.scanCap.setAttribute('x', x - 75);
+    var vc = gp(T, D.model.cool_opt, D.model.cool_var), vw = gp(T, D.model.warm_opt, D.model.warm_var);
+    o.dC.setAttribute('cx', x); o.dC.setAttribute('cy', o.Y(vc)); o.dW.setAttribute('cx', x); o.dW.setAttribute('cy', o.Y(vw));
+    var pl = E.out3(seg(t, 4.9, 5.5));
+    o.lC.setAttribute('x', x + 30); o.lC.setAttribute('y', o.Y(vc) - 22); o.lC.textContent = 'Greens ' + pct(vc) + '%'; o.lC.style.opacity = pl;
+    o.lW.setAttribute('x', x + 30); o.lW.setAttribute('y', o.Y(vw) + 14); o.lW.textContent = 'Couch ' + pct(vw) + '%'; o.lW.style.opacity = pl;
+    if (o.bandRect){ var pb = E.out3(seg(t, 5.8, 6.7)); o.band.style.opacity = pb; o.bandRect.style.transformOrigin = 'center'; o.bandRect.style.transformBox = 'fill-box'; o.bandRect.style.transform = 'scaleX(' + lerp(.3, 1, pb) + ')'; }
+  }, '02 · The model');
+}
+
+function sHist(){
+  var Hh = D.hist, S = D.stats;
+  scene('hist', 8.6, function(r, o){
+    var hd = el('div', 'head', null, r);
+    o.kick = el('div', 'kick', 'Last ' + Hh.length + ' days', hd);
+    o.h = el('div', 'h2', D.headline_hist, hd);
+    var x0 = 170, x1 = 1230, yt = 440, yb = 800, sb0 = 836, sb1 = 940;
+    var n = Hh.length, X = function(i){ return x0 + i / (n - 1) * (x1 - x0); }, Y = function(v){ return yb - v * (yb - yt); };
+    var svg = sv('svg', {width: W, height: H, viewBox: '0 0 1920 1080', style: 'position:absolute;inset:0'}, r);
+    var defs = sv('defs', {}, svg);
+    [['hc', '#6fe0a0'], ['hw', '#f4a75a']].forEach(function(a){ var lg = sv('linearGradient', {id: a[0], x1: 0, y1: 0, x2: 0, y2: 1}, defs); sv('stop', {offset: 0, 'stop-color': a[1], 'stop-opacity': .28}, lg); sv('stop', {offset: 1, 'stop-color': a[1], 'stop-opacity': 0}, lg); });
+    var cp = sv('clipPath', {id: 'hclip'}, defs); o.clipR = sv('rect', {x: x0 - 20, y: 0, width: 0, height: H}, cp);
+    o.grid = sv('g', {class: 'grid'}, svg); o.ax = sv('g', {class: 'ax'}, svg);
+    [0, .5, 1].forEach(function(v){ sv('line', {x1: x0, x2: x1, y1: Y(v), y2: Y(v)}, o.grid); var tx = sv('text', {x: x0 - 22, y: Y(v) + 9, 'text-anchor': 'end'}, o.ax); tx.textContent = pct(v) + '%'; });
+    [0, Math.floor((n - 1) / 2), n - 1].forEach(function(i, k){ var tx = sv('text', {x: X(i), y: sb1 + 44, 'text-anchor': k === 0 ? 'start' : k === 2 ? 'end' : 'middle'}, o.ax); tx.textContent = Hh[i].lab; });
+    // temperature strip
+    o.bars = []; var bw = Math.max(6, (x1 - x0) / n * .62), tmax = 30;
+    var tl = sv('text', {x: x1 + 18, y: sb0 + 26}, o.ax); tl.textContent = 'Mean °C';
+    Hh.forEach(function(d, i){
+      var h = clamp(d.t / tmax) * (sb1 - sb0), k = clamp((d.t - 8) / 18);
+      var col = 'rgb(' + Math.round(lerp(96, 244, k)) + ',' + Math.round(lerp(150, 167, k)) + ',' + Math.round(lerp(170, 90, k)) + ')';
+      o.bars.push(sv('rect', {x: X(i) - bw / 2, y: sb1 - h, width: bw, height: h, rx: Math.min(4, bw / 2), fill: col, opacity: .85, style: 'transform-box:fill-box;transform-origin:50% 100%'}, svg));
+    });
+    function line(key){ return mono(Hh.map(function(p, i){ return [X(i), Y(p[key])]; })); }
+    var g = sv('g', {'clip-path': 'url(#hclip)'}, svg);
+    sv('path', {d: line('c') + 'L' + x1 + ' ' + yb + 'L' + x0 + ' ' + yb + 'Z', fill: 'url(#hc)'}, g);
+    sv('path', {d: line('w') + 'L' + x1 + ' ' + yb + 'L' + x0 + ' ' + yb + 'Z', fill: 'url(#hw)'}, g);
+    o.pc = sv('path', {d: line('c'), fill: 'none', stroke: '#6fe0a0', 'stroke-width': 6, 'stroke-linejoin': 'round', style: 'filter:drop-shadow(0 0 10px rgba(111,224,160,.55))'}, g);
+    o.pw = sv('path', {d: line('w'), fill: 'none', stroke: '#f4a75a', 'stroke-width': 6, 'stroke-linejoin': 'round', style: 'filter:drop-shadow(0 0 10px rgba(244,167,90,.5))'}, g);
+    o.lc = o.pc.getTotalLength(); o.lw = o.pw.getTotalLength();
+    o.headC = sv('circle', {r: 12, fill: '#fff', stroke: '#6fe0a0', 'stroke-width': 5}, svg);
+    o.headW = sv('circle', {r: 12, fill: '#fff', stroke: '#f4a75a', 'stroke-width': 5}, svg);
+    o.X = X; o.Y = Y; o.x0 = x0; o.x1 = x1; o.n = n;
+    // stat chips
+    var ch = el('div', 'chips', null, r); o.chips = [];
+    function chip(l, v, unit, d){ var c = el('div', 'chip', '<div class="l">' + l + '</div><div class="v">' + v + (unit ? '<small>' + unit + '</small>' : '') + '</div>' + (d ? '<div class="d">' + d + '</div>' : ''), ch); o.chips.push(c); return c; }
+    var dc = S.cool14_prev == null ? '' : deltaTxt(S.cool14, S.cool14_prev);
+    chip('Greens GP · 14-day', pct(S.cool14) + '%', '', dc).querySelector('.v').style.color = 'var(--cool)';
+    var dw = S.warm14_prev == null ? '' : deltaTxt(S.warm14, S.warm14_prev);
+    chip('Couch GP · 14-day', pct(S.warm14) + '%', '', dw).querySelector('.v').style.color = 'var(--warm)';
+    if (S.clip14 != null) chip('Greens clippings · 14-day', fmt1(S.clip14), 'mL/m² a day', S.gvx21 != null ? 'GvX 21-day <b>' + fmt1(S.gvx21) + '</b> (house scale)' : '');
+  }, function(t, o){
+    rise(o.kick, t, .1, .7); rise(o.h, t, .2, .9);
+    var pa = E.out3(seg(t, .3, 1.0)); o.grid.style.opacity = pa; o.ax.style.opacity = pa;
+    o.bars.forEach(function(b, i){ var p = E.outBack(seg(t, .4 + i * .025, .4 + i * .025 + .6)); b.style.transform = 'scaleY(' + Math.max(0, p) + ')'; });
+    var p = E.inout3(seg(t, .8, 3.6)), xr = lerp(o.x0, o.x1, p);
+    o.clipR.setAttribute('width', xr - o.x0 + 22);
+    [[o.headC, o.pc, o.lc], [o.headW, o.pw, o.lw]].forEach(function(a){ var q = atX(a[1], a[2], xr); a[0].setAttribute('cx', q.x); a[0].setAttribute('cy', q.y); a[0].style.opacity = seg(t, .8, 1.0); });
+    o.chips.forEach(function(c, i){ var a = 1.4 + i * .45, q = E.out3(seg(t, a, a + .8)); c.style.opacity = q; c.style.transform = 'translateX(' + (1 - q) * 70 + 'px)'; });
+  }, '03 · Last ' + D.hist.length + ' days');
+}
+// monotone cubic path (no overshoot below 0% or above 100%)
+function mono(pts){
+  var n = pts.length, i; if (n < 3) return 'M' + pts.map(function(p){ return p[0] + ' ' + p[1]; }).join('L');
+  var dx = [], m = [], tg = [];
+  for (i = 0; i < n - 1; i++){ dx[i] = pts[i+1][0] - pts[i][0]; m[i] = (pts[i+1][1] - pts[i][1]) / dx[i]; }
+  tg[0] = m[0]; tg[n-1] = m[n-2];
+  for (i = 1; i < n - 1; i++) tg[i] = m[i-1] * m[i] <= 0 ? 0 : (m[i-1] + m[i]) / 2;
+  for (i = 0; i < n - 1; i++){ if (m[i] === 0){ tg[i] = tg[i+1] = 0; continue; } var a = tg[i] / m[i], b = tg[i+1] / m[i], s = a * a + b * b; if (s > 9){ var k = 3 / Math.sqrt(s); tg[i] = k * a * m[i]; tg[i+1] = k * b * m[i]; } }
+  var d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+  for (i = 0; i < n - 1; i++){ var h = dx[i] / 3; d += 'C' + (pts[i][0] + h).toFixed(1) + ' ' + (pts[i][1] + tg[i] * h).toFixed(1) + ' ' + (pts[i+1][0] - h).toFixed(1) + ' ' + (pts[i+1][1] - tg[i+1] * h).toFixed(1) + ' ' + pts[i+1][0].toFixed(1) + ' ' + pts[i+1][1].toFixed(1); }
+  return d;
+}
+// point on a left-to-right path at a given x
+function atX(path, len, x){ var lo = 0, hi = len, p = path.getPointAtLength(0); for (var k = 0; k < 22; k++){ var mid = (lo + hi) / 2; p = path.getPointAtLength(mid); if (p.x < x) lo = mid; else hi = mid; } return p; }
+function deltaTxt(now, prev){ var d = Math.round((now - prev) * 100); if (Math.abs(d) < 2) return 'Steady on the 14 days before'; return (d > 0 ? '<b style="color:var(--cool)">▲ ' + d + ' pts</b>' : '<b style="color:var(--hot)">▼ ' + (-d) + ' pts</b>') + ' on the 14 days before'; }
+
+function sForecast(){
+  var F = D.forecast;
+  scene('fc', 8.8, function(r, o){
+    var hd = el('div', 'head', null, r);
+    o.kick = el('div', 'kick', 'Next ' + F.days.length + ' days', hd);
+    o.h = el('div', 'h2', D.headline_fc, hd);
+    var cols = el('div', 'cols', null, r); o.cols = [];
+    F.days.forEach(function(d){
+      var c = el('div', 'col' + (d.hot ? ' hot' : ''), null, cols);
+      el('div', 'dw', d.dow, c); el('div', 'dt', d.lab, c);
+      el('div', 'tp', Math.round(d.tmax) + '° <span>/ ' + Math.round(d.tmin) + '°</span>', c);
+      if (d.hot) el('div', 'badge', 'HOT', c);
+      var bars = el('div', 'bars', null, c), bh = 300;
+      var bc = el('div', 'bar c', null, bars), bw = el('div', 'bar w', null, bars);
+      var lc = el('div', 'bl', pct(d.c) + '%', bars), lw = el('div', 'bl', pct(d.w) + '%', bars);
+      lc.style.color = 'var(--cool)'; lw.style.color = 'var(--warm)';
+      el('div', 'mn', fmt1(d.t) + '° mean', c);
+      o.cols.push({c: c, bc: bc, bw: bw, lc: lc, lw: lw, d: d, bh: bh, bars: bars});
+    });
+    o.leg = el('div', 'legend', '<span><i style="background:linear-gradient(180deg,#6fe0a0,#37c3b0)"></i>Greens · bent and Poa</span><span><i style="background:linear-gradient(180deg,#f4a75a,#f07f45)"></i>Couch · fairways</span><span style="color:var(--faint)">Forecast: ' + F.source + '</span>', r);
+  }, function(t, o){
+    rise(o.kick, t, .1, .7); rise(o.h, t, .2, .9);
+    o.cols.forEach(function(k, i){
+      var a = .35 + i * .09; rise(k.c, t, a, .8, 60);
+      var w = k.bars.clientWidth || 230, cx = w / 2;
+      k.bc.style.left = (cx - 66) + 'px'; k.bw.style.left = (cx + 8) + 'px';
+      var hc = Math.max(10, k.d.c * k.bh), hw = Math.max(10, k.d.w * k.bh);
+      k.bc.style.height = hc + 'px'; k.bw.style.height = hw + 'px';
+      var b0 = 1.0 + i * .1, pc = E.outBack(seg(t, b0, b0 + .9)), pw = E.outBack(seg(t, b0 + .15, b0 + 1.05));
+      k.bc.style.transform = 'scaleY(' + Math.max(0, pc) + ')'; k.bw.style.transform = 'scaleY(' + Math.max(0, pw) + ')';
+      k.lc.style.left = (cx - 66 + 29 - 45) + 'px'; k.lw.style.left = (cx + 8 + 29 - 45) + 'px';
+      k.lc.style.bottom = (hc * clamp(pc, 0, 1.2) + 10) + 'px'; k.lw.style.bottom = (hw * clamp(pw, 0, 1.2) + 10) + 'px';
+      k.lc.style.opacity = seg(t, b0 + .5, b0 + .9); k.lw.style.opacity = seg(t, b0 + .65, b0 + 1.05);
+    });
+    rise(o.leg, t, 2.4, .8, 16);
+  }, '04 · Next ' + D.forecast.days.length + ' days');
+}
+
+function sMeans(){
+  scene('means', 7.6, function(r, o){
+    var hd = el('div', 'head', null, r);
+    o.kick = el('div', 'kick', 'What it means', hd);
+    o.h = el('div', 'h2', 'For the week <em>ahead</em>', hd);
+    var rows = el('div', 'rows', null, r); o.rows = [];
+    D.takeaways.forEach(function(k, i){
+      var col = k.tone === 'cool' ? 'linear-gradient(135deg,#37c3b0,#6fe0a0)' : k.tone === 'warm' ? 'linear-gradient(135deg,#f4c25a,#f07f45)' : k.tone === 'hot' ? 'linear-gradient(135deg,#ff9a7a,#ff6a55)' : 'linear-gradient(135deg,#cfd8d0,#9fb1a4)';
+      var row = el('div', 'row', '<div class="ic">' + (i + 1) + '</div><div class="tx"><div class="hd">' + k.head + '</div><div class="dt">' + k.detail + '</div></div>', rows);
+      row.querySelector('.ic').style.background = col;
+      o.rows.push(row);
+    });
+  }, function(t, o){
+    rise(o.kick, t, .1, .7); rise(o.h, t, .2, .9);
+    o.rows.forEach(function(rw, i){ var a = .6 + i * .75, q = E.out3(seg(t, a, a + .8)); rw.style.opacity = q; rw.style.transform = 'translateX(' + (1 - q) * -60 + 'px)';
+      var ic = rw.querySelector('.ic'), s = E.outBack(seg(t, a, a + .7)); ic.style.transform = 'scale(' + Math.max(0, s) + ')'; });
+  }, '05 · What it means');
+}
+
+function sEnd(){
+  scene('end', 4.6, function(r, o){
+    var w = el('div', 'wrap', null, r);
+    o.k = el('div', 'kick', 'Ranfurlie Golf Club · Course maintenance', w);
+    o.h = el('h3', '', 'Growth <em>potential</em>', w);
+    o.ln = el('div', 'ln', null, w);
+    o.p = el('p', '', '<b>PACE Turf growth potential model</b> (Gelernter and Stowell, 2005)<br>Cool season: optimum ' + D.model.cool_opt + ' °C, spread ' + D.model.cool_var + ' · Warm season: optimum ' + D.model.warm_opt + ' °C, spread ' + D.model.warm_var + '<br>Measured: on-course weather station · Forecast: ' + D.forecast.source, w);
+    o.a = el('div', 'auto', 'Rebuilt automatically every time Greens Live updates · data to ' + D.asof_long, w);
+  }, function(t, o){
+    rise(o.k, t, .15, .7, 20); rise(o.h, t, .3, .9, 30);
+    o.ln.style.transform = 'scaleX(' + E.out3(seg(t, .6, 1.4)) + ')';
+    rise(o.p, t, .8, .9, 20); rise(o.a, t, 1.2, .9, 16);
+  }, '');
+}
+
+/* ---------- timeline ---------- */
+var OVER = .45; // scene cross-over
+function layout(){ var s = 0; SC.forEach(function(o, i){ o.start = s; s += o.dur - (i < SC.length - 1 ? OVER : 0); }); TOTAL = s; }
+
+window.__setup = function(payload){
+  D = payload;
+  $('#asof').innerHTML = 'Data to <b>' + D.asof_label + '</b>';
+  grain(); buildTopo();
+  sTitle(); sToday(); sModel(); sHist();
+  if (D.forecast && D.forecast.days && D.forecast.days.length) sForecast();
+  if (D.takeaways && D.takeaways.length) sMeans();
+  sEnd();
+  layout();
+  window.__render(0);
+  return TOTAL;
+};
+
+window.__marks = function(){ return SC.map(function(o){ return {id: o.id, start: o.start, dur: o.dur}; }); };
+
+window.__render = function(t){
+  // background drift
+  var bg = $('#bg-glow').style;
+  bg.setProperty('--gx1', (18 + 6 * Math.sin(t * .21)) + '%'); bg.setProperty('--gy1', (8 + 5 * Math.cos(t * .17)) + '%');
+  bg.setProperty('--gx2', (92 - 5 * Math.sin(t * .15)) + '%'); bg.setProperty('--gy2', (96 - 6 * Math.cos(t * .19)) + '%');
+  topo.g.setAttribute('transform', 'translate(' + (1520 + 30 * Math.sin(t * .08)) + ' ' + (250 + 20 * Math.cos(t * .07)) + ') rotate(' + (t * 1.1) + ') scale(' + (1 + .03 * Math.sin(t * .3)) + ')');
+  var gr = window.__grain || 'static', fr = Math.round(t * 30); $('#grain').style.display = gr === 'off' ? 'none' : 'block'; $('#grain').style.backgroundPosition = gr === 'moving' ? ((fr * 73) % 256) + 'px ' + ((fr * 151) % 256) + 'px' : '0 0';
+  var live = $('#live'), ph = (t % 1.6) / 1.6; live.style.boxShadow = '0 0 0 ' + (ph * 14) + 'px rgba(111,224,160,' + (0.55 * (1 - ph)) + ')';
+  $('#prog').style.transform = 'scaleX(' + clamp(t / TOTAL) + ')';
+  var chapTxt = '', chromeOn = 0;
+  SC.forEach(function(o, i){
+    var lt = t - o.start, inn = i === 0 ? 1 : E.out3(seg(lt, 0, OVER + .1)), out = i === SC.length - 1 ? 1 : 1 - E.inout3(seg(lt, o.dur - OVER - .05, o.dur));
+    var vis = lt >= -0.001 && lt <= o.dur + .001 ? Math.min(inn, out) : 0;
+    o.root.style.opacity = vis;
+    o.root.style.transform = vis < 1 && lt > o.dur / 2 ? 'translateY(' + (-(1 - out) * 30) + 'px)' : 'none';
+    o.root.style.display = vis > 0 ? 'block' : 'none';
+    if (vis > 0){ o.render(clamp(lt, 0, o.dur), o); if (vis > .5 && o.chap){ chapTxt = o.chap; } if (o.id !== 'title' && o.id !== 'end') chromeOn = Math.max(chromeOn, vis); }
+  });
+  var chap = $('#chap'); if (chapTxt && chap.dataset.t !== chapTxt){ chap.dataset.t = chapTxt; chap.innerHTML = '<span>●</span>' + chapTxt; }
+  $('#credit').style.opacity = chromeOn * .9; chap.style.opacity = chromeOn;
+};
+})();
+</script>
+</body>
+</html>

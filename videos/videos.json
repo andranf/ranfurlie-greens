@@ -1,18 +1,13 @@
 [
  {
-  "file": "videos/course-briefing-2026-10-19.mp4",
-  "poster": "videos/course-briefing-2026-10-19.jpg",
-  "title": "Course briefing",
-  "date": "2026-10-19",
-  "caption": "40-second recap of the greens, growth, water and what's coming up. Data to 19 Oct. Made with HyperFrames.",
-  "hyperframes_project": "9fcfb4c1-2e61-4ec3-a6dc-63626fbdb391"
- },
- {
-  "file": "videos/course-briefing-2026-10-14.mp4",
-  "poster": "videos/course-briefing-2026-10-14.jpg",
-  "title": "Course briefing",
-  "date": "2026-10-14",
-  "caption": "40-second recap of the greens, growth, water and what's coming up. Made with HyperFrames.",
-  "hyperframes_project": "9fcfb4c1-2e61-4ec3-a6dc-63626fbdb391"
+  "file": "videos/gp-recap.mp4?v=202610211056",
+  "poster": "videos/gp-recap.jpg?v=202610211056",
+  "title": "Growth potential",
+  "date": "2026-10-20",
+  "caption": "PACE Turf growth potential for the greens (bent and Poa) and couch: the latest day, the last 30 days and the next 7. Rebuilt automatically every time this dashboard updates. Forecast: Open-Meteo.",
+  "kind": "gp-recap",
+  "built": "2026-10-21T10:56+1100",
+  "seconds": 47.7,
+  "inputs": "81c33df29a0c9c16"
  }
 ]
