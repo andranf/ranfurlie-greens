@@ -279,7 +279,123 @@ footer{font-size:14px}
 .chip.p-High{background:transparent}
 }
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* ==== TANK MIX SKIN v1 (Ranfurlie Tank Mix design system, 23 Oct 2026) ==== */
+:root{
+  color-scheme:dark;
+  --bg:#06121b; --bg2:#0b1d2a; --panel:rgba(18,40,56,.52); --panel2:rgba(18,40,56,.32); --line:rgba(255,255,255,.1); --line2:rgba(255,255,255,.18);
+  --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6;
+  --water:#38c6ff; --water2:#1490cc; --waterglow:rgba(56,198,255,.3);
+  --acc:#38c6ff; --acc2:#1490cc;
+  --bad:#ff5c5c; --warn:#ffbc45; --ok:#2fd27a;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --r:26px; --r2:18px;
+  --tm-sky1:#0a6fa8; --tm-sky2:#0d7a4c; --tm-sky3:#5a4a12; --tm-sky4:#2a2f7a;
+  --tm-glass-hi:rgba(28,58,78,.66); --tm-glass-solid:rgba(14,34,48,.96); --tm-soft:rgba(56,198,255,.14);
+  --tm-rim:rgba(255,255,255,.22); --tm-rim2:rgba(255,255,255,.06); --tm-edge:rgba(0,0,0,.35);
+  --tm-shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --tm-go2:#6ff0a6; --tm-go-ink:#03210f;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  color-scheme:light;
+  --bg:#e4f1f7; --bg2:#eef6fa; --panel:rgba(255,255,255,.58); --panel2:rgba(255,255,255,.34); --line:rgba(16,52,72,.12); --line2:rgba(16,52,72,.2);
+  --fg:#0b2231; --muted:#3f5d6e; --faint:#6f8a99;
+  --water:#0573a8; --water2:#0aa6dc; --waterglow:rgba(10,166,220,.22);
+  --acc:#0573a8; --acc2:#0aa6dc;
+  --bad:#e0313b; --warn:#a86000; --ok:#13a356;
+  --tm-sky1:#7fd3ff; --tm-sky2:#86e8b4; --tm-sky3:#ffe08a; --tm-sky4:#b9c8ff;
+  --tm-glass-hi:rgba(255,255,255,.78); --tm-glass-solid:rgba(246,251,253,.94); --tm-soft:rgba(10,166,220,.14);
+  --tm-rim:rgba(255,255,255,.9); --tm-rim2:rgba(255,255,255,.35); --tm-edge:rgba(16,52,72,.10);
+  --tm-shadow:0 18px 40px -18px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --tm-go2:#2fd27a; --tm-go-ink:#ffffff;
+}}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#e4f1f7; --bg2:#eef6fa; --panel:rgba(255,255,255,.58); --panel2:rgba(255,255,255,.34); --line:rgba(16,52,72,.12); --line2:rgba(16,52,72,.2);
+  --fg:#0b2231; --muted:#3f5d6e; --faint:#6f8a99;
+  --water:#0573a8; --water2:#0aa6dc; --waterglow:rgba(10,166,220,.22);
+  --acc:#0573a8; --acc2:#0aa6dc;
+  --bad:#e0313b; --warn:#a86000; --ok:#13a356;
+  --tm-sky1:#7fd3ff; --tm-sky2:#86e8b4; --tm-sky3:#ffe08a; --tm-sky4:#b9c8ff;
+  --tm-glass-hi:rgba(255,255,255,.78); --tm-glass-solid:rgba(246,251,253,.94); --tm-soft:rgba(10,166,220,.14);
+  --tm-rim:rgba(255,255,255,.9); --tm-rim2:rgba(255,255,255,.35); --tm-edge:rgba(16,52,72,.10);
+  --tm-shadow:0 18px 40px -18px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --tm-go2:#2fd27a; --tm-go-ink:#ffffff;
+}
+body{background:var(--bg);font-variant-numeric:tabular-nums lining-nums}
+.tm-sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.tm-sky i{position:absolute;border-radius:50%;filter:blur(8px);opacity:.85}
+.tm-sky i:nth-child(1){width:80vmax;height:80vmax;left:-30vmax;top:-34vmax;background:radial-gradient(circle,var(--tm-sky1) 0,transparent 62%);animation:tmDrift1 38s ease-in-out infinite alternate}
+.tm-sky i:nth-child(2){width:75vmax;height:75vmax;right:-34vmax;top:18vh;background:radial-gradient(circle,var(--tm-sky2) 0,transparent 62%);animation:tmDrift2 44s ease-in-out infinite alternate}
+.tm-sky i:nth-child(3){width:60vmax;height:60vmax;left:-10vmax;bottom:-30vmax;background:radial-gradient(circle,var(--tm-sky3) 0,transparent 60%);opacity:.6;animation:tmDrift1 52s ease-in-out infinite alternate-reverse}
+.tm-sky i:nth-child(4){width:55vmax;height:55vmax;right:-20vmax;bottom:-26vmax;background:radial-gradient(circle,var(--tm-sky4) 0,transparent 62%);opacity:.55;animation:tmDrift2 47s ease-in-out infinite alternate-reverse}
+@keyframes tmDrift1{to{transform:translate(8vmax,6vmax) scale(1.08)}}
+@keyframes tmDrift2{to{transform:translate(-7vmax,-5vmax) scale(1.1)}}
+/* type */
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:0}
+.brand h1{text-transform:none;letter-spacing:0;line-height:1.02}
+.ph h2{text-transform:none;letter-spacing:0;font-size:24px}
+.eyebrow{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:none;color:var(--muted)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--water);outline-offset:2px;border-radius:12px}
+/* glass: every floating surface */
+.panel,.kpi,.ticker{background:linear-gradient(180deg,var(--tm-glass-hi),var(--panel) 38%,var(--panel));-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border:0;box-shadow:inset 0 1px 0 var(--tm-rim),inset 0 0 0 1px var(--tm-rim2),inset 0 -1px 0 var(--tm-edge),var(--tm-shadow)}
+.panel,.kpi{border-radius:var(--r)}
+.ticker{border-radius:22px}
+.ticker .tag{background:var(--tm-glass-solid);border-right:1px solid var(--line);font-weight:700;letter-spacing:.02em;text-transform:none;font-size:17px}
+.kpi:hover{border-color:transparent}
+.kpi .v{font-weight:800}
+.kpi::after{left:auto;right:14px;top:14px;bottom:auto;width:10px;height:10px;border-radius:50%}
+.mark{border:0;border-radius:18px;box-shadow:inset 0 1px 0 var(--tm-rim),inset 0 0 0 1px var(--tm-rim2)}
+/* recessed glass: things inside a card */
+.pill,.seg,.dcard,.chip,.hot button,.jl button,.fchip,.job,.hc,.howto,.holebar button,.more,.btn.ghost{border:0;background:var(--panel2);box-shadow:inset 0 1px 0 var(--tm-rim),inset 0 0 0 1px var(--tm-rim2)}
+.pill{font-family:var(--display);font-weight:700;font-size:15px;color:var(--muted);padding:5px 12px}
+.pill b{font-weight:700}
+a.pill:hover{color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--water)}
+.seg button{font-family:var(--display);font-weight:700;font-size:15px}
+.seg button[aria-pressed="true"],.holebar button[aria-pressed="true"],.fchip[aria-pressed="true"],.hc.on{background:var(--tm-soft);color:var(--fg);border-color:transparent;box-shadow:inset 0 0 0 1.5px var(--water)}
+.dcard,.job,.hc,.howto{border-radius:var(--r2)}
+.dcard h3{font-weight:700}
+.chip,button.chip{font-family:var(--display);font-weight:700;font-size:14px;padding:2px 11px}
+.chip.p-High{color:var(--bad);background:color-mix(in srgb,var(--bad) 13%,transparent);box-shadow:none}
+.chip.p-Medium{color:var(--warn);background:color-mix(in srgb,var(--warn) 18%,transparent);box-shadow:none}
+.chip.c{color:var(--water);background:var(--tm-soft);box-shadow:none}
+.chip.cond{box-shadow:none}
+.btn{border-radius:999px;background:linear-gradient(180deg,var(--tm-go2),var(--ok));color:var(--tm-go-ink);font-family:var(--display);font-weight:700;font-size:19px;padding:8px 18px;min-height:46px;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(0,0,0,.08),0 12px 26px -12px color-mix(in srgb,var(--ok) 90%,transparent)}
+.btn.ghost{color:var(--fg);background:var(--panel2)}
+.hot button,.jl button{border-radius:var(--r2)}
+.hot button:hover,.jl button:hover,.hc:hover,.job:hover{box-shadow:inset 0 0 0 1.5px var(--water)}
+.fchip{font-family:var(--display);font-weight:700;font-size:15px;color:var(--muted)}
+.fchip b{font-family:var(--display)}
+.search{border:0;background:var(--panel2);box-shadow:inset 0 1px 2px var(--tm-edge),inset 0 0 0 1px var(--tm-rim2);font-weight:600}
+.search:focus{outline:none;box-shadow:inset 0 0 0 2px var(--water)}
+.job{padding:12px 12px 12px 32px}
+.job::before{left:14px;top:18px;bottom:auto;width:10px;height:10px;border-radius:50%}
+.job .h{font-weight:700}
+.howto code{font-family:var(--display);font-weight:700;background:var(--panel2);border:0;box-shadow:inset 0 1px 0 var(--tm-rim),inset 0 0 0 1px var(--tm-rim2)}
+.audit{border-left:0;border-radius:var(--r2);background:var(--panel2);box-shadow:inset 0 1px 0 var(--tm-rim),inset 0 0 0 1px var(--tm-rim2)}
+.hdet{border:0;border-radius:var(--r2);background:var(--panel2);box-shadow:inset 0 1px 0 var(--tm-rim),inset 0 0 0 1px var(--tm-rim2)}
+.hdet button:hover{background:var(--tm-soft)}
+.holebar button{border-radius:999px;min-width:40px}
+.more{border-radius:999px;font-family:var(--display);font-weight:700;font-size:17px}
+/* the map and what floats on it */
+.mapbox{border:0;border-radius:var(--r2);box-shadow:inset 0 1px 0 var(--tm-rim),inset 0 0 0 1px var(--tm-rim2)}
+.map-l,.map-hint,.dock button,.zoomc button,.tip{background:var(--tm-glass-solid);border:0;box-shadow:inset 0 1px 0 var(--tm-rim),inset 0 0 0 1px var(--tm-rim2),var(--tm-shadow)}
+.map-l,.tip{border-radius:14px}
+.map-hint,.dock button{border-radius:999px}
+.zoomc button{border-radius:50%}
+.tip b,.bkn,.job .id,.job .bn,.age,.feed .when,.feed .st2,.moves .d,.moves .q,td.n,.dcard .irr,.dcard .sub,.hc .hk,.hdet .n,.chart .ax,.holebar .lbl,.dock button b{font-family:var(--display)}
+/* tables, bars, lists */
+th{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.02em;text-transform:none}
+.bar{background:var(--panel2);box-shadow:inset 0 1px 2px var(--tm-edge)}
+.st{font-family:var(--display);font-weight:700;font-size:14px}
+.dcard .sub{letter-spacing:.04em;text-transform:none;font-size:13px}
+footer{border-top:1px solid var(--line)}
+@supports not (background:color-mix(in srgb,red 50%,blue)){.map-l,.map-hint,.dock button,.zoomc button{background:var(--bg2)}}
+@media (prefers-reduced-motion: reduce){.tm-sky i{animation:none!important}}
+/* ==== END TANK MIX SKIN ==== */
 </style>
+<div class="tm-sky" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
 <div class="wrap">
   <header class="top">
