@@ -85,12 +85,10 @@ function b64dec(s: string): string {
   if (B) return B.from(c, "base64").toString("utf8");
   return decodeURIComponent(escape(atob(c)));
 }
-function melTime(iso: string): string {
+// only call inside a step (Date is guarded outside steps)
+function melTime(d: Date): string {
   return new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Melbourne", hour: "numeric", minute: "2-digit", hour12: true })
-    .format(new Date(iso)).replace(/\s+/g, "").toLowerCase();
-}
-function melDay(iso: string): string {
-  return new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Melbourne", weekday: "short", day: "numeric", month: "short" }).format(new Date(iso));
+    .format(d).replace(/\s+/g, "").toLowerCase();
 }
 function permalink(ch: string, ts: string): string {
   return `https://ranfurliegolfclub.slack.com/archives/${ch}/p${ts.replace(".", "")}`;
@@ -193,8 +191,9 @@ async function commit(ctx: any, name: string, message: string, files: Record<str
         if (nt.status !== 201) throw new Error(`tree ${nt.status} ${nt.text}`);
         const nc = await gh("/git/commits", "POST", { message, tree: nt.json.sha, parents: [head] });
         if (nc.status !== 201) throw new Error(`commit ${nc.status} ${nc.text}`);
+        const at = new Date().toISOString();
         const up = await gh("/git/refs/heads/main", "PATCH", { sha: nc.json.sha, force: false });
-        if (up.status === 200) return { ok: true, sha: nc.json.sha };
+        if (up.status === 200) return { ok: true, sha: nc.json.sha, at };
         last = `ref update ${up.status} ${up.text}`;
         await new Promise((r) => setTimeout(r, 400 * (attempt + 1) + Math.floor(Math.random() * 500)));
       } catch (e: any) {
@@ -345,8 +344,11 @@ const workflow = defineDurable<unknown, unknown>("hardware-map", async (ctx, raw
   const bySlack = /^U[A-Z0-9]{6,14}$/.test(bySlackRaw) ? bySlackRaw : "";
   const who = bySlack ? `<@${bySlack}>` : slackSafe(by);
 
-  const now: { iso: string } = await ctx.step("capture-now", async () => ({ iso: new Date().toISOString() }));
-  const time = melTime(now.iso);
+  const now: { iso: string; time: string } = await ctx.step("capture-now", async () => {
+    const d = new Date();
+    return { iso: d.toISOString(), time: melTime(d) };
+  });
+  const time = now.time;
 
   const live = await readLive(ctx, "read-live");
   const existing = (live.records || []).find((r: any) => r.id === id) || null;
@@ -414,22 +416,27 @@ const workflow = defineDurable<unknown, unknown>("hardware-map", async (ctx, raw
       return { ok: !!saved?.ok, kind, id, alert: false, test: isTest };
     }
 
-    // wait for GitHub Pages to serve the pin page so Slack can show its preview
+    // wait for GitHub Pages to deploy a commit at or after ours, so Slack can read the pin page's preview
     let pageLive = false;
     if (saved?.ok) {
-      const url = `${PAGES}p/${id}.html`;
+      const since = String(saved.at || "").slice(0, 19);
       for (let i = 0; i < 12 && !pageLive; i++) {
-        if (i > 0) await ctx.wait(`wait-for-pages-${i}`, 12);
-        const st: any = await ctx.step(`check-pin-page-${i}`, async () => {
+        await ctx.wait(`wait-for-pages-${i}`, i === 0 ? 25 : 10);
+        const st: any = await ctx.step(`check-pages-deploy-${i}`, async () => {
           try {
-            const r = await fetch(`${url}?v=${Date.now()}`, { method: "GET", redirect: "manual" as any });
-            return { status: r.status };
+            const r = await gh("/actions/runs?per_page=10", "GET");
+            if (r.status !== 200) return { live: false, status: r.status };
+            const live = (r.json?.workflow_runs || []).some((w: any) => w.name === "pages build and deployment" && w.status === "completed"
+              && w.conclusion === "success" && String(w.created_at || "").slice(0, 19) >= since);
+            return { live, status: 200 };
           } catch (e: any) {
-            return { status: 0, error: String(e?.message ?? e).slice(0, 120) };
+            return { live: false, status: 0, error: String(e?.message ?? e).slice(0, 120) };
           }
         });
-        pageLive = st?.status === 200;
+        if (st?.status !== 200 && i >= 3) { pageLive = true; break; } // can't see deploys: a minute is normally enough
+        pageLive = !!st?.live;
       }
+      if (pageLive) await ctx.wait("wait-for-cdn", 6);
     }
     const linkUrl = pageLive ? `${PAGES}p/${id}.html` : pinUrl(id, rec.lat, rec.lng);
     const ch = t.fam === "drn" ? DRN_CH : IRR_CH;
