@@ -242,6 +242,11 @@ body.ml.mledit .fabs{bottom:calc(178px + var(--safe-b))}
 .pump svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .jn{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #0a84ff;box-shadow:0 1px 3px rgba(0,0,0,.5)}
 .jn.tee{width:16px;height:16px;border:3px solid #ffb020}
+.bend{width:18px;height:18px;border-radius:5px;background:#fff;border:3px solid #ffcc00;box-shadow:0 1px 4px rgba(0,0,0,.6);transform:rotate(45deg)}
+.bend.mid{width:12px;height:12px;border-radius:50%;border-width:2px;background:rgba(255,204,0,.85);transform:none;opacity:.9}
+.shapebar{position:fixed;left:0;right:0;bottom:0;z-index:610;padding:0 12px calc(12px + var(--safe-b));display:none}
+body.shaping .shapebar{display:block}body.shaping .mlbar{display:none}
+.shapebar .glass{max-width:640px;margin:0 auto;border-radius:24px;padding:12px}
 .legs{display:grid;gap:8px}
 .leg{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line)}
 .leg .arr{flex:0 0 34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--tank-soft);color:var(--tank-deep);font-family:var(--display);font-weight:800;font-size:13px}
@@ -278,6 +283,7 @@ body.ml.mledit .fabs{bottom:calc(178px + var(--safe-b))}
 <div class="hint glass" id="hint">Put the cross right on it</div>
 <div class="placebar"><div class="glass" id="placebar"></div></div>
 <div class="mlbar"><div class="glass" id="mlbar"></div></div>
+<div class="shapebar"><div class="glass" id="shapebar"></div></div>
 <div class="tool glass" id="tool"><span id="toolTxt"></span><button class="btn soft sm" id="toolX">Done</button></div>
 <div class="toast glass" id="toast" role="status"></div>
 <div id="layer"></div>
@@ -903,7 +909,7 @@ function drawNet(){
       m.on("click",function(){onNode(n)});m.on("dragend",function(e){var q=e.target.getLatLng();relocateValve(n,[q.lat,q.lng])});m.addTo(LGM.valves);return}
     if(ML.edit&&z>=17){var tee=(ADJ[n.id]||[]).filter(function(p){return !p.stub}).length>=3;var j=L.marker([n.lat,n.lng],{icon:L.divIcon({className:"",html:'<div class="jn'+(tee?' tee':'')+'"></div>',iconSize:tee?[16,16]:[12,12],iconAnchor:tee?[8,8]:[6,6]}),draggable:true,zIndexOffset:400,keyboard:false});j.on("click",function(){onNode(n)});j.on("dragend",function(e){moveNode(n,e.target.getLatLng())});j.addTo(LGM.edit)}
   });
-  drawMlHeads();mlBar();mlCounts();
+  drawShape();drawMlHeads();mlBar();mlCounts();
 }
 function drawMlHeads(){
   LGM.heads.clearLayers();if(!NET||!MSHOW.heads)return;var z=map.getZoom();var dry=SIM?SIM.dry:{};var any=Object.keys(dry).length;
@@ -940,7 +946,7 @@ function mlBar(){
   var shut=Object.keys(ML.closed);var dr=dryText(SIM?SIM.dry:{},4);var h="";
   if(ML.edit){
     var n=ML.ops.length;
-    h='<div class="st"><span class="dot" style="background:#ffb020"></span><div><b>Editing the mainline'+(n?' · '+n+' change'+(n===1?'':'s'):'')+'</b><small>Drag a valve onto the pipe it\'s really on. Tap an orange tee to put valves on its legs. Nothing is shared until you save.</small></div></div>'+
+    h='<div class="st"><span class="dot" style="background:#ffb020"></span><div><b>Editing the mainline'+(n?' · '+n+' change'+(n===1?'':'s'):'')+'</b><small>Tap a pipe to reshape or redraw it. Drag a valve onto the pipe it\'s really on. Tap an orange tee for valves on its legs. Nothing is shared until you save.</small></div></div>'+
       '<div class="row"><button class="btn soft sm" id="eValve">Add valve</button><button class="btn soft sm" id="ePipe">Draw pipe</button>'+(ML.undo.length?'<button class="btn soft sm" id="eUndo">Undo</button>':'')+'</div><div class="row" style="margin-top:8px"><button class="btn soft sm" id="eCancel">'+(n?"Discard":"Stop editing")+'</button><button class="btn go" id="eSave" style="flex:2"'+(n?"":" disabled")+'>Save for everyone</button></div>';
   }else{
     if(!shut.length)h='<div class="st"><span class="dot" style="background:#2fd27a"></span><div><b>Water everywhere</b><small>Tap a valve to shut it, or find the valves to shut off a spot.</small></div></div>';
@@ -965,7 +971,10 @@ function valveLi(n){var V=VALVE[n.k]||VALVE.ov;var nt=nearText([n.lat,n.lng]);re
 function wireValveLi(s){s.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){var n=NI[b.dataset.v];closeSheet();map.setView([n.lat,n.lng],Math.max(map.getZoom(),19));setTimeout(function(){onNode(n)},300)}})}
 
 /* ---- tools (one tap on the map does the next thing) ---- */
-function setTool(t){ML.tool=t;var el=$("#tool");if(!t){el.classList.remove("on");LGM.draw.clearLayers();drawMlHeads();return}$("#toolTxt").textContent=t.txt;$("#toolX").textContent=t.k==="pipe"&&t.pts&&t.pts.length>1?"Finish":t.k==="pipe"?"Cancel":"Done";el.classList.add("on");if(t.k==="link")drawMlHeads()}
+function setTool(t){var was=ML.tool;ML.tool=t;var el=$("#tool");
+  if(!t||(t.k!=="shape"&&t.k!=="redraw")){document.body.classList.remove("shaping");if(was&&(was.k==="shape"||was.k==="redraw")){LGM.draw.clearLayers();if(!t){el.classList.remove("on");drawNet();return}}}
+  if(t&&(t.k==="shape"||t.k==="redraw")){el.classList.remove("on");return}
+  if(!t){el.classList.remove("on");LGM.draw.clearLayers();drawMlHeads();return}$("#toolTxt").textContent=t.txt;$("#toolX").textContent=t.k==="pipe"&&t.pts&&t.pts.length>1?"Finish":t.k==="pipe"?"Cancel":"Done";el.classList.add("on");if(t.k==="link")drawMlHeads()}
 $("#toolX").onclick=function(){var t=ML.tool;if(t&&t.k==="pipe"&&t.pts.length>1){finishPipe();return}setTool(null)};
 function screenD(a,b){var p=map.latLngToContainerPoint(a),q=map.latLngToContainerPoint(b);return Math.hypot(p.x-q.x,p.y-q.y)}
 function nearNode(ll,px,filter){var best=null;NET.nodes.forEach(function(n){if(filter&&!filter(n))return;var d=screenD(ll,[n.lat,n.lng]);if(d<=px&&(!best||d<best[0]))best=[d,n]});return best&&best[1]}
@@ -976,8 +985,14 @@ map.on("click",function(e){if(MODE!=="ml"||PLACE)return;var t=ML.tool;if(!t)retu
   if(t.k==="pipe"){t.pts.push(ll);drawSketch();$("#toolTxt").textContent=t.pts.length===1?"Tap along the pipe, then Finish":"Keep tapping along it, then Finish";$("#toolX").textContent=t.pts.length>1?"Finish":"Cancel";return}
   if(t.k==="link"||t.k==="feed"){var h2=nearHead(ll,22);if(h2)onHead(h2);return}
   if(t.k==="move"){var mv=NI[t.node];if(!mv){setTool(null);return}if(relocateValve(mv,ll))setTool(null);return}
+  if(t.k==="shape"){var np3=nearestPipe(ll);if(np3&&screenD(ll,np3.ll)<=26&&np3.p.id!==t.pipe){t.pipe=np3.p.id;drawNet()}return}
+  if(t.k==="redraw"){t.pts.push(ll);drawSketch();shapeBar();return}
 });
-function drawSketch(){LGM.draw.clearLayers();var t=ML.tool;if(!t||!t.pts)return;L.polyline(t.pts,{color:"#ffcc00",weight:5,dashArray:"8 6",interactive:false}).addTo(LGM.draw);t.pts.forEach(function(p){L.circleMarker(p,{radius:5,color:"#fff",weight:2,fillColor:"#ffcc00",fillOpacity:1,interactive:false}).addTo(LGM.draw)})}
+function drawSketch(){LGM.draw.clearLayers();var t=ML.tool;if(!t||!t.pts)return;
+  if(t.k==="redraw"){var rp=pipeById(t.pipe);if(!rp)return;var A=NI[rp.a],B=NI[rp.b];var line=[[A.lat,A.lng]].concat(t.pts,[[B.lat,B.lng]]);
+    L.polyline(pipeLL(rp),{color:"#ff3b30",weight:4,opacity:.6,dashArray:"4 8",interactive:false}).addTo(LGM.draw);
+    L.polyline(line,{color:"#ffcc00",weight:5,interactive:false}).addTo(LGM.draw);t.pts.forEach(function(p){L.circleMarker(p,{radius:5,color:"#fff",weight:2,fillColor:"#ffcc00",fillOpacity:1,interactive:false}).addTo(LGM.draw)});return}
+  L.polyline(t.pts,{color:"#ffcc00",weight:5,dashArray:"8 6",interactive:false}).addTo(LGM.draw);t.pts.forEach(function(p){L.circleMarker(p,{radius:5,color:"#fff",weight:2,fillColor:"#ffcc00",fillOpacity:1,interactive:false}).addTo(LGM.draw)})}
 
 /* ---- taps on the network ---- */
 function onHead(h){
@@ -1001,12 +1016,16 @@ function onPipe(p,latlng){
   var len=p._len||(p._len=plen(p));var wet=SIM&&SIM.pw[p.id];
   var h='<h2>'+esc(p.run||"Mainline")+'</h2><div class="opts" style="margin-top:6px">'+(wet?'<span class="pill info">Has water</span>':'<span class="pill bad">No water</span>')+(p.mm?'<span class="pill">'+esc(p.mm)+'</span>':'')+(p.stub?'<span class="pill">Lateral take-off</span>':'')+'<span class="pill">'+fmtM(len)+' between '+esc(vname(NI[p.a]))+' and '+esc(vname(NI[p.b]))+'</span></div>'+(p.note?'<div class="note">'+esc(p.note)+'</div>':'');
   h+='<div class="row" style="margin-top:14px"><button class="btn go" id="pFind" style="flex:2">Valves to shut this off</button></div>';
-  if(ML.edit)h+='<h3>Change</h3><div class="row"><button class="btn soft sm" id="pValve">Add a valve here</button><button class="btn soft sm" id="pSize">Size / name</button><button class="btn stop sm" id="pDel">Delete pipe</button></div>';
+  h+='<h3>Change this pipe</h3><div class="row"><button class="btn soft sm" id="pShape">Reshape</button><button class="btn soft sm" id="pRedraw">Redraw</button><button class="btn soft sm" id="pValve">Add a valve here</button></div><div class="row" style="margin-top:8px"><button class="btn soft sm" id="pSplit">Add a join here</button><button class="btn soft sm" id="pSize">Size / name</button><button class="btn stop sm" id="pDel">Delete pipe</button></div>';
+  if(!ML.edit)h+='<p class="faint" style="font-size:13.5px;margin-top:8px">Changes are saved for everyone once you hit Save.</p>';
   var s=sheet(h,{peek:true});
+  $("#pShape").onclick=function(){withEdit(function(){closeSheet();startShape(p.id)})};
+  $("#pRedraw").onclick=function(){withEdit(function(){closeSheet();setTool({k:"redraw",pipe:p.id,pts:[],txt:"Tap along the new route, from "+vname(NI[p.a])+" to "+vname(NI[p.b])});document.body.classList.add("shaping");drawSketch();shapeBar()})};
+  $("#pSplit").onclick=function(){withEdit(function(){var np=npOnPipe(p,ll);mutate("join on pipe");splitPipe(np,"j",{});closeSheet();drawNet();toast("Join added: drag it, or draw a pipe from it")})};
   $("#pFind").onclick=function(){closeSheet();findFor({pipe:p.id},(p.run||"this pipe"))};
-  if($("#pValve"))$("#pValve").onclick=function(){closeSheet();var np=nearestPipe(ll);newValveSheet(np&&np.p.id===p.id?np:{p:p,i:0,t:.5,ll:pipeLL(p)[0]})};
-  if($("#pSize"))$("#pSize").onclick=function(){pipeSheet(p)};
-  if($("#pDel"))$("#pDel").onclick=function(){mutate("delete pipe");delPipe(p);closeSheet();drawNet()};
+  $("#pValve").onclick=function(){withEdit(function(){closeSheet();newValveSheet(npOnPipe(p,ll))})};
+  $("#pSize").onclick=function(){withEdit(function(){pipeSheet(p)})};
+  $("#pDel").onclick=function(){withEdit(function(){mutate("delete pipe");delPipe(p);closeSheet();drawNet()})};
 }
 function onNode(n){
   if(MODE!=="ml"||PLACE)return;var t=ML.tool;
@@ -1059,11 +1078,11 @@ function startEdit(then){if(!who()){var s=sheet('<h2>Who\'s editing?</h2><p clas
   ML.edit=true;ML.closed={};ML.hit={};ML.target=null;document.body.classList.add("mledit");mlApply(true);
   if(typeof then==="function")then();else if(map.getZoom()<17)toast("Zoom in to see the tees and junctions")}
 function withEdit(f){if(ML.edit)f();else startEdit(f)}
-function stopEdit(){ML.edit=false;ML.undo=[];ML.ops=[];setTool(null);document.body.classList.remove("mledit");try{localStorage.removeItem("ml.draft")}catch(e){}mlApply(true)}
+function stopEdit(){ML.edit=false;ML.undo=[];ML.ops=[];setTool(null);document.body.classList.remove("shaping");document.body.classList.remove("mledit");try{localStorage.removeItem("ml.draft")}catch(e){}mlApply(true)}
 function cancelEdit(){if(!ML.ops.length){stopEdit();return}var s=sheet('<h2>Throw away '+ML.ops.length+' change'+(ML.ops.length===1?'':'s')+'?</h2><div class="row" style="margin-top:14px"><button class="btn soft" data-close>Keep editing</button><button class="btn stop" id="cGo" style="flex:2">Throw them away</button></div>');$("#cGo").onclick=function(){closeSheet();loadNet(true).then(function(){stopEdit()})}}
 function mutate(what){ML.undo.push(JSON.stringify(NET));if(ML.undo.length>60)ML.undo.shift();ML.ops.push(what);draft()}
 function draft(){ls("ml.draft",{base:NETBASE,net:NET,ops:ML.ops,test:TEST})}
-function undo(){var s=ML.undo.pop();if(!s)return;NET=JSON.parse(s);ML.ops.pop();netIndex();draft();drawNet()}
+function undo(){var s=ML.undo.pop();if(!s)return;NET=JSON.parse(s);ML.ops.pop();netIndex();HEADFEED=null;draft();if(ML.tool&&ML.tool.pipe&&!pipeById(ML.tool.pipe))setTool(null);drawNet()}
 function moveNode(n,latlng){mutate("move "+vname(n));n.lat=+latlng.lat.toFixed(7);n.lng=+latlng.lng.toFixed(7);(ADJ[n.id]||[]).forEach(function(p){p._len=null});HEADFEED=null;drawNet()}
 function splitPipe(np,kind,props,reuse){
   var p=np.p;var ll=pipeLL(p);var idx=np.i;var at=np.ll;var node,nid;
@@ -1082,6 +1101,41 @@ function newValveSheet(np){
     else splitPipe(np,k0,props);
     closeSheet();drawNet();toast("Valve added")};
 }
+/* ---- reshaping a pipe: drag its bends, drag the small dots to add bends, tap a bend to take it out ---- */
+function pipeById(id){for(var i=0;i<NET.pipes.length;i++)if(NET.pipes[i].id===id)return NET.pipes[i];return null}
+function startShape(id){setTool({k:"shape",pipe:id,txt:""});document.body.classList.add("shaping");var p=pipeById(id);if(p)map.fitBounds(L.latLngBounds(pipeLL(p)).pad(.1),{maxZoom:20.5,paddingTopLeft:[20,130],paddingBottomRight:[20,190],animate:false});drawNet()}
+map.on("zoomend",function(){if(MODE==="ml"&&ML.tool&&ML.tool.k==="shape")drawShape()});
+var BEND=L.divIcon({className:"",html:'<div class="bend"></div>',iconSize:[18,18],iconAnchor:[9,9]}),BENDMID=L.divIcon({className:"",html:'<div class="bend mid"></div>',iconSize:[12,12],iconAnchor:[6,6]});
+function drawShape(){
+  var t=ML.tool;if(!t||t.k!=="shape"||!ML.edit)return;var p=pipeById(t.pipe);if(!p){setTool(null);return}
+  LGM.draw.clearLayers();var ll=pipeLL(p);
+  var line=L.polyline(ll,{color:"#ffcc00",weight:6,opacity:.9,interactive:false}).addTo(LGM.draw);
+  function live(i,q,insert){var c=ll.slice();if(insert)c.splice(i,0,q);else c[i]=q;line.setLatLngs(c)}
+  p.pts.forEach(function(q,k){var m=L.marker(q,{icon:BEND,draggable:true,zIndexOffset:1500,keyboard:false}).addTo(LGM.draw);
+    m.on("drag",function(e){var g=e.target.getLatLng();live(k+1,[g.lat,g.lng])});
+    m.on("dragend",function(e){var g=e.target.getLatLng();mutate("reshape pipe");p.pts[k]=[+g.lat.toFixed(7),+g.lng.toFixed(7)];p._len=null;HEADFEED=null;drawNet()});
+    m.on("click",function(){mutate("reshape pipe");p.pts.splice(k,1);p._len=null;HEADFEED=null;drawNet();toast("Bend taken out")})});
+  for(var k=0;k<ll.length-1;k++)(function(k){var a=ll[k],b=ll[k+1];if(screenD(a,b)<28)return;var mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    var m=L.marker(mid,{icon:BENDMID,draggable:true,zIndexOffset:1400,keyboard:false}).addTo(LGM.draw);
+    m.on("drag",function(e){var g=e.target.getLatLng();live(k+1,[g.lat,g.lng],true)});
+    m.on("dragend",function(e){var g=e.target.getLatLng();mutate("reshape pipe");p.pts.splice(k,0,[+g.lat.toFixed(7),+g.lng.toFixed(7)]);p._len=null;HEADFEED=null;drawNet()});
+    m.on("click",function(){mutate("reshape pipe");p.pts.splice(k,0,[+mid[0].toFixed(7),+mid[1].toFixed(7)]);p._len=null;drawNet()})})(k);
+  shapeBar();
+}
+function shapeBar(){var t=ML.tool;var el=$("#shapebar");if(!t||(t.k!=="shape"&&t.k!=="redraw")){el.innerHTML="";return}var p=pipeById(t.pipe);if(!p)return;
+  var n=ML.ops.length;var h;
+  if(t.k==="shape")h='<div class="st" style="display:flex;gap:10px;margin-bottom:10px"><span class="dot" style="flex:0 0 14px;height:14px;border-radius:50%;margin-top:5px;background:#ffcc00"></span><div><b style="font-family:var(--display);font-weight:800;font-size:20px">Reshaping '+esc(p.run||"this pipe")+'</b><small style="display:block;color:var(--muted);font-size:14px;line-height:1.3">Drag the yellow diamonds to move a bend. Drag a small dot to add a bend. Tap a diamond to take it out. Tap another pipe to switch to it.</small></div></div>'+
+    '<div class="row">'+(ML.undo.length?'<button class="btn soft sm" id="sUndo">Undo</button>':'')+'<button class="btn soft sm" id="sStraight">Make it straight</button><button class="btn go" id="sDone" style="flex:2">Done</button></div>';
+  else h='<div class="st" style="display:flex;gap:10px;margin-bottom:10px"><span class="dot" style="flex:0 0 14px;height:14px;border-radius:50%;margin-top:5px;background:#ffcc00"></span><div><b style="font-family:var(--display);font-weight:800;font-size:20px">Redraw '+esc(p.run||"this pipe")+'</b><small style="display:block;color:var(--muted);font-size:14px;line-height:1.3">Tap along where it really runs, in order from '+esc(vname(NI[p.a]))+' to '+esc(vname(NI[p.b]))+'. The ends stay put. '+(t.pts.length?t.pts.length+' point'+(t.pts.length===1?'':'s')+' so far.':'')+'</small></div></div>'+
+    '<div class="row"><button class="btn soft sm" id="rCancel">Cancel</button>'+(t.pts.length?'<button class="btn soft sm" id="rBack">Undo point</button>':'')+'<button class="btn go" id="rDone" style="flex:2"'+(t.pts.length?'':' disabled')+'>Use route</button></div>';
+  el.innerHTML=h;
+  var b=function(id,f){var x=$(id);if(x)x.onclick=f};
+  b("#sUndo",function(){undo()});b("#sDone",function(){setTool(null)});
+  b("#sStraight",function(){if(!p.pts.length)return;mutate("straighten pipe");p.pts=[];p._len=null;HEADFEED=null;drawNet()});
+  b("#rCancel",function(){setTool(null)});b("#rBack",function(){t.pts.pop();drawSketch();shapeBar()});
+  b("#rDone",function(){mutate("redraw pipe");p.pts=t.pts.map(function(q){return [+q[0].toFixed(7),+q[1].toFixed(7)]});p._len=null;HEADFEED=null;setTool(null);startShape(p.id);toast("New route in. Fine-tune the bends, then Done.")});
+}
+
 /* ---- moving valves between pipes, and valves on the legs of a tee ---- */
 function llOf(q){return [q[1]/110574,q[0]/(111320*K0)]}
 function npOnPipe(p,ll){var P=xy(ll),c=pipeLL(p).map(xy),best=null;for(var i=1;i<c.length;i++){var r=projSeg(P,c[i-1],c[i]);if(!best||r.d<best.d)best={p:p,i:i-1,t:r.t,d:r.d,q:r.q}}best.ll=llOf(best.q);return best}

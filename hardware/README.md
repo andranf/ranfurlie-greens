@@ -51,6 +51,9 @@ else. Post `{"kind":"purge_test","__test":"1"}` to the hook to clear them.
   valve the crew have pinned on the hardware map.
 - Tees: in Edit, tees show as orange rings. Tap one to add a valve on each leg that has one (5 m from the tee). A valve
   sitting right on a tee shuts every way out; its card offers to put it on its leg.
+- Reshaping pipes: tap a pipe > Reshape. Drag the yellow diamonds to move bends, drag the small dots to add a bend, tap a
+  diamond to take it out, or Make it straight. Redraw: tap along the real route and the ends stay put. Add a join: puts a
+  junction on the pipe to drag or branch a new pipe from. A pipe here is the stretch between two valves or junctions.
 - Edits: Mainline > Edit. Drag valves and junctions, add valves, draw pipes, delete pipes, link heads, then Save. The page
   posts the whole network to the hook (`kind: "net"`), which commits `network.json` with a log line. Nothing in the page
   needs changing when the network changes.
