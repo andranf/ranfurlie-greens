@@ -1113,19 +1113,24 @@ function setMode(m){MODE=m;ls("hw.mode",m);document.body.classList.toggle("ml",m
 $("#seg").onclick=function(e){var b=e.target.closest("button");if(b&&b.dataset.m!==MODE)setMode(b.dataset.m)};
 
 /* ---- Cirrus Pro: mainline and valves as small KML layers ---- */
+/* Cirrus copies are simplified to within 2 m (the trace is no better than that) so the layers stay small */
+function rdpLL(pts,eps){if(pts.length<3)return pts;var a=xy(pts[0]),b=xy(pts[pts.length-1]),dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1e-9,best=-1,idx=0;
+  for(var i=1;i<pts.length-1;i++){var q=xy(pts[i]);var d=Math.abs(dx*(q[1]-a[1])-dy*(q[0]-a[0]))/L;if(d>best){best=d;idx=i}}
+  if(best>eps)return rdpLL(pts.slice(0,idx+1),eps).slice(0,-1).concat(rdpLL(pts.slice(idx),eps));return [pts[0],pts[pts.length-1]]}
+function cirrusLL(p){return rdpLL(pipeLL(p),2)}
 function netKmlSets(){var out=[];if(!NET)return out;
   var runs={};NET.pipes.forEach(function(p){if(p.stub)return;var k=p.run||"Mainline";(runs[k]=runs[k]||[]).push(p)});
-  var parts=[],cur=[],n=0;Object.keys(runs).forEach(function(k){runs[k].forEach(function(p){var c=pipeLL(p).length;if(n+c>CIRRUS_SMALL-10&&cur.length){parts.push(cur);cur=[];n=0}cur.push(p);n+=c})});if(cur.length)parts.push(cur);
+  var parts=[],cur=[],n=0;Object.keys(runs).forEach(function(k){runs[k].forEach(function(p){var c=cirrusLL(p).length;if(n+c>CIRRUS_SMALL-10&&cur.length){parts.push(cur);cur=[];n=0}cur.push(p);n+=c})});if(cur.length)parts.push(cur);
   parts.forEach(function(ps,i){out.push({name:"HW Mainline"+(parts.length>1?" part "+(i+1)+" of "+parts.length:""),file:"HW_Mainline"+(parts.length>1?"_"+(i+1):""),col:"#38c6ff",lines:ps})});
   var sv=NET.nodes.filter(function(n){return n.k==="sv"||n.k==="mv"||n.k==="ov"}),iv=NET.nodes.filter(function(n){return n.k==="iv"});
   if(sv.length)out.push({name:"HW Mainline valves",file:"HW_Mainline_valves",col:"#0a84ff",pts:sv});
   if(iv.length)out.push({name:"HW LI-IV valves",file:"HW_LI-IV_valves",col:"#30d158",pts:iv});
   return out}
 function netKml(S){var c=kmlColor(S.col);var body;
-  if(S.lines)body=S.lines.map(function(p){return '<Placemark><name>'+xesc((p.run||"Mainline")+(p.mm?" "+p.mm:""))+'</name><styleUrl>#s</styleUrl><LineString><coordinates>'+pipeLL(p).map(function(q){return q[1].toFixed(7)+","+q[0].toFixed(7)+",0"}).join(" ")+'</coordinates></LineString></Placemark>'}).join("\n");
+  if(S.lines)body=S.lines.map(function(p){return '<Placemark><name>'+xesc((p.run||"Mainline")+(p.mm?" "+p.mm:""))+'</name><styleUrl>#s</styleUrl><LineString><coordinates>'+cirrusLL(p).map(function(q){return q[1].toFixed(7)+","+q[0].toFixed(7)+",0"}).join(" ")+'</coordinates></LineString></Placemark>'}).join("\n");
   else body=S.pts.map(function(n){return '<Placemark><name>'+xesc(vname(n)+(n.cond==="fail"?" · seized":""))+'</name><styleUrl>#s</styleUrl><Point><coordinates>'+n.lng.toFixed(7)+','+n.lat.toFixed(7)+',0</coordinates></Point></Placemark>'}).join("\n");
   return '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>'+xesc(S.name)+'</name><Style id="s"><IconStyle><color>'+c+'</color><scale>0.8</scale></IconStyle><LineStyle><color>'+c+'</color><width>3</width></LineStyle></Style>\n'+body+'\n</Document></kml>\n'}
-function kmlCount(S){return S.lines?S.lines.reduce(function(a,p){return a+pipeLL(p).length},0):S.pts.length}
+function kmlCount(S){return S.lines?S.lines.reduce(function(a,p){return a+cirrusLL(p).length},0):S.pts.length}
 
 /* ---------- load ---------- */
 function loadLive(){return fetch("live.json?v="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():{records:[]}}).catch(function(){return null})}
