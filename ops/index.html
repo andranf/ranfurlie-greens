@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ranfurlie Course Ops</title>
+<meta name="description" content="Irrigation, drainage, bunkers, topdressing and grounds at Ranfurlie in one place: open jobs, maps, stock and stocktakes, bunker sand and live Turfco loads.">
+<meta name="theme-color" content="#e4f1f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#06121b" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+/* Ranfurlie Course Ops v1.0 (24 Oct 2026). One page for irrigation, drainage, bunkers, topdressing and grounds.
+   Reads each area's data.json (rebuilt hourly from Slack + Notion) plus ops/live.json (written straight away by the
+   Zapier "Ops dashboard actions" hook whenever someone does a stocktake, adds sand or taps a Turfco load here).
+   Design: the tank-mix glass system. Each area has its own colour so it's obvious which one you're in. */
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6); --glass-hi:rgba(255,255,255,.8); --glass-lo:rgba(255,255,255,.36); --glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92); --rim2:rgba(255,255,255,.38); --edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231; --muted:#3f5d6e; --faint:#6f8a99; --line:rgba(16,52,72,.12);
+  --hi:#e0313b; --hi-bg:rgba(224,49,59,.12); --med:#b86a00; --med-bg:rgba(255,176,32,.2); --lo:#4f6a7a; --lo-bg:rgba(79,106,122,.12);
+  --ok:#13a356; --ok-bg:rgba(19,163,86,.14);
+  --scrim:rgba(8,30,44,.4);
+  --turf:#c7e1bd; --fair:#a6d596; --appr:#93cc86; --tee:#86c37a; --green:#5bb36b; --sand:#ecdcaa; --sand-edge:#c4a967; --water:#7cc6e8; --pipe:#d1792f; --pit:#a06a1c; --ag:#5f9e8f; --holeTxt:rgba(11,34,49,.55);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px; --r2:16px; --ease:cubic-bezier(.2,.8,.2,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54); --glass-hi:rgba(28,58,78,.68); --glass-lo:rgba(18,40,56,.34); --glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2); --rim2:rgba(255,255,255,.06); --edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.1);
+  --hi:#ff6b6b; --hi-bg:rgba(255,107,107,.16); --med:#ffbc45; --med-bg:rgba(255,188,69,.15); --lo:#a9c4d2; --lo-bg:rgba(169,196,210,.12);
+  --ok:#2fd27a; --ok-bg:rgba(47,210,122,.16);
+  --scrim:rgba(0,0,0,.6);
+  --turf:#143222; --fair:#1d4b31; --appr:#215639; --tee:#29683f; --green:#36905c; --sand:#b9a165; --sand-edge:#7d6a3a; --water:#1f6f93; --pipe:#f0a060; --pit:#f2d27a; --ag:#7fb3a3; --holeTxt:rgba(241,248,251,.55);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54); --glass-hi:rgba(28,58,78,.68); --glass-lo:rgba(18,40,56,.34); --glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2); --rim2:rgba(255,255,255,.06); --edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.1);
+  --hi:#ff6b6b; --hi-bg:rgba(255,107,107,.16); --med:#ffbc45; --med-bg:rgba(255,188,69,.15); --lo:#a9c4d2; --lo-bg:rgba(169,196,210,.12);
+  --ok:#2fd27a; --ok-bg:rgba(47,210,122,.16);
+  --scrim:rgba(0,0,0,.6);
+  --turf:#143222; --fair:#1d4b31; --appr:#215639; --tee:#29683f; --green:#36905c; --sand:#b9a165; --sand-edge:#7d6a3a; --water:#1f6f93; --pipe:#f0a060; --pit:#f2d27a; --ag:#7fb3a3; --holeTxt:rgba(241,248,251,.55);
+}
+
+/* one colour per area: light value, dark value */
+body{--accL:#0a7fd0;--accD:#4cc2ff;--deepL:#05589a;--deepD:#a6e0ff}
+body[data-area="irrigation"]{--accL:#0a7fd0;--accD:#4cc2ff;--deepL:#05589a;--deepD:#a6e0ff}
+body[data-area="drainage"]{--accL:#6a46f5;--accD:#a68dff;--deepL:#4527c2;--deepD:#d2c6ff}
+body[data-area="bunkers"]{--accL:#c27a06;--accD:#f5bd4c;--deepL:#7f4f00;--deepD:#ffe0a1}
+body[data-area="topdressing"]{--accL:#dc5222;--accD:#ff8f62;--deepL:#9b3412;--deepD:#ffc3ab}
+body[data-area="grounds"]{--accL:#169552;--accD:#3ddc8a;--deepL:#0c6a3a;--deepD:#a5f0c8}
+body{--acc:var(--accL);--acc-deep:var(--deepL);--acc-ink:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body{--acc:var(--accD);--acc-deep:var(--deepD);--acc-ink:#03141d}}
+:root[data-theme="dark"] body{--acc:var(--accD);--acc-deep:var(--deepD);--acc-ink:#03141d}
+body{--acc-soft:color-mix(in srgb,var(--acc) 15%,transparent);--acc-line:color-mix(in srgb,var(--acc) 40%,transparent)}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;line-height:1.02;letter-spacing:.01em}
+a{color:var(--acc-deep)}
+button,select,textarea,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:12px}
+.num{font-variant-numeric:tabular-nums}
+
+/* the sky behind the glass, tinted to the area */
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8;transition:background 1s var(--ease)}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,color-mix(in srgb,var(--acc) 55%,transparent) 0,transparent 62%);animation:drift1 40s ease-in-out infinite alternate}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,color-mix(in srgb,var(--acc) 28%,#86e8b4 30%) 0,transparent 62%);animation:drift2 46s ease-in-out infinite alternate}
+.sky i:nth-child(3){width:60vmax;height:60vmax;left:-12vmax;bottom:-32vmax;background:radial-gradient(circle,color-mix(in srgb,var(--acc) 30%,#ffe08a 30%) 0,transparent 60%);opacity:.5;animation:drift1 54s ease-in-out infinite alternate-reverse}
+.sky i:nth-child(4){width:50vmax;height:50vmax;right:-18vmax;bottom:-24vmax;background:radial-gradient(circle,color-mix(in srgb,var(--acc) 40%,transparent) 0,transparent 62%);opacity:.45;animation:drift2 48s ease-in-out infinite alternate-reverse}
+@keyframes drift1{to{transform:translate(8vmax,6vmax) scale(1.08)}}
+@keyframes drift2{to{transform:translate(-7vmax,-5vmax) scale(1.1)}}
+@media (prefers-reduced-motion: reduce){.sky i{animation:none}*{scroll-behavior:auto!important}}
+
+/* glass recipe */
+.card,.tabs .bar,.toast,.sheet .panel,.seg{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+}
+.card{border-radius:var(--r);padding:18px;min-width:0}
+@media (min-width:640px){.card{padding:22px}}
+.card h2{font-size:24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card h2 .count{font-size:16px;font-weight:700;color:var(--acc-deep);background:var(--acc-soft);border-radius:99px;padding:2px 10px}
+.card .head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sub{color:var(--muted);font-size:15px}
+.eyebrow{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--muted)}
+
+/* header */
+.top .wrap{padding-block:16px 6px;display:grid;gap:6px}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top h1{font-size:clamp(34px,8vw,48px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:16px;height:16px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 6px var(--acc-soft)}
+.facts{display:flex;flex-wrap:wrap;gap:6px}
+.fact{background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);border-radius:999px;padding:3px 12px;font-family:var(--display);font-weight:700;font-size:16px;white-space:nowrap}
+.fact.acc{background:var(--acc);color:var(--acc-ink);box-shadow:none}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:0;background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);display:grid;place-items:center}
+.iconbtn svg{width:20px;height:20px}
+.testbar{background:var(--med-bg);color:var(--med);font-weight:600;text-align:center;padding:6px 12px;font-size:14px}
+
+/* tabs */
+.tabs{position:sticky;top:0;z-index:20;padding-top:max(8px,env(safe-area-inset-top,0px));padding-bottom:6px}
+.tabs .bar{max-width:1180px;margin:0 auto;border-radius:20px;padding:6px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs .bar::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-width:0;border:0;background:transparent;border-radius:14px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;font-size:18px;color:var(--muted);white-space:nowrap;transition:background .25s var(--ease),color .25s}
+.tab i{width:12px;height:12px;border-radius:50%;flex:none;background:var(--c)}
+.tab b{font-size:13px;min-width:22px;padding:0 6px;border-radius:99px;background:var(--glass-lo);color:var(--fg);line-height:20px;text-align:center}
+.tab[aria-selected="true"]{background:var(--c);color:#fff}
+.tab[aria-selected="true"] b{background:rgba(255,255,255,.25);color:#fff}
+@media (max-width:620px){.tabs .bar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:5px}.tab{flex-direction:column;gap:3px;padding:7px 2px 6px;font-size:clamp(12.5px,3.5vw,16px);letter-spacing:0}.tab span{max-width:100%;overflow:hidden;text-overflow:ellipsis}.tab b{position:absolute;margin:-4px 0 0 30px;font-size:11px;min-width:18px;line-height:17px;padding:0 4px}.tab{position:relative}.tab i{width:11px;height:11px}}
+
+/* layout */
+main .wrap{display:grid;gap:16px;padding-block:10px 120px}
+.grid2{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:960px){.grid2{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:start}}
+.stack{display:grid;gap:16px;min-width:0}
+.in{animation:inUp .4s var(--ease) both}
+@keyframes inUp{from{opacity:0;transform:translateY(10px)}}
+
+/* KPI tiles with a little chart inside (house style) */
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:760px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{border-radius:18px;padding:12px 14px 10px;background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);display:grid;gap:2px;min-width:0}
+.tile .k{font-size:13.5px;color:var(--muted);font-weight:600}
+.tile .v{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.tile .v small{font-size:17px;font-weight:700;color:var(--muted);margin-left:3px}
+.tile .viz{height:26px;margin-top:4px}
+.tile .viz svg{width:100%;height:26px;display:block}
+.tile.acc .v{color:var(--acc-deep)}
+.tile.hi .v{color:var(--hi)}
+
+/* buttons */
+.btn{border:0;border-radius:14px;padding:11px 16px;font-weight:700;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);min-height:46px;text-decoration:none;color:var(--fg);transition:transform .15s var(--ease)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--acc);color:var(--acc-ink);box-shadow:0 10px 24px -12px var(--acc)}
+.btn.ghost{background:transparent;box-shadow:inset 0 0 0 1.5px var(--acc-line);color:var(--acc-deep)}
+.btn.small{min-height:36px;padding:6px 12px;font-size:15px;border-radius:12px}
+.btn.wide{width:100%}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btn svg{width:18px;height:18px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.spacer{flex:1}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:0;border-radius:99px;padding:7px 13px;font-weight:600;font-size:15px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line);min-height:38px}
+.chip[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink);box-shadow:none}
+.chip.sm{min-height:30px;padding:4px 10px;font-size:14px}
+.tag{display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:1px 9px;font-size:13px;font-weight:700;white-space:nowrap}
+.tag.High{background:var(--hi-bg);color:var(--hi)} .tag.Medium{background:var(--med-bg);color:var(--med)} .tag.Low{background:var(--lo-bg);color:var(--lo)}
+.tag.st{background:var(--acc-soft);color:var(--acc-deep)}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+
+/* jobs */
+.jobs{display:grid;gap:2px}
+.job{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:11px 4px;border-top:1px solid var(--line)}
+.job:first-child{border-top:0}
+.job .pd{width:12px;height:12px;border-radius:50%;margin-top:6px}
+.pd.High{background:var(--hi)} .pd.Medium{background:var(--med)} .pd.Low{background:var(--lo)}
+.job .t{font-weight:600;line-height:1.3}
+.job .m{color:var(--muted);font-size:14px;grid-column:2;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.job .go{font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap;padding:4px 8px;border-radius:10px;background:var(--acc-soft);color:var(--acc-deep)}
+.job.sel{background:var(--acc-soft);border-radius:14px}
+details.more{margin-top:8px}
+details.more summary{cursor:pointer;font-weight:700;color:var(--acc-deep);list-style:none;padding:8px 4px}
+details.more summary::-webkit-details-marker{display:none}
+.empty{color:var(--muted);padding:10px 4px}
+
+/* map */
+.map{position:relative;border-radius:18px;overflow:hidden;background:var(--turf);touch-action:none;user-select:none;-webkit-user-select:none;aspect-ratio:960/680;box-shadow:inset 0 0 0 1px var(--line)}
+.map svg{width:100%;height:100%;display:block}
+.map .ctl{position:absolute;right:8px;top:8px;display:grid;gap:6px}
+.map .ctl button{width:38px;height:38px;border-radius:12px;border:0;background:var(--glass-solid);box-shadow:var(--shadow);font-size:20px;font-weight:700;display:grid;place-items:center}
+.map .hint{position:absolute;left:10px;bottom:8px;font-size:13px;font-weight:600;background:var(--glass-solid);border-radius:10px;padding:3px 9px;color:var(--muted);pointer-events:none}
+.mapbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.mapbar select{border-radius:12px;border:0;padding:8px 10px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line);font-weight:600;min-height:40px}
+.lg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13.5px;color:var(--muted);margin-top:8px}
+.lg i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+svg .p-fairway{fill:var(--fair)} svg .p-approach{fill:var(--appr)} svg .p-tee{fill:var(--tee)} svg .p-green{fill:var(--green)}
+svg .p-bunker{fill:var(--sand);stroke:var(--sand-edge);stroke-width:.6}
+svg .bk{fill:var(--sand);stroke:var(--sand-edge);stroke-width:.7;cursor:pointer;transition:fill .2s}
+svg .bk.recent{fill:color-mix(in srgb,var(--acc) 55%,var(--sand))}
+svg .bk.job{stroke:var(--hi);stroke-width:1.6}
+svg .bk.sel{fill:var(--acc);stroke:var(--fg);stroke-width:1.4}
+svg .bkhit{fill:transparent;stroke:transparent;stroke-width:14;cursor:pointer;vector-effect:non-scaling-stroke}
+svg .hn{font-family:var(--display);font-weight:800;fill:var(--holeTxt);pointer-events:none;text-anchor:middle;dominant-baseline:central}
+svg .bn{font-family:var(--display);font-weight:700;fill:var(--fg);pointer-events:none;text-anchor:middle;dominant-baseline:central;opacity:0;transition:opacity .2s}
+svg[data-z="2"] .bn{opacity:.9}
+svg .pin{stroke:#fff;stroke-width:1.2;cursor:pointer;vector-effect:non-scaling-stroke}
+svg .pin.High{fill:var(--hi)} svg .pin.Medium{fill:var(--med)} svg .pin.Low{fill:var(--lo)}
+svg .pin.sel{stroke:var(--fg);stroke-width:3}
+svg .pipe{fill:none;stroke:var(--pipe);stroke-width:1.4;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.9}
+svg .agl{fill:none;stroke:var(--ag);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.8}
+svg .pit{fill:var(--pit);stroke:rgba(0,0,0,.35);stroke-width:.6}
+svg .pond{fill:var(--water);opacity:.75}
+svg .gdone{fill:var(--acc)}
+svg .glabel{font-family:var(--display);font-weight:800;fill:#fff;pointer-events:none;text-anchor:middle;dominant-baseline:central}
+
+/* stock */
+.stock{display:grid;gap:0}
+.si{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:10px 2px;border-top:1px solid var(--line);align-items:center}
+.si:first-child{border-top:0}
+.si .n{font-weight:600}
+.si .q{font-family:var(--display);font-weight:800;font-size:22px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.si .q small{font-size:14px;color:var(--muted);font-weight:700;margin-left:2px}
+.si .d{grid-column:1/-1;color:var(--muted);font-size:13.5px}
+.si .q.unk{font-size:15px;color:var(--faint);font-family:var(--body);font-weight:600}
+.flag{color:var(--hi);font-weight:700}
+
+/* bottom sheet */
+.sheet{position:fixed;inset:0;z-index:50;display:grid;align-items:end;justify-items:center}
+.sheet .scrim{position:absolute;inset:0;background:var(--scrim);animation:fade .25s both}
+.sheet .panel{position:relative;width:min(640px,100%);max-height:92vh;overflow:auto;border-radius:26px 26px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom,0px));background:var(--glass-solid);animation:sheetUp .32s var(--ease) both}
+@media (min-width:700px){.sheet{align-items:center}.sheet .panel{border-radius:26px;max-height:86vh}}
+.sheet .grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:2px auto 10px}
+.sheet h3{font-size:28px;margin-bottom:2px}
+.sheet .sec{margin-top:16px}
+.sheet .sec > .lab{font-weight:700;font-size:14px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--display)}
+.sheet .x{position:absolute;right:12px;top:12px}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:0}}
+@keyframes fade{from{opacity:0}}
+input.field,select.field,textarea.field{width:100%;border:0;border-radius:14px;padding:12px 14px;background:var(--glass-lo);box-shadow:inset 0 0 0 1.5px var(--line);font-size:17px;min-height:48px}
+input.field:focus,select.field:focus,textarea.field:focus{box-shadow:inset 0 0 0 2px var(--acc);outline:0}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{width:56px;height:56px;border-radius:16px;border:0;font-size:28px;font-weight:700;background:var(--glass-lo);box-shadow:inset 0 0 0 1.5px var(--line)}
+.stepper input{width:110px;text-align:center;font-family:var(--display);font-weight:800;font-size:34px;border:0;background:transparent;font-variant-numeric:tabular-nums}
+.count{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.count:first-child{border-top:0}
+.count .n{font-weight:600}
+.count .e{color:var(--muted);font-size:14px}
+.count .in{display:flex;gap:6px;align-items:center}
+.count input{width:88px;text-align:center;border:0;border-radius:12px;padding:8px;background:var(--glass-lo);box-shadow:inset 0 0 0 1.5px var(--line);font-size:18px;font-weight:700;min-height:44px}
+.count input.set{box-shadow:inset 0 0 0 2px var(--acc)}
+.count .ok{min-width:44px;min-height:44px;border:0;border-radius:12px;background:var(--glass-lo);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:800}
+.count .ok[aria-pressed="true"]{background:var(--ok);color:#fff;box-shadow:none}
+.check{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:14px;background:var(--acc-soft);font-weight:600}
+.check input{width:24px;height:24px;accent-color:var(--acc);flex:none;margin:0}
+
+/* topdressing */
+.td-hero{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:720px){.td-hero{grid-template-columns:auto minmax(0,1fr);align-items:center}}
+.ring{position:relative;width:200px;height:200px;margin:0 auto}
+.ring svg{width:200px;height:200px;transform:rotate(-90deg)}
+.ring .bg{fill:none;stroke:var(--acc-soft);stroke-width:16}
+.ring .fg{fill:none;stroke:var(--acc);stroke-width:16;stroke-linecap:round;transition:stroke-dashoffset .8s var(--ease)}
+.ring .ct{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .big{font-family:var(--display);font-weight:800;font-size:72px;line-height:.9;font-variant-numeric:tabular-nums}
+.ring .of{font-family:var(--display);font-weight:700;font-size:18px;color:var(--muted)}
+.loadbtn{width:100%;min-height:92px;border:0;border-radius:24px;background:var(--acc);color:var(--acc-ink);font-family:var(--display);font-weight:800;font-size:30px;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 18px 34px -16px var(--acc);transition:transform .12s var(--ease)}
+.loadbtn:active{transform:scale(.97)}
+.loadbtn svg{width:34px;height:34px}
+.loadbtn small{display:block;font-size:16px;font-weight:700;opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--glass-lo);border-radius:16px;padding:10px 12px;box-shadow:inset 0 0 0 1px var(--line)}
+.stat .k{font-size:13px;color:var(--muted);font-weight:600}
+.stat .v{font-family:var(--display);font-weight:800;font-size:26px;font-variant-numeric:tabular-nums}
+.greens{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+@media (min-width:560px){.greens{grid-template-columns:repeat(10,minmax(0,1fr))}}
+.gbtn{min-height:46px;border:0;border-radius:12px;font-family:var(--display);font-weight:800;font-size:20px;background:var(--glass-lo);box-shadow:inset 0 0 0 1.5px var(--line)}
+.gbtn[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink);box-shadow:none}
+.loadlog{display:grid;gap:0;margin-top:6px}
+.loadlog div{display:flex;gap:10px;padding:7px 2px;border-top:1px solid var(--line);font-size:15px}
+.loadlog div:first-child{border-top:0}
+.loadlog b{font-family:var(--display);font-size:18px;min-width:64px}
+.loadlog .pend{color:var(--faint)}
+.call{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline}
+.call .big{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;color:var(--acc-deep)}
+.bars{display:grid;grid-template-columns:repeat(21,minmax(0,1fr));gap:3px;height:170px;align-items:end}
+.bc{display:grid;grid-template-rows:1fr 28px;height:100%;min-width:0}
+.bw{position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-height:0}
+.bw .b{width:100%;background:var(--acc);border-radius:5px 5px 2px 2px;min-height:0;transition:height .6s var(--ease)}
+.bw .bv{font-size:11px;font-weight:700;color:var(--acc-deep);margin-bottom:2px}
+.bw .cl{position:absolute;left:-1px;right:-1px;border-top:2px dashed var(--fg);opacity:.55}
+.bl{font-size:10.5px;line-height:1.1;color:var(--muted);text-align:center;padding-top:4px;white-space:nowrap}
+
+/* overlay with the old full pages (3D maps, history) */
+.full{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;grid-template-rows:auto 1fr}
+.full .bar{display:flex;align-items:center;gap:10px;padding:max(8px,env(safe-area-inset-top,0px)) 12px 8px;background:var(--glass-solid);box-shadow:var(--shadow)}
+.full .bar h3{font-size:22px;flex:1}
+.full iframe{border:0;width:100%;height:100%;background:#000}
+
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:70;border-radius:16px;padding:12px 18px;font-weight:600;max-width:min(92vw,520px);animation:sheetUp .3s var(--ease) both}
+.outbox{font-size:13.5px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.outbox i{width:9px;height:9px;border-radius:50%;background:var(--med)}
+.foot{color:var(--faint);font-size:13.5px;text-align:center;padding:10px 0 30px}
+.foot a{color:inherit}
+.alerts{display:grid;gap:0}
+.alert{display:flex;gap:10px;padding:8px 2px;border-top:1px solid var(--line);font-size:15px;align-items:baseline}
+.alert:first-child{border-top:0}
+.alert b{font-family:var(--display);font-size:18px;min-width:58px}
+.alert span{color:var(--muted);font-size:13.5px;margin-left:auto;white-space:nowrap}
+.seg{display:inline-flex;border-radius:16px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:12px;padding:8px 14px;font-family:var(--display);font-weight:700;font-size:17px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.seg button i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.seg button[aria-pressed="true"]{background:var(--c);color:#fff}
+.seg button[aria-pressed="true"] i{background:#fff}
+.note{font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body data-area="irrigation">
+<div class="sky" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="testbar" id="testbar" hidden>Test mode: actions go to Andy's DM and are marked as tests in Notion</div>
+<header class="top gut">
+  <div class="wrap">
+    <div class="topline">
+      <span class="eyebrow">Ranfurlie · Course ops</span>
+      <div class="row">
+        <button class="iconbtn" id="who" aria-label="Who's using this phone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></button>
+        <button class="iconbtn" id="theme" aria-label="Light or dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
+      </div>
+    </div>
+    <h1><span class="dot"></span><span id="title">Irrigation</span></h1>
+    <div class="facts" id="facts"></div>
+    <span class="outbox" id="outbox" hidden><i></i><span></span></span>
+  </div>
+</header>
+<nav class="tabs gut" aria-label="Areas"><div class="bar" id="tabs" role="tablist"></div></nav>
+<main class="gut"><div class="wrap" id="view"><div class="card"><p class="sub">Loading…</p></div></div></main>
+<div class="foot gut" id="foot"></div>
+<div class="sheet" id="sheet" hidden><div class="scrim" data-close></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div><button class="iconbtn x" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="sheetBody"></div></div></div>
+<div class="full" id="full" hidden><div class="bar"><button class="iconbtn" id="fullClose" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button><h3 id="fullTitle">3D map</h3><a class="btn small" id="fullOpen" target="_blank" rel="noopener">Open on its own</a></div><iframe id="fullFrame" title="Full dashboard" loading="lazy"></iframe></div>
+<div class="toast" id="toast" hidden role="status"></div>
+<script>
+"use strict";
+/* ------------------------------------------------------------------ config */
+const HOOK = "https://hooks.zapier.com/hooks/catch/18429017/R9IHP2aX1ajxyU3o/";
+const SLACK = "https://ranfurliegolfclub.slack.com/archives/";
+const CREW = ["Andy Anderson","Ben Hartley","Neil Harper","Kyle Craig","Nathan Drew","Nathan Ferguson","Brodie Macdonald","Nicholas Debrincat","Flynn Sinclair","James King","Joshua Cope","Mitch Mahoney","Samuel Cope","Tremayne Gallagher","Michael K"];
+const AREAS = {
+  irrigation:{label:"Irrigation",long:"",c:"#0a7fd0",data:"../irrigation/data.json",full:"../irrigation/",ch:"C06HV77DBQV",chName:"#irrigation",pfx:"IRR"},
+  drainage:{label:"Drainage",c:"#6a46f5",data:"../drainage/data.json",full:"../drainage/",ch:"C0B885SR474",chName:"#drainage",pfx:"DRN"},
+  bunkers:{label:"Bunkers",c:"#c27a06",data:"../bunkers/data.json",full:"../bunkers/",ch:"C06SNC8QM7T",chName:"#bunkers",pfx:"BNK"},
+  topdressing:{label:"Topdressing",c:"#dc5222",ch:"C0AMNEELZND",chName:"#topdressing"},
+  grounds:{label:"Grounds",c:"#169552",data:"../grounds/data.json",full:"../grounds/",pfx:""}
+};
+const ORDER = ["irrigation","drainage","bunkers","topdressing","grounds"];
+const GROUNDS = {amstel:{label:"Amstel",c:"#169552",ch:"C06G6PGEJ80",chName:"#amstelgrounds",area:"amstel"},clubhouse:{label:"Clubhouse",c:"#4b6fe0",ch:"C06FWKZN5BK",chName:"#ranfurlieclubhouse",area:"clubhouse"},sand:{label:"Sand counter",c:"#b5841a",ch:"C087R8YRB28",chName:"#sandcounter",area:"sand"}};
+const OPEN = ["Open","In progress","Waiting on parts","Waiting on materials"];
+const PR = {High:0,Medium:1,Low:2};
+const STD = {
+  irrigation:[["752 head",""],["751 head",""],["700 head",""],["900 head",""],["950 head",""],["952 head",""],["Case",""],["Drive case",""],["Green nozzle",""],["Nozzle",""],["Coil",""],["Solenoid",""],["Pilot valve",""],["Decoder",""],["Clip",""],["1 inch adapter",""],["ACME/BSP adapter",""],["DBR/Y connector",""],["Screw cap",""],["Heat shrink cap",""]],
+  drainage:[["Slotted pipe 100mm","m"],["Slotted pipe 50mm","m"],["PVC pipe 100mm","lengths"],["PVC pipe 90mm","lengths"],["Junction","each"],["Elbow","each"],["End cap","each"],["Pit/riser","each"],["Grate","each"],["Geofabric","m"],["Drainage rock","t"],["Drainage sand","t"],["PVC glue/primer","each"]],
+  bunkers:[["Medium top","t"],["Black sand","t"],["Bunker matting","rolls"],["Turf","m2"],["Ag pipe","m"],["Gravel","t"],["Sump pit","each"],["Pins/staples","bags"],["Wetting agent","each"]]
+};
+const TD_AREAS = ["Greens","Tees","Surrounds","Approaches","Fairways","Practice greens","Nursery","Other"];
+const SAND_UNITS = ["buckets","gator loads","t","trailer loads","bags"];
+const TEST = new URLSearchParams(location.search).get("test") === "1";
+
+/* ------------------------------------------------------------------ state */
+const S = {data:{}, live:null, tab:"irrigation", sub:"amstel", sel:{}, views:{}, tdKey:null, mapApi:{}};
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => Array.from(el.querySelectorAll(s));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const LS = {get(k,d){try{const v=localStorage.getItem("ops."+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ops."+k,JSON.stringify(v))}catch(e){}}};
+const fmt = n => n==null||isNaN(n) ? "?" : String(Math.round(n*100)/100);
+const uid = p => p+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7);
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function melYmd(d){return new Intl.DateTimeFormat("en-CA",{timeZone:"Australia/Melbourne",year:"numeric",month:"2-digit",day:"2-digit"}).format(d)}
+function melTime(d){return new Intl.DateTimeFormat("en-AU",{timeZone:"Australia/Melbourne",hour:"numeric",minute:"2-digit",hour12:true}).format(d).replace(/\s+/g,"").toLowerCase()}
+function dayLabel(ymd){if(!ymd)return"";const [y,m,d]=ymd.split("-").map(Number);const dt=new Date(Date.UTC(y,m-1,d,2));return new Intl.DateTimeFormat("en-AU",{weekday:"short",timeZone:"UTC"}).format(dt)+" "+d+" "+MON[m-1]}
+function shortDate(ymd){if(!ymd)return"";const [y,m,d]=ymd.slice(0,10).split("-").map(Number);return d+" "+MON[m-1]}
+function today(){return melYmd(new Date())}
+function daysAgo(ymd){if(!ymd)return null;const a=Date.parse(ymd.slice(0,10)+"T00:00:00Z"),b=Date.parse(today()+"T00:00:00Z");return Math.round((b-a)/86400000)}
+function ago(iso){const m=Math.round((Date.now()-Date.parse(iso))/60000);if(m<1)return"just now";if(m<60)return m+" min ago";const h=Math.round(m/60);if(h<24)return h+" h ago";return Math.round(h/24)+" d ago"}
+function genUtc(gen){ // data.json "generated" is Melbourne local time without an offset
+  if(!gen)return 0;const m=Number(gen.slice(5,7));const off=(m>=10||m<=3)?"+11:00":"+10:00";return Date.parse(gen+":00"+off)||0}
+function name(){return LS.get("name","")}
+
+/* ------------------------------------------------------------------ outbox: queued posts to the Zapier hook, kept until sent */
+function outbox(){return LS.get("outbox",[])}
+function setOutbox(a){LS.set("outbox",a);showOutbox()}
+function send(payload){
+  payload.sent_at=new Date().toISOString();
+  if(TEST){payload.__test="1";payload.__quiet="1"}
+  const a=outbox();a.push(payload);setOutbox(a);flush();
+}
+let flushing=false;
+function flush(){
+  if(flushing||!HOOK||HOOK.indexOf("hooks.zapier.com")<0)return;const a=outbox();if(!a.length)return;flushing=true;const item=a[0];
+  const body=new URLSearchParams();Object.keys(item).forEach(k=>{const v=item[k];body.append(k,v==null?"":(typeof v==="object"?JSON.stringify(v):String(v)))});
+  fetch(HOOK,{method:"POST",mode:"no-cors",body}).then(()=>{const b=outbox();b.shift();setOutbox(b);flushing=false;flush()},()=>{flushing=false;showOutbox()});
+}
+function showOutbox(){const n=outbox().length;const el=$("#outbox");el.hidden=!n;if(n)$("span",el).textContent=n+" waiting to send"}
+window.addEventListener("online",flush);setInterval(flush,15000);
+
+/* pending: what this phone has done that live.json doesn't show yet */
+function pending(){return LS.get("pending",[]).filter(p=>Date.now()-Date.parse(p.at)<3*3600000)}
+function addPending(p){const a=pending();a.push(p);LS.set("pending",a)}
+function prunePending(){
+  const L=S.live;if(!L)return;const ids=new Set((L.events||[]).map(e=>e.id));
+  const loads=new Set();const jobs=new Set();(L.td?.jobs||[]).forEach(j=>{jobs.add(j.key);(j.loads||[]).forEach(l=>loads.add(l.key))});
+  const keep=pending().filter(p=>{
+    if(p.kind==="td_start")return !jobs.has(p.key);
+    if(p.kind==="td_load")return !loads.has(p.load_key)&&!p.undone;
+    if(p.kind==="td_undo")return loads.has(p.load_key);
+    if(p.kind==="td_done"){const j=(L.td?.jobs||[]).find(x=>x.key===p.key);return !(j&&j.finished)}
+    if(p.kind==="td_greens"){return Date.parse(L.updated||0)<Date.parse(p.at)}
+    return !ids.has(p.id);
+  });
+  LS.set("pending",keep);
+}
+
+/* ------------------------------------------------------------------ data */
+async function getJSON(url){const r=await fetch(url+(url.includes("?")?"&":"?")+"v="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error(r.status);return r.json()}
+async function loadAll(){
+  const keys=["irrigation","drainage","bunkers","grounds"];
+  const res=await Promise.allSettled(keys.map(k=>getJSON(AREAS[k].data)));
+  res.forEach((r,i)=>{if(r.status==="fulfilled")S.data[keys[i]]=r.value});
+  await loadLive();
+}
+async function loadLive(){try{S.live=await getJSON("live.json")}catch(e){S.live=S.live||{events:[],td:{jobs:[],call:null},stock:{}}}prunePending()}
+
+/* ------------------------------------------------------------------ jobs, normalised across areas */
+function jobsOf(area){
+  const d=S.data[area];if(!d)return[];
+  if(area==="grounds")return (d.jobs||[]).map(j=>({ref:j.ref,ch:j.ch,title:j.title,status:j.status,prio:j.priority,where:j.place,reported:j.reported,done:j.done,url:j.card,by:j.by,doneBy:j.done_by,chips:[j.area].filter(Boolean)}));
+  const p=AREAS[area].pfx;
+  return (d.jobs||[]).map(j=>({id:j.id,ref:p+"-"+j.id,title:j.title,status:j.status,prio:j.prio,where:j.where||j.loc||(j.heads||""),hole:j.hole,reported:j.reported,done:j.done,url:j.url,by:j.by,doneBy:j.doneBy,note:j.note,age:j.age,bks:j.bks||[],work:j.work||j.faults||[],chips:(j.work||j.faults||[]).slice(0,3)}));
+}
+const isOpen=j=>OPEN.includes(j.status);
+function sortJobs(a){return a.slice().sort((x,y)=>(PR[x.prio]??3)-(PR[y.prio]??3)||String(x.reported||"").localeCompare(String(y.reported||"")))}
+
+/* ------------------------------------------------------------------ stock, normalised, with live counts laid over */
+function stockOf(area){
+  const d=S.data[area==="topdressing"||GROUNDS[area]?"grounds":area];const L=S.live||{};let items=[];
+  if(area==="irrigation")items=(d?.stock||[]).map(s=>({name:s.part,unit:"",on:s.onHand,last:s.last,flag:s.toOrder?"to order":s.ordered?"ordered":""}));
+  else if(area==="drainage"||area==="bunkers")items=(d?.stock||[]).map(s=>({name:s.mat,unit:s.unit||"",on:s.onHand,last:s.last,flag:s.toOrder?"to order":s.ordered?"ordered":""}));
+  else{const ch=area==="topdressing"?"sand":area;items=(d?.stock||[]).filter(s=>(s.ch||[]).includes(ch)&&!/setup test/i.test(s.item)).map(s=>({name:s.item,unit:s.unit||"",on:s.on_hand,last:s.counted||s.moved,sid:s.id,flag:s.low?"low":"",reorder:s.reorder}));
+    if(area==="topdressing"||area==="sand"){/* new sand rows made from this page */Object.entries(L.stock||{}).forEach(([n,v])=>{if(!items.some(i=>i.name===n))items.push({name:n,unit:v.unit||"",on:v.on_hand,last:(v.at||"").slice(0,10),sid:v.sid})})}}
+  const gen=genUtc(d?.generated);
+  // counts and deliveries made since the data was built
+  const evArea=area;
+  (L.events||[]).filter(e=>(e.kind==="stocktake"||e.kind==="stock_in")&&e.area===evArea&&(!e.test||TEST)&&Date.parse(e.at)>gen).forEach(e=>{
+    (e.items||[]).forEach(it=>{let i=items.find(x=>x.name.toLowerCase()===String(it.name).toLowerCase()&&(!x.unit||!it.unit||x.unit===it.unit));if(!i){i={name:it.name,unit:it.unit||"",on:null};items.push(i)}if(it.after!=null)i.on=it.after;i.last=e.at.slice(0,10);i.live=true})});
+  if(area==="topdressing"||GROUNDS[area]){Object.entries(L.stock||{}).forEach(([n,v])=>{const i=items.find(x=>x.name===n);if(i&&Date.parse(v.at)>gen){i.on=v.on_hand;i.live=true}})}
+  pending().filter(p=>(p.kind==="stocktake"||p.kind==="stock_in")&&p.area===evArea).forEach(p=>{(p.items||[]).forEach(it=>{let i=items.find(x=>x.name.toLowerCase()===it.name.toLowerCase());if(!i){i={name:it.name,unit:it.unit||"",on:null};items.push(i)}i.on=p.kind==="stocktake"?Number(it.counted):(i.on==null?Number(it.counted):i.on+Number(it.counted));i.pend=true})});
+  if(area==="topdressing")pending().filter(p=>p.kind==="td_load").forEach(p=>{const i=items.find(x=>x.name===p.sand);if(i&&i.on!=null&&!i.pend)i.on=Math.round((i.on-Number(p.t))*100)/100});
+  return items.sort((a,b)=>(a.on==null)-(b.on==null)||a.name.localeCompare(b.name));
+}
+
+/* ------------------------------------------------------------------ small svg helpers */
+function spark(vals,opt={}){if(!vals||!vals.length)return"";const w=120,h=26,max=Math.max(1,...vals);const bw=w/vals.length;
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${vals.map((v,i)=>`<rect x="${(i*bw+1).toFixed(1)}" y="${(h-(v/max)*(h-2)).toFixed(1)}" width="${Math.max(1,bw-2).toFixed(1)}" height="${((v/max)*(h-2)).toFixed(1)}" rx="1.5" fill="${opt.c||"var(--acc)"}" opacity="${i===vals.length-1?1:.55}"/>`).join("")}</svg>`}
+function meter(v,max){const p=Math.max(0,Math.min(1,max?v/max:0));return `<svg viewBox="0 0 120 26" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="9" width="120" height="8" rx="4" fill="var(--acc-soft)"/><rect x="0" y="9" width="${(120*p).toFixed(1)}" height="8" rx="4" fill="var(--acc)"/></svg>`}
+const ICON={
+  load:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  sand:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18c3-4 6-6 9-6s6 2 9 6"/><path d="M12 3v6M9 6l3 3 3-3"/></svg>',
+  count:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
+  truck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 6h11v10H2zM13 10h5l4 4v2h-9z"/><circle cx="6.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg>',
+  map3d:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/></svg>',
+  slack:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3v8M15 13v8M3 15h8M13 9h8"/></svg>',
+  flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 21V4l12 5-12 5"/></svg>',
+  undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>'
+};
+
+/* ------------------------------------------------------------------ the course map (shared by irrigation, drainage, bunkers, topdressing) */
+const ptsPath=p=>"M"+p.map(q=>q[0].toFixed(1)+" "+q[1].toFixed(1)).join("L")+"Z";
+let BASE=null;
+function baseLayers(){
+  if(BASE)return BASE;const d=S.data.bunkers||S.data.irrigation||S.data.drainage;if(!d)return null;
+  const order=["fairway","approach","tee","green"];const by={};(d.map||[]).forEach(m=>{if(order.includes(m.l))(by[m.l]=by[m.l]||[]).push(m)});
+  const svg=order.map(l=>(by[l]||[]).map(m=>`<path class="p-${l}" d="${ptsPath(m.p)}"/>`).join("")).join("");
+  BASE={svg,bounds:d.bounds||[0,0,960,680],holes:d.holes||{},greens:by.green||[]};return BASE;
+}
+function holeLabels(B){return Object.entries(B.holes).map(([h,v])=>`<text class="hn" x="${v.g[0].toFixed(1)}" y="${(v.g[1]-16).toFixed(1)}" font-size="15">${h}</text>`).join("")}
+function mapCard(area,inner,opts={}){
+  const B=baseLayers();if(!B)return"";const [x0,y0,x1,y1]=B.bounds;const v=S.views[area]||[x0,y0,x1-x0,y1-y0];
+  const holes=Object.keys(B.holes).sort((a,b)=>a-b);
+  const bk=area!=="bunkers"&&S.data.bunkers?(S.data.bunkers.bunkers||[]).map(b=>`<path class="p-bunker" d="${(b.p||[]).map(r=>ptsPath(r)).join("")}"/>`).join(""):"";
+  return `<div class="mapbar"><select aria-label="Zoom to a hole" data-hole="${area}"><option value="">Whole course</option>${holes.map(h=>`<option value="${h}">Hole ${h}</option>`).join("")}</select>${opts.bar||""}</div>
+  <div class="map" id="map-${area}"><svg viewBox="${v.join(" ")}" data-area="${area}" xmlns="http://www.w3.org/2000/svg"><rect x="${x0-200}" y="${y0-200}" width="${x1-x0+400}" height="${y1-y0+400}" fill="var(--turf)"/>${B.svg}${bk}${opts.under||""}${holeLabels(B)}${inner}</svg>
+  <div class="ctl"><button data-z="in" aria-label="Zoom in">+</button><button data-z="out" aria-label="Zoom out">−</button><button data-z="all" aria-label="Whole course">⤢</button></div>${opts.hint?`<div class="hint">${opts.hint}</div>`:""}</div>${opts.legend?`<div class="lg">${opts.legend}</div>`:""}`;
+}
+function wireMap(area,onTap){
+  const box=$("#map-"+area);if(!box)return;const svg=$("svg",box);const B=baseLayers();const [x0,y0,x1,y1]=B.bounds;const full=[x0,y0,x1-x0,y1-y0];
+  let v=(S.views[area]||full).slice();
+  const apply=()=>{svg.setAttribute("viewBox",v.map(n=>n.toFixed(1)).join(" "));S.views[area]=v.slice();const z=full[2]/v[2];svg.dataset.z=z>1.6?"2":"1";
+    const k=v[2]/full[2];$$(".pin",svg).forEach(c=>c.setAttribute("r",(Number(c.dataset.r||7)*Math.max(.35,k)).toFixed(2)));$$(".bn",svg).forEach(t=>t.setAttribute("font-size",(11*Math.max(.3,k)).toFixed(2)));$$(".pit",svg).forEach(c=>c.setAttribute("r",(3*Math.max(.4,k)).toFixed(2)))};
+  const clamp=()=>{v[2]=Math.min(full[2]*1.05,Math.max(full[2]/12,v[2]));v[3]=v[2]*full[3]/full[2];v[0]=Math.min(x1-v[2]*.3,Math.max(x0-v[2]*.7,v[0]));v[1]=Math.min(y1-v[3]*.3,Math.max(y0-v[3]*.7,v[1]))};
+  const zoomAt=(f,cx,cy)=>{const nw=v[2]*f,nh=v[3]*f;v=[cx-(cx-v[0])*f,cy-(cy-v[1])*f,nw,nh];clamp();apply()};
+  const toSvg=(clientX,clientY)=>{const r=svg.getBoundingClientRect();return[v[0]+(clientX-r.left)/r.width*v[2],v[1]+(clientY-r.top)/r.height*v[3]]};
+  apply();
+  S.mapApi[area]={set(nv){v=nv.slice();clamp();apply()}};
+  $$(".ctl button",box).forEach(b=>b.onclick=e=>{e.stopPropagation();const z=b.dataset.z;if(z==="all"){v=full.slice();apply();const s=$(`select[data-hole="${area}"]`);if(s)s.value="";return}zoomAt(z==="in"?.6:1/.6,v[0]+v[2]/2,v[1]+v[3]/2)});
+  const sel=$(`select[data-hole="${area}"]`);if(sel)sel.onchange=()=>{const h=B.holes[sel.value];if(!h){v=full.slice();apply();return}
+    const xs=[h.g[0],h.t[0]],ys=[h.g[1],h.t[1]];const pad=60;let bx0=Math.min(...xs)-pad,bx1=Math.max(...xs)+pad,by0=Math.min(...ys)-pad,by1=Math.max(...ys)+pad;
+    if(opts_greenFocus[area]){bx0=h.g[0]-70;bx1=h.g[0]+70;by0=h.g[1]-50;by1=h.g[1]+50}
+    let w=bx1-bx0,hh=by1-by0;const ar=full[2]/full[3];if(w/hh<ar){w=hh*ar}else{hh=w/ar}v=[(bx0+bx1)/2-w/2,(by0+by1)/2-hh/2,w,hh];clamp();apply()};
+  box.addEventListener("wheel",e=>{e.preventDefault();const [cx,cy]=toSvg(e.clientX,e.clientY);zoomAt(e.deltaY>0?1.15:1/1.15,cx,cy)},{passive:false});
+  const pts=new Map();let moved=false,start=null,pinch=null,lastTap=0;
+  box.addEventListener("pointerdown",e=>{if(e.target.closest(".ctl"))return;box.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=false;start={x:e.clientX,y:e.clientY,v:v.slice(),target:e.target};
+    if(pts.size===2){const [a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),v:v.slice(),c:toSvg((a[0]+b[0])/2,(a[1]+b[1])/2)}}});
+  box.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2&&pinch){const [a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);const f=pinch.d/d;v=pinch.v.slice();const [cx,cy]=pinch.c;v=[cx-(cx-v[0])*f,cy-(cy-v[1])*f,v[2]*f,v[3]*f];clamp();apply();moved=true;return}
+    if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;if(!moved)return;const r=svg.getBoundingClientRect();v=[start.v[0]-dx/r.width*v[2],start.v[1]-dy/r.height*v[3],v[2],v[3]];clamp();apply()});
+  const up=e=>{const had=pts.has(e.pointerId);pts.delete(e.pointerId);if(pts.size<2)pinch=null;if(!had)return;
+    if(!moved&&start&&pts.size===0){const now=Date.now();const t=document.elementFromPoint(e.clientX,e.clientY);const hit=t&&t.closest("[data-tap]");
+      if(hit&&onTap){onTap(hit.dataset.tap,hit)}else if(now-lastTap<320){const [cx,cy]=toSvg(e.clientX,e.clientY);zoomAt(.5,cx,cy)}lastTap=now}
+    if(pts.size===0)start=null};
+  box.addEventListener("pointerup",up);box.addEventListener("pointercancel",up);
+}
+const opts_greenFocus={topdressing:true};
+
+/* ------------------------------------------------------------------ shared cards */
+function kpiTiles(tiles){return `<div class="kpis">${tiles.map(t=>`<div class="tile ${t.cls||""}"><div class="k">${t.k}</div><div class="v num">${t.v}${t.u?`<small>${t.u}</small>`:""}</div><div class="viz">${t.viz||""}</div></div>`).join("")}</div>`}
+function jobRow(j,area){
+  const age=daysAgo(j.reported);const meta=[j.where?esc(j.where):"",j.status!=="Open"?`<span class="tag st">${esc(j.status)}</span>`:"",age!=null?(age===0?"today":age+"d"):"",(j.chips||[]).map(c=>esc(c)).join(" · ")].filter(Boolean).join(" · ");
+  return `<div class="job${S.sel[area]===j.ref?" sel":""}" data-job="${esc(j.ref)}"><span class="pd ${esc(j.prio)}"></span><div class="t">${esc(j.title)} <span class="note">${esc(j.ref)}</span></div>${j.url?`<a class="go" href="${esc(j.url)}" target="_blank" rel="noopener">Card</a>`:"<span></span>"}<div class="m">${meta}</div></div>`}
+function jobsCard(area,jobs,opts={}){
+  const open=sortJobs(jobs.filter(isOpen));const conf=jobs.filter(j=>j.status==="Needs confirming");const done=jobs.filter(j=>j.status==="Done"&&daysAgo(j.done)!=null&&daysAgo(j.done)<=14).sort((a,b)=>String(b.done).localeCompare(String(a.done)));
+  return `<div class="card in"><div class="head"><h2>Open jobs <span class="count">${open.length}</span></h2>${opts.ch?`<a class="btn small ghost" href="${SLACK+opts.ch}" target="_blank" rel="noopener">${ICON.slack}${esc(opts.chName)}</a>`:""}</div>
+  <div class="jobs">${open.length?open.slice(0,10).map(j=>jobRow(j,area)).join(""):`<div class="empty">Nothing open. Post jobs in ${esc(opts.chName||"the channel")} and they show up here.</div>`}</div>
+  ${open.length>10?`<details class="more"><summary>Show all ${open.length} open jobs</summary><div class="jobs">${open.slice(10).map(j=>jobRow(j,area)).join("")}</div></details>`:""}
+  ${conf.length?`<details class="more"><summary>Old reports to check (${conf.length})</summary><div class="jobs">${conf.map(j=>jobRow(j,area)).join("")}</div></details>`:""}
+  ${done.length?`<details class="more"><summary>Done in the last 2 weeks (${done.length})</summary><div class="jobs">${done.map(j=>jobRow(j,area)).join("")}</div></details>`:""}</div>`}
+function stockCard(area,opts={}){
+  const items=stockOf(area);const label=opts.title||"Stock";
+  return `<div class="card in"><div class="head"><h2>${esc(label)}</h2><div class="row"><button class="btn small" data-act="delivery" data-area="${area}">${ICON.truck}Delivery</button><button class="btn small primary" data-act="stocktake" data-area="${area}">${ICON.count}Stocktake</button></div></div>
+  ${items.length?`<div class="stock">${items.filter(i=>i.on!=null||i.pend).map(i=>siRow(i)).join("")||'<div class="empty">Nothing counted yet. A stocktake starts the count.</div>'}</div>${items.some(i=>i.on==null&&!i.pend)?`<details class="more"><summary>Not counted yet (${items.filter(i=>i.on==null&&!i.pend).length})</summary><div class="stock">${items.filter(i=>i.on==null&&!i.pend).map(i=>siRow(i)).join("")}</div></details>`:""}`:`<div class="empty">Nothing counted yet. Do a stocktake to start the count.</div>`}
+  <p class="note">${opts.note||"Counts set what's on hand. Use since the count comes off as jobs are closed in Slack."}</p></div>`}
+function siRow(i){return `<div class="si"><div class="n">${esc(i.name)}${i.flag?` <span class="flag">· ${esc(i.flag)}</span>`:""}</div><div class="q num${i.on==null?" unk":""}">${i.on==null?"not counted":fmt(i.on)+(i.unit?`<small>${esc(i.unit)}</small>`:"")}</div>${i.last||i.pend?`<div class="d">${i.pend?"sending…":(i.live?"counted ":"last move ")+shortDate(i.last)}</div>`:""}</div>`}
+function fullBtn(area,label){return AREAS[area].full?`<button class="btn small ghost" data-act="full" data-area="${area}">${ICON.map3d}${label||"3D map & history"}</button>`:""}
+
+/* ------------------------------------------------------------------ IRRIGATION */
+function viewIrrigation(){
+  const d=S.data.irrigation;if(!d)return noData("irrigation");const jobs=jobsOf("irrigation");const open=jobs.filter(isOpen);
+  const flow=(d.flow||[]).map(f=>f.reported);const fixed30=jobs.filter(j=>j.status==="Done"&&daysAgo(j.done)!=null&&daysAgo(j.done)<=30).length;
+  const wait=open.filter(j=>/Waiting/.test(j.status)).length;const hi=open.filter(j=>j.prio==="High").length;
+  const pins=(d.pins||[]).map(p=>({p,j:jobs.find(j=>j.id===p.job)})).filter(x=>x.j&&isOpen(x.j));
+  const inner=pins.map(({p,j})=>`<circle class="pin ${esc(j.prio)}${S.sel.irrigation===j.ref?" sel":""}" cx="${p.x}" cy="${p.y}" r="7" data-r="7" data-tap="${esc(j.ref)}"><title>${esc(j.ref+" "+j.title)}</title></circle>`).join("");
+  const alerts=(d.alerts||[]).slice(0,10);
+  return `${kpiTiles([{k:"Open jobs",v:open.length,viz:spark(flow),cls:"acc"},{k:"High priority",v:hi,viz:meter(hi,Math.max(open.length,1)),cls:hi?"hi":""},{k:"Waiting on parts",v:wait,viz:meter(wait,Math.max(open.length,1))},{k:"Fixed, 30 days",v:fixed30,viz:spark((d.flow||[]).map(f=>f.fixed),{c:"var(--ok)"})}])}
+  <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Where the jobs are</h2>${fullBtn("irrigation")}</div>${mapCard("irrigation",inner,{hint:"Tap a pin",legend:'<span><i style="background:var(--hi)"></i>High</span><span><i style="background:var(--med)"></i>Medium</span><span><i style="background:var(--lo)"></i>Low</span>'})}<div id="pick-irrigation"></div></div>
+  ${alerts.length?`<div class="card in"><div class="head"><h2>Cirrus alarms</h2><span class="sub">last 14 days</span></div><div class="alerts">${alerts.map(a=>`<div class="alert"><b>${esc(a.station)}</b><div>${esc(a.text)}${a.job?` · <a href="#" data-pickjob="IRR-${a.job}">IRR-${a.job}</a>`:""}</div><span>${shortDate(a.at)} ${esc(a.at.slice(11,16))}</span></div>`).join("")}</div></div>`:""}</div>
+  <div class="stack">${jobsCard("irrigation",jobs,{ch:AREAS.irrigation.ch,chName:"#irrigation"})}${stockCard("irrigation",{title:"Parts on hand"})}</div></div>`}
+
+/* ------------------------------------------------------------------ DRAINAGE */
+function viewDrainage(){
+  const d=S.data.drainage;if(!d)return noData("drainage");const jobs=jobsOf("drainage");const open=jobs.filter(isOpen);const n=d.net||{};
+  const hi=open.filter(j=>j.prio==="High").length;const fixed30=jobs.filter(j=>j.status==="Done"&&daysAgo(j.done)!=null&&daysAgo(j.done)<=30).length;
+  const under=(n.ag||[]).map(a=>(a.lines||[]).map(l=>`<path class="agl" d="M${l.map(q=>q.join(" ")).join("L")}"/>`).join("")).join("")+(n.pipes||[]).map(p=>`<path class="pipe" d="M${p.pts.map(q=>q.join(" ")).join("L")}"/>`).join("")+(n.pits||[]).map(p=>`<circle class="pit" cx="${p.x}" cy="${p.y}" r="3"><title>${esc(p.label)}</title></circle>`).join("")+(n.ponds||[]).map(p=>`<circle class="pond" cx="${p.x}" cy="${p.y}" r="9"><title>${esc(p.label)}</title></circle>`).join("");
+  const pins=(d.pins||[]).map(p=>({p,j:jobs.find(j=>j.id===p.job)})).filter(x=>x.j&&isOpen(x.j));
+  const inner=pins.map(({p,j})=>`<circle class="pin ${esc(j.prio)}${S.sel.drainage===j.ref?" sel":""}" cx="${p.x}" cy="${p.y}" r="7" data-r="7" data-tap="${esc(j.ref)}"><title>${esc(j.ref+" "+j.title)}</title></circle>`).join("");
+  return `${kpiTiles([{k:"Open jobs",v:open.length,viz:spark((d.flow||[]).map(f=>f.reported)),cls:"acc"},{k:"High priority",v:hi,viz:meter(hi,Math.max(open.length,1)),cls:hi?"hi":""},{k:"Pits mapped",v:(n.pits||[]).length,viz:meter((n.pits||[]).length,40)},{k:"Fixed, 30 days",v:fixed30,viz:spark((d.flow||[]).map(f=>f.fixed),{c:"var(--ok)"})}])}
+  <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Jobs and drains</h2>${fullBtn("drainage","3D underground & history")}</div>${mapCard("drainage",inner,{under,hint:"Tap a pin",legend:'<span><i style="background:var(--pipe)"></i>Pipes</span><span><i style="background:var(--ag)"></i>Ag drains</span><span><i style="background:var(--pit)"></i>Pits</span><span><i style="background:var(--hi)"></i>Job</span>'})}<div id="pick-drainage"></div><p class="note">Drain lines are placed from the Landmark and Farm Works sheets, so positions are approximate.</p></div></div>
+  <div class="stack">${jobsCard("drainage",jobs,{ch:AREAS.drainage.ch,chName:"#drainage"})}${stockCard("drainage",{title:"Drainage materials"})}</div></div>`}
+
+/* ------------------------------------------------------------------ BUNKERS (tap a bunker, add sand) */
+function sandEvents(){const L=S.live||{};const ev=(L.events||[]).filter(e=>e.kind==="sand"&&(!e.test||TEST)).map(e=>({bunker:e.bunker,qty:e.qty,unit:e.unit,material:e.material,by:e.by,at:e.at}));
+  pending().filter(p=>p.kind==="sand").forEach(p=>ev.push({bunker:Number(p.bunker),qty:Number(p.qty),unit:p.unit,material:p.material,by:p.by,at:p.at,pend:true}));
+  const d=S.data.bunkers;(d?.moves||[]).filter(m=>m.move==="Used"&&(m.bks||[]).length).forEach(m=>m.bks.forEach(b=>{if(!ev.some(e=>e.bunker===b&&e.at.slice(0,10)===m.date))ev.push({bunker:b,qty:m.qty,unit:m.unit,material:m.mat,by:m.by,at:m.date+"T00:00:00Z",old:true})}));
+  return ev.sort((a,b)=>b.at.localeCompare(a.at))}
+function viewBunkers(){
+  const d=S.data.bunkers;if(!d)return noData("bunkers");const jobs=jobsOf("bunkers");const open=jobs.filter(isOpen);const sev=sandEvents();
+  const lastSand={};sev.forEach(e=>{if(!lastSand[e.bunker])lastSand[e.bunker]=e});
+  const jobB={};open.forEach(j=>(j.bks||[]).forEach(b=>(jobB[b]=jobB[b]||[]).push(j)));
+  const recent=Object.values(lastSand).filter(e=>daysAgo(e.at.slice(0,10))<=14).length;
+  const inner=(d.bunkers||[]).map(b=>{const rings=b.p||[];const path=rings.map(r=>ptsPath(r)).join("");const cls=["bk",lastSand[b.n]&&daysAgo(lastSand[b.n].at.slice(0,10))<=14?"recent":"",jobB[b.n]?"job":"",S.sel.bunkers==="B"+b.n?"sel":""].join(" ");
+    return `<g data-tap="B${b.n}"><path class="${cls}" d="${path}"/><path class="bkhit" d="${path}"/><text class="bn" x="${b.c[0]}" y="${b.c[1]}" font-size="11">${b.n}</text></g>`}).join("");
+  const sandToday=sev.filter(e=>e.at.slice(0,10)===today()||(e.at&&melYmd(new Date(e.at))===today()));
+  return `${kpiTiles([{k:"Open jobs",v:open.length,viz:spark((d.flow||[]).map(f=>f.reported)),cls:"acc"},{k:"Sanded, 14 days",v:recent,u:"bunkers",viz:meter(recent,(d.bunkers||[]).length)},{k:"Sand added today",v:sandToday.length,u:sandToday.length===1?"bunker":"bunkers",viz:""},{k:"Bunkers mapped",v:(d.bunkers||[]).length,viz:""}])}
+  <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Tap a bunker to add sand</h2>${fullBtn("bunkers")}</div>
+  ${mapCard("bunkers",inner,{hint:"Pick a hole, then tap the bunker",legend:'<span><i style="background:color-mix(in srgb,var(--acc) 55%,var(--sand))"></i>Sanded in the last 14 days</span><span><i style="background:transparent;box-shadow:inset 0 0 0 2px var(--hi)"></i>Open job</span>'})}
+  <div class="sec" style="margin-top:12px"><div class="eyebrow" style="margin-bottom:6px">Or pick from the list</div><div class="chips" id="bkHoles">${Object.keys(baseLayers().holes).sort((a,b)=>a-b).map(h=>`<button class="chip sm" data-bkhole="${h}">${h}</button>`).join("")}</div><div class="chips" id="bkList" style="margin-top:8px"></div></div></div>
+  ${sev.length?`<div class="card in"><div class="head"><h2>Sand added</h2><span class="sub">latest first</span></div><div class="alerts">${sev.slice(0,12).map(e=>{const b=(d.bunkers||[]).find(x=>x.n===e.bunker);return `<div class="alert"><b>${e.bunker}</b><div>${b?esc(holeName(b.h)+" "+b.d)+" · ":""}${fmt(e.qty)} ${esc(e.unit||"")} ${esc(e.material||"")}${e.by?" · "+esc(e.by):""}${e.pend?" · sending…":""}</div><span>${e.old?shortDate(e.at):shortDate(melYmd(new Date(e.at)))+" "+melTime(new Date(e.at))}</span></div>`}).join("")}</div></div>`:""}</div>
+  <div class="stack">${jobsCard("bunkers",jobs,{ch:AREAS.bunkers.ch,chName:"#bunkers"})}${stockCard("bunkers",{title:"Bunker sand & materials"})}</div></div>`}
+function holeName(h){const n=Number(h);const s=["th","st","nd","rd"];const v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+function bunkerSheet(n){
+  const d=S.data.bunkers;const b=(d.bunkers||[]).find(x=>x.n===n);if(!b)return;S.sel.bunkers="B"+n;
+  const jobs=jobsOf("bunkers").filter(j=>isOpen(j)&&(j.bks||[]).includes(n));const last=sandEvents().find(e=>e.bunker===n);
+  const topJob=jobs.find(j=>(j.work||[]).includes("Sand top-up"))||null;
+  const st=LS.get("sandPrefs",{material:"Medium top",unit:"buckets",qty:2});
+  openSheet(`<span class="eyebrow">Bunker ${n}</span><h3>${esc(holeName(b.h))} ${esc(b.d)}</h3>
+  <div class="row" style="margin-top:6px;gap:6px">${b.cond?`<span class="tag st">Condition ${b.cond}/5</span>`:""}${b.area?`<span class="tag st">${Math.round(b.area)} m²</span>`:""}${last?`<span class="tag ok">Last sand ${last.old?shortDate(last.at):ago(last.at)}: ${fmt(last.qty)} ${esc(last.unit||"")}</span>`:""}</div>
+  ${jobs.length?`<div class="sec"><div class="lab">Open jobs here</div>${jobs.map(j=>`<div class="row" style="justify-content:space-between;padding:4px 0"><span><span class="tag ${esc(j.prio)}">${esc(j.ref)}</span> ${esc(j.title)}</span>${j.url?`<a class="go btn small ghost" href="${esc(j.url)}" target="_blank" rel="noopener">Card</a>`:""}</div>`).join("")}</div>`:""}
+  <div class="sec"><div class="lab">Sand</div><div class="chips" data-pick="material">${["Medium top","Black sand"].map(m=>`<button class="chip" aria-pressed="${st.material===m}" data-v="${m}">${m}</button>`).join("")}<button class="chip" data-v="__other" aria-pressed="${!["Medium top","Black sand"].includes(st.material)}">Other</button></div><input class="field" id="sandOther" placeholder="What sand?" style="margin-top:8px" ${["Medium top","Black sand"].includes(st.material)?"hidden":""} value="${["Medium top","Black sand"].includes(st.material)?"":esc(st.material)}"></div>
+  <div class="sec"><div class="lab">How much</div><div class="stepper"><button data-step="-1" aria-label="Less">−</button><input id="sandQty" inputmode="decimal" value="${st.qty}" aria-label="Amount"><button data-step="1" aria-label="More">+</button></div>
+  <div class="chips" data-pick="unit" style="margin-top:10px">${SAND_UNITS.map(u=>`<button class="chip" aria-pressed="${st.unit===u}" data-v="${u}">${u}</button>`).join("")}</div></div>
+  ${topJob?`<label class="check sec"><input type="checkbox" id="sandClose"> Close ${esc(topJob.ref)} (${esc(topJob.title)})</label>`:""}
+  <div class="sec">${whoField()}</div>
+  <div class="sec"><button class="btn primary wide" id="sandGo" style="min-height:58px;font-size:20px">${ICON.sand}Add sand to bunker ${n}</button></div>`,()=>{
+    const pick=(name,v)=>{st[name]=v};
+    $$("[data-pick]").forEach(g=>g.onclick=e=>{const c=e.target.closest(".chip");if(!c)return;$$(".chip",g).forEach(x=>x.setAttribute("aria-pressed",x===c));if(g.dataset.pick==="material"){$("#sandOther").hidden=c.dataset.v!=="__other";if(c.dataset.v!=="__other")pick("material",c.dataset.v)}else pick(g.dataset.pick,c.dataset.v)});
+    $$("[data-step]").forEach(bt=>bt.onclick=()=>{const i=$("#sandQty");const v=Math.max(0,(parseFloat(i.value)||0)+Number(bt.dataset.step));i.value=v});
+    wireWho();
+    $("#sandGo").onclick=()=>{const who=readWho();if(!who)return;const other=$("#sandOther");const material=!other.hidden?other.value.trim():st.material;const qty=parseFloat($("#sandQty").value);
+      if(!material){toast("Say what sand");return}if(!(qty>0)){toast("How much sand?");return}
+      LS.set("sandPrefs",{material,unit:st.unit,qty});const close=$("#sandClose")?.checked;
+      const p={kind:"sand",id:uid("sand"),bunker:n,hole:b.h,desc:holeName(b.h)+" "+b.d,material,qty,unit:st.unit,by:who,close:close?"1":"",job:topJob&&close?topJob.id:(jobs[0]?.id||"")};
+      send({...p});addPending({...p,at:new Date().toISOString()});closeSheet();toast(`Sand added to bunker ${n}. It's in #bunkers.`);render()};
+  });
+}
+
+/* ------------------------------------------------------------------ TOPDRESSING */
+function tdJobs(){
+  const L=S.live||{};let jobs=(L.td?.jobs||[]).map(j=>({...j,loads:(j.loads||[]).slice(),greens:(j.greens||[]).slice()})).filter(j=>TEST||!(j.test||j.status==="Test"));
+  const pend=pending();
+  pend.filter(p=>p.kind==="td_start").forEach(p=>{if(!jobs.some(j=>j.key===p.key))jobs.push({key:p.key,id:"TD",date:p.at?melYmd(new Date(p.at)):today(),area:p.area,holes:p.holes,sand:p.sand,load_t:Number(p.load_t),status:"In progress",started:p.at,by:p.by,loads:[],greens:[],pend:true})});
+  pend.filter(p=>p.kind==="td_load"&&!p.undone).forEach(p=>{const j=jobs.find(x=>x.key===p.key);if(j&&!j.loads.some(l=>l.key===p.load_key))j.loads.push({key:p.load_key,at:p.at,by:p.by,t:Number(p.t),pend:true})});
+  pend.filter(p=>p.kind==="td_undo").forEach(p=>{const j=jobs.find(x=>x.key===p.key);if(j)j.loads=j.loads.filter(l=>l.key!==p.load_key)});
+  pend.filter(p=>p.kind==="td_greens").forEach(p=>{const j=jobs.find(x=>x.key===p.key);if(j)j.greens=JSON.parse(p.greens||"[]")});
+  pend.filter(p=>p.kind==="td_done").forEach(p=>{const j=jobs.find(x=>x.key===p.key);if(j){j.status="Done";j.finished=p.at;j.done_by=p.by;j.pendDone=true}});
+  jobs.forEach(j=>{j.loads.sort((a,b)=>a.at.localeCompare(b.at));j.t=Math.round(j.loads.reduce((a,l)=>a+(Number(l.t)||0),0)*100)/100});
+  return jobs.sort((a,b)=>String(b.started).localeCompare(String(a.started)));
+}
+function viewTopdressing(){
+  const jobs=tdJobs();const L=S.live||{};const call=L.td?.call&&L.td.call.date===today()?L.td.call:null;
+  const active=jobs.filter(j=>j.status==="In progress");if(!active.find(j=>j.key===S.tdKey))S.tdKey=active[0]?.key||null;const job=active.find(j=>j.key===S.tdKey);
+  const done=jobs.filter(j=>j.status==="Done");const t7=done.concat(active).filter(j=>daysAgo(j.date)!=null&&daysAgo(j.date)<7).reduce((a,j)=>a+j.t,0);const t30=done.concat(active).filter(j=>daysAgo(j.date)!=null&&daysAgo(j.date)<30).reduce((a,j)=>a+j.t,0);
+  const sand=stockOf("topdressing");const main=sand.find(s=>/kiln/i.test(s.name))||sand[0];
+  // last 21 days, tonnes a day
+  const days=[];for(let i=20;i>=0;i--){const dt=new Date(Date.now()-i*86400000);days.push(melYmd(dt))}
+  const perDay=days.map(d=>jobs.filter(j=>j.date===d).reduce((a,j)=>a+j.t,0));const callDay=days.map(d=>{const j=jobs.find(x=>x.date===d&&x.call&&x.call.t);return j?j.call.t:(call&&d===today()?call.t:null)});
+  const tiles=kpiTiles([{k:"Today's call",v:call&&call.loads?call.loads:"–",u:call&&call.loads?"loads":"",viz:call?`<div class="note" style="line-height:26px">${call.mm?call.mm+" mm":""}${call.t?" · ~"+call.t+" t":""}</div>`:"",cls:"acc"},{k:"Last 7 days",v:fmt(t7),u:"t",viz:spark(perDay.slice(-7))},{k:"Last 30 days",v:fmt(t30),u:"t",viz:spark(perDay)},{k:main?main.name:"Sand on hand",v:main&&main.on!=null?fmt(main.on):"–",u:main&&main.on!=null?main.unit:"",viz:main&&main.on!=null?meter(main.on,Math.max(main.on,20)):`<div class="note" style="line-height:26px">count it below</div>`}]);
+  return `${tiles}${active.length>1?`<div class="seg" style="justify-self:start">${active.map(j=>`<button aria-pressed="${j.key===S.tdKey}" data-tdkey="${j.key}" style="--c:var(--acc)">${esc(j.id&&j.id!=="TD"?j.id:"New")} ${esc(j.area)}</button>`).join("")}</div>`:""}
+  ${job?tdActive(job,call):tdStart(call)}
+  <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Tonnes a day</h2><span class="sub">last 3 weeks · dashes are the sand call</span></div>${barChart(days,perDay,callDay)}</div>
+  <div class="card in"><div class="head"><h2>Jobs</h2>${AREAS.topdressing.ch?`<a class="btn small ghost" href="${SLACK+AREAS.topdressing.ch}" target="_blank" rel="noopener">${ICON.slack}#topdressing</a>`:""}</div>${jobs.length?`<div class="jobs">${jobs.slice(0,30).map(j=>`<div class="job"><span class="pd" style="background:${j.status==="Done"?"var(--ok)":"var(--acc)"}"></span><div class="t">${esc(j.area)}${j.holes?" "+esc(j.holes):""} · ${(j.loads||[]).length} load${(j.loads||[]).length===1?"":"s"}, ${fmt(j.t)} t <span class="note">${esc(j.id&&j.id!=="TD"?j.id:"")}</span></div>${j.card?`<a class="go" href="${esc(j.card)}" target="_blank" rel="noopener">Thread</a>`:"<span></span>"}<div class="m">${esc(dayLabel(j.date))} · ${esc(j.sand||"")} · ${esc(j.done_by||j.by||"")}${j.call&&j.call.loads?` · call ~${j.call.loads}`:""}${j.status!=="Done"?` · <span class="tag st">${esc(j.status)}</span>`:""}</div></div>`).join("")}</div>`:`<div class="empty">No topdressing logged yet. Start one above.</div>`}</div></div>
+  <div class="stack">${stockCard("topdressing",{title:"Sand on hand",note:"Each Turfco load comes off the sand it was filled with. A stocktake or a delivery sets it straight."})}</div></div>`}
+function barChart(days,vals,calls){const max=Math.max(1,...vals,...calls.filter(x=>x!=null));
+  return `<div class="bars" role="img" aria-label="Tonnes of sand per day, last three weeks">${days.map((d,i)=>{const v=vals[i],c=calls[i];return `<div class="bc"><div class="bw">${v?`<span class="bv">${fmt(v)}</span>`:""}<div class="b" style="height:${(v/max*100).toFixed(1)}%"></div>${c!=null?`<div class="cl" style="bottom:${(c/max*100).toFixed(1)}%"></div>`:""}</div><div class="bl">${i%4===0||i===days.length-1?shortDate(d).replace(" ","<br>"):""}</div></div>`}).join("")}</div>`}
+function tdStart(call){
+  const st=LS.get("tdPrefs",{area:"Greens",holes:"1-18",sand:"Kiln-dried sand",load_t:1});const sands=stockOf("topdressing").map(s=>s.name);if(!sands.includes("Kiln-dried sand"))sands.unshift("Kiln-dried sand");
+  return `<div class="card in"><div class="head"><h2>Start topdressing</h2>${call&&call.loads?`<span class="tag st">Today's call ~${call.loads} loads${call.mm?" · "+call.mm+" mm":""}</span>`:""}</div>
+  <div class="grid2" style="gap:14px"><div class="stack" style="gap:12px">
+   <div><div class="eyebrow" style="margin-bottom:6px">Where</div><div class="chips" data-td="area">${TD_AREAS.map(a=>`<button class="chip" aria-pressed="${st.area===a}" data-v="${a}">${a}</button>`).join("")}</div></div>
+   <div><div class="eyebrow" style="margin-bottom:6px">Holes</div><div class="chips" data-td="holes">${["1-18","1-9","10-18"].map(a=>`<button class="chip" aria-pressed="${st.holes===a}" data-v="${a}">${a}</button>`).join("")}<button class="chip" data-v="__other" aria-pressed="${!["1-18","1-9","10-18"].includes(st.holes)}">Other</button></div><input class="field" id="tdHoles" placeholder="e.g. 3, 5, 12" style="margin-top:8px" ${["1-18","1-9","10-18"].includes(st.holes)?"hidden":""} value="${["1-18","1-9","10-18"].includes(st.holes)?"":esc(st.holes)}"></div>
+  </div><div class="stack" style="gap:12px">
+   <div><div class="eyebrow" style="margin-bottom:6px">Sand</div><div class="chips" data-td="sand">${sands.map(a=>`<button class="chip" aria-pressed="${st.sand===a}" data-v="${esc(a)}">${esc(a)}</button>`).join("")}<button class="chip" data-v="__other" aria-pressed="${!sands.includes(st.sand)}">Other</button></div><input class="field" id="tdSand" placeholder="Which sand?" style="margin-top:8px" ${sands.includes(st.sand)?"hidden":""} value="${sands.includes(st.sand)?"":esc(st.sand)}"></div>
+   <div><div class="eyebrow" style="margin-bottom:6px">Turfco load (tonnes)</div><div class="stepper"><button data-tdstep="-0.1" aria-label="Less">−</button><input id="tdLoadT" inputmode="decimal" value="${st.load_t}" aria-label="Tonnes per load"><button data-tdstep="0.1" aria-label="More">+</button></div><p class="note">The sand call works on about 1 t a hopper. Change it if the hopper isn't filled full.</p></div>
+   ${whoField()}
+  </div></div>
+  <button class="loadbtn" id="tdStart" style="margin-top:14px">${ICON.flag}Start topdressing</button></div>`}
+function tdActive(job,call){
+  const n=job.loads.length;const target=(job.call&&job.call.loads)||(call&&job.area==="Greens"?call.loads:null);const last=job.loads[n-1];
+  const R=84,C=2*Math.PI*R;const frac=target?Math.min(1,n/target):(n?1:0);
+  const greens=job.area==="Greens"||job.area==="Practice greens";const gList=job.area==="Practice greens"?["PG","CG"]:Array.from({length:18},(_,i)=>String(i+1)).concat(["PG","CG"]);
+  return `<div class="card in"><div class="head"><div><span class="eyebrow">${esc(job.id&&job.id!=="TD"?job.id:"New job")} · started ${job.started?melTime(new Date(job.started)):""} by ${esc(job.by||"")}</span><h2>${esc(job.area)}${job.holes?" "+esc(job.holes):""} · ${esc(job.sand||"")}</h2></div>${job.card?`<a class="btn small ghost" href="${esc(job.card)}" target="_blank" rel="noopener">${ICON.slack}Thread</a>`:""}</div>
+  <div class="td-hero"><div class="ring"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="${R}"/><circle class="fg" cx="100" cy="100" r="${R}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-frac)).toFixed(1)}"/></svg><div class="ct"><div><div class="big">${n}</div><div class="of">${target?"of ~"+target+" loads":(n===1?"load":"loads")}</div></div></div></div>
+  <div class="stack" style="gap:12px"><button class="loadbtn" id="tdLoad">${ICON.load}<span>Another Turfco load<small>${fmt(job.load_t||1)} t of ${esc(job.sand||"sand")}</small></span></button>
+  <div class="stats"><div class="stat"><div class="k">Sand so far</div><div class="v">${fmt(job.t)} t</div></div><div class="stat"><div class="k">Last load</div><div class="v" style="font-size:20px"${last?` data-ago="${last.at}"`:""}>${last?ago(last.at):"–"}</div></div><div class="stat"><div class="k">Going</div><div class="v" style="font-size:20px"${job.started?` data-ago="${job.started}" data-trim=" ago"`:""}>${job.started?ago(job.started).replace(" ago",""):"–"}</div></div></div>
+  <div class="row">${last?`<button class="btn small" id="tdUndo">${ICON.undo}Undo load ${n}</button>`:""}<span class="spacer"></span><button class="btn small ghost" id="tdFinish">${ICON.flag}Finish</button></div></div></div>
+  ${greens?`<div class="sec" style="margin-top:16px"><div class="eyebrow" style="margin-bottom:6px">Greens done · tap as you finish each one</div><div class="greens">${gList.map(g=>`<button class="gbtn" data-green="${g}" aria-pressed="${(job.greens||[]).includes(g)}">${g}</button>`).join("")}</div></div>
+  <div style="margin-top:14px">${mapCard("topdressing",greenMarks(job),{hint:"Coloured greens are done"})}</div>`:""}
+  ${n?`<div class="sec" style="margin-top:14px"><div class="eyebrow">Loads</div><div class="loadlog">${job.loads.slice().reverse().map((l,i)=>`<div class="${l.pend?"pend":""}"><b>Load ${n-i}</b><span>${fmt(l.t)} t · ${melTime(new Date(l.at))} · ${esc(l.by||"")}${l.pend?" · sending…":""}</span></div>`).join("")}</div></div>`:""}</div>`}
+function greenMarks(job){const B=baseLayers();if(!B)return"";const done=new Set(job.greens||[]);return B.greens.map(g=>done.has(String(g.h))?`<path class="gdone" d="${ptsPath(g.p)}"/>`:"").join("")}
+
+/* ------------------------------------------------------------------ GROUNDS */
+function viewGrounds(){
+  const d=S.data.grounds;if(!d)return noData("grounds");const g=GROUNDS[S.sub]?S.sub:"amstel";const G=GROUNDS[g];
+  const all=jobsOf("grounds");const jobs=all.filter(j=>j.ch===g);
+  const counts=Object.keys(GROUNDS).map(k=>all.filter(j=>j.ch===k&&isOpen(j)).length);
+  return `<div class="seg" style="justify-self:start">${Object.entries(GROUNDS).map(([k,v],i)=>`<button data-sub="${k}" aria-pressed="${k===g}" style="--c:${v.c}"><i></i>${v.label} ${counts[i]?`<b>${counts[i]}</b>`:""}</button>`).join("")}</div>
+  ${kpiTiles([{k:"Open jobs",v:jobs.filter(isOpen).length,cls:"acc",viz:""},{k:"High priority",v:jobs.filter(j=>isOpen(j)&&j.prio==="High").length,viz:""},{k:"Done, 30 days",v:jobs.filter(j=>j.status==="Done"&&daysAgo(j.done)!=null&&daysAgo(j.done)<=30).length,viz:""},{k:"Stock items",v:stockOf(g).length,viz:""}])}
+  <div class="grid2"><div class="stack">${jobsCard("grounds",jobs,{ch:G.ch,chName:G.chName})}</div><div class="stack">${stockCard(g,{title:g==="sand"?"Sand on hand":"Consumables",note:g==="sand"?"Turfco loads logged on the Topdressing tab come off here too.":"Counts set what's on hand. Say what you used in the channel and it comes off."})}</div></div>`}
+
+function noData(area){return `<div class="card"><h2>${AREAS[area].label}</h2><p class="sub">Couldn't load this area's data just now. It refreshes every hour; pull down to try again.</p></div>`}
+
+/* ------------------------------------------------------------------ who's using this phone */
+function whoField(){const n=name();return `<div><div class="eyebrow" style="margin-bottom:6px">Who's this</div><select class="field" id="whoSel"><option value="">Pick your name</option>${CREW.map(c=>`<option ${c===n?"selected":""}>${esc(c)}</option>`).join("")}<option value="__other" ${n&&!CREW.includes(n)?"selected":""}>Someone else</option></select><input class="field" id="whoOther" placeholder="Your name" style="margin-top:8px" ${n&&!CREW.includes(n)?"":"hidden"} value="${n&&!CREW.includes(n)?esc(n):""}"></div>`}
+function wireWho(){const s=$("#whoSel");if(!s)return;s.onchange=()=>{$("#whoOther").hidden=s.value!=="__other";if(s.value&&s.value!=="__other")LS.set("name",s.value)};const o=$("#whoOther");if(o)o.oninput=()=>LS.set("name",o.value.trim())}
+function readWho(){const s=$("#whoSel");let v=s?(s.value==="__other"?$("#whoOther").value.trim():s.value):name();if(!v){toast("Pick your name first");s&&s.focus();return""}LS.set("name",v);return v}
+
+/* ------------------------------------------------------------------ stocktake + delivery sheets */
+function stocktakeSheet(area){
+  const items=stockOf(area);const std=(STD[area]||[]).filter(([n])=>!items.some(i=>i.name.toLowerCase()===n.toLowerCase()));
+  const label=area==="topdressing"?"Sand":GROUNDS[area]?GROUNDS[area].label:AREAS[area].label;
+  openSheet(`<span class="eyebrow">${esc(label)}</span><h3>Stocktake</h3><p class="sub">Count what's there. Tap ✓ if it matches, or type the real number. Leave anything you didn't count blank.</p>
+  <div class="sec" id="stRows">${items.map((i,k)=>countRow(i,k)).join("")}</div>
+  <div class="sec"><div class="lab">Add something not on the list</div>${std.length?`<div class="chips" id="stStd">${std.map(([n,u])=>`<button class="chip sm" data-n="${esc(n)}" data-u="${esc(u)}">${esc(n)}</button>`).join("")}</div>`:""}<div class="row" style="margin-top:8px"><input class="field" id="stNew" placeholder="Item name" style="flex:2;min-width:150px"><input class="field" id="stNewU" placeholder="Unit (t, bags…)" style="flex:1;min-width:100px"><button class="btn small" id="stAdd">Add</button></div></div>
+  <div class="sec">${whoField()}</div>
+  <div class="sec"><button class="btn primary wide" id="stGo" style="min-height:56px;font-size:19px">${ICON.count}Send count</button></div>`,()=>{
+    let idx=items.length;
+    const addRow=(n,u)=>{if(!n)return;$("#stRows").insertAdjacentHTML("beforeend",countRow({name:n,unit:u,on:null,isNew:true},idx++));wireRows()};
+    const wireRows=()=>{$$(".count").forEach(r=>{const i=$("input",r),ok=$(".ok",r);if(ok)ok.onclick=()=>{const on=ok.getAttribute("aria-pressed")==="true";ok.setAttribute("aria-pressed",!on);if(!on){i.value=r.dataset.exp}else i.value="";i.classList.toggle("set",!!i.value)};i.oninput=()=>{i.classList.toggle("set",i.value!=="");if(ok)ok.setAttribute("aria-pressed",i.value!==""&&i.value===r.dataset.exp)}})};
+    wireRows();wireWho();
+    $$("#stStd .chip").forEach(c=>c.onclick=()=>{addRow(c.dataset.n,c.dataset.u);c.remove()});
+    $("#stAdd").onclick=()=>{addRow($("#stNew").value.trim(),$("#stNewU").value.trim());$("#stNew").value="";$("#stNewU").value=""};
+    $("#stGo").onclick=()=>{const who=readWho();if(!who)return;const out=$$(".count").map(r=>({name:r.dataset.name,unit:r.dataset.unit,sid:r.dataset.sid||"",counted:$("input",r).value.trim()})).filter(x=>x.counted!==""&&!isNaN(parseFloat(x.counted))).map(x=>({...x,counted:parseFloat(x.counted)}));
+      if(!out.length){toast("Nothing counted yet");return}
+      const p={kind:"stocktake",id:uid("st"),area,by:who,items:out};send({...p});addPending({...p,at:new Date().toISOString()});closeSheet();toast(`Count sent: ${out.length} item${out.length===1?"":"s"}. Posted in ${chName(area)}.`);render()};
+  });
+}
+function countRow(i,k){const exp=i.on==null?"":fmt(i.on);return `<div class="count" data-name="${esc(i.name)}" data-unit="${esc(i.unit||"")}" data-sid="${esc(i.sid||"")}" data-exp="${exp}"><div><div class="n">${esc(i.name)}</div><div class="e">${i.on==null?(i.isNew?"new item":"not counted before"):"should be "+exp+(i.unit?" "+esc(i.unit):"")}</div></div><div class="in">${exp!==""?`<button class="ok" aria-pressed="false" aria-label="Matches">✓</button>`:""}<input inputmode="decimal" placeholder="${i.unit?esc(i.unit):"count"}" aria-label="Count for ${esc(i.name)}"></div></div>`}
+function chName(area){return area==="topdressing"?"#topdressing":GROUNDS[area]?GROUNDS[area].chName:AREAS[area].chName}
+function deliverySheet(area){
+  const items=stockOf(area);const std=(STD[area]||[]);const names=Array.from(new Set(items.map(i=>i.name).concat(std.map(s=>s[0]))));
+  const unitOf=n=>(items.find(i=>i.name===n)||{}).unit||((std.find(s=>s[0]===n)||[])[1])||"";
+  const first=area==="topdressing"?(names.find(n=>/kiln/i.test(n))||names[0]||""):(names[0]||"");
+  openSheet(`<span class="eyebrow">${esc(area==="topdressing"?"Sand":GROUNDS[area]?GROUNDS[area].label:AREAS[area].label)}</span><h3>Delivery</h3>
+  <div class="sec"><div class="lab">What came in</div><select class="field" id="dlItem">${names.map(n=>`<option ${n===first?"selected":""}>${esc(n)}</option>`).join("")}<option value="__new">Something else</option></select><input class="field" id="dlNew" placeholder="Item name" style="margin-top:8px" hidden></div>
+  <div class="sec"><div class="lab">How much</div><div class="row"><input class="field" id="dlQty" inputmode="decimal" placeholder="Amount" style="flex:1;min-width:120px;font-size:22px;font-weight:700"><input class="field" id="dlUnit" placeholder="Unit" value="${esc(unitOf(first))}" style="flex:1;min-width:100px"></div></div>
+  <div class="sec">${whoField()}</div>
+  <div class="sec"><button class="btn primary wide" id="dlGo" style="min-height:56px;font-size:19px">${ICON.truck}Log delivery</button></div>`,()=>{
+    wireWho();const sel=$("#dlItem");sel.onchange=()=>{$("#dlNew").hidden=sel.value!=="__new";if(sel.value!=="__new")$("#dlUnit").value=unitOf(sel.value)};
+    $("#dlGo").onclick=()=>{const who=readWho();if(!who)return;const nm=sel.value==="__new"?$("#dlNew").value.trim():sel.value;const q=parseFloat($("#dlQty").value);if(!nm){toast("What came in?");return}if(!(q>0)){toast("How much?");return}
+      const it=items.find(i=>i.name===nm);const p={kind:"stock_in",id:uid("in"),area,by:who,name:nm,qty:q,unit:$("#dlUnit").value.trim(),sid:it?.sid||"",items:[{name:nm,unit:$("#dlUnit").value.trim(),counted:q}]};
+      send({kind:p.kind,id:p.id,area,by:who,name:nm,qty:q,unit:p.unit,sid:p.sid});addPending({...p,at:new Date().toISOString()});closeSheet();toast(`Delivery logged: ${fmt(q)} ${p.unit} ${nm}`);render()};
+  });
+}
+
+/* ------------------------------------------------------------------ sheet, toast, full-page overlay */
+let sheetOnClose=null;
+function openSheet(html,wire){$("#sheetBody").innerHTML=html;$("#sheet").hidden=false;document.body.style.overflow="hidden";wire&&wire();const f=$("#sheetBody input:not([hidden]),#sheetBody button");}
+function closeSheet(){$("#sheet").hidden=true;document.body.style.overflow="";if(sheetOnClose){sheetOnClose();sheetOnClose=null}}
+$$("#sheet [data-close]").forEach(b=>b.onclick=closeSheet);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(!$("#full").hidden)closeFull()}});
+let toastT=null;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3600)}
+function openFull(area){const a=AREAS[area];$("#fullTitle").textContent=a.label+" · 3D map & history";$("#fullOpen").href=a.full;$("#fullFrame").src=a.full;$("#full").hidden=false;document.body.style.overflow="hidden"}
+function closeFull(){$("#full").hidden=true;$("#fullFrame").src="about:blank";document.body.style.overflow=""}
+$("#fullClose").onclick=closeFull;
+
+/* ------------------------------------------------------------------ render */
+function openCount(area){const j=jobsOf(area==="grounds"?"grounds":area);return area==="topdressing"?tdJobs().filter(j=>j.status==="In progress").length:j.filter(isOpen).length}
+function renderTabs(){
+  $("#tabs").innerHTML=ORDER.map(k=>{const a=AREAS[k];const n=S.data[k]||k==="topdressing"?openCount(k):0;return `<button class="tab" role="tab" aria-selected="${k===S.tab}" data-tab="${k}" style="--c:${a.c}"><i></i><span>${a.label}</span>${n?`<b>${n}</b>`:""}</button>`}).join("");
+  $$("#tabs .tab").forEach(b=>b.onclick=()=>go(b.dataset.tab));
+}
+function facts(){
+  const k=S.tab;const d=S.data[k];const f=[];
+  if(k==="topdressing"){const c=S.live?.td?.call;if(c&&c.date===today()&&c.loads)f.push(`<span class="fact acc">Call ~${c.loads} loads · ${c.mm} mm</span>`)}
+  else if(d){const j=jobsOf(k);const o=j.filter(isOpen);f.push(`<span class="fact acc">${o.length} open</span>`);const h=o.filter(x=>x.prio==="High").length;if(h)f.push(`<span class="fact">${h} high</span>`)}
+  const gen=k==="topdressing"?(S.live?.updated?melTime(new Date(S.live.updated))+" "+shortDate(melYmd(new Date(S.live.updated))):""):(d?.generated?melTime(new Date(genUtc(d.generated)))+" "+shortDate(d.generated):"");
+  if(gen)f.push(`<span class="fact">Updated ${gen}</span>`);
+  $("#facts").innerHTML=f.join("");
+}
+let lastSig="";
+function sig(){return [S.tab,S.sub,S.live&&S.live.updated,...["irrigation","drainage","bunkers","grounds"].map(k=>S.data[k]&&S.data[k].generated),JSON.stringify(pending()),outbox().length].join("|")}
+function render(){
+  lastSig=sig();
+  document.body.dataset.area=S.tab;$("#title").textContent=AREAS[S.tab].label;document.title=AREAS[S.tab].label+" · Ranfurlie Course Ops";
+  renderTabs();facts();
+  const v={irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds}[S.tab]();
+  $("#view").innerHTML=v;wire();
+  $("#foot").innerHTML=`Jobs, maps and stock rebuild from Slack and Notion every hour. Stocktakes, sand and Turfco loads from this page show within a minute or two.<br>Separate pages: <a href="../">Greens Live</a> · <a href="../machinery/">Machinery</a> · <a href="../stock.html">Shed stocktake</a> · <a href="../spray/">Spraying</a>`;
+}
+function wire(){
+  $$("[data-act=stocktake]").forEach(b=>b.onclick=()=>stocktakeSheet(b.dataset.area));
+  $$("[data-act=delivery]").forEach(b=>b.onclick=()=>deliverySheet(b.dataset.area));
+  $$("[data-act=full]").forEach(b=>b.onclick=()=>openFull(b.dataset.area));
+  $$("[data-sub]").forEach(b=>b.onclick=()=>{S.sub=b.dataset.sub;history.replaceState(null,"","#grounds-"+S.sub);LS.set("sub",S.sub);render()});
+  $$("[data-pickjob]").forEach(a=>a.onclick=e=>{e.preventDefault();pickJob(S.tab,a.dataset.pickjob)});
+  $$(".job[data-job]").forEach(r=>r.addEventListener("click",e=>{if(e.target.closest("a"))return;pickJob(S.tab,r.dataset.job,true)}));
+  if(S.tab==="irrigation"||S.tab==="drainage")wireMap(S.tab,ref=>pickJob(S.tab,ref));
+  if(S.tab==="bunkers"){wireMap("bunkers",ref=>{if(ref[0]==="B")bunkerSheet(Number(ref.slice(1)))});
+    $$("[data-bkhole]").forEach(c=>c.onclick=()=>{$$("[data-bkhole]").forEach(x=>x.setAttribute("aria-pressed",x===c));const h=Number(c.dataset.bkhole);const list=(S.data.bunkers.bunkers||[]).filter(b=>b.h===h);
+      $("#bkList").innerHTML=list.map(b=>`<button class="chip" data-bk="${b.n}">${b.n} · ${esc(b.d)}</button>`).join("")||'<span class="note">No bunkers on this hole</span>';$$("#bkList [data-bk]").forEach(x=>x.onclick=()=>bunkerSheet(Number(x.dataset.bk)));
+      const s=$('select[data-hole="bunkers"]');if(s){s.value=String(h);s.onchange()}})}
+  if(S.tab==="topdressing")wireTd();
+}
+function pickJob(area,ref,fromList){
+  S.sel[area]=ref;const j=jobsOf(area).find(x=>x.ref===ref);if(!j)return;
+  $$(".job").forEach(r=>r.classList.toggle("sel",r.dataset.job===ref));$$(`#map-${area} .pin`).forEach(c=>c.classList.toggle("sel",c.dataset.tap===ref));
+  const box=$("#pick-"+area);if(box)box.innerHTML=`<div style="margin-top:10px">${jobRow(j,area)}</div>${j.note?`<p class="note" style="margin:6px 4px 0">${esc(j.note)}</p>`:""}`;
+  if(fromList){const pin=$(`#map-${area} .pin[data-tap="${ref}"]`);if(pin&&S.mapApi[area]){const B=baseLayers();const cx=Number(pin.getAttribute("cx")),cy=Number(pin.getAttribute("cy"));const w=(B.bounds[2]-B.bounds[0])/4;S.mapApi[area].set([cx-w/2,cy-w*0.354,w,w*0.708]);$(`#map-${area}`).scrollIntoView({behavior:"smooth",block:"center"})}}
+}
+
+/* topdressing wiring */
+function wireTd(){
+  $$("[data-tdkey]").forEach(b=>b.onclick=()=>{S.tdKey=b.dataset.tdkey;render()});
+  const st=LS.get("tdPrefs",{area:"Greens",holes:"1-18",sand:"Kiln-dried sand",load_t:1});
+  $$("[data-td]").forEach(g=>g.onclick=e=>{const c=e.target.closest(".chip");if(!c)return;$$(".chip",g).forEach(x=>x.setAttribute("aria-pressed",x===c));const f=g.dataset.td;
+    if(f==="holes"){$("#tdHoles").hidden=c.dataset.v!=="__other";if(c.dataset.v!=="__other")st.holes=c.dataset.v}
+    else if(f==="sand"){$("#tdSand").hidden=c.dataset.v!=="__other";if(c.dataset.v!=="__other")st.sand=c.dataset.v}
+    else st[f]=c.dataset.v;
+    if(f==="area"&&c.dataset.v==="Practice greens"){st.holes="";$$('[data-td="holes"] .chip').forEach(x=>x.setAttribute("aria-pressed","false"))}});
+  $$("[data-tdstep]").forEach(b=>b.onclick=()=>{const i=$("#tdLoadT");i.value=Math.max(.1,Math.round(((parseFloat(i.value)||1)+Number(b.dataset.tdstep))*10)/10)});
+  wireWho();
+  const start=$("#tdStart");if(start)start.onclick=()=>{const who=readWho();if(!who)return;const holes=!$("#tdHoles").hidden?$("#tdHoles").value.trim():st.holes;const sand=!$("#tdSand").hidden?$("#tdSand").value.trim():st.sand;const load_t=parseFloat($("#tdLoadT").value)||1;
+    if(!sand){toast("Which sand?");return}
+    LS.set("tdPrefs",{area:st.area,holes,sand,load_t});const p={kind:"td_start",key:uid("td"),area:st.area,holes,sand,load_t,by:who};S.tdKey=p.key;
+    send({...p});addPending({...p,at:new Date().toISOString()});toast("Topdressing started. Tap a load each time the Turfco is filled.");render();window.scrollTo({top:0,behavior:"smooth"})};
+  const job=tdJobs().find(j=>j.key===S.tdKey);if(!job)return;
+  const ld=$("#tdLoad");if(ld)ld.onclick=()=>{const who=name()||"";if(!who){openSheet(`<h3>Who's this?</h3><div class="sec">${whoField()}</div><div class="sec"><button class="btn primary wide" id="whoGo">Save</button></div>`,()=>{wireWho();$("#whoGo").onclick=()=>{if(readWho()){closeSheet();ld.click()}}});return}
+    const last=job.loads[job.loads.length-1];if(last&&Date.now()-Date.parse(last.at)<45000&&!confirm("Another load already? The last one was under a minute ago."))return;
+    const p={kind:"td_load",key:job.key,load_key:uid("ld"),t:job.load_t||1,by:who,sand:job.sand};send({...p});addPending({...p,at:new Date().toISOString()});
+    if(navigator.vibrate)navigator.vibrate(40);toast(`Load ${job.loads.length+1} counted`);render()};
+  const un=$("#tdUndo");if(un)un.onclick=()=>{const last=job.loads[job.loads.length-1];if(!last)return;if(!confirm(`Take load ${job.loads.length} off? Only if it was tapped by mistake.`))return;
+    const ob=outbox();const i=ob.findIndex(o=>o.kind==="td_load"&&o.load_key===last.key);
+    if(i>=0){ob.splice(i,1);setOutbox(ob);LS.set("pending",pending().filter(p=>p.load_key!==last.key))}
+    else{const p={kind:"td_undo",key:job.key,load_key:last.key,t:last.t,by:name()||"Someone"};send({...p});addPending({...p,at:new Date().toISOString()})}
+    toast("Load taken off");render()};
+  let gTimer=null;$$("[data-green]").forEach(b=>b.onclick=()=>{const on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",on);const greens=$$("[data-green]").filter(x=>x.getAttribute("aria-pressed")==="true").map(x=>x.dataset.green);
+    LS.set("pending",pending().filter(p=>!(p.kind==="td_greens"&&p.key===job.key)).concat([{kind:"td_greens",key:job.key,greens:JSON.stringify(greens),at:new Date().toISOString()}]));
+    const svgWrap=$("#map-topdressing svg");if(svgWrap){$$(".gdone",svgWrap).forEach(x=>x.remove());const hn=svgWrap.querySelector(".hn");const tmp=document.createElementNS("http://www.w3.org/2000/svg","g");tmp.innerHTML=greenMarks({greens});[...tmp.childNodes].forEach(n=>svgWrap.insertBefore(n,hn))}
+    clearTimeout(gTimer);gTimer=setTimeout(()=>send({kind:"td_greens",key:job.key,greens:JSON.stringify(greens),by:name()||"Someone"}),2500)});
+  if($("#map-topdressing"))wireMap("topdressing",null);
+  const fin=$("#tdFinish");if(fin)fin.onclick=()=>{openSheet(`<span class="eyebrow">${esc(job.id||"")}</span><h3>Finish topdressing</h3><p class="sub">${job.loads.length} load${job.loads.length===1?"":"s"}, ${fmt(job.t)} t of ${esc(job.sand||"sand")}. This goes in the job's thread in #topdressing.</p>
+    <div class="sec"><div class="lab">Anything to add (optional)</div><textarea class="field" id="finNote" rows="3" placeholder="e.g. brushed in, watered in, 6 and 9 still to drag"></textarea></div><div class="sec">${whoField()}</div>
+    <div class="sec"><button class="btn primary wide" id="finGo" style="min-height:56px;font-size:19px">${ICON.flag}Finish</button></div>`,()=>{wireWho();$("#finGo").onclick=()=>{const who=readWho();if(!who)return;clearTimeout(gTimer);
+      const greens=JSON.stringify(job.greens||[]);const p={kind:"td_done",key:job.key,greens,note:$("#finNote").value.trim(),by:who};send({...p});addPending({...p,at:new Date().toISOString()});closeSheet();toast("Topdressing finished. Nice work.");render()}})};
+}
+
+/* ------------------------------------------------------------------ routing */
+function go(tab){if(!AREAS[tab])tab="irrigation";S.tab=tab;LS.set("tab",tab);history.replaceState(null,"","#"+(tab==="grounds"?"grounds-"+S.sub:tab));render();window.scrollTo({top:0})}
+function fromHash(){const h=location.hash.slice(1);if(h.startsWith("grounds")){S.tab="grounds";const s=h.split("-")[1];if(GROUNDS[s])S.sub=s}else if(AREAS[h])S.tab=h;else{S.tab=LS.get("tab","irrigation");S.sub=LS.get("sub","amstel")}}
+window.addEventListener("hashchange",()=>{fromHash();render()});
+
+/* theme: follow the phone, or pick */
+function applyTheme(){const t=LS.get("theme","auto");if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.dataset.theme=t}
+$("#theme").onclick=()=>{const t=LS.get("theme","auto");const n=t==="auto"?(matchMedia("(prefers-color-scheme: dark)").matches?"light":"dark"):t==="dark"?"light":"auto";LS.set("theme",n);applyTheme();toast(n==="auto"?"Following the phone's light/dark":n==="dark"?"Dark":"Light")};
+$("#who").onclick=()=>openSheet(`<h3>Who's using this phone?</h3><p class="sub">Your name goes on stocktakes, sand and loads you log here.</p><div class="sec">${whoField()}</div><div class="sec"><button class="btn primary wide" id="whoGo">Save</button></div>`,()=>{wireWho();$("#whoGo").onclick=()=>{if(readWho()){closeSheet();toast("Saved")}}});
+
+/* ------------------------------------------------------------------ start */
+applyTheme();if(TEST)$("#testbar").hidden=false;fromHash();showOutbox();
+loadAll().then(()=>{render();flush()});
+let lastLive=Date.now();
+async function tick(all){if(document.hidden)return;if(all)await loadAll();else await loadLive();lastLive=Date.now();if($("#sheet").hidden&&$("#full").hidden&&sig()!==lastSig)render()}
+setInterval(()=>{if(S.tab==="topdressing"||Date.now()-lastLive>45000)tick(false)},20000);
+setInterval(()=>tick(true),300000);
+setInterval(()=>$$("[data-ago]").forEach(el=>el.textContent=ago(el.dataset.ago).replace(el.dataset.trim||"\u0000","")),30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){tick(false);flush()}});
+</script>
+</body>
+</html>
