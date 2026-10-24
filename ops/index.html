@@ -26,7 +26,7 @@
   --hi:#e0313b; --hi-bg:rgba(224,49,59,.12); --med:#b86a00; --med-bg:rgba(255,176,32,.2); --lo:#4f6a7a; --lo-bg:rgba(79,106,122,.12);
   --ok:#13a356; --ok-bg:rgba(19,163,86,.14);
   --scrim:rgba(8,30,44,.4);
-  --turf:#c7e1bd; --fair:#a6d596; --appr:#93cc86; --tee:#86c37a; --green:#5bb36b; --sand:#ecdcaa; --sand-edge:#c4a967; --water:#7cc6e8; --pipe:#d1792f; --pit:#a06a1c; --ag:#5f9e8f; --holeTxt:rgba(11,34,49,.55);
+  --turf:#d9e6d2; --fair:#bdd8b2; --appr:#a5cfa6; --tee:#8fc29a; --green:#5fae73; --sand:#d8bf82; --sand-edge:#6f8a5c; --water:#0573a8; --pipe:#b8651d; --pit:#8a6a12; --ag:#3f7f6c; --holeTxt:#0b2231; --map-bg1:#eef6fa; --map-bg2:#e4f1f7; --map-edge:#e4f1f7; --lo-map:#4e6aa8;
   --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
   --r:24px; --r2:16px; --ease:cubic-bezier(.2,.8,.2,1);
@@ -41,7 +41,7 @@
   --hi:#ff6b6b; --hi-bg:rgba(255,107,107,.16); --med:#ffbc45; --med-bg:rgba(255,188,69,.15); --lo:#a9c4d2; --lo-bg:rgba(169,196,210,.12);
   --ok:#2fd27a; --ok-bg:rgba(47,210,122,.16);
   --scrim:rgba(0,0,0,.6);
-  --turf:#143222; --fair:#1d4b31; --appr:#215639; --tee:#29683f; --green:#36905c; --sand:#b9a165; --sand-edge:#7d6a3a; --water:#1f6f93; --pipe:#f0a060; --pit:#f2d27a; --ag:#7fb3a3; --holeTxt:rgba(241,248,251,.55);
+  --turf:#1b3524; --fair:#22472f; --appr:#295a3b; --tee:#2d6845; --green:#3f915f; --sand:#a8925f; --sand-edge:#0d120c; --water:#38c6ff; --pipe:#e39a52; --pit:#f2d27a; --ag:#7fb3a3; --holeTxt:#f1f8fb; --map-bg1:#0b1d2a; --map-bg2:#06121b; --map-edge:#06121b; --lo-map:#93a9d6;
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
@@ -53,7 +53,7 @@
   --hi:#ff6b6b; --hi-bg:rgba(255,107,107,.16); --med:#ffbc45; --med-bg:rgba(255,188,69,.15); --lo:#a9c4d2; --lo-bg:rgba(169,196,210,.12);
   --ok:#2fd27a; --ok-bg:rgba(47,210,122,.16);
   --scrim:rgba(0,0,0,.6);
-  --turf:#143222; --fair:#1d4b31; --appr:#215639; --tee:#29683f; --green:#36905c; --sand:#b9a165; --sand-edge:#7d6a3a; --water:#1f6f93; --pipe:#f0a060; --pit:#f2d27a; --ag:#7fb3a3; --holeTxt:rgba(241,248,251,.55);
+  --turf:#1b3524; --fair:#22472f; --appr:#295a3b; --tee:#2d6845; --green:#3f915f; --sand:#a8925f; --sand-edge:#0d120c; --water:#38c6ff; --pipe:#e39a52; --pit:#f2d27a; --ag:#7fb3a3; --holeTxt:#f1f8fb; --map-bg1:#0b1d2a; --map-bg2:#06121b; --map-edge:#06121b; --lo-map:#93a9d6;
 }
 
 /* one colour per area: light value, dark value */
@@ -189,7 +189,7 @@ details.more summary::-webkit-details-marker{display:none}
 .empty{color:var(--muted);padding:10px 4px}
 
 /* map */
-.map{position:relative;border-radius:18px;overflow:hidden;background:var(--turf);touch-action:none;user-select:none;-webkit-user-select:none;aspect-ratio:960/680;box-shadow:inset 0 0 0 1px var(--line)}
+.map{position:relative;border-radius:18px;overflow:hidden;background:radial-gradient(120% 90% at 40% 40%,var(--map-bg1),var(--map-bg2));touch-action:none;user-select:none;-webkit-user-select:none;aspect-ratio:960/680;box-shadow:inset 0 0 0 1px var(--line)}
 .map svg{width:100%;height:100%;display:block}
 .map .ctl{position:absolute;right:8px;top:8px;display:grid;gap:6px}
 .map .ctl button{width:38px;height:38px;border-radius:12px;border:0;background:var(--glass-solid);box-shadow:var(--shadow);font-size:20px;font-weight:700;display:grid;place-items:center}
@@ -198,23 +198,33 @@ details.more summary::-webkit-details-marker{display:none}
 .mapbar select{border-radius:12px;border:0;padding:8px 10px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line);font-weight:600;min-height:40px}
 .lg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13.5px;color:var(--muted);margin-top:8px}
 .lg i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
-svg .p-fairway{fill:var(--fair)} svg .p-approach{fill:var(--appr)} svg .p-tee{fill:var(--tee)} svg .p-green{fill:var(--green)}
-svg .p-bunker{fill:var(--sand);stroke:var(--sand-edge);stroke-width:.6}
-svg .bk{fill:var(--sand);stroke:var(--sand-edge);stroke-width:.7;cursor:pointer;transition:fill .2s}
-svg .bk.recent{fill:color-mix(in srgb,var(--acc) 55%,var(--sand))}
-svg .bk.job{stroke:var(--hi);stroke-width:1.6}
-svg .bk.sel{fill:var(--acc);stroke:var(--fg);stroke-width:1.4}
+svg .water{fill:var(--water);fill-opacity:.22;stroke:var(--water);stroke-opacity:.5;stroke-width:.8}
+svg .p-fairway,svg .p-approach,svg .p-tee{stroke:var(--map-edge);stroke-width:.6}
+svg .p-fairway{fill:var(--fair)} svg .p-approach{fill:var(--appr)} svg .p-tee{fill:var(--tee)} svg .p-green{fill:var(--green);stroke:var(--map-edge);stroke-width:1.2}
+svg .p-bunker{fill:var(--sand);stroke:var(--map-edge);stroke-width:.6}
+svg .bk{fill:var(--sand);stroke:var(--sand-edge);stroke-width:.8;cursor:pointer;transition:fill .2s}
+svg .bk.job.High{fill:var(--hi)} svg .bk.job.Medium{fill:var(--med)} svg .bk.job.Low{fill:var(--lo-map)}
+svg .bk.recent{stroke:var(--ok);stroke-width:2.4;vector-effect:non-scaling-stroke}
+svg .bk.sel{fill:var(--acc);stroke:var(--fg);stroke-width:2;vector-effect:non-scaling-stroke}
 svg .bkhit{fill:transparent;stroke:transparent;stroke-width:14;cursor:pointer;vector-effect:non-scaling-stroke}
-svg .hn{font-family:var(--display);font-weight:800;fill:var(--holeTxt);pointer-events:none;text-anchor:middle;dominant-baseline:central}
-svg .bn{font-family:var(--display);font-weight:700;fill:var(--fg);pointer-events:none;text-anchor:middle;dominant-baseline:central;opacity:0;transition:opacity .2s}
-svg[data-z="2"] .bn{opacity:.9}
-svg .pin{stroke:#fff;stroke-width:1.2;cursor:pointer;vector-effect:non-scaling-stroke}
-svg .pin.High{fill:var(--hi)} svg .pin.Medium{fill:var(--med)} svg .pin.Low{fill:var(--lo)}
-svg .pin.sel{stroke:var(--fg);stroke-width:3}
-svg .pipe{fill:none;stroke:var(--pipe);stroke-width:1.4;stroke-linecap:round;vector-effect:non-scaling-stroke;opacity:.9}
-svg .agl{fill:none;stroke:var(--ag);stroke-width:1;vector-effect:non-scaling-stroke;opacity:.8}
-svg .pit{fill:var(--pit);stroke:rgba(0,0,0,.35);stroke-width:.6}
-svg .pond{fill:var(--water);opacity:.75}
+svg .hn{font-family:var(--display);font-weight:700;fill:var(--holeTxt);opacity:.55;pointer-events:none;text-anchor:middle}
+svg .bn{font-family:var(--display);font-weight:700;fill:var(--fg);pointer-events:none;text-anchor:middle;dominant-baseline:central;opacity:0;transition:opacity .2s;paint-order:stroke;stroke:var(--map-edge);stroke-linejoin:round}
+svg .pin{stroke:var(--map-edge);stroke-width:1.5;cursor:pointer;vector-effect:non-scaling-stroke}
+svg .pin.High{fill:var(--hi)} svg .pin.Medium{fill:var(--med)} svg .pin.Low{fill:var(--lo-map)}
+svg .pin.sel{stroke:var(--fg);stroke-width:2.5}
+svg .pring{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:center;animation:ripple 2.6s ease-out infinite;pointer-events:none}
+svg .pring.High{stroke:var(--hi)} svg .pring.Medium{stroke:var(--med)} svg .pring.Low{stroke:var(--lo-map)}
+svg .est{fill:none;stroke-width:1.8;stroke-dasharray:2.5 2;vector-effect:non-scaling-stroke;pointer-events:none}
+svg .halo{pointer-events:none}
+@keyframes ripple{0%{transform:scale(.6);opacity:.95}100%{transform:scale(3.4);opacity:0}}
+@media (prefers-reduced-motion: reduce){svg .pring{animation:none;opacity:0}}
+svg .pipe-u{fill:none;stroke:var(--map-edge);stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;opacity:.7}
+svg .pipe{fill:none;stroke:var(--pipe);stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+svg .agl{fill:none;stroke:var(--ag);stroke-width:1;stroke-dasharray:3 2;vector-effect:non-scaling-stroke;opacity:.75}
+svg .pit{fill:var(--map-edge);stroke:var(--pit);stroke-width:1.6;vector-effect:non-scaling-stroke}
+svg .pit.hot{fill:var(--hi);stroke:var(--hi)}
+svg .outf{fill:var(--water);stroke:var(--map-edge);stroke-width:1.2;vector-effect:non-scaling-stroke}
+svg .outf.hot{stroke:var(--hi);stroke-width:2.4}
 svg .gdone{fill:var(--acc)}
 svg .glabel{font-family:var(--display);font-weight:800;fill:#fff;pointer-events:none;text-anchor:middle;dominant-baseline:central}
 
@@ -424,10 +434,21 @@ function prunePending(){
 
 /* ------------------------------------------------------------------ data */
 async function getJSON(url){const r=await fetch(url+(url.includes("?")?"&":"?")+"v="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error(r.status);return r.json()}
+/* The data.json maps are y-up (same as the 3D and 2D maps on the per-area dashboards, which flip y when they draw).
+   Flip once on load so everything on this page (map, holes, bunkers, pins, drains) is drawn the right way up. */
+const WATER=[[[949.0,189.5],[937.0,188.5],[936.0,187.5],[925.0,188.5],[922.0,186.5],[918.0,186.5],[916.0,184.5],[894.0,183.5],[878.0,178.5],[873.0,175.5],[861.0,176.5],[857.5,173.0],[857.5,169.0],[871.0,153.5],[876.0,151.5],[882.0,146.5],[888.0,146.5],[892.0,149.5],[894.5,146.0],[900.0,141.5],[906.0,143.5],[918.0,143.5],[920.0,142.5],[925.0,148.5],[929.0,148.5],[931.0,146.5],[933.0,146.5],[936.0,144.5],[941.0,144.5],[943.5,147.0],[943.5,153.0],[946.5,158.0],[946.5,162.0],[947.5,163.0],[946.5,176.0],[951.5,185.0],[951.5,187.0]],[[792.0,282.5],[787.0,282.5],[781.5,277.0],[782.5,268.0],[788.0,263.5],[792.0,263.5],[793.0,264.5],[796.0,264.5],[797.0,263.5],[800.0,266.5],[802.0,265.5],[804.5,269.0]],[[306.0,424.5],[302.5,421.0],[304.5,417.0],[299.5,410.0],[307.0,401.5],[311.0,405.5],[316.0,402.5],[319.5,406.0],[316.5,416.0],[310.0,423.5],[307.0,423.5]],[[369.0,433.5],[361.0,432.5],[360.0,431.5],[355.0,431.5],[352.5,429.0],[352.5,426.0],[354.5,422.0],[357.0,419.5],[367.0,419.5],[371.0,421.5],[373.5,426.0]]];
+function flipData(d){
+  if(!d||!Array.isArray(d.bounds)||d.__flipped)return d;const Y=d.bounds[1]+d.bounds[3];
+  const fp=q=>{if(Array.isArray(q)&&q.length>=2&&typeof q[0]==="number"&&typeof q[1]==="number")q[1]=+(Y-q[1]).toFixed(2)};
+  const fr=r=>{(r||[]).forEach(fp)};const fxy=o=>{if(o&&typeof o.y==="number")o.y=+(Y-o.y).toFixed(2)};
+  (d.map||[]).forEach(m=>fr(m.p));Object.values(d.holes||{}).forEach(h=>{if(h&&typeof h==="object")Object.values(h).forEach(fp)});
+  (d.bunkers||[]).forEach(b=>{fp(b.c);(b.p||[]).forEach(fr)});(d.pins||[]).forEach(fxy);fp(d.chip);
+  const n=d.net;if(n){(n.pits||[]).forEach(fxy);(n.outfalls||[]).forEach(fxy);(n.ponds||[]).forEach(fxy);(n.pipes||[]).forEach(p=>fr(p.pts));(n.ag||[]).forEach(a=>{fr(a.ring);(a.lines||[]).forEach(fr)})}
+  d.__flipped=true;return d}
 async function loadAll(){
   const keys=["irrigation","drainage","bunkers","grounds"];
   const res=await Promise.allSettled(keys.map(k=>getJSON(AREAS[k].data)));
-  res.forEach((r,i)=>{if(r.status==="fulfilled")S.data[keys[i]]=r.value});
+  res.forEach((r,i)=>{if(r.status==="fulfilled")S.data[keys[i]]=keys[i]==="grounds"?r.value:flipData(r.value)});
   await loadLive();
 }
 async function loadLive(){try{S.live=await getJSON("live.json")}catch(e){S.live=S.live||{events:[],td:{jobs:[],call:null},stock:{}}}prunePending()}
@@ -481,30 +502,40 @@ let BASE=null;
 function baseLayers(){
   if(BASE)return BASE;const d=S.data.bunkers||S.data.irrigation||S.data.drainage;if(!d)return null;
   const order=["fairway","approach","tee","green"];const by={};(d.map||[]).forEach(m=>{if(order.includes(m.l))(by[m.l]=by[m.l]||[]).push(m)});
-  const svg=order.map(l=>(by[l]||[]).map(m=>`<path class="p-${l}" d="${ptsPath(m.p)}"/>`).join("")).join("");
-  BASE={svg,bounds:d.bounds||[0,0,960,680],holes:d.holes||{},greens:by.green||[]};return BASE;
+  const water=WATER.map(r=>`<path class="water" d="${ptsPath(r)}"/>`).join("");
+  const svg=water+order.map(l=>(by[l]||[]).map(m=>`<path class="p-${l}" d="${ptsPath(m.p)}"/>`).join("")).join("");
+  const alt=S.data.irrigation||S.data.drainage;const bkLayer=((alt&&alt.map)||[]).filter(m=>m.l==="bunker").map(m=>`<path class="p-bunker" d="${ptsPath(m.p)}"/>`).join("");
+  BASE={svg,bkLayer,bounds:d.bounds||[0,0,960,680],holes:d.holes||{},greens:by.green||[]};return BASE;
 }
-function holeLabels(B){return Object.entries(B.holes).map(([h,v])=>`<text class="hn" x="${v.g[0].toFixed(1)}" y="${(v.g[1]-16).toFixed(1)}" font-size="15">${h}</text>`).join("")}
+function holeLabels(B){return Object.entries(B.holes).map(([h,v])=>`<text class="hn" x="${v.g[0].toFixed(1)}" y="${(v.g[1]-16).toFixed(1)}" font-size="13">${h}</text>`).join("")}
 function mapCard(area,inner,opts={}){
   const B=baseLayers();if(!B)return"";const [x0,y0,x1,y1]=B.bounds;const v=S.views[area]||[x0,y0,x1-x0,y1-y0];
   const holes=Object.keys(B.holes).sort((a,b)=>a-b);
-  const bk=area!=="bunkers"&&S.data.bunkers?(S.data.bunkers.bunkers||[]).map(b=>`<path class="p-bunker" d="${(b.p||[]).map(r=>ptsPath(r)).join("")}"/>`).join(""):"";
+  const bk=area==="bunkers"?"":S.data.bunkers?(S.data.bunkers.bunkers||[]).filter(b=>(b.p||[]).length).map(b=>`<path class="p-bunker" d="${b.p.map(r=>ptsPath(r)).join("")}"/>`).join(""):(B.bkLayer||"");
+  const glow=`<defs><radialGradient id="glow-${area}"><stop offset="0%" style="stop-color:var(--hi);stop-opacity:.38"/><stop offset="100%" style="stop-color:var(--hi);stop-opacity:0"/></radialGradient></defs>`;
   return `<div class="mapbar"><select aria-label="Zoom to a hole" data-hole="${area}"><option value="">Whole course</option>${holes.map(h=>`<option value="${h}">Hole ${h}</option>`).join("")}</select>${opts.bar||""}</div>
-  <div class="map" id="map-${area}"><svg viewBox="${v.join(" ")}" data-area="${area}" xmlns="http://www.w3.org/2000/svg"><rect x="${x0-200}" y="${y0-200}" width="${x1-x0+400}" height="${y1-y0+400}" fill="var(--turf)"/>${B.svg}${bk}${opts.under||""}${holeLabels(B)}${inner}</svg>
+  <div class="map" id="map-${area}"><svg viewBox="${v.join(" ")}" data-area="${area}" xmlns="http://www.w3.org/2000/svg">${glow}<rect x="${x0-200}" y="${y0-200}" width="${x1-x0+400}" height="${y1-y0+400}" fill="transparent"/>${B.svg}${bk}${opts.under||""}${holeLabels(B)}${inner}</svg>
   <div class="ctl"><button data-z="in" aria-label="Zoom in">+</button><button data-z="out" aria-label="Zoom out">−</button><button data-z="all" aria-label="Whole course">⤢</button></div>${opts.hint?`<div class="hint">${opts.hint}</div>`:""}</div>${opts.legend?`<div class="lg">${opts.legend}</div>`:""}`;
 }
 function wireMap(area,onTap){
   const box=$("#map-"+area);if(!box)return;const svg=$("svg",box);const B=baseLayers();const [x0,y0,x1,y1]=B.bounds;const full=[x0,y0,x1-x0,y1-y0];
-  let v=(S.views[area]||full).slice();
-  const apply=()=>{svg.setAttribute("viewBox",v.map(n=>n.toFixed(1)).join(" "));S.views[area]=v.slice();const z=full[2]/v[2];svg.dataset.z=z>1.6?"2":"1";
-    const k=v[2]/full[2];$$(".pin",svg).forEach(c=>c.setAttribute("r",(Number(c.dataset.r||7)*Math.max(.35,k)).toFixed(2)));$$(".bn",svg).forEach(t=>t.setAttribute("font-size",(11*Math.max(.3,k)).toFixed(2)));$$(".pit",svg).forEach(c=>c.setAttribute("r",(3*Math.max(.4,k)).toFixed(2)))};
+  let v=(S.views[area]||full).slice();S.focus=S.focus||{};svg.dataset.hole=S.focus[area]||"";
+  const apply=()=>{svg.setAttribute("viewBox",v.map(n=>n.toFixed(1)).join(" "));S.views[area]=v.slice();const z=full[2]/v[2];
+    const scr=Math.max(1,full[2]/(svg.getBoundingClientRect().width||full[2]));svg.dataset.z=z>=1.9*Math.max(1,scr*.7)?"2":"1";
+    const k=v[2]/full[2],pf=Math.max(1,scr*.5)*Math.max(.35,k),f=Math.max(1,scr*1.05);
+    $$(".pin,.pring,.est,.outf",svg).forEach(c=>c.setAttribute("r",(Number(c.dataset.r||7)*pf).toFixed(2)));
+    $$(".halo",svg).forEach(c=>c.setAttribute("r",(Number(c.dataset.r||30)*Math.max(.5,k)*Math.max(1,scr*.6)).toFixed(2)));
+    const focus=svg.dataset.hole||"",thr=1.9*Math.max(1,scr*.7);
+    $$(".bn",svg).forEach(t=>{t.setAttribute("font-size",(10*f*k).toFixed(2));t.setAttribute("stroke-width",(2.4*f*k).toFixed(2));t.style.opacity=(z>=thr||(focus&&t.dataset.h===focus&&z>1.4))?"1":"0"});
+    $$(".hn",svg).forEach(t=>t.setAttribute("font-size",(13*Math.max(1,scr*.85)*Math.sqrt(k)).toFixed(2)));
+    $$(".pit",svg).forEach(r=>{const h=Number(r.dataset.s||4.2)*pf,x=Number(r.dataset.x),y=Number(r.dataset.y);r.setAttribute("x",(x-h).toFixed(2));r.setAttribute("y",(y-h).toFixed(2));r.setAttribute("width",(h*2).toFixed(2));r.setAttribute("height",(h*2).toFixed(2))})};
   const clamp=()=>{v[2]=Math.min(full[2]*1.05,Math.max(full[2]/12,v[2]));v[3]=v[2]*full[3]/full[2];v[0]=Math.min(x1-v[2]*.3,Math.max(x0-v[2]*.7,v[0]));v[1]=Math.min(y1-v[3]*.3,Math.max(y0-v[3]*.7,v[1]))};
   const zoomAt=(f,cx,cy)=>{const nw=v[2]*f,nh=v[3]*f;v=[cx-(cx-v[0])*f,cy-(cy-v[1])*f,nw,nh];clamp();apply()};
   const toSvg=(clientX,clientY)=>{const r=svg.getBoundingClientRect();return[v[0]+(clientX-r.left)/r.width*v[2],v[1]+(clientY-r.top)/r.height*v[3]]};
   apply();
   S.mapApi[area]={set(nv){v=nv.slice();clamp();apply()}};
-  $$(".ctl button",box).forEach(b=>b.onclick=e=>{e.stopPropagation();const z=b.dataset.z;if(z==="all"){v=full.slice();apply();const s=$(`select[data-hole="${area}"]`);if(s)s.value="";return}zoomAt(z==="in"?.6:1/.6,v[0]+v[2]/2,v[1]+v[3]/2)});
-  const sel=$(`select[data-hole="${area}"]`);if(sel)sel.onchange=()=>{const h=B.holes[sel.value];if(!h){v=full.slice();apply();return}
+  $$(".ctl button",box).forEach(b=>b.onclick=e=>{e.stopPropagation();const z=b.dataset.z;if(z==="all"){v=full.slice();svg.dataset.hole=S.focus[area]="";apply();const s=$(`select[data-hole="${area}"]`);if(s)s.value="";return}zoomAt(z==="in"?.6:1/.6,v[0]+v[2]/2,v[1]+v[3]/2)});
+  const sel=$(`select[data-hole="${area}"]`);if(sel&&S.focus[area])sel.value=S.focus[area];if(sel)sel.onchange=()=>{const h=B.holes[sel.value];svg.dataset.hole=S.focus[area]=h?sel.value:"";if(!h){v=full.slice();apply();return}
     const xs=[h.g[0],h.t[0]],ys=[h.g[1],h.t[1]];const pad=60;let bx0=Math.min(...xs)-pad,bx1=Math.max(...xs)+pad,by0=Math.min(...ys)-pad,by1=Math.max(...ys)+pad;
     if(opts_greenFocus[area]){bx0=h.g[0]-70;bx1=h.g[0]+70;by0=h.g[1]-50;by1=h.g[1]+50}
     let w=bx1-bx0,hh=by1-by0;const ar=full[2]/full[3];if(w/hh<ar){w=hh*ar}else{hh=w/ar}v=[(bx0+bx1)/2-w/2,(by0+by1)/2-hh/2,w,hh];clamp();apply()};
@@ -543,16 +574,20 @@ function stockCard(area,opts={}){
 function siRow(i){return `<div class="si"><div class="n">${esc(i.name)}${i.flag?` <span class="flag">· ${esc(i.flag)}</span>`:""}</div><div class="q num${i.on==null?" unk":""}">${i.on==null?"not counted":fmt(i.on)+(i.unit?`<small>${esc(i.unit)}</small>`:"")}</div>${i.last||i.pend?`<div class="d">${i.pend?"sending…":(i.live?"counted ":"last move ")+shortDate(i.last)}</div>`:""}</div>`}
 function fullBtn(area,label){return AREAS[area].full?`<button class="btn small ghost" data-act="full" data-area="${area}">${ICON.map3d}${label||"3D map & history"}</button>`:""}
 
+function pinsSvg(area,pins){const ord={High:0,Medium:1,Low:2};pins=pins.slice().sort((a,b)=>(ord[b.j.prio]??3)-(ord[a.j.prio]??3));
+  const halo=pins.filter(x=>x.j.prio==="High").map(({p})=>`<circle class="halo" cx="${p.x}" cy="${p.y}" r="30" data-r="30" fill="url(#glow-${area})"/>`).join("");
+  return halo+pins.map(({p,j},i)=>{const r=j.prio==="High"?7:5.5;const pr=esc(j.prio);return `<circle class="pring ${pr}" cx="${p.x}" cy="${p.y}" r="${r}" data-r="${r}" style="animation-delay:${((i%9)*.29).toFixed(2)}s"/><circle class="pin ${pr}${S.sel[area]===j.ref?" sel":""}" cx="${p.x}" cy="${p.y}" r="${r}" data-r="${r}" data-tap="${esc(j.ref)}"><title>${esc(j.ref+" "+j.title)}</title></circle>`}).join("")}
+
 /* ------------------------------------------------------------------ IRRIGATION */
 function viewIrrigation(){
   const d=S.data.irrigation;if(!d)return noData("irrigation");const jobs=jobsOf("irrigation");const open=jobs.filter(isOpen);
   const flow=(d.flow||[]).map(f=>f.reported);const fixed30=jobs.filter(j=>j.status==="Done"&&daysAgo(j.done)!=null&&daysAgo(j.done)<=30).length;
   const wait=open.filter(j=>/Waiting/.test(j.status)).length;const hi=open.filter(j=>j.prio==="High").length;
   const pins=(d.pins||[]).map(p=>({p,j:jobs.find(j=>j.id===p.job)})).filter(x=>x.j&&isOpen(x.j));
-  const inner=pins.map(({p,j})=>`<circle class="pin ${esc(j.prio)}${S.sel.irrigation===j.ref?" sel":""}" cx="${p.x}" cy="${p.y}" r="7" data-r="7" data-tap="${esc(j.ref)}"><title>${esc(j.ref+" "+j.title)}</title></circle>`).join("");
+  const inner=pinsSvg("irrigation",pins);
   const alerts=(d.alerts||[]).slice(0,10);
   return `${kpiTiles([{k:"Open jobs",v:open.length,viz:spark(flow),cls:"acc"},{k:"High priority",v:hi,viz:meter(hi,Math.max(open.length,1)),cls:hi?"hi":""},{k:"Waiting on parts",v:wait,viz:meter(wait,Math.max(open.length,1))},{k:"Fixed, 30 days",v:fixed30,viz:spark((d.flow||[]).map(f=>f.fixed),{c:"var(--ok)"})}])}
-  <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Where the jobs are</h2>${fullBtn("irrigation")}</div>${mapCard("irrigation",inner,{hint:"Tap a pin",legend:'<span><i style="background:var(--hi)"></i>High</span><span><i style="background:var(--med)"></i>Medium</span><span><i style="background:var(--lo)"></i>Low</span>'})}<div id="pick-irrigation"></div></div>
+  <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Where the jobs are</h2>${fullBtn("irrigation")}</div>${mapCard("irrigation",inner,{hint:"Tap a pin",legend:'<span><i style="background:var(--hi)"></i>High</span><span><i style="background:var(--med)"></i>Medium</span><span><i style="background:var(--lo-map)"></i>Low</span>'})}<div id="pick-irrigation"></div></div>
   ${alerts.length?`<div class="card in"><div class="head"><h2>Cirrus alarms</h2><span class="sub">last 14 days</span></div><div class="alerts">${alerts.map(a=>`<div class="alert"><b>${esc(a.station)}</b><div>${esc(a.text)}${a.job?` · <a href="#" data-pickjob="IRR-${a.job}">IRR-${a.job}</a>`:""}</div><span>${shortDate(a.at)} ${esc(a.at.slice(11,16))}</span></div>`).join("")}</div></div>`:""}</div>
   <div class="stack">${jobsCard("irrigation",jobs,{ch:AREAS.irrigation.ch,chName:"#irrigation"})}${stockCard("irrigation",{title:"Parts on hand"})}</div></div>`}
 
@@ -560,11 +595,16 @@ function viewIrrigation(){
 function viewDrainage(){
   const d=S.data.drainage;if(!d)return noData("drainage");const jobs=jobsOf("drainage");const open=jobs.filter(isOpen);const n=d.net||{};
   const hi=open.filter(j=>j.prio==="High").length;const fixed30=jobs.filter(j=>j.status==="Done"&&daysAgo(j.done)!=null&&daysAgo(j.done)<=30).length;
-  const under=(n.ag||[]).map(a=>(a.lines||[]).map(l=>`<path class="agl" d="M${l.map(q=>q.join(" ")).join("L")}"/>`).join("")).join("")+(n.pipes||[]).map(p=>`<path class="pipe" d="M${p.pts.map(q=>q.join(" ")).join("L")}"/>`).join("")+(n.pits||[]).map(p=>`<circle class="pit" cx="${p.x}" cy="${p.y}" r="3"><title>${esc(p.label)}</title></circle>`).join("")+(n.ponds||[]).map(p=>`<circle class="pond" cx="${p.x}" cy="${p.y}" r="9"><title>${esc(p.label)}</title></circle>`).join("");
+  const openIds=new Set(open.map(j=>j.id));const hot=new Set((d.pins||[]).filter(p=>p.net&&openIds.has(p.job)).map(p=>p.net));
+  const pl=pts=>"M"+pts.map(q=>q[0].toFixed(1)+" "+q[1].toFixed(1)).join("L");
+  const under=(n.ag||[]).map(a=>(a.lines||[]).map(l=>`<path class="agl" d="${pl(l)}"/>`).join("")).join("")
+    +(n.pipes||[]).map(p=>{const w=p.kind==="trunk"?3.2:2;return `<path class="pipe-u" d="${pl(p.pts)}" style="stroke-width:${w+2.2}px"/><path class="pipe" d="${pl(p.pts)}" style="stroke-width:${w}px"><title>${esc(p.label||"")}</title></path>`}).join("")
+    +(n.outfalls||[]).map((o,i)=>`<circle class="outf${hot.has("O"+i)?" hot":""}" cx="${o.x}" cy="${o.y}" r="4.2" data-r="4.2"><title>${esc(o.label||"Outfall")}</title></circle>`).join("")
+    +(n.pits||[]).map(p=>{const sz=p.kind==="junction"?3.4:4.2;return `<rect class="pit${hot.has(p.id)?" hot":""}" data-x="${p.x}" data-y="${p.y}" data-s="${sz}" x="${p.x-sz}" y="${p.y-sz}" width="${sz*2}" height="${sz*2}" rx="1"><title>${esc(p.label||"Pit")}</title></rect>`}).join("");
   const pins=(d.pins||[]).map(p=>({p,j:jobs.find(j=>j.id===p.job)})).filter(x=>x.j&&isOpen(x.j));
-  const inner=pins.map(({p,j})=>`<circle class="pin ${esc(j.prio)}${S.sel.drainage===j.ref?" sel":""}" cx="${p.x}" cy="${p.y}" r="7" data-r="7" data-tap="${esc(j.ref)}"><title>${esc(j.ref+" "+j.title)}</title></circle>`).join("");
+  const inner=pinsSvg("drainage",pins);
   return `${kpiTiles([{k:"Open jobs",v:open.length,viz:spark((d.flow||[]).map(f=>f.reported)),cls:"acc"},{k:"High priority",v:hi,viz:meter(hi,Math.max(open.length,1)),cls:hi?"hi":""},{k:"Pits mapped",v:(n.pits||[]).length,viz:meter((n.pits||[]).length,40)},{k:"Fixed, 30 days",v:fixed30,viz:spark((d.flow||[]).map(f=>f.fixed),{c:"var(--ok)"})}])}
-  <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Jobs and drains</h2>${fullBtn("drainage","3D underground & history")}</div>${mapCard("drainage",inner,{under,hint:"Tap a pin",legend:'<span><i style="background:var(--pipe)"></i>Pipes</span><span><i style="background:var(--ag)"></i>Ag drains</span><span><i style="background:var(--pit)"></i>Pits</span><span><i style="background:var(--hi)"></i>Job</span>'})}<div id="pick-drainage"></div><p class="note">Drain lines are placed from the Landmark and Farm Works sheets, so positions are approximate.</p></div></div>
+  <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Jobs and drains</h2>${fullBtn("drainage","3D underground & history")}</div>${mapCard("drainage",inner,{under,hint:"Tap a pin",legend:'<span><i style="background:var(--pipe);border-radius:2px;height:4px;vertical-align:2px"></i>Pipes</span><span><i style="background:transparent;border-top:2px dashed var(--ag);border-radius:0;height:0;vertical-align:3px"></i>Ag drains</span><span><i style="background:transparent;box-shadow:inset 0 0 0 2px var(--pit);border-radius:2px"></i>Pits</span><span><i style="background:var(--water)"></i>Outfalls</span><span><i style="background:var(--hi)"></i>High</span><span><i style="background:var(--med)"></i>Medium</span><span><i style="background:var(--lo-map)"></i>Low</span>'})}<div id="pick-drainage"></div><p class="note">Drain lines are placed from the Landmark and Farm Works sheets, so positions are approximate.</p></div></div>
   <div class="stack">${jobsCard("drainage",jobs,{ch:AREAS.drainage.ch,chName:"#drainage"})}${stockCard("drainage",{title:"Drainage materials"})}</div></div>`}
 
 /* ------------------------------------------------------------------ BUNKERS (tap a bunker, add sand) */
@@ -577,12 +617,16 @@ function viewBunkers(){
   const lastSand={};sev.forEach(e=>{if(!lastSand[e.bunker])lastSand[e.bunker]=e});
   const jobB={};open.forEach(j=>(j.bks||[]).forEach(b=>(jobB[b]=jobB[b]||[]).push(j)));
   const recent=Object.values(lastSand).filter(e=>daysAgo(e.at.slice(0,10))<=14).length;
-  const inner=(d.bunkers||[]).map(b=>{const rings=b.p||[];const path=rings.map(r=>ptsPath(r)).join("");const cls=["bk",lastSand[b.n]&&daysAgo(lastSand[b.n].at.slice(0,10))<=14?"recent":"",jobB[b.n]?"job":"",S.sel.bunkers==="B"+b.n?"sel":""].join(" ");
-    return `<g data-tap="B${b.n}"><path class="${cls}" d="${path}"/><path class="bkhit" d="${path}"/><text class="bn" x="${b.c[0]}" y="${b.c[1]}" font-size="11">${b.n}</text></g>`}).join("");
+  const PRK={High:0,Medium:1,Low:2};const topPrio=n=>(jobB[n]||[]).map(j=>j.prio).sort((a,b)=>(PRK[a]??3)-(PRK[b]??3))[0]||"";
+  const circ=(c,r)=>`M${(c[0]-r).toFixed(1)} ${c[1].toFixed(1)}a${r} ${r} 0 1 0 ${r*2} 0a${r} ${r} 0 1 0 ${-r*2} 0Z`;
+  const halos=(d.bunkers||[]).filter(b=>topPrio(b.n)==="High").map(b=>`<circle class="halo" cx="${b.c[0]}" cy="${b.c[1]}" r="30" data-r="30" fill="url(#glow-bunkers)"/>`).join("");
+  const est=(d.pins||[]).filter(p=>p.est).map(p=>({p,j:open.find(j=>j.id===p.job)})).filter(x=>x.j).map(({p,j})=>`<circle class="est" cx="${p.x}" cy="${p.y}" r="7" data-r="7" style="stroke:var(--${j.prio==="High"?"hi":j.prio==="Medium"?"med":"lo-map"})"><title>${esc(j.ref+" "+j.title)}</title></circle>`).join("");
+  const inner=halos+(d.bunkers||[]).map(b=>{const rings=b.p||[];const path=rings.length?rings.map(r=>ptsPath(r)).join(""):circ(b.c,6);const tp=topPrio(b.n);const cls=["bk",lastSand[b.n]&&daysAgo(lastSand[b.n].at.slice(0,10))<=14?"recent":"",tp?"job "+tp:"",S.sel.bunkers==="B"+b.n?"sel":""].filter(Boolean).join(" ");
+    return `<g data-tap="B${b.n}"><path class="${cls}" d="${path}"${rings.length?"":' stroke-dasharray="2 1.5"'}/><path class="bkhit" d="${path}"/><text class="bn" data-h="${b.h}" x="${b.c[0]}" y="${b.c[1]}" font-size="11">${b.n}</text></g>`}).join("")+est;
   const sandToday=sev.filter(e=>e.at.slice(0,10)===today()||(e.at&&melYmd(new Date(e.at))===today()));
   return `${kpiTiles([{k:"Open jobs",v:open.length,viz:spark((d.flow||[]).map(f=>f.reported)),cls:"acc"},{k:"Sanded, 14 days",v:recent,u:"bunkers",viz:meter(recent,(d.bunkers||[]).length)},{k:"Sand added today",v:sandToday.length,u:sandToday.length===1?"bunker":"bunkers",viz:""},{k:"Bunkers mapped",v:(d.bunkers||[]).length,viz:""}])}
   <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Tap a bunker to add sand</h2>${fullBtn("bunkers")}</div>
-  ${mapCard("bunkers",inner,{hint:"Pick a hole, then tap the bunker",legend:'<span><i style="background:color-mix(in srgb,var(--acc) 55%,var(--sand))"></i>Sanded in the last 14 days</span><span><i style="background:transparent;box-shadow:inset 0 0 0 2px var(--hi)"></i>Open job</span>'})}
+  ${mapCard("bunkers",inner,{hint:"Pick a hole, then tap the bunker",legend:'<span><i style="background:var(--hi)"></i>High</span><span><i style="background:var(--med)"></i>Medium</span><span><i style="background:var(--lo-map)"></i>Low</span><span><i style="background:var(--sand)"></i>No open work</span><span><i style="background:transparent;box-shadow:inset 0 0 0 2px var(--ok)"></i>Sanded, last 14 days</span><span><i style="background:transparent;border:1.5px dashed var(--muted)"></i>No bunker number</span>'})}
   <div class="sec" style="margin-top:12px"><div class="eyebrow" style="margin-bottom:6px">Or pick from the list</div><div class="chips" id="bkHoles">${Object.keys(baseLayers().holes).sort((a,b)=>a-b).map(h=>`<button class="chip sm" data-bkhole="${h}">${h}</button>`).join("")}</div><div class="chips" id="bkList" style="margin-top:8px"></div></div></div>
   ${sev.length?`<div class="card in"><div class="head"><h2>Sand added</h2><span class="sub">latest first</span></div><div class="alerts">${sev.slice(0,12).map(e=>{const b=(d.bunkers||[]).find(x=>x.n===e.bunker);return `<div class="alert"><b>${e.bunker}</b><div>${b?esc(holeName(b.h)+" "+b.d)+" · ":""}${fmt(e.qty)} ${esc(e.unit||"")} ${esc(e.material||"")}${e.by?" · "+esc(e.by):""}${e.pend?" · sending…":""}</div><span>${e.old?shortDate(e.at):shortDate(melYmd(new Date(e.at)))+" "+melTime(new Date(e.at))}</span></div>`}).join("")}</div></div>`:""}</div>
   <div class="stack">${jobsCard("bunkers",jobs,{ch:AREAS.bunkers.ch,chName:"#bunkers"})}${stockCard("bunkers",{title:"Bunker sand & materials"})}</div></div>`}
