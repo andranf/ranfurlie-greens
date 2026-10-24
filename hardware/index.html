@@ -231,7 +231,10 @@ body.ml.mledit .fabs{bottom:calc(178px + var(--safe-b))}
 .vlv.shut{background:#ff3b30!important;border-color:#fff}
 .vlv.shut::after{content:"✕";font-size:13px}
 .vlv.iv.shut::after{font-size:10px}
+.vlv{position:relative}
 .vlv.bad{box-shadow:0 0 0 3px #ffb020,0 2px 6px rgba(0,0,0,.5)}
+.vlv.bad::before{content:"";position:absolute;right:-6px;top:-6px;width:11px;height:11px;border-radius:50%;background:#ffb020;border:2px solid #fff}
+.vlv.sel.bad{box-shadow:0 0 0 3px #ffb020,0 0 0 6px var(--tank),0 2px 6px rgba(0,0,0,.5)}
 .vlv.hit{animation:hit 1.1s ease-in-out infinite}
 @keyframes hit{50%{box-shadow:0 0 0 7px rgba(255,59,48,.45),0 2px 6px rgba(0,0,0,.5)}}
 .vlv.sel{box-shadow:0 0 0 4px var(--tank),0 2px 6px rgba(0,0,0,.5)}
@@ -1063,7 +1066,7 @@ function newValveSheet(np){
     closeSheet();drawNet();toast("Valve added")};
 }
 function offsetLL(ll,np,m){var c=pipeLL(np.p).map(xy);var a=c[np.i],b=c[np.i+1]||c[np.i];var dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;var P=xy(ll);var q=[P[0]-dy/L*m,P[1]+dx/L*m];return [+(q[1]/110574).toFixed(7),+(q[0]/(111320*K0)).toFixed(7)]}
-function valveEditSheet(n){var k0=n.k;var s=sheet('<h2>'+esc(vname(n))+'</h2><h3>What is it?</h3><div class="opts" id="veK">'+["sv","mv","iv","ov"].map(function(k){return '<button class="opt'+(k===k0?" sel":"")+'" data-v="'+k+'">'+VALVE[k].name+'</button>'}).join("")+'</div><h3>Does it work?</h3><div class="opts" id="veC">'+[["","Works / not checked"],["work","Needs work"],["fail","Seized or won't shut"]].map(function(c){return '<button class="opt'+((n.cond||"")===c[0]?" sel":"")+'" data-v="'+c[0]+'">'+c[1]+'</button>'}).join("")+'</div><label class="f" for="veTag">Tag or number</label><input class="in" id="veTag" maxlength="24" value="'+esc(n.ref||"")+'"><label class="f" for="veNote">Notes</label><input class="in" id="veNote" maxlength="200" value="'+esc(n.note||"")+'"><div class="row" style="margin-top:14px"><button class="btn go w" id="veGo">Done</button></div>');
+function valveEditSheet(n){ML.sel=null;var k0=n.k;var s=sheet('<h2>'+esc(vname(n))+'</h2><h3>What is it?</h3><div class="opts" id="veK">'+["sv","mv","iv","ov"].map(function(k){return '<button class="opt'+(k===k0?" sel":"")+'" data-v="'+k+'">'+VALVE[k].name+'</button>'}).join("")+'</div><h3>Does it work?</h3><div class="opts" id="veC">'+[["","Works / not checked"],["work","Needs work"],["fail","Seized or won't shut"]].map(function(c){return '<button class="opt'+((n.cond||"")===c[0]?" sel":"")+'" data-v="'+c[0]+'">'+c[1]+'</button>'}).join("")+'</div><label class="f" for="veTag">Tag or number</label><input class="in" id="veTag" maxlength="24" value="'+esc(n.ref||"")+'"><label class="f" for="veNote">Notes</label><input class="in" id="veNote" maxlength="200" value="'+esc(n.note||"")+'"><div class="row" style="margin-top:14px"><button class="btn go w" id="veGo">Done</button></div>');
   var c0=n.cond||"";function grp(id,f){var g=s.querySelector(id);g.onclick=function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");f(b.dataset.v)}}
   grp("#veK",function(v){k0=v});grp("#veC",function(v){c0=v});
   $("#veGo").onclick=function(){var tag=$("#veTag").value.trim(),note=$("#veNote").value.trim();mutate("edit "+vname(n));n.k=k0;if(tag)n.ref=tag;else delete n.ref;if(note)n.note=note;else delete n.note;if(c0)n.cond=c0;else delete n.cond;closeSheet();drawNet()}}
