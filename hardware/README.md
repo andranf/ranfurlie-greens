@@ -15,7 +15,7 @@ The crew pin two kinds of things with phone GPS:
 | File | What it is | Written by |
 |---|---|---|
 | `index.html` | The map page | Claude |
-| `ref.json` | Reference layers: 674 CirrusPRO head positions, 240 as-built plan points (LI-IV, SV, MV, DP, DO), buried and irrigation lines, drainage areas | `_build/build_ref.py` from `_build/cirrus_ref.txt` |
+| `ref.json` | Reference layers: 674 CirrusPRO head positions, 240 as-built plan points (LI-IV, SV, MV, DP, DO). The plan lines and drainage areas were taken off the map (24 Oct 2026) | `_build/build_ref.py` from `_build/cirrus_ref.txt` |
 | `live.json` | Every pin (records) and a short event log | Zapier workflow "Hardware map" |
 | `p/<PIN>.html` | One small page per Slack post: its link preview shows the spot, then it opens the map at the pin | Zapier workflow |
 | `snaps/<PIN>.jpg` | The aerial snapshot with the pin drawn on (made by the page when the pin is saved) | Zapier workflow |

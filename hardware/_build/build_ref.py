@@ -8,6 +8,9 @@ cirrus_ref.txt is a compact extract taken from CirrusPRO (site 2) on 24 Oct 2026
   A|  drainage plan areas          code:p/p/...
 Offsets are in millionths of a degree from LAT0/LNG0 (south and east are positive).
 
+The L and A sections are kept in the extract but not put in ref.json: Andy had them taken off the map
+(24 Oct 2026) as clutter. The lines were straight two-point segments that didn't match anything on the ground.
+
 Re-run after re-extracting from CirrusPRO:  python3 hardware/_build/build_ref.py
 """
 import json, os, re, datetime
@@ -53,16 +56,6 @@ def main():
         n, c = tok.split(":")
         plan.append([n, plan_type(n)] + dec(c))
     plan.sort(key=lambda r: (r[1], natkey(r[0])))
-    lines = []
-    for tok in sec["L"].split():
-        n, c = tok.split(":")
-        lines.append([n, plan_type(n), [dec(x) for x in c.split("/")]])
-    lines.sort(key=lambda r: (r[1], natkey(r[0])))
-    areas = []
-    for tok in sec["A"].split():
-        n, c = tok.split(":")
-        areas.append([n, [dec(x) for x in c.split("/")]])
-    areas.sort(key=lambda r: natkey(r[0]))
     out = {
         "v": 1,
         "generated": datetime.date.today().isoformat(),
@@ -70,12 +63,10 @@ def main():
         "heads": heads,
         "noGps": sorted(NO_GPS, key=natkey),
         "plan": plan,
-        "lines": lines,
-        "areas": areas,
     }
     s = json.dumps(out, separators=(",", ":"))
     open(OUT, "w").write(s)
-    print(f"ref.json: {len(heads)} heads, {len(plan)} plan points, {len(lines)} lines, {len(areas)} areas, {len(s)/1024:.1f} KB")
+    print(f"ref.json: {len(heads)} heads, {len(plan)} plan points, {len(s)/1024:.1f} KB")
 
 
 if __name__ == "__main__":

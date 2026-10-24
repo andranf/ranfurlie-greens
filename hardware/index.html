@@ -18,8 +18,8 @@
 /* Ranfurlie Hardware Map v1.0 (24 Oct 2026).
    Crew pin permanent hardware (valves, QCVs, drain pits...) and problems (leaks, wet spots, blocked drains) with phone GPS.
    Problems and failed hardware post to #irrigation / #drainage through the Zapier "Hardware map" hook, with a link back to the pin.
-   Records live in hardware/live.json (written by that workflow). Reference layers (Cirrus heads, as-built valves and pits,
-   buried lines) come from hardware/ref.json. Cirrus Pro layers: one small KML per hardware type from the Layers sheet.
+   Records live in hardware/live.json (written by that workflow). Reference layers (Cirrus heads, as-built valves and pits)
+   come from hardware/ref.json. Cirrus Pro layers: one small KML per hardware type from the Layers sheet.
    Design: the tank-mix glass system (Barlow / Barlow Condensed, frosted rim-lit panels) floating over the aerial. */
 :root{
   color-scheme:light;
@@ -309,7 +309,7 @@ function evId(){return Date.now().toString(36)+Math.random().toString(36).slice(
 var toastT;function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show")},3200)}
 
 /* ---------- data ---------- */
-var REF={heads:[],plan:[],lines:[],areas:[],noGps:[]};
+var REF={heads:[],plan:[],noGps:[]};
 var LIVE={records:[]};
 var LOCAL=ls("hw.local")||{};   /* id -> {rec, ev} records changed on this phone and not yet in live.json */
 var HEADS=[];                    /* [{n,lat,lng,hole,area}] */
@@ -335,8 +335,8 @@ L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/
 var COURSE=L.latLngBounds([-38.1238,145.2378],[-38.1171,145.2507]);
 map.fitBounds(COURSE,{padding:[0,0]});
 var canvas=L.canvas({padding:.4,tolerance:6});
-var LG={heads:L.layerGroup(),plan:L.layerGroup(),lines:L.layerGroup(),issues:L.layerGroup(),assets:L.layerGroup(),fixed:L.layerGroup(),me:L.layerGroup().addTo(map),tmp:L.layerGroup().addTo(map)};
-var SHOW=Object.assign({issues:true,assets:true,plan:true,heads:true,lines:true,fixed:false},ls("hw.show")||{});
+var LG={heads:L.layerGroup(),plan:L.layerGroup(),issues:L.layerGroup(),assets:L.layerGroup(),fixed:L.layerGroup(),me:L.layerGroup().addTo(map),tmp:L.layerGroup().addTo(map)};
+var SHOW=Object.assign({issues:true,assets:true,plan:true,heads:true,fixed:false},ls("hw.show")||{});delete SHOW.lines;
 var labelLayer=L.layerGroup().addTo(map);
 
 function buildRef(){
@@ -348,15 +348,9 @@ function buildRef(){
   LG.plan.clearLayers();
   REF.plan.forEach(function(p){
     var P=PLAN[p[1]];if(!P)return;
-    var m=L.circleMarker([p[2],p[3]],{renderer:canvas,radius:6,weight:2.4,color:P.col,fillColor:P.col,fillOpacity:.12,dashArray:"3 3"});
+    var m=L.circleMarker([p[2],p[3]],{renderer:canvas,radius:5,weight:1.8,color:P.col,opacity:.9,fillColor:P.col,fillOpacity:.18});
     m.on("click",function(){openPlan(p)});m.addTo(LG.plan);
   });
-  LG.lines.clearLayers();
-  REF.lines.forEach(function(l){
-    var col=l[1]==="il"?"#ff9f0a":"#d1d1d6";
-    L.polyline(l[2],{renderer:canvas,color:col,weight:2.5,opacity:.85,dashArray:l[1]==="bl"?"6 5":null,interactive:true}).bindTooltip(l[0]+(l[1]==="bl"?" · buried line (plan)":" · irrigation line (plan)"),{sticky:true,className:"lbl-tip"}).addTo(LG.lines);
-  });
-  REF.areas.forEach(function(a){L.polygon(a[1],{renderer:canvas,color:"#ffd60a",weight:1.5,opacity:.6,fillOpacity:.06,dashArray:"4 4",interactive:false}).addTo(LG.lines)});
   applyShow();
 }
 
@@ -386,7 +380,7 @@ function counts(recs){
   var fixed=recs.filter(function(r){return (T[r.type]||{}).cat==="issue"&&r.status==="fixed"}).length;
   var assets=recs.filter(function(r){return (T[r.type]||{}).cat==="asset"}).length;
   $("#sub").textContent=(open?open+" open problem"+(open===1?"":"s"):"No open problems")+" · "+assets+" hardware pinned"+(TEST?" · TEST":"");
-  var C=[["issues","Problems",open,"#ff3b30"],["assets","Hardware",assets,"#30d158"],["plan","As-built",REF.plan.length,"#ffd60a"],["heads","Heads",HEADS.length,"#ffffff"],["lines","Buried lines","","#d1d1d6"],["fixed","Fixed",fixed,"#8e8e93"]];
+  var C=[["issues","Problems",open,"#ff3b30"],["assets","Hardware",assets,"#30d158"],["plan","As-built",REF.plan.length,"#ffd60a"],["heads","Heads",HEADS.length,"#ffffff"],["fixed","Fixed",fixed,"#8e8e93"]];
   $("#chips").innerHTML=C.map(function(c){return '<button class="chip glass'+(SHOW[c[0]]?"":" off")+'" data-k="'+c[0]+'"><span class="dot" style="background:'+c[3]+'"></span>'+c[1]+(c[2]!==""?' <span class="n">'+c[2]+'</span>':'')+'</button>'}).join("");
 }
 $("#chips").addEventListener("click",function(e){var b=e.target.closest(".chip");if(!b)return;var k=b.dataset.k;SHOW[k]=!SHOW[k];ls("hw.show",SHOW);applyShow();counts()});
@@ -394,8 +388,7 @@ function applyShow(){
   var z=map.getZoom();
   ["issues","assets","fixed"].forEach(function(k){if(SHOW[k])LG[k].addTo(map);else map.removeLayer(LG[k])});
   if(SHOW.heads&&z>=16.5)LG.heads.addTo(map);else map.removeLayer(LG.heads);
-  if(SHOW.plan&&z>=15.5)LG.plan.addTo(map);else map.removeLayer(LG.plan);
-  if(SHOW.lines&&z>=15.5)LG.lines.addTo(map);else map.removeLayer(LG.lines);
+  if(SHOW.plan&&z>=17)LG.plan.addTo(map);else map.removeLayer(LG.plan);
   labels();
 }
 /* names on heads and plan points once zoomed right in, only for what's on screen */
