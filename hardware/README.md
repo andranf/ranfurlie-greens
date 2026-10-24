@@ -46,6 +46,11 @@ else. Post `{"kind":"purge_test","__test":"1"}` to the hook to clear them.
   its lateral. Heads feed off the nearest main unless they're linked to a valve (Edit > tap an LI-IV > Link heads).
 - The simulation runs from the pump through every open valve. "Find valves to shut" finds the ring of working valves
   around a head or pipe; valves logged as seized (in Edit, or as a Failed valve pin on the hardware map) are skipped.
+- Moving valves: drag a valve onto the pipe it's really on (it snaps on and the old spot joins back up), or tap it >
+  Move it > tap the pipe. A valve keeps its name, links and history when it moves. "GPS pin nearby" moves it onto a
+  valve the crew have pinned on the hardware map.
+- Tees: in Edit, tees show as orange rings. Tap one to add a valve on each leg that has one (5 m from the tee). A valve
+  sitting right on a tee shuts every way out; its card offers to put it on its leg.
 - Edits: Mainline > Edit. Drag valves and junctions, add valves, draw pipes, delete pipes, link heads, then Save. The page
   posts the whole network to the hook (`kind: "net"`), which commits `network.json` with a log line. Nothing in the page
   needs changing when the network changes.

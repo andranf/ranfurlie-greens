@@ -241,6 +241,12 @@ body.ml.mledit .fabs{bottom:calc(178px + var(--safe-b))}
 .pump{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:#0a84ff;border:2.5px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.55)}
 .pump svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .jn{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #0a84ff;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.jn.tee{width:16px;height:16px;border:3px solid #ffb020}
+.legs{display:grid;gap:8px}
+.leg{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line)}
+.leg .arr{flex:0 0 34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--tank-soft);color:var(--tank-deep);font-family:var(--display);font-weight:800;font-size:13px}
+.leg .arr svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.leg .t{flex:1;min-width:0}.leg b{font-family:var(--display);font-size:17px;display:block;line-height:1.1}.leg small{color:var(--faint);font-size:13px}
 .tool{position:fixed;left:50%;transform:translateX(-50%);top:calc(122px + var(--safe-t));z-index:600;border-radius:999px;padding:8px 8px 8px 16px;font-family:var(--display);font-weight:700;font-size:17px;display:none;align-items:center;gap:10px;max-width:calc(100vw - 24px)}
 .tool.on{display:flex}
 .tool span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -894,8 +900,8 @@ function drawNet(){
     if(isValve(n)){if(n.k==="iv"?!MSHOW.iv:!MSHOW.valves){if(!ML.closed[n.id]&&!ML.hit[n.id])return}
       if(n.k==="iv"&&z<16.5&&!ML.closed[n.id]&&!ML.hit[n.id])return;
       var m=L.marker([n.lat,n.lng],{icon:vIcon(n),zIndexOffset:n.k==="iv"?600:800,draggable:ML.edit,keyboard:false});
-      m.on("click",function(){onNode(n)});m.on("dragend",function(e){moveNode(n,e.target.getLatLng())});m.addTo(LGM.valves);return}
-    if(ML.edit&&z>=17){var j=L.marker([n.lat,n.lng],{icon:L.divIcon({className:"",html:'<div class="jn"></div>',iconSize:[12,12],iconAnchor:[6,6]}),draggable:true,zIndexOffset:400,keyboard:false});j.on("click",function(){onNode(n)});j.on("dragend",function(e){moveNode(n,e.target.getLatLng())});j.addTo(LGM.edit)}
+      m.on("click",function(){onNode(n)});m.on("dragend",function(e){var q=e.target.getLatLng();relocateValve(n,[q.lat,q.lng])});m.addTo(LGM.valves);return}
+    if(ML.edit&&z>=17){var tee=(ADJ[n.id]||[]).filter(function(p){return !p.stub}).length>=3;var j=L.marker([n.lat,n.lng],{icon:L.divIcon({className:"",html:'<div class="jn'+(tee?' tee':'')+'"></div>',iconSize:tee?[16,16]:[12,12],iconAnchor:tee?[8,8]:[6,6]}),draggable:true,zIndexOffset:400,keyboard:false});j.on("click",function(){onNode(n)});j.on("dragend",function(e){moveNode(n,e.target.getLatLng())});j.addTo(LGM.edit)}
   });
   drawMlHeads();mlBar();mlCounts();
 }
@@ -934,7 +940,7 @@ function mlBar(){
   var shut=Object.keys(ML.closed);var dr=dryText(SIM?SIM.dry:{},4);var h="";
   if(ML.edit){
     var n=ML.ops.length;
-    h='<div class="st"><span class="dot" style="background:#ffb020"></span><div><b>Editing the mainline'+(n?' · '+n+' change'+(n===1?'':'s'):'')+'</b><small>Drag valves and junctions to move them. Tap a pipe or valve to change it. Nothing is shared until you save.</small></div></div>'+
+    h='<div class="st"><span class="dot" style="background:#ffb020"></span><div><b>Editing the mainline'+(n?' · '+n+' change'+(n===1?'':'s'):'')+'</b><small>Drag a valve onto the pipe it\'s really on. Tap an orange tee to put valves on its legs. Nothing is shared until you save.</small></div></div>'+
       '<div class="row"><button class="btn soft sm" id="eValve">Add valve</button><button class="btn soft sm" id="ePipe">Draw pipe</button>'+(ML.undo.length?'<button class="btn soft sm" id="eUndo">Undo</button>':'')+'</div><div class="row" style="margin-top:8px"><button class="btn soft sm" id="eCancel">'+(n?"Discard":"Stop editing")+'</button><button class="btn go" id="eSave" style="flex:2"'+(n?"":" disabled")+'>Save for everyone</button></div>';
   }else{
     if(!shut.length)h='<div class="st"><span class="dot" style="background:#2fd27a"></span><div><b>Water everywhere</b><small>Tap a valve to shut it, or find the valves to shut off a spot.</small></div></div>';
@@ -947,7 +953,7 @@ function mlBar(){
   b("#mFind",function(){setTool({k:"find",txt:"Tap the head or pipe you need to work on"})});
   b("#mOpen",function(){ML.closed={};ML.hit={};ML.target=null;drawNet()});
   b("#mList",function(){shutSheet()});
-  b("#mEdit",startEdit);
+  b("#mEdit",function(){startEdit()});
   b("#eValve",function(){setTool({k:"addValve",txt:"Tap the pipe where the valve is"})});
   b("#ePipe",function(){setTool({k:"pipe",txt:"Tap where the pipe starts",pts:[]})});
   b("#eUndo",undo);b("#eCancel",cancelEdit);b("#eSave",saveSheet);
@@ -969,6 +975,7 @@ map.on("click",function(e){if(MODE!=="ml"||PLACE)return;var t=ML.tool;if(!t)retu
   if(t.k==="addValve"){var np2=nearestPipe(ll);if(!np2||screenD(ll,np2.ll)>28){toast("Tap right on the pipe");return}setTool(null);newValveSheet(np2);return}
   if(t.k==="pipe"){t.pts.push(ll);drawSketch();$("#toolTxt").textContent=t.pts.length===1?"Tap along the pipe, then Finish":"Keep tapping along it, then Finish";$("#toolX").textContent=t.pts.length>1?"Finish":"Cancel";return}
   if(t.k==="link"||t.k==="feed"){var h2=nearHead(ll,22);if(h2)onHead(h2);return}
+  if(t.k==="move"){var mv=NI[t.node];if(!mv){setTool(null);return}if(relocateValve(mv,ll))setTool(null);return}
 });
 function drawSketch(){LGM.draw.clearLayers();var t=ML.tool;if(!t||!t.pts)return;L.polyline(t.pts,{color:"#ffcc00",weight:5,dashArray:"8 6",interactive:false}).addTo(LGM.draw);t.pts.forEach(function(p){L.circleMarker(p,{radius:5,color:"#fff",weight:2,fillColor:"#ffcc00",fillOpacity:1,interactive:false}).addTo(LGM.draw)})}
 
@@ -1004,7 +1011,7 @@ function onPipe(p,latlng){
 function onNode(n){
   if(MODE!=="ml"||PLACE)return;var t=ML.tool;
   if(t&&t.k==="feed"){if(!isValve(n)&&n.k!=="j"){toast("Tap a valve");return}mutate("link "+t.head);NET.feeds[t.head]=n.id;HEADFEED=null;setTool(null);drawNet();toast(t.head+" linked to "+vname(n));return}
-  if(t&&t.k==="pipe"){map.fire("click",{latlng:L.latLng(n.lat,n.lng)});return}
+  if(t&&(t.k==="pipe"||t.k==="move"||t.k==="addValve")){if(t.k==="move"&&t.node===n.id)return;map.fire("click",{latlng:L.latLng(n.lat,n.lng)});return}
   if(t&&t.k==="find"){if(isValve(n)){setTool(null);findFor({node:n.id},vname(n));return}}
   if(n.k==="src"){sheet('<div class="head"><span class="ic" style="background:#0a84ff22">'+svg("dot","#0a84ff",2.2)+'</span><div><h2>'+esc(n.name||"Pump")+'</h2><div class="muted">Where the water comes from</div></div></div>'+(n.note?'<div class="note">'+esc(n.note)+'</div>':'')+(ML.edit?'<p class="faint">Drag it on the map to move it.</p>':''),{peek:true});return}
   if(!isValve(n)){if(ML.edit)nodeEditSheet(n);return}
@@ -1017,13 +1024,19 @@ function onNode(n){
   h+='<p class="muted" style="margin-top:10px">'+(shut?"Shut, so these are off: ":"Shutting it would turn off: ")+(dr.n?'<b>'+esc(dr.text)+'</b>':(n.k==="iv"&&!linked?"nothing yet: no heads are linked to this LI-IV.":"nothing on its own. Water gets around it."))+'</p>';
   if(seized(n))h+='<p class="faint" style="font-size:14px">Logged as seized, so the valve finder works around it.</p>';
   h+='<div class="row" style="margin-top:12px"><button class="btn '+(shut?"soft":"go")+'" id="vTog" style="flex:2">'+(shut?"Open it":"Shut it")+'</button><a class="btn soft sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+n.lat+','+n.lng+'">Directions</a></div>';
-  h+='<div class="row" style="margin-top:8px"><button class="btn soft sm" id="vLog">Log its condition</button>'+(r?'<button class="btn soft sm" id="vPin">Open its pin</button>':'')+'</div>';
-  if(ML.edit)h+='<h3>Change</h3><div class="row"><button class="btn soft sm" id="vEdit">Type, tag, notes</button>'+(n.k==="iv"?'<button class="btn soft sm" id="vLink">Link heads</button>':'')+'<button class="btn stop sm" id="vDel">Remove valve</button></div><p class="faint" style="font-size:13.5px;margin-top:6px">Drag it on the map to move it.</p>';
+  h+='<div class="row" style="margin-top:8px"><button class="btn soft sm" id="vMove">Move it</button><button class="btn soft sm" id="vEdit">Change</button><button class="btn soft sm" id="vLog">Log its condition</button>'+(r?'<button class="btn soft sm" id="vPin">Open its pin</button>':'')+'</div>';
+  var tee=n.k!=="iv"&&(ADJ[n.id]||[]).filter(function(p){return !p.stub}).length>=3;
+  if(tee)h+='<div class="note"><b>Sits right on a tee</b>, so shutting it closes every way out. If it\'s really on one leg, <a href="#" id="vLegs">put it on its leg</a>.</div>';
+  var pins=nearPins(n);if(pins.length)h+='<p class="faint" style="font-size:14px;margin-top:8px">GPS pin nearby: '+pins.map(function(x){return '<a href="#" data-pin="'+x[1].id+'">'+esc((x[1].ref||x[1].label||T[x[1].type].name)+" · "+fmtM(x[0]))+'</a>'}).join(", ")+' <span class="faint">(tap to move the valve onto it)</span></p>';
+  if(ML.edit)h+='<h3>More</h3><div class="row">'+(n.k==="iv"?'<button class="btn soft sm" id="vLink">Link heads</button>':'')+'<button class="btn stop sm" id="vDel">Remove valve</button></div>';
   ML.sel=n.id;drawNet();var s=sheet(h,{peek:true,onClose:function(){ML.sel=null;drawNet()}});
   $("#vTog").onclick=function(){if(shut)delete ML.closed[n.id];else ML.closed[n.id]=1;ML.hit={};ML.target=null;ML.sel=null;closeSheet();drawNet()};
   $("#vLog").onclick=function(){var ty=n.k==="ov"?"other_hw":n.k;DRAFT={mode:"add",id:newId(),type:T[ty]?ty:"other_hw",ref:n.ref||"",lat:n.lat,lng:n.lng};closeSheet();ML.sel=null;startPlace()};
   if($("#vPin"))$("#vPin").onclick=function(){closeSheet();setMode("hw");setTimeout(function(){openRecord(r.id)},200)};
-  if($("#vEdit"))$("#vEdit").onclick=function(){valveEditSheet(n)};
+  $("#vEdit").onclick=function(){withEdit(function(){valveEditSheet(n)})};
+  $("#vMove").onclick=function(){withEdit(function(){closeSheet();ML.sel=n.id;drawNet();setTool({k:"move",node:n.id,txt:"Tap the pipe where "+vname(n)+" really is"})})};
+  if($("#vLegs"))$("#vLegs").onclick=function(e){e.preventDefault();withEdit(function(){legsSheet(n)})};
+  s.querySelectorAll("[data-pin]").forEach(function(a){a.onclick=function(e){e.preventDefault();var rec=find(a.dataset.pin);if(!rec)return;withEdit(function(){closeSheet();if(relocateValve(n,[rec.lat,rec.lng],{far:true}))map.setView([n.lat,n.lng],Math.max(map.getZoom(),19))})}});
   if($("#vLink"))$("#vLink").onclick=function(){closeSheet();ML.sel=null;setTool({k:"link",valve:n.id,txt:"Tap the heads "+vname(n)+" feeds"})};
   if($("#vDel"))$("#vDel").onclick=function(){mutate("remove "+vname(n));removeValve(n);closeSheet();ML.sel=null;drawNet()};
 }
@@ -1042,17 +1055,21 @@ function findFor(target,label){
 }
 
 /* ---- editing ---- */
-function startEdit(){if(!who()){var s=sheet('<h2>Who\'s editing?</h2><p class="muted">Edits to the mainline are saved for everyone, with your name on them.</p>'+whoHtml("Who\'s editing")+'<div class="row" style="margin-top:14px"><button class="btn go w" id="wGo">Start editing</button></div>');wireWho(s);$("#wGo").onclick=function(){if(!who()){toast("Pick your name first");return}closeSheet();startEdit()};return}
-  ML.edit=true;ML.closed={};ML.hit={};ML.target=null;document.body.classList.add("mledit");mlApply(true);if(map.getZoom()<17)toast("Zoom in to see junctions you can drag")}
+function startEdit(then){if(!who()){var s=sheet('<h2>Who\'s editing?</h2><p class="muted">Edits to the mainline are saved for everyone, with your name on them.</p>'+whoHtml("Who\'s editing")+'<div class="row" style="margin-top:14px"><button class="btn go w" id="wGo">Start editing</button></div>');wireWho(s);$("#wGo").onclick=function(){if(!who()){toast("Pick your name first");return}closeSheet();startEdit(then)};return}
+  ML.edit=true;ML.closed={};ML.hit={};ML.target=null;document.body.classList.add("mledit");mlApply(true);
+  if(typeof then==="function")then();else if(map.getZoom()<17)toast("Zoom in to see the tees and junctions")}
+function withEdit(f){if(ML.edit)f();else startEdit(f)}
 function stopEdit(){ML.edit=false;ML.undo=[];ML.ops=[];setTool(null);document.body.classList.remove("mledit");try{localStorage.removeItem("ml.draft")}catch(e){}mlApply(true)}
 function cancelEdit(){if(!ML.ops.length){stopEdit();return}var s=sheet('<h2>Throw away '+ML.ops.length+' change'+(ML.ops.length===1?'':'s')+'?</h2><div class="row" style="margin-top:14px"><button class="btn soft" data-close>Keep editing</button><button class="btn stop" id="cGo" style="flex:2">Throw them away</button></div>');$("#cGo").onclick=function(){closeSheet();loadNet(true).then(function(){stopEdit()})}}
 function mutate(what){ML.undo.push(JSON.stringify(NET));if(ML.undo.length>60)ML.undo.shift();ML.ops.push(what);draft()}
 function draft(){ls("ml.draft",{base:NETBASE,net:NET,ops:ML.ops,test:TEST})}
 function undo(){var s=ML.undo.pop();if(!s)return;NET=JSON.parse(s);ML.ops.pop();netIndex();draft();drawNet()}
 function moveNode(n,latlng){mutate("move "+vname(n));n.lat=+latlng.lat.toFixed(7);n.lng=+latlng.lng.toFixed(7);(ADJ[n.id]||[]).forEach(function(p){p._len=null});HEADFEED=null;drawNet()}
-function splitPipe(np,kind,props){
-  var p=np.p;var ll=pipeLL(p);var idx=np.i;var at=np.ll;
-  var nid=nextId("n",NET.nodes);var node=Object.assign({id:nid,k:kind,lat:+at[0].toFixed(7),lng:+at[1].toFixed(7)},props||{});NET.nodes.push(node);
+function splitPipe(np,kind,props,reuse){
+  var p=np.p;var ll=pipeLL(p);var idx=np.i;var at=np.ll;var node,nid;
+  if(reuse){node=reuse;nid=node.id;node.lat=+at[0].toFixed(7);node.lng=+at[1].toFixed(7)}
+  else{nid=nextId("n",NET.nodes);node=Object.assign({id:nid,k:kind,lat:+at[0].toFixed(7),lng:+at[1].toFixed(7)},props||{})}
+  NET.nodes.push(node);
   var before=ll.slice(1,idx+1),after=ll.slice(idx+1,ll.length-1);
   var p2={id:nextId("p",NET.pipes),a:nid,b:p.b,pts:after.map(function(x){return [x[0],x[1]]})};["mm","run"].forEach(function(k){if(p[k])p2[k]=p[k]});
   p.b=nid;p.pts=before.map(function(x){return [x[0],x[1]]});p._len=null;NET.pipes.push(p2);netIndex();return node}
@@ -1061,16 +1078,59 @@ function newValveSheet(np){
   var g=s.querySelector("#nvK");g.onclick=function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");k0=b.dataset.v};
   $("#nvGo").onclick=function(){var tag=$("#nvTag").value.trim(),note=$("#nvNote").value.trim();mutate("add "+(tag||VALVE[k0].short));
     var props={};if(tag)props.ref=tag;if(note)props.note=note;
-    if(k0==="iv"){var tap=splitPipe(np,"j",{});var off=offsetLL([tap.lat,tap.lng],np,4);var vid=nextId("n",NET.nodes);NET.nodes.push(Object.assign({id:vid,k:"iv",lat:off[0],lng:off[1]},props));NET.pipes.push({id:nextId("p",NET.pipes),a:tap.id,b:vid,pts:[],run:"LI stub",stub:1});netIndex()}
+    if(k0==="iv"){var tap=splitPipe(np,"j",{});var off=offsetLL([tap.lat,tap.lng],np,4);var vid=nextId("n",NET.nodes);NET.nodes.push(Object.assign({id:vid,k:"iv",lat:off[0],lng:off[1]},props));NET.pipes.push({id:nextId("p",NET.pipes),a:tap.id,b:vid,pts:[],run:"LI-IV take-off",stub:1});netIndex()}
     else splitPipe(np,k0,props);
     closeSheet();drawNet();toast("Valve added")};
+}
+/* ---- moving valves between pipes, and valves on the legs of a tee ---- */
+function llOf(q){return [q[1]/110574,q[0]/(111320*K0)]}
+function npOnPipe(p,ll){var P=xy(ll),c=pipeLL(p).map(xy),best=null;for(var i=1;i<c.length;i++){var r=projSeg(P,c[i-1],c[i]);if(!best||r.d<best.d)best={p:p,i:i-1,t:r.t,d:r.d,q:r.q}}best.ll=llOf(best.q);return best}
+function alongLL(ll,m){var acc=0;for(var i=1;i<ll.length;i++){var d=dist(ll[i-1],ll[i]);if(acc+d>=m){var t=(m-acc)/(d||1);return [ll[i-1][0]+(ll[i][0]-ll[i-1][0])*t,ll[i-1][1]+(ll[i][1]-ll[i-1][1])*t]}acc+=d}return ll[ll.length-1]}
+function sideOf(ll,np){var c=pipeLL(np.p).map(xy);var a=c[np.i],b=c[np.i+1]||a;var P=xy(ll);var cr=(b[0]-a[0])*(P[1]-a[1])-(b[1]-a[1])*(P[0]-a[0]);return np.d<1.5?1:(cr>=0?1:-1)}
+/* take a valve out of the network without losing it: what it sat on is joined back up */
+function freeNode(n){
+  var ps=(ADJ[n.id]||[]).slice();
+  if(n.k==="iv"){var stub=ps.filter(function(p){return p.stub})[0]||(ps.length===1?ps[0]:null);
+    if(stub){var tap=stub.a===n.id?stub.b:stub.a;NET.pipes=NET.pipes.filter(function(x){return x!==stub});netIndex();var tn=NI[tap];if(tn&&tn.k==="j"&&(ADJ[tap]||[]).length===2)mergeAt(tn);else if(tn&&tn.k==="j"&&(ADJ[tap]||[]).length===1)tn.k="end"}
+    ps=(ADJ[n.id]||[]).slice()}
+  if(ps.length){var id=nextId("n",NET.nodes);var r={id:id,k:ps.length===1?"end":"j",lat:n.lat,lng:n.lng};NET.nodes.push(r);
+    ps.forEach(function(p){if(p.a===n.id)p.a=id;if(p.b===n.id)p.b=id});netIndex();if(r.k==="j"&&ps.length===2)mergeAt(r)}
+  NET.nodes=NET.nodes.filter(function(x){return x!==n});netIndex()}
+function attachValve(n,np,side){
+  if(n.k==="iv"){var tap=splitPipe(np,"j",{});var off=offsetLL([tap.lat,tap.lng],np,4*(side||1));n.lat=off[0];n.lng=off[1];NET.nodes.push(n);NET.pipes.push({id:nextId("p",NET.pipes),a:tap.id,b:n.id,pts:[],run:"LI-IV take-off",stub:1});netIndex();return}
+  splitPipe(np,n.k,null,n)}
+function relocateValve(n,ll,opt){opt=opt||{};
+  var np0=nearestPipe(ll,{noStub:true});
+  if(!np0||(!opt.far&&screenD(ll,np0.ll)>36)||(opt.far&&np0.d>25)){toast("Put it right on a pipe");drawNet();return false}
+  mutate("move "+vname(n));var side=sideOf(ll,np0);
+  freeNode(n);var np=nearestPipe(ll,{noStub:true});if(!np){undo();toast("Couldn't find the pipe");return false}
+  attachValve(n,np,side);HEADFEED=null;ML.sel=null;drawNet();toast(vname(n)+" moved");return true}
+function nearPins(n){var out=[];records().forEach(function(r){var t=T[r.type];if(!t||!t.valve||t.cat!=="asset"||r._pending)return;var d=dist([n.lat,n.lng],[r.lat,r.lng]);if(d<=30&&d>1)out.push([d,r])});return out.sort(function(a,b){return a[0]-b[0]}).slice(0,3)}
+var ARROW='<svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>';
+function legsOf(j){return (ADJ[j.id]||[]).filter(function(p){return !p.stub}).map(function(p){
+  var ll=pipeLL(p);if(p.a!==j.id)ll=ll.slice().reverse();var len=plen(p);var other=NI[p.a===j.id?p.b:p.a];
+  var ahead=alongLL(ll,Math.min(15,len));var deg=(Math.atan2((ahead[1]-ll[0][1])*K0,ahead[0]-ll[0][0])*180/Math.PI+360)%360;
+  var nt=nearText(alongLL(ll,Math.min(40,len)));
+  return {p:p,ll:ll,len:len,to:other,deg:deg,dir:bearing(ll[0],ahead),valve:isValve(other)&&len<=10?other:null,place:nt.place}})}
+function legsSheet(j){
+  var isV=isValve(j);var legs=legsOf(j);
+  var h='<h2>'+(isV?esc(vname(j))+' is on a tee':'Tee · '+legs.length+' ways')+'</h2><p class="muted">'+(isV?'Pick the leg it\'s really on and it moves 5 m down that leg.':'Add a valve on each leg that has one. It goes 5 m from the tee; drag it after if it\'s further.')+'</p><div class="legs">';
+  legs.forEach(function(L,i){var sub=[L.place?"towards "+L.place:"",!L.valve&&isValve(L.to)?vname(L.to)+" in "+fmtM(L.len):""].filter(Boolean).join(" · ");
+    h+='<div class="leg"><span class="arr" style="transform:rotate('+Math.round(L.deg)+'deg)">'+ARROW+'</span><span class="t"><b>Heading '+L.dir+'</b><small>'+esc(sub)+'</small></span>'+
+      (isV?'<button class="btn go sm" data-leg="'+i+'">It\'s on this one</button>':L.valve?'<span class="pill">'+esc(vname(L.valve))+(L.len>0.5?' · '+fmtM(L.len):'')+'</span>':'<button class="btn soft sm" data-leg="'+i+'">Add valve</button>')+'</div>'});
+  h+='</div>';
+  if(!isV)h+='<p class="faint" style="font-size:13.5px;margin-top:10px">Drag the tee to move it. Valves already on a leg show their name.</p>';
+  var s=sheet(h,{peek:true});
+  s.querySelectorAll("[data-leg]").forEach(function(b){b.onclick=function(){var L=legs[+b.dataset.leg];var at=alongLL(L.ll,Math.min(5,L.len*.45));
+    if(isV){mutate("put "+vname(j)+" on its leg");var p=L.p;freeNode(j);attachValve(j,npOnPipe(p,at),1);HEADFEED=null;closeSheet();drawNet();toast(vname(j)+" moved onto its leg");return}
+    closeSheet();newValveSheet(npOnPipe(L.p,at))}});
 }
 function offsetLL(ll,np,m){var c=pipeLL(np.p).map(xy);var a=c[np.i],b=c[np.i+1]||c[np.i];var dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;var P=xy(ll);var q=[P[0]-dy/L*m,P[1]+dx/L*m];return [+(q[1]/110574).toFixed(7),+(q[0]/(111320*K0)).toFixed(7)]}
 function valveEditSheet(n){ML.sel=null;var k0=n.k;var s=sheet('<h2>'+esc(vname(n))+'</h2><h3>What is it?</h3><div class="opts" id="veK">'+["sv","mv","iv","ov"].map(function(k){return '<button class="opt'+(k===k0?" sel":"")+'" data-v="'+k+'">'+VALVE[k].name+'</button>'}).join("")+'</div><h3>Does it work?</h3><div class="opts" id="veC">'+[["","Works / not checked"],["work","Needs work"],["fail","Seized or won't shut"]].map(function(c){return '<button class="opt'+((n.cond||"")===c[0]?" sel":"")+'" data-v="'+c[0]+'">'+c[1]+'</button>'}).join("")+'</div><label class="f" for="veTag">Tag or number</label><input class="in" id="veTag" maxlength="24" value="'+esc(n.ref||"")+'"><label class="f" for="veNote">Notes</label><input class="in" id="veNote" maxlength="200" value="'+esc(n.note||"")+'"><div class="row" style="margin-top:14px"><button class="btn go w" id="veGo">Done</button></div>');
   var c0=n.cond||"";function grp(id,f){var g=s.querySelector(id);g.onclick=function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");f(b.dataset.v)}}
   grp("#veK",function(v){k0=v});grp("#veC",function(v){c0=v});
   $("#veGo").onclick=function(){var tag=$("#veTag").value.trim(),note=$("#veNote").value.trim();mutate("edit "+vname(n));n.k=k0;if(tag)n.ref=tag;else delete n.ref;if(note)n.note=note;else delete n.note;if(c0)n.cond=c0;else delete n.cond;closeSheet();drawNet()}}
-function nodeEditSheet(n){var deg=(ADJ[n.id]||[]).length;var s=sheet('<h2>'+esc(vname(n))+'</h2><p class="muted">'+deg+' pipe'+(deg===1?'':'s')+' meet here. Drag it to move it.</p><div class="row" style="margin-top:12px"><button class="btn soft sm" id="neV">Make it a valve</button>'+(deg===2?'<button class="btn soft sm" id="neM">Remove the bend</button>':'')+'</div>',{peek:true});
+function nodeEditSheet(n){var deg=(ADJ[n.id]||[]).length;if((ADJ[n.id]||[]).filter(function(p){return !p.stub}).length>=3){legsSheet(n);return}var s=sheet('<h2>'+esc(vname(n))+'</h2><p class="muted">'+deg+' pipe'+(deg===1?'':'s')+' meet here. Drag it to move it.</p><div class="row" style="margin-top:12px"><button class="btn soft sm" id="neV">Make it a valve</button>'+(deg===2?'<button class="btn soft sm" id="neM">Remove the bend</button>':'')+'</div>',{peek:true});
   $("#neV").onclick=function(){mutate("valve at junction");n.k="sv";closeSheet();valveEditSheet(n)};
   if($("#neM"))$("#neM").onclick=function(){mutate("merge pipes");mergeAt(n);closeSheet();drawNet()}}
 function pipeSheet(p){var s=sheet('<h2>Pipe</h2><label class="f" for="psRun">Name of the run</label><input class="in" id="psRun" maxlength="40" value="'+esc(p.run||"")+'"><label class="f">Size</label><div class="opts" id="psMm">'+["50mm","65mm","80mm","100mm","150mm","200mm","250mm",""].map(function(v){return '<button class="opt'+((p.mm||"")===v?" sel":"")+'" data-v="'+v+'">'+(v||"Not sure")+'</button>'}).join("")+'</div><div class="row" style="margin-top:14px"><button class="btn go w" id="psGo">Done</button></div>');
