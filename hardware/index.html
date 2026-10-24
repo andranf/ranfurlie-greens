@@ -606,8 +606,8 @@ function snapshot(rec){
       x.lineWidth=4;x.strokeStyle="#fff";x.beginPath();x.arc(p[0],p[1],15,0,7);x.stroke();x.lineWidth=2.5;x.strokeStyle=t.col;x.beginPath();x.arc(p[0],p[1],15,0,7);x.stroke();
       x.beginPath();x.moveTo(p[0]-30,p[1]);x.lineTo(p[0]-19,p[1]);x.moveTo(p[0]+19,p[1]);x.lineTo(p[0]+30,p[1]);x.moveTo(p[0],p[1]-30);x.lineTo(p[0],p[1]-19);x.moveTo(p[0],p[1]+19);x.lineTo(p[0],p[1]+30);x.lineWidth=4;x.strokeStyle="#fff";x.stroke();
       x.beginPath();x.arc(p[0],p[1],4,0,7);x.fillStyle=t.col;x.fill();x.lineWidth=1.5;x.strokeStyle="#fff";x.stroke();
-      x.fillStyle="rgba(6,18,27,.72)";x.fillRect(0,H-22,W,22);x.fillStyle="#fff";x.font="600 13px Barlow, system-ui, sans-serif";x.fillText(t.name+" · "+(rec.place?rec.place+", ":"")+(rec.near||"")+"   ·   10 m scale:",8,H-7);
-      var sx=W-8-10/(mpp*k);x.fillRect(sx,H-11,10/(mpp*k),3);
+      x.fillStyle="rgba(6,18,27,.72)";x.fillRect(0,H-22,W,22);x.fillStyle="#fff";x.font="600 13px Barlow, system-ui, sans-serif";x.fillText(t.name+" · "+(rec.place?rec.place+", ":"")+(rec.near||""),8,H-7);
+      var bw=10/(mpp*k),sx=W-8-bw;x.fillRect(sx,H-11,bw,3);x.fillRect(sx,H-15,2,7);x.fillRect(sx+bw-2,H-15,2,7);x.textAlign="right";x.fillText("10 m",sx-6,H-7);x.textAlign="left";
       var d=cv.toDataURL("image/jpeg",.74);res(d.slice(d.indexOf(",")+1));
     }catch(e){rej(e)}};
     img.onerror=function(){clearTimeout(to);rej("img")};img.src=url;
