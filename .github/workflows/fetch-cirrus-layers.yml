@@ -1,0 +1,26 @@
+# Pulls the CirrusPRO image layers (MetroMap backdrop, 2000 irrigation as-built, drainage overlay) for the hardware map build.
+# Run by hand (Actions tab > Fetch CirrusPRO image layers > Run workflow). Output is a build artifact, not committed.
+name: Fetch CirrusPRO image layers
+on:
+  workflow_dispatch:
+    inputs:
+      files:
+        description: "Space-separated file names under assets/images/layers/ on the CirrusPRO server"
+        required: true
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download
+        run: |
+          mkdir -p layers
+          for f in ${{ inputs.files }}; do
+            curl -fsS --retry 3 --max-time 120 -o "layers/$f" "https://ranfurlie.rainbird.mobi:50020/assets/images/layers/$f"
+          done
+          ls -la layers
+          sha256sum layers/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cirrus-layers
+          path: layers/
+          retention-days: 3
