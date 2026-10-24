@@ -50,6 +50,7 @@ else. Post `{"kind":"purge_test","__test":"1"}` to the hook to clear them.
   posts the whole network to the hook (`kind: "net"`), which commits `network.json` with a log line. Nothing in the page
   needs changing when the network changes.
 - `_build/build_network.py` rebuilds the first pass from the drawing. Running it again throws away the crew's edits.
+- `_build/smooth_network.py` evens out wobbly runs in place (keeps every valve, link and edit; ran once on 24 Oct 2026).
 - Cirrus Pro: the Layers button in the Mainline tab gives the mainline and valve layers as KML, each under 200 points.
 
 ## Aerials
