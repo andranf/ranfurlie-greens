@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ranfurlie Hardware Map</title>
+<meta name="description" content="Valves, drains, QCVs and problems pinned by the Ranfurlie crew.">
+<meta property="og:title" content="Ranfurlie hardware map">
+<meta property="og:description" content="Valves, drains, QCVs and problems pinned by the crew. Tap to open the pin.">
+<meta property="og:image" content="https://andranf.github.io/ranfurlie-greens/hardware/og.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b2231">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Ranfurlie Hardware Map v1.0 (24 Oct 2026).
+   Crew pin permanent hardware (valves, QCVs, drain pits...) and problems (leaks, wet spots, blocked drains) with phone GPS.
+   Problems and failed hardware post to #irrigation / #drainage through the Zapier "Hardware map" hook, with a link back to the pin.
+   Records live in hardware/live.json (written by that workflow). Reference layers (Cirrus heads, as-built valves and pits,
+   buried lines) come from hardware/ref.json. Cirrus Pro layers: one small KML per hardware type from the Layers sheet.
+   Design: the tank-mix glass system (Barlow / Barlow Condensed, frosted rim-lit panels) floating over the aerial. */
+:root{
+  color-scheme:light;
+  --bg:#e4f1f7;
+  --glass:rgba(255,255,255,.62); --glass-hi:rgba(255,255,255,.82); --glass-lo:rgba(255,255,255,.38); --glass-solid:rgba(246,251,253,.96); --sheet:#f3f9fb;
+  --rim:rgba(255,255,255,.9); --rim2:rgba(255,255,255,.35); --edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -18px rgba(14,52,76,.45),0 2px 6px -2px rgba(14,52,76,.16);
+  --fg:#0b2231; --muted:#3f5d6e; --faint:#6f8a99; --line:rgba(16,52,72,.12);
+  --go:#13a356; --go2:#2fd27a; --go-ink:#ffffff; --go-soft:rgba(47,210,122,.18);
+  --tank:#0aa6dc; --tank-deep:#0573a8; --tank-soft:rgba(10,166,220,.14);
+  --poison:#e0313b; --poison-bg:rgba(224,49,59,.13); --caution:#a86000; --caution-bg:rgba(255,176,32,.2); --ok:#13a356;
+  --scrim:rgba(8,30,44,.38);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:26px; --r2:18px; --ease:cubic-bezier(.2,.8,.2,1);
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(16,36,52,.62); --glass-hi:rgba(28,58,78,.74); --glass-lo:rgba(18,40,56,.42); --glass-solid:rgba(14,34,48,.97); --sheet:#0f2433;
+  --rim:rgba(255,255,255,.22); --rim2:rgba(255,255,255,.06); --edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.65),0 2px 6px -2px rgba(0,0,0,.45);
+  --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.1);
+  --go:#2fd27a; --go2:#6ff0a6; --go-ink:#03210f; --go-soft:rgba(47,210,122,.18);
+  --tank:#38c6ff; --tank-deep:#1490cc; --tank-soft:rgba(56,198,255,.14);
+  --poison:#ff5c5c; --poison-bg:rgba(255,92,92,.16); --caution:#ffbc45; --caution-bg:rgba(255,188,69,.16); --ok:#2fd27a;
+  --scrim:rgba(0,0,0,.55);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(16,36,52,.62); --glass-hi:rgba(28,58,78,.74); --glass-lo:rgba(18,40,56,.42); --glass-solid:rgba(14,34,48,.97); --sheet:#0f2433;
+  --rim:rgba(255,255,255,.22); --rim2:rgba(255,255,255,.06); --edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.65),0 2px 6px -2px rgba(0,0,0,.45);
+  --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.1);
+  --go:#2fd27a; --go2:#6ff0a6; --go-ink:#03210f; --go-soft:rgba(47,210,122,.18);
+  --tank:#38c6ff; --tank-deep:#1490cc; --tank-soft:rgba(56,198,255,.14);
+  --poison:#ff5c5c; --poison-bg:rgba(255,92,92,.16); --caution:#ffbc45; --caution-bg:rgba(255,188,69,.16); --ok:#2fd27a;
+  --scrim:rgba(0,0,0,.55);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+#map{position:fixed;inset:0;background:#20323b}
+.leaflet-container{font-family:var(--body);background:#20323b}
+.leaflet-control-attribution{font-size:10px;background:rgba(0,0,0,.35)!important;color:rgba(255,255,255,.75)!important;margin-bottom:var(--safe-b)!important}
+.leaflet-control-attribution a{color:rgba(255,255,255,.85)!important}
+
+/* glass */
+.glass{background:linear-gradient(180deg,var(--glass-hi),var(--glass) 38%,var(--glass));-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow)}
+.inset{box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
+
+/* top bar */
+.top{position:fixed;left:0;right:0;top:0;z-index:500;padding:calc(10px + var(--safe-t)) 12px 0;pointer-events:none}
+.bar{pointer-events:auto;display:flex;align-items:center;gap:10px;border-radius:22px;padding:8px 8px 8px 14px;max-width:760px;margin:0 auto}
+.bar .t{flex:1;min-width:0}
+.bar h1{margin:0;font-family:var(--display);font-weight:800;font-size:23px;line-height:1;letter-spacing:.01em}
+.bar .sub{font-size:13.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.ib{border:0;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;cursor:pointer;background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);transition:transform .15s var(--ease)}
+.ib:active{transform:scale(.94)}
+.ib svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chips{pointer-events:auto;display:flex;gap:7px;overflow-x:auto;padding:9px 2px 6px;max-width:760px;margin:0 auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:0;cursor:pointer;font-family:var(--display);font-weight:700;font-size:16px;border-radius:999px;padding:6px 13px 6px 10px;display:flex;align-items:center;gap:7px;color:var(--muted);transition:opacity .2s,transform .15s}
+.chip .dot{width:11px;height:11px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.75)}
+.chip .n{font-variant-numeric:tabular-nums;opacity:.8}
+.chip.off{opacity:.55}.chip.off .dot{background:transparent!important;box-shadow:inset 0 0 0 2px var(--faint)}
+.chip:active{transform:scale(.96)}
+
+/* corner buttons */
+.fabs{position:fixed;right:12px;bottom:calc(104px + var(--safe-b));z-index:500;display:grid;gap:10px}
+.fabs .ib{width:52px;height:52px;border-radius:18px}
+.fabs .ib.on svg{stroke:var(--tank)}
+.add{white-space:nowrap;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + var(--safe-b));z-index:500;border:0;cursor:pointer;border-radius:999px;padding:0 28px 0 22px;min-height:64px;display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:24px;background:linear-gradient(180deg,var(--go2),var(--go));color:var(--go-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(0,0,0,.08),0 14px 30px -12px rgba(0,0,0,.55);transition:transform .15s var(--ease)}
+.add:active{transform:translateX(-50%) scale(.97)}
+.add svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round}
+
+/* sheets */
+.scrim{position:fixed;inset:0;z-index:900;background:var(--scrim);animation:fade .2s ease both}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:901;max-width:640px;margin:0 auto;border-radius:28px 28px 0 0;padding:8px 16px calc(18px + var(--safe-b));max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--glass-solid);box-shadow:inset 0 1px 0 var(--rim),0 -18px 40px -16px rgba(0,0,0,.45);animation:up .32s var(--ease) both}
+.sheet.peek{max-height:62vh}
+.grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 10px}
+.sheet h2{font-family:var(--display);font-weight:800;font-size:27px;line-height:1.05;margin:2px 0 4px}
+.sheet h3{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 8px}
+.sheet p{margin:6px 0}
+.muted{color:var(--muted)}.faint{color:var(--faint)}
+.x{position:absolute;right:12px;top:10px}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:520px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tile{border:0;cursor:pointer;text-align:left;border-radius:18px;padding:11px 12px;min-height:66px;display:flex;align-items:center;gap:10px;background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);transition:transform .15s var(--ease),background .2s}
+.tile:active{transform:scale(.97)}
+.tile .ic{flex:0 0 38px;height:38px;border-radius:12px;display:grid;place-items:center}
+.tile .ic svg{width:22px;height:22px}
+.tile b{font-family:var(--display);font-weight:700;font-size:18.5px;line-height:1.05;display:block}
+.tile small{display:block;color:var(--faint);font-size:12.5px;line-height:1.2;margin-top:2px}
+.tile.sel{background:var(--tank-soft);box-shadow:inset 0 0 0 2px var(--tank)}
+
+.btn{border:0;border-radius:999px;padding:10px 20px;font-family:var(--display);font-weight:700;font-size:20px;cursor:pointer;min-height:54px;transition:transform .15s var(--ease),opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn.go{background:linear-gradient(180deg,var(--go2),var(--go));color:var(--go-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 22px -12px var(--go)}
+.btn.go:disabled{opacity:.4}
+.btn.soft{background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
+.btn.stop{background:var(--poison-bg);color:var(--poison)}
+.btn.sm{min-height:42px;font-size:17px;padding:6px 15px}
+.btn.w{width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>.btn{flex:1 1 auto}
+.acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.acts .btn,a.btn{color:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+@media (min-width:520px){.acts{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.opts{display:flex;flex-wrap:wrap;gap:7px}
+.opt{border:0;cursor:pointer;border-radius:999px;padding:8px 14px;font-family:var(--display);font-weight:700;font-size:17px;background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);color:var(--muted)}
+.opt.sel{background:var(--tank);color:#fff;box-shadow:none}
+.opt.good.sel{background:var(--go)}
+.opt.work.sel{background:#e08a00}
+.opt.fail.sel{background:var(--poison)}
+label.f{display:block;font-weight:600;font-size:14px;color:var(--muted);margin:12px 0 5px}
+input.in,textarea.in{width:100%;border:0;border-radius:14px;padding:12px 14px;font:inherit;font-size:17px;color:var(--fg);background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--line);outline:none}
+input.in:focus,textarea.in:focus{box-shadow:inset 0 0 0 2px var(--tank)}
+textarea.in{min-height:76px;resize:vertical}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--poison-bg);cursor:pointer}
+.toggle input{width:22px;height:22px;accent-color:var(--poison)}
+.toggle b{font-family:var(--display);font-size:18px}
+
+/* record card */
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:15px;margin:10px 0}
+.kv dt{color:var(--faint)}.kv dd{margin:0;font-weight:500}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-weight:700;font-size:15px;border-radius:999px;padding:2px 11px;background:var(--glass-lo);color:var(--muted);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
+.pill.bad{background:var(--poison-bg);color:var(--poison)}
+.pill.warn{background:var(--caution-bg);color:var(--caution)}
+.pill.ok{background:var(--go-soft);color:var(--go)}
+.pill.info{background:var(--tank-soft);color:var(--tank-deep)}
+.head{display:flex;gap:12px;align-items:center;margin-top:2px}
+.head .ic{flex:0 0 48px;height:48px;border-radius:15px;display:grid;place-items:center}
+.head .ic svg{width:28px;height:28px}
+.note{border-radius:16px;padding:10px 12px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line);margin:10px 0;white-space:pre-wrap}
+
+/* placing mode */
+.cross{position:fixed;left:50%;top:50%;z-index:450;width:76px;height:76px;margin:-38px 0 0 -38px;pointer-events:none;display:none}
+.cross svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 1px 2px rgba(0,0,0,.7))}
+body.placing .cross{display:block}
+body.placing .add,body.placing .fabs .hide-place,body.placing .chips{display:none}
+.placebar{position:fixed;left:0;right:0;bottom:0;z-index:600;padding:0 12px calc(12px + var(--safe-b));display:none}
+body.placing .placebar{display:block}
+.placebar .glass{max-width:640px;margin:0 auto;border-radius:24px;padding:12px}
+.gps{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.gps .big{font-family:var(--display);font-weight:800;font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.gps .lbl{font-size:13.5px;color:var(--muted);line-height:1.25}
+.meter{flex:1;height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--poison),#ffb020 45%,var(--go2));transition:width .4s var(--ease)}
+.near{font-size:14.5px;color:var(--muted);margin:-2px 0 10px}
+.hint{position:fixed;left:50%;transform:translateX(-50%);top:calc(70px + var(--safe-t));z-index:600;display:none;border-radius:999px;padding:8px 16px;font-family:var(--display);font-weight:700;font-size:17px;white-space:nowrap}
+body.placing .hint{display:block}
+
+/* markers */
+.pin{width:34px;height:44px;position:relative}
+.pin svg{width:34px;height:44px;overflow:visible;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
+.pin.issue::before{content:"";position:absolute;left:5px;top:5px;width:24px;height:24px;border-radius:50%;background:currentColor;opacity:.55;animation:pulse 2s ease-out infinite}
+.pin.pending{opacity:.75}
+.pin.pending svg{animation:bob 1.2s ease-in-out infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:.55}100%{transform:scale(2.6);opacity:0}}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.lbl-tip{background:rgba(6,18,27,.72);color:#fff;border:0;border-radius:6px;padding:1px 5px;font-family:var(--display);font-weight:600;font-size:12.5px;box-shadow:none}
+.lbl-tip::before{display:none}
+.lbl-tip.plan{color:#ffe9a8}
+
+.toast{position:fixed;left:50%;top:calc(126px + var(--safe-t));transform:translate(-50%,-14px);z-index:1000;border-radius:999px;padding:11px 18px;font-weight:600;font-size:15.5px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s var(--ease);max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.list{display:grid;gap:6px}
+.li{border:0;cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:14px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line)}
+.li .ic{flex:0 0 30px;height:30px;border-radius:10px;display:grid;place-items:center}
+.li .ic svg{width:18px;height:18px}
+.li b{font-family:var(--display);font-size:17.5px;font-weight:700;display:block;line-height:1.1}
+.li small{color:var(--faint);font-size:13px}
+.li .r{margin-left:auto;font-family:var(--display);font-weight:700;color:var(--faint)}
+table.lay{width:100%;border-collapse:collapse;font-size:15px}
+table.lay td{padding:9px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.lay td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.sw{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;vertical-align:-1px;box-shadow:0 0 0 1.5px rgba(0,0,0,.25)}
+.loading{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;background:var(--bg);font-family:var(--display);font-weight:700;font-size:22px;color:var(--muted);transition:opacity .4s}
+.loading.gone{opacity:0;pointer-events:none}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="map" aria-label="Course map"></div>
+<div class="loading" id="loading">Loading the course…</div>
+
+<header class="top">
+  <div class="bar glass">
+    <div class="t"><h1>Hardware map</h1><div class="sub" id="sub">Ranfurlie</div></div>
+    <button class="ib" id="bSearch" aria-label="Find a valve, head or pin"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></button>
+    <button class="ib" id="bMenu" aria-label="Lists and Cirrus Pro layers"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 8 12 13l9.5-5z"/><path d="m2.5 12.5 9.5 5 9.5-5"/><path d="m2.5 17 9.5 5 9.5-5"/></svg></button>
+  </div>
+  <nav class="chips" id="chips" aria-label="Show on the map"></nav>
+</header>
+
+<div class="fabs">
+  <button class="ib glass" id="bLocate" aria-label="Show where I am"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg></button>
+  <button class="ib glass hide-place" id="bFit" aria-label="Whole course"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+</div>
+<button class="add" id="bAdd"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Pin something</button>
+
+<div class="cross" aria-hidden="true"><svg viewBox="0 0 76 76"><circle cx="38" cy="38" r="15" fill="none" stroke="#fff" stroke-width="3"/><circle cx="38" cy="38" r="15" fill="none" stroke="#0aa6dc" stroke-width="1.4" stroke-dasharray="4 4"/><path d="M38 4v20M38 52v20M4 38h20M52 38h20" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="38" cy="38" r="2.6" fill="#ff3b30" stroke="#fff" stroke-width="1.2"/></svg></div>
+<div class="hint glass" id="hint">Put the cross right on it</div>
+<div class="placebar"><div class="glass" id="placebar"></div></div>
+<div class="toast glass" id="toast" role="status"></div>
+<div id="layer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function(){
+"use strict";
+/* ---------- config ---------- */
+var HOOK="__HOOK__";
+var PAGE="https://andranf.github.io/ranfurlie-greens/hardware/";
+var PREVIEW=!/github\.io$/.test(location.hostname);
+var QS=new URLSearchParams(location.search);
+var TEST=QS.get("test")==="1";
+var CREW=[["Andy Anderson","U06BCCG4HT9"],["Ben Hartley","U06NBNSR9LG"],["Neil Harper","U06FJ0J1RH8"],["Kyle Craig","U06FWK6ND5X"],["Nathan Drew","U06FJ0J5DS6"],["Nathan Ferguson","U06H9J0LBEC"],["Brodie Macdonald","U0839HLQA8G"],["Nicholas Debrincat","U07QSB7MDK5"],["Flynn Sinclair","U08C1SVFSFR"],["James King","U08D57N6JSC"],["Joshua Cope","U08ENB28AQZ"],["Mitch Mahoney","U08K55E3QJU"],["Samuel Cope","U09LN1Q8QH2"],["Tremayne Gallagher","U09V6AVPUDP"],["Michael K","U07QSB7HVM1"]];
+var CIRRUS_SMALL=200; /* Cirrus Pro calls a layer Small under 200 points */
+
+/* ---------- icons ---------- */
+var G={
+  drop:'<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/>',
+  wave:'<path d="M3 10c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>',
+  grate:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 4v16M12 4v16M16 4v16"/>',
+  box:'<rect x="3.5" y="6" width="17" height="12" rx="2"/><path d="M3.5 10h17"/>',
+  head:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+  bang:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/>',
+  valve:'<path d="M4 17h16"/><path d="M7 17V9l5 4 5-4v8"/><path d="M12 13V5M9 5h6"/>',
+  qcv:'<path d="M12 21V11"/><circle cx="12" cy="7" r="4"/><path d="M12 5v4M10 7h4"/>',
+  chip:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>',
+  air:'<path d="M5 9h9a3 3 0 1 0-3-3"/><path d="M3 13h14a3 3 0 1 1-3 3"/><path d="M4 17h5"/>',
+  outlet:'<path d="M3 8h10a4 4 0 0 1 4 4v1"/><path d="M3 14h7"/><path d="M17 16c0 1.5 1 3 2 4M15 17c0 1.4-.6 2.6-1.4 3.5M19.5 14.5c.6 1 .9 2 .9 3"/>',
+  co:'<circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/>',
+  dot:'<circle cx="12" cy="12" r="5"/>',
+  tick:'<path d="m5 12.5 4.5 4.5L19 7.5"/>'
+};
+function svg(g,col,sw){return '<svg viewBox="0 0 24 24" style="stroke:'+(col||'currentColor')+';fill:none;stroke-width:'+(sw||2)+';stroke-linecap:round;stroke-linejoin:round">'+G[g]+'</svg>'}
+
+/* ---------- types ---------- */
+/* fam: irr -> #irrigation, drn -> #drainage. plan: the as-built code family the type lines up with. */
+var T={
+  leak:{cat:"issue",fam:"irr",name:"Leak",hint:"Water coming up, wet patch over a pipe",g:"drop",col:"#ff3b30"},
+  headfault:{cat:"issue",fam:"irr",name:"Head fault",hint:"Stuck on, won't pop, broken, wrong arc",g:"head",col:"#ff3b30"},
+  box:{cat:"issue",fam:"irr",name:"Broken or sunken box",hint:"Lid gone, cracked, trip hazard",g:"box",col:"#ff3b30"},
+  other_irr:{cat:"issue",fam:"irr",name:"Other irrigation",hint:"Anything else for #irrigation",g:"bang",col:"#ff3b30"},
+  wet:{cat:"issue",fam:"drn",name:"Wet or boggy spot",hint:"Not draining, standing water",g:"wave",col:"#ff9f0a"},
+  blocked:{cat:"issue",fam:"drn",name:"Blocked or slow drain",hint:"Pit full, grate blocked, outlet not running",g:"grate",col:"#ff9f0a"},
+  other_drn:{cat:"issue",fam:"drn",name:"Other drainage",hint:"Anything else for #drainage",g:"bang",col:"#ff9f0a"},
+  iv:{cat:"asset",fam:"irr",name:"Isolation valve",plural:"Isolation valves",plan:"iv",g:"valve",col:"#30d158",valve:true},
+  sv:{cat:"asset",fam:"irr",name:"Sluice valve",plural:"Sluice valves",plan:"sv",g:"valve",col:"#0a84ff",valve:true},
+  mv:{cat:"asset",fam:"irr",name:"MV valve",plural:"MV valves",hint:"Marked MV on the 2000 as-built",plan:"mv",g:"valve",col:"#8e8cff",valve:true},
+  qcv:{cat:"asset",fam:"irr",name:"Quick coupler (QCV)",plural:"Quick couplers",g:"qcv",col:"#64d2ff",valve:true},
+  vbox:{cat:"asset",fam:"irr",name:"Valve box",plural:"Valve boxes",g:"box",col:"#d9a75f"},
+  head:{cat:"asset",fam:"irr",name:"Sprinkler head",plural:"Sprinkler heads",hint:"True GPS spot of a head",g:"head",col:"#f2f2f7"},
+  dec:{cat:"asset",fam:"irr",name:"Decoder or splice",plural:"Decoders and splices",g:"chip",col:"#bf5af2"},
+  air:{cat:"asset",fam:"irr",name:"Air valve",plural:"Air valves",g:"air",col:"#5ad8cf",valve:true},
+  dp:{cat:"asset",fam:"drn",name:"Drain pit",plural:"Drain pits",plan:"dp",g:"grate",col:"#ffd60a"},
+  do:{cat:"asset",fam:"drn",name:"Drain outlet",plural:"Drain outlets",plan:"do",g:"outlet",col:"#ffb340"},
+  co:{cat:"asset",fam:"drn",name:"Cleanout or flush point",plural:"Cleanouts and flush points",g:"co",col:"#e6d18a"},
+  other_hw:{cat:"asset",fam:"irr",name:"Other hardware",plural:"Other hardware",g:"dot",col:"#c7c7cc"}
+};
+var ISSUES=["leak","headfault","box","other_irr","wet","blocked","other_drn"];
+var ASSETS=["iv","sv","mv","qcv","vbox","head","dec","air","dp","do","co","other_hw"];
+var PLAN={iv:{name:"LI-IV",desc:"lateral isolation valve",type:"iv",col:"#30d158"},sv:{name:"SV",desc:"sluice valve",type:"sv",col:"#0a84ff"},mv:{name:"MV",desc:"marked MV",type:"mv",col:"#8e8cff"},dp:{name:"DP",desc:"drain pit",type:"dp",col:"#ffd60a"},do:{name:"DO",desc:"drain outlet",type:"do",col:"#ffb340"}};
+var COND={good:["Works fine","ok"],work:["Needs work","warn"],fail:["Failed","bad"]};
+var AREA={F:"fairway",G:"green",T:"tee",A:"approach",S:"surrounds",P:"green surrounds",R:"rough",M:"",D:"driving range",O:"practice putting green",HPPG:"Himalayan putting green",N:"chipping green",C:"chipping area"};
+
+/* ---------- small helpers ---------- */
+function $(s,r){return (r||document).querySelector(s)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function ord(n){var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+function ls(k,v){try{if(v===undefined){var x=localStorage.getItem(k);return x==null?null:JSON.parse(x)}localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+var R=6371008.8;
+function dist(a,b){var p=Math.PI/180,dlat=(b[0]-a[0])*p,dlng=(b[1]-a[1])*p*Math.cos((a[0]+b[0])/2*p);return R*Math.sqrt(dlat*dlat+dlng*dlng)}
+function bearing(a,b){var p=Math.PI/180,y=(b[1]-a[1])*Math.cos((a[0]+b[0])/2*p),x=b[0]-a[0];var d=(Math.atan2(y,x)/p+360)%360;return ["N","NE","E","SE","S","SW","W","NW"][Math.round(d/45)%8]}
+function fmtM(m){return m<10?m.toFixed(1)+" m":Math.round(m)+" m"}
+function when(iso){if(!iso)return "";var d=new Date(iso);if(isNaN(d))return "";var now=new Date();var t=d.toLocaleTimeString("en-AU",{hour:"numeric",minute:"2-digit"}).replace(/\s/g,"").toLowerCase();var same=d.toDateString()===now.toDateString();var y=new Date(now.getTime()-864e5);if(same)return "today "+t;if(d.toDateString()===y.toDateString())return "yesterday "+t;return d.toLocaleDateString("en-AU",{weekday:"short",day:"numeric",month:"short"})+" "+t}
+function newId(){var n=Math.floor(Date.now()/1000)-1767225600;var s=n.toString(36).toUpperCase();var a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return "PIN-"+s.slice(-5)+a[Math.floor(Math.random()*a.length)]}
+function evId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+var toastT;function toast(msg){var t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show")},3200)}
+
+/* ---------- data ---------- */
+var REF={heads:[],plan:[],lines:[],areas:[],noGps:[]};
+var LIVE={records:[]};
+var LOCAL=ls("hw.local")||{};   /* id -> {rec, ev} records changed on this phone and not yet in live.json */
+var HEADS=[];                    /* [{n,lat,lng,hole,area}] */
+function parseHead(n){var m=/^(\d+)([A-Z]+)(\d+)/.exec(n);if(!m)return {hole:null,area:""};return {hole:+m[1],area:m[2]}}
+function placeOf(h){if(!h)return "";var a=AREA[h.area];if(h.hole===19)return a||"practice area";if(!h.hole)return "";return ord(h.hole)+(a?" "+a:"")}
+function nearestHeads(ll,k){var out=[];for(var i=0;i<HEADS.length;i++){var h=HEADS[i];out.push([dist(ll,[h.lat,h.lng]),h])}out.sort(function(a,b){return a[0]-b[0]});return out.slice(0,k||1)}
+function nearText(ll){var n=nearestHeads(ll,1)[0];if(!n||n[0]>120)return {text:"",hole:null,place:""};var h=n[1];return {text:"near "+h.n+" ("+fmtM(n[0])+" "+bearing([h.lat,h.lng],ll)+")",hole:h.hole===19?null:h.hole,place:placeOf(h),head:h.n,d:n[0]}}
+function nearestPlan(ll,planType,max){var best=null;REF.plan.forEach(function(p){if(planType&&p[1]!==planType)return;var d=dist(ll,[p[2],p[3]]);if(d<=(max||25)&&(!best||d<best[0]))best=[d,p]});return best}
+
+function records(){
+  var by={};
+  (LIVE.records||[]).forEach(function(r){if(r.test&&!TEST)return;by[r.id]=r});
+  Object.keys(LOCAL).forEach(function(id){var L=LOCAL[id];var live=by[id];
+    if(live&&live.evs&&live.evs.indexOf(L.ev)>=0){delete LOCAL[id];return}
+    by[id]=Object.assign({},live||{},L.rec,{_pending:true})});
+  ls("hw.local",LOCAL);
+  return Object.keys(by).map(function(k){return by[k]}).filter(function(r){return r.status!=="removed"});
+}
+
+/* ---------- map ---------- */
+var map=L.map("map",{zoomControl:false,attributionControl:true,maxZoom:22,minZoom:14,preferCanvas:true,zoomSnap:.25,wheelPxPerZoomLevel:90});
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxNativeZoom:19,maxZoom:22,attribution:"Imagery &copy; Esri, Maxar, Earthstar Geographics",crossOrigin:true,keepBuffer:3}).addTo(map);
+var COURSE=L.latLngBounds([-38.1238,145.2378],[-38.1171,145.2507]);
+map.fitBounds(COURSE,{padding:[0,0]});
+var canvas=L.canvas({padding:.4,tolerance:6});
+var LG={heads:L.layerGroup(),plan:L.layerGroup(),lines:L.layerGroup(),issues:L.layerGroup(),assets:L.layerGroup(),fixed:L.layerGroup(),me:L.layerGroup().addTo(map),tmp:L.layerGroup().addTo(map)};
+var SHOW=Object.assign({issues:true,assets:true,plan:true,heads:true,lines:true,fixed:false},ls("hw.show")||{});
+var labelLayer=L.layerGroup().addTo(map);
+
+function buildRef(){
+  LG.heads.clearLayers();
+  HEADS.forEach(function(h){
+    var m=L.circleMarker([h.lat,h.lng],{renderer:canvas,radius:3.2,weight:1.2,color:"#0b2231",fillColor:"#ffffff",fillOpacity:.9,opacity:.75});
+    m.on("click",function(){openHead(h)});m.addTo(LG.heads);
+  });
+  LG.plan.clearLayers();
+  REF.plan.forEach(function(p){
+    var P=PLAN[p[1]];if(!P)return;
+    var m=L.circleMarker([p[2],p[3]],{renderer:canvas,radius:6,weight:2.4,color:P.col,fillColor:P.col,fillOpacity:.12,dashArray:"3 3"});
+    m.on("click",function(){openPlan(p)});m.addTo(LG.plan);
+  });
+  LG.lines.clearLayers();
+  REF.lines.forEach(function(l){
+    var col=l[1]==="il"?"#ff9f0a":"#d1d1d6";
+    L.polyline(l[2],{renderer:canvas,color:col,weight:2.5,opacity:.85,dashArray:l[1]==="bl"?"6 5":null,interactive:true}).bindTooltip(l[0]+(l[1]==="bl"?" · buried line (plan)":" · irrigation line (plan)"),{sticky:true,className:"lbl-tip"}).addTo(LG.lines);
+  });
+  REF.areas.forEach(function(a){L.polygon(a[1],{renderer:canvas,color:"#ffd60a",weight:1.5,opacity:.6,fillOpacity:.06,dashArray:"4 4",interactive:false}).addTo(LG.lines)});
+  applyShow();
+}
+
+function pinIcon(r){
+  var t=T[r.type]||T.other_hw;var col=t.col;var issue=t.cat==="issue"&&r.status!=="fixed";
+  var fill=r.status==="fixed"?"#8e8e93":col;var ink=(t.cat==="asset"&&(r.type==="head"||r.type==="dp"||r.type==="co"||r.type==="do"||r.type==="vbox"||r.type==="qcv"||r.type==="air"||r.type==="other_hw"))?"#0b2231":"#ffffff";
+  var ring=r.cond==="fail"?"#ff3b30":r.cond==="work"?"#ff9f0a":"#ffffff";
+  var html='<div class="pin'+(issue?" issue":"")+(r._pending?" pending":"")+'" style="color:'+fill+'"><svg viewBox="0 0 34 44"><path d="M17 43C17 43 3 27.5 3 17a14 14 0 0 1 28 0c0 10.5-14 26-14 26z" fill="'+fill+'" stroke="'+ring+'" stroke-width="'+(ring==="#ffffff"?2:3.2)+'"/><g transform="translate(7.4 7.2) scale(.8)" style="stroke:'+ink+';fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round">'+(r.status==="fixed"?G.tick:G[t.g])+'</g></svg></div>';
+  return L.divIcon({html:html,className:"",iconSize:[34,44],iconAnchor:[17,43]});
+}
+var MARK={};
+function drawRecords(){
+  LG.issues.clearLayers();LG.assets.clearLayers();LG.fixed.clearLayers();MARK={};
+  var recs=records();
+  recs.forEach(function(r){
+    if(r.lat==null||r.lng==null)return;
+    var t=T[r.type]||T.other_hw;
+    var grp=t.cat==="issue"?(r.status==="fixed"?LG.fixed:LG.issues):LG.assets;
+    var m=L.marker([r.lat,r.lng],{icon:pinIcon(r),zIndexOffset:t.cat==="issue"?1000:500,keyboard:false});
+    m.on("click",function(){openRecord(r.id)});m.addTo(grp);MARK[r.id]=m;
+  });
+  counts(recs);
+}
+function counts(recs){
+  recs=recs||records();
+  var open=recs.filter(function(r){return (T[r.type]||{}).cat==="issue"&&r.status!=="fixed"}).length;
+  var fixed=recs.filter(function(r){return (T[r.type]||{}).cat==="issue"&&r.status==="fixed"}).length;
+  var assets=recs.filter(function(r){return (T[r.type]||{}).cat==="asset"}).length;
+  $("#sub").textContent=(open?open+" open problem"+(open===1?"":"s"):"No open problems")+" · "+assets+" hardware pinned"+(TEST?" · TEST":"");
+  var C=[["issues","Problems",open,"#ff3b30"],["assets","Hardware",assets,"#30d158"],["plan","As-built",REF.plan.length,"#ffd60a"],["heads","Heads",HEADS.length,"#ffffff"],["lines","Buried lines","","#d1d1d6"],["fixed","Fixed",fixed,"#8e8e93"]];
+  $("#chips").innerHTML=C.map(function(c){return '<button class="chip glass'+(SHOW[c[0]]?"":" off")+'" data-k="'+c[0]+'"><span class="dot" style="background:'+c[3]+'"></span>'+c[1]+(c[2]!==""?' <span class="n">'+c[2]+'</span>':'')+'</button>'}).join("");
+}
+$("#chips").addEventListener("click",function(e){var b=e.target.closest(".chip");if(!b)return;var k=b.dataset.k;SHOW[k]=!SHOW[k];ls("hw.show",SHOW);applyShow();counts()});
+function applyShow(){
+  var z=map.getZoom();
+  ["issues","assets","fixed"].forEach(function(k){if(SHOW[k])LG[k].addTo(map);else map.removeLayer(LG[k])});
+  if(SHOW.heads&&z>=16.5)LG.heads.addTo(map);else map.removeLayer(LG.heads);
+  if(SHOW.plan&&z>=15.5)LG.plan.addTo(map);else map.removeLayer(LG.plan);
+  if(SHOW.lines&&z>=15.5)LG.lines.addTo(map);else map.removeLayer(LG.lines);
+  labels();
+}
+/* names on heads and plan points once zoomed right in, only for what's on screen */
+function labels(){
+  labelLayer.clearLayers();var z=map.getZoom();if(z<19)return;var b=map.getBounds().pad(.05);var n=0;
+  if(SHOW.heads)HEADS.forEach(function(h){if(n>140||!b.contains([h.lat,h.lng]))return;n++;L.tooltip({permanent:true,direction:"right",offset:[5,0],className:"lbl-tip",interactive:false}).setLatLng([h.lat,h.lng]).setContent(h.n).addTo(labelLayer)});
+  if(SHOW.plan)REF.plan.forEach(function(p){if(n>200||!b.contains([p[2],p[3]]))return;n++;L.tooltip({permanent:true,direction:"left",offset:[-7,0],className:"lbl-tip plan",interactive:false}).setLatLng([p[2],p[3]]).setContent(p[0]).addTo(labelLayer)});
+}
+map.on("zoomend moveend",function(){applyShow()});
+
+/* ---------- my location ---------- */
+var watch=null,meDot=null,meAcc=null,lastFix=null;
+function startWatch(){
+  if(!navigator.geolocation){toast("This phone can't share its location");return}
+  if(watch!=null)return;
+  watch=navigator.geolocation.watchPosition(function(p){
+    lastFix={lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy,t:Date.now()};
+    var ll=[lastFix.lat,lastFix.lng];
+    if(!meDot){meAcc=L.circle(ll,{radius:lastFix.acc,color:"#0a84ff",weight:1,fillOpacity:.12,interactive:false}).addTo(LG.me);meDot=L.circleMarker(ll,{radius:8,color:"#fff",weight:3,fillColor:"#0a84ff",fillOpacity:1,interactive:false}).addTo(LG.me)}
+    else{meDot.setLatLng(ll);meAcc.setLatLng(ll).setRadius(lastFix.acc)}
+    gpsTick(lastFix);
+  },function(err){if(err.code===1)toast("Location is blocked. Allow it for this site in your browser settings.");else toast("Can't get a GPS fix right now")},{enableHighAccuracy:true,maximumAge:0,timeout:30000});
+  $("#bLocate").classList.add("on");
+}
+function stopWatch(){if(watch!=null)navigator.geolocation.clearWatch(watch);watch=null;LG.me.clearLayers();meDot=meAcc=null;$("#bLocate").classList.remove("on")}
+$("#bLocate").onclick=function(){if(watch!=null&&!PLACE){if(lastFix)map.setView([lastFix.lat,lastFix.lng],Math.max(map.getZoom(),19));else stopWatch();return}startWatch();toast("Finding you…");var once=setInterval(function(){if(lastFix){clearInterval(once);map.setView([lastFix.lat,lastFix.lng],Math.max(map.getZoom(),19))}},500);setTimeout(function(){clearInterval(once)},20000)};
+$("#bFit").onclick=function(){map.fitBounds(COURSE,{padding:[0,0]})};
+
+/* ---------- sheets ---------- */
+var sheetClose=null;
+function sheet(html,opts){
+  closeSheet();opts=opts||{};
+  var l=$("#layer");l.innerHTML='<div class="scrim" data-close></div><div class="sheet'+(opts.peek?" peek":"")+'" role="dialog" aria-modal="true"><div class="grab"></div><button class="ib x" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>'+html+'</div>';
+  l.querySelectorAll("[data-close]").forEach(function(b){b.onclick=function(){closeSheet();if(opts.onClose)opts.onClose()}});
+  sheetClose=opts.onClose||null;
+  return l.querySelector(".sheet");
+}
+function closeSheet(){$("#layer").innerHTML=""}
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){if($("#layer").innerHTML){closeSheet();if(sheetClose)sheetClose()}else if(PLACE)cancelPlace()}});
+
+/* ---------- the add flow ---------- */
+var DRAFT=null;   /* {mode:'add'|'move'|'edit', id, type, lat,lng,acc,fixes, ref, cond, size, depth, label, notes, urgent} */
+$("#bAdd").onclick=function(){DRAFT={mode:"add",id:newId()};pickType()};
+function tilesHtml(list){return list.map(function(k){var t=T[k];return '<button class="tile" data-t="'+k+'"><span class="ic" style="background:'+t.col+'22">'+svg(t.g,t.col,2.2)+'</span><span><b>'+esc(t.name)+'</b>'+(t.hint?'<small>'+esc(t.hint)+'</small>':'')+'</span></button>'}).join("")}
+function pickType(){
+  var s=sheet('<h2>What are you pinning?</h2><p class="muted">Problems go to Slack with a link to the pin. Hardware builds the map and the Cirrus Pro layers.</p><h3>A problem · #irrigation</h3><div class="tiles">'+tilesHtml(ISSUES.filter(function(k){return T[k].fam==="irr"}))+'</div><h3>A problem · #drainage</h3><div class="tiles">'+tilesHtml(ISSUES.filter(function(k){return T[k].fam==="drn"}))+'</div><h3>Hardware that stays put</h3><div class="tiles">'+tilesHtml(ASSETS)+'</div>',{onClose:function(){DRAFT=null}});
+  s.querySelectorAll(".tile").forEach(function(b){b.onclick=function(){DRAFT.type=b.dataset.t;closeSheet();startPlace()}});
+}
+
+/* placing: the map centre under the cross is the spot; GPS averages fixes and drives the map until you drag it */
+var PLACE=null;
+function startPlace(){
+  var t=T[DRAFT.type];
+  PLACE={fixes:[],t0:Date.now(),dragged:false,follow:DRAFT.mode==="add",est:null,acc:null};
+  document.body.classList.add("placing");
+  $("#hint").textContent=DRAFT.mode==="move"?"Put the cross on its new spot":"Put the cross right on the "+t.name.toLowerCase();
+  if(DRAFT.lat!=null)map.setView([DRAFT.lat,DRAFT.lng],Math.max(map.getZoom(),20));
+  else if(lastFix&&Date.now()-lastFix.t<60000)map.setView([lastFix.lat,lastFix.lng],Math.max(map.getZoom(),20));
+  else if(map.getZoom()<18)map.setZoom(18);
+  renderPlacebar();
+  if(navigator.geolocation&&DRAFT.mode==="add")startWatch();
+  map.on("dragstart",onDrag);map.on("move",onPlaceMove);
+}
+function onDrag(){if(PLACE&&!PLACE.moving){PLACE.dragged=true;PLACE.follow=false;renderPlacebar()}}
+function onPlaceMove(){if(PLACE)renderNear()}
+function gpsTick(f){
+  if(!PLACE)return;
+  if(f.acc<=40)PLACE.fixes.push(f);
+  if(PLACE.fixes.length){
+    var best=Math.min.apply(null,PLACE.fixes.map(function(x){return x.acc}));
+    var use=PLACE.fixes.filter(function(x){return x.acc<=Math.max(best*1.8,4)}).slice(-30);
+    var w=0,la=0,lo=0;use.forEach(function(x){var k=1/(x.acc*x.acc);w+=k;la+=x.lat*k;lo+=x.lng*k});
+    var acc=use.map(function(x){return x.acc}).sort(function(a,b){return a-b})[Math.floor(use.length/2)];
+    PLACE.est={lat:la/w,lng:lo/w,acc:acc,n:use.length};
+    if(PLACE.follow)followGps();
+  }
+  renderPlacebar(f.acc>40?f.acc:null);
+}
+function followGps(){if(!PLACE||!PLACE.est)return;PLACE.moving=true;map.stop();map.setView([PLACE.est.lat,PLACE.est.lng],Math.max(map.getZoom(),20),{animate:false});PLACE.moving=false}
+map.on("zoomend",function(){if(PLACE&&PLACE.follow&&PLACE.est){var c=map.getCenter();if(dist([c.lat,c.lng],[PLACE.est.lat,PLACE.est.lng])>0.3)followGps()}});
+function renderPlacebar(poor){
+  if(!PLACE)return;var e=PLACE.est;var t=T[DRAFT.type];
+  var acc=e?e.acc:null;var pct=acc==null?0:Math.max(6,Math.min(100,(30-acc)/26*100));
+  var gpsTxt;
+  if(!navigator.geolocation)gpsTxt='<div class="lbl">No GPS on this device. Drag the map to put the cross on it.</div>';
+  else if(!e&&watch==null)gpsTxt='<div class="lbl">GPS off. Drag the map to place it, or use GPS.</div>';
+  else if(!e)gpsTxt='<div class="lbl">'+(poor?"Weak GPS (±"+Math.round(poor)+" m). Stand right on it and wait…":"Getting a GPS fix… stand right on it")+'</div>';
+  else gpsTxt='<div><div class="big">±'+(acc<10?acc.toFixed(1):Math.round(acc))+' m</div><div class="lbl">'+e.n+' GPS reading'+(e.n===1?"":"s")+(PLACE.follow?" · map follows GPS":" · placed by hand")+'</div></div>';
+  var gpsBtn=navigator.geolocation?(PLACE.follow&&watch!=null?'':'<button class="btn soft sm" id="pGps">Use GPS</button>'):'';
+  $("#placebar").innerHTML='<div class="gps">'+gpsTxt+'<div class="meter"><i style="width:'+pct+'%"></i></div></div><div class="near" id="pNear"></div><div class="row"><button class="btn soft sm" id="pCancel">Cancel</button>'+gpsBtn+'<button class="btn go" id="pHere" style="flex:2">'+(DRAFT.mode==="move"?"Move it here":"It's here")+'</button></div>';
+  $("#pCancel").onclick=cancelPlace;$("#pHere").onclick=confirmPlace;
+  if($("#pGps"))$("#pGps").onclick=function(){PLACE.follow=true;PLACE.dragged=false;startWatch();if(PLACE.est)map.setView([PLACE.est.lat,PLACE.est.lng],Math.max(map.getZoom(),20));renderPlacebar()};
+  renderNear();
+}
+function renderNear(){var el=$("#pNear");if(!el)return;var c=map.getCenter();var n=nearText([c.lat,c.lng]);el.textContent=n.text?(n.place?n.place+", ":"")+n.text:"No sprinkler head within 120 m"}
+function cancelPlace(){endPlace();if(DRAFT&&DRAFT.mode!=="add")openRecord(DRAFT.id);DRAFT=null}
+function endPlace(){document.body.classList.remove("placing");map.off("dragstart",onDrag);map.off("move",onPlaceMove);var keep=PLACE&&PLACE.keepWatch;PLACE=null;if(!keep)stopWatch()}
+function confirmPlace(){
+  var c=map.getCenter();var e=PLACE.est;
+  var usedGps=!!(e&&PLACE.follow);if(usedGps)c={lat:e.lat,lng:e.lng};
+  DRAFT.lat=+c.lat.toFixed(7);DRAFT.lng=+c.lng.toFixed(7);
+  DRAFT.acc=usedGps?Math.round(e.acc*10)/10:null;DRAFT.fixes=usedGps?e.n:0;
+  DRAFT.gpsAcc=e&&!usedGps?Math.round(e.acc*10)/10:null;DRAFT.adj=e&&!usedGps?Math.round(dist([c.lat,c.lng],[e.lat,e.lng])*10)/10:null;
+  endPlace();
+  if(DRAFT.mode==="move"){sendMove();return}
+  details();
+}
+
+/* details */
+function details(){
+  var t=T[DRAFT.type];var isIssue=t.cat==="issue";var ll=[DRAFT.lat,DRAFT.lng];var n=nearText(ll);
+  var h='<div class="head"><span class="ic" style="background:'+t.col+'22">'+svg(t.g,t.col,2.2)+'</span><div><h2>'+esc(t.name)+'</h2><div class="muted">'+esc((n.place?n.place+", ":"")+(n.text||"position set"))+'</div></div></div>';
+  h+='<p class="faint" style="font-size:14px">'+posText(DRAFT)+'</p>';
+  /* link to the as-built point or the head it is */
+  if(t.plan&&DRAFT.mode==="add"){var np=nearestPlan(ll,t.plan,30);if(np&&!DRAFT.ref){DRAFT.planGuess=np[1][0];if(np[0]<=12&&DRAFT.ref==null)DRAFT.ref=np[1][0]}
+    if(DRAFT.ref||DRAFT.planGuess){h+='<h3>On the 2000 as-built</h3><div class="opts" id="dRef"><button class="opt'+(DRAFT.ref?" sel":"")+'" data-v="'+esc(DRAFT.ref||DRAFT.planGuess)+'">It\'s '+esc(DRAFT.ref||DRAFT.planGuess)+(np?' ('+fmtM(np[0])+' from the plan spot)':'')+'</button><button class="opt'+(DRAFT.ref?"":" sel")+'" data-v="">Not on the plan</button></div>'}}
+  if(DRAFT.type==="head"){var nh=nearestHeads(ll,3).filter(function(x){return x[0]<25});if(nh.length){if(DRAFT.ref==null)DRAFT.ref=nh[0][1].n;h+='<h3>Which head is it?</h3><div class="opts" id="dRef">'+nh.map(function(x){return '<button class="opt'+(DRAFT.ref===x[1].n?" sel":"")+'" data-v="'+x[1].n+'">'+x[1].n+' <span class="faint">'+fmtM(x[0])+'</span></button>'}).join("")+'<button class="opt'+(DRAFT.ref===""?" sel":"")+'" data-v="">Not in Cirrus</button></div>'}}
+  if(!isIssue){
+    h+='<h3>Condition</h3><div class="opts" id="dCond">'+Object.keys(COND).map(function(k){return '<button class="opt '+k+(DRAFT.cond===k?" sel":"")+'" data-v="'+k+'">'+COND[k][0]+'</button>'}).join("")+'</div>';
+    if(t.valve)h+='<p class="faint" style="font-size:13.5px;margin-top:6px">Works fine = turns and shuts off fully. Needs work = stiff, weeping, box buried or broken. Failed = seized, won\'t shut, or can\'t get to it. Needs work and Failed also go to #'+(t.fam==="drn"?"drainage":"irrigation")+'.</p>';
+    else h+='<p class="faint" style="font-size:13.5px;margin-top:6px">Needs work and Failed also go to #'+(t.fam==="drn"?"drainage":"irrigation")+'.</p>';
+    if(t.valve){h+='<label class="f">Size</label><div class="opts" id="dSize">'+["25","32","40","50","65","80","100","150","?"].map(function(v){return '<button class="opt'+(DRAFT.size===v?" sel":"")+'" data-v="'+v+'">'+(v==="?"?"Not sure":v+" mm")+'</button>'}).join("")+'</div>'}
+    h+='<label class="f" for="dLabel">Number or tag <span class="faint">(optional)</span></label><input class="in" id="dLabel" maxlength="40" placeholder="e.g. IV-27, the tag on the lid" value="'+esc(DRAFT.label||"")+'">';
+    h+='<label class="f" for="dDepth">Depth to the top of the valve or pipe <span class="faint">(cm, optional)</span></label><input class="in" id="dDepth" inputmode="numeric" maxlength="4" value="'+esc(DRAFT.depth||"")+'">';
+  }
+  h+='<label class="f" for="dNotes">'+(isIssue?"What's wrong?":"Notes")+' <span class="faint">'+(isIssue?"":"(optional)")+'</span></label><textarea class="in" id="dNotes" maxlength="600" placeholder="'+(isIssue?"e.g. bubbling up beside the head, steady flow":"e.g. lid under 5 cm of sand, handle rusted")+'">'+esc(DRAFT.notes||"")+'</textarea>';
+  if(isIssue&&DRAFT.mode==="add")h+='<label class="toggle"><input type="checkbox" id="dUrgent"'+(DRAFT.urgent?" checked":"")+'><span><b>Urgent</b><br><span class="muted" style="font-size:13.5px">Tags Andy, Ben and Neil</span></span></label>';
+  h+=whoHtml();
+  h+='<div class="row" style="margin-top:16px">'+(DRAFT.mode==="add"?'<button class="btn soft" id="dBack">Move pin</button>':'')+'<button class="btn go" id="dSave" style="flex:2">'+(DRAFT.mode==="edit"?"Save changes":isIssue?"Send to #"+(t.fam==="drn"?"drainage":"irrigation"):"Save")+'</button></div>';
+  var s=sheet(h,{onClose:function(){if(DRAFT&&DRAFT.mode==="edit")openRecord(DRAFT.id);DRAFT=null}});
+  function grp(id,key){var g=s.querySelector(id);if(!g)return;g.addEventListener("click",function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");DRAFT[key]=b.dataset.v})}
+  grp("#dCond","cond");grp("#dSize","size");grp("#dRef","ref");
+  if(s.querySelector("#dRef")&&DRAFT.ref==null)DRAFT.ref="";
+  wireWho(s);
+  if($("#dBack"))$("#dBack").onclick=function(){keepInputs();closeSheet();startPlace()};
+  $("#dSave").onclick=function(){
+    keepInputs();
+    if(T[DRAFT.type].cat==="issue"&&!DRAFT.notes&&DRAFT.mode==="add"){toast("Add a few words on what's wrong");$("#dNotes").focus();return}
+    if(!who()){toast("Pick your name first");return}
+    if(DRAFT.mode==="edit")sendEdit();else sendAdd();
+  };
+}
+function keepInputs(){var v=function(id){var e=$(id);return e?e.value.trim():undefined};
+  if($("#dLabel"))DRAFT.label=v("#dLabel");if($("#dDepth"))DRAFT.depth=v("#dDepth").replace(/[^\d.]/g,"");if($("#dNotes"))DRAFT.notes=v("#dNotes");if($("#dUrgent"))DRAFT.urgent=$("#dUrgent").checked}
+
+/* who */
+function who(){return ls("hw.who")}
+function whoHtml(){var w=who();return '<label class="f">Who\'s pinning it</label><div class="opts" id="dWho">'+CREW.map(function(c){return '<button class="opt'+(w&&w[0]===c[0]?" sel":"")+'" data-n="'+esc(c[0])+'" data-s="'+c[1]+'">'+esc(c[0].split(" ")[0]+(c[0]==="Nathan Ferguson"?" F":c[0]==="Nathan Drew"?" D":c[0]==="Samuel Cope"||c[0]==="Joshua Cope"?" C":""))+'</button>'}).join("")+'<button class="opt'+(w&&!w[1]?" sel":"")+'" data-n="" data-s="">Someone else</button></div><input class="in" id="dWhoOther" placeholder="Your name" maxlength="40" style="margin-top:8px;'+(w&&!w[1]?"":"display:none")+'" value="'+esc(w&&!w[1]?w[0]:"")+'">'}
+function wireWho(s){var g=s.querySelector("#dWho");if(!g)return;var other=s.querySelector("#dWhoOther");
+  g.addEventListener("click",function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");if(b.dataset.n){ls("hw.who",[b.dataset.n,b.dataset.s]);other.style.display="none"}else{other.style.display="";other.focus();if(other.value.trim())ls("hw.who",[other.value.trim(),""]);else localStorage.removeItem("hw.who")}});
+  other.addEventListener("input",function(){var v=other.value.trim();if(v)ls("hw.who",[v,""]);else localStorage.removeItem("hw.who")})}
+
+/* ---------- sending ---------- */
+function outbox(){return ls("hw.outbox")||[]}
+function send(payload){
+  var w=who()||["",""];payload.by=w[0];payload.by_slack=w[1];payload.ev=payload.ev||evId();payload.sent_at=new Date().toISOString();
+  if(TEST)payload.__test="1";
+  if(PREVIEW||HOOK.indexOf("__")===0){toast("Preview only: not sent");return payload}
+  var a=outbox();a.push(payload);ls("hw.outbox",a);flush();return payload;
+}
+var flushing=false;
+function flush(){
+  if(flushing||PREVIEW)return;var a=outbox();if(!a.length)return;flushing=true;var item=a[0];
+  var body=new URLSearchParams();Object.keys(item).forEach(function(k){body.append(k,item[k]==null?"":String(item[k]))});
+  fetch(HOOK,{method:"POST",mode:"no-cors",body:body}).then(function(){var b=outbox();b.shift();ls("hw.outbox",b);flushing=false;flush()},function(){flushing=false;toast("No signal: it'll send when you're back in range")});
+}
+window.addEventListener("online",flush);setInterval(flush,20000);
+
+function localSave(rec,ev){LOCAL[rec.id]={rec:rec,ev:ev};ls("hw.local",LOCAL);drawRecords()}
+function baseRec(){var w=who()||["",""];var n=nearText([DRAFT.lat,DRAFT.lng]);var t=T[DRAFT.type];
+  return {id:DRAFT.id,cat:t.cat,type:DRAFT.type,lat:DRAFT.lat,lng:DRAFT.lng,acc:DRAFT.acc,fixes:DRAFT.fixes||0,gpsAcc:DRAFT.gpsAcc,adj:DRAFT.adj,label:DRAFT.label||"",ref:DRAFT.ref||"",cond:DRAFT.cond||"",size:DRAFT.size||"",depth:DRAFT.depth||"",notes:DRAFT.notes||"",urgent:!!DRAFT.urgent,near:n.text,place:n.place,hole:n.hole,by:w[0],at:new Date().toISOString(),status:t.cat==="issue"?"open":"active"}}
+function needsSlack(r){var t=T[r.type];return t.cat==="issue"||r.cond==="work"||r.cond==="fail"}
+function sendAdd(){
+  var rec=baseRec();var d=DRAFT;DRAFT=null;closeSheet();
+  var p={kind:"add",id:rec.id,type:rec.type,lat:rec.lat,lng:rec.lng,acc:rec.acc==null?"":rec.acc,fixes:rec.fixes,gps_acc:rec.gpsAcc==null?"":rec.gpsAcc,adj:rec.adj==null?"":rec.adj,label:rec.label,ref:rec.ref,cond:rec.cond,size:rec.size,depth:rec.depth,notes:rec.notes,urgent:rec.urgent?"1":"",near:rec.near,place:rec.place,hole:rec.hole==null?"":rec.hole};
+  var go=function(snap){if(snap)p.snap=snap;var sent=send(p);localSave(rec,sent.ev);
+    toast(needsSlack(rec)?"Pinned and sent to #"+(T[rec.type].fam==="drn"?"drainage":"irrigation"):"Pinned");};
+  if(needsSlack(rec))snapshot(rec).then(go,function(){go(null)});else go(null);
+}
+function sendMove(){
+  var r=find(DRAFT.id);var id=DRAFT.id;var n=nearText([DRAFT.lat,DRAFT.lng]);
+  var rec=Object.assign({},r,{lat:DRAFT.lat,lng:DRAFT.lng,acc:DRAFT.acc,fixes:DRAFT.fixes||0,gpsAcc:DRAFT.gpsAcc,adj:DRAFT.adj,near:n.text,place:n.place,hole:n.hole});
+  var sent=send({kind:"move",id:id,lat:DRAFT.lat,lng:DRAFT.lng,acc:DRAFT.acc==null?"":DRAFT.acc,fixes:DRAFT.fixes||0,gps_acc:DRAFT.gpsAcc==null?"":DRAFT.gpsAcc,adj:DRAFT.adj==null?"":DRAFT.adj,near:n.text,place:n.place,hole:n.hole==null?"":n.hole});
+  localSave(rec,sent.ev);DRAFT=null;toast("Pin moved");setTimeout(function(){openRecord(id)},300);
+}
+function sendEdit(){
+  var r=find(DRAFT.id);var id=DRAFT.id;
+  var rec=Object.assign({},r,{label:DRAFT.label||"",ref:DRAFT.ref||"",cond:DRAFT.cond||"",size:DRAFT.size||"",depth:DRAFT.depth||"",notes:DRAFT.notes||""});
+  var sent=send({kind:"edit",id:id,label:rec.label,ref:rec.ref,cond:rec.cond,size:rec.size,depth:rec.depth,notes:rec.notes});
+  localSave(rec,sent.ev);DRAFT=null;closeSheet();toast("Saved");setTimeout(function(){openRecord(id)},300);
+}
+
+/* aerial snapshot with the pin drawn on, so the Slack post shows exactly where */
+function merc(lat,lng){var x=lng*20037508.34/180;var y=Math.log(Math.tan((90+lat)*Math.PI/360))*6378137;return [x,y]}
+function snapshot(rec){
+  return new Promise(function(res,rej){
+    var W=640,H=400,mpp=0.14;var c=merc(rec.lat,rec.lng);var k=1/Math.cos(rec.lat*Math.PI/180);
+    var hw=W/2*mpp*k,hh=H/2*mpp*k;var bb=[c[0]-hw,c[1]-hh,c[0]+hw,c[1]+hh];
+    var url="https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox="+bb.join(",")+"&bboxSR=3857&imageSR=3857&size="+W+","+H+"&format=jpg&f=image";
+    var img=new Image();img.crossOrigin="anonymous";var to=setTimeout(function(){rej("timeout")},9000);
+    img.onload=function(){clearTimeout(to);try{
+      var cv=document.createElement("canvas");cv.width=W;cv.height=H;var x=cv.getContext("2d");x.drawImage(img,0,0,W,H);
+      var px=function(lat,lng){var m=merc(lat,lng);return [(m[0]-bb[0])/(bb[2]-bb[0])*W,(bb[3]-m[1])/(bb[3]-bb[1])*H]};
+      x.font="600 13px Barlow, system-ui, sans-serif";
+      HEADS.forEach(function(h){var p=px(h.lat,h.lng);if(p[0]<0||p[1]<0||p[0]>W||p[1]>H)return;x.beginPath();x.arc(p[0],p[1],4,0,7);x.fillStyle="#fff";x.fill();x.lineWidth=1.5;x.strokeStyle="#0b2231";x.stroke();x.fillStyle="rgba(6,18,27,.7)";var tw=x.measureText(h.n).width;x.fillRect(p[0]+6,p[1]-8,tw+8,16);x.fillStyle="#fff";x.fillText(h.n,p[0]+10,p[1]+4)});
+      var t=T[rec.type];var p=px(rec.lat,rec.lng);
+      if(rec.acc){x.beginPath();x.arc(p[0],p[1],Math.max(6,rec.acc/(mpp*k)),0,7);x.fillStyle="rgba(10,132,255,.14)";x.fill();x.lineWidth=1.5;x.strokeStyle="rgba(255,255,255,.8)";x.stroke()}
+      x.lineWidth=4;x.strokeStyle="#fff";x.beginPath();x.arc(p[0],p[1],15,0,7);x.stroke();x.lineWidth=2.5;x.strokeStyle=t.col;x.beginPath();x.arc(p[0],p[1],15,0,7);x.stroke();
+      x.beginPath();x.moveTo(p[0]-30,p[1]);x.lineTo(p[0]-19,p[1]);x.moveTo(p[0]+19,p[1]);x.lineTo(p[0]+30,p[1]);x.moveTo(p[0],p[1]-30);x.lineTo(p[0],p[1]-19);x.moveTo(p[0],p[1]+19);x.lineTo(p[0],p[1]+30);x.lineWidth=4;x.strokeStyle="#fff";x.stroke();
+      x.beginPath();x.arc(p[0],p[1],4,0,7);x.fillStyle=t.col;x.fill();x.lineWidth=1.5;x.strokeStyle="#fff";x.stroke();
+      x.fillStyle="rgba(6,18,27,.72)";x.fillRect(0,H-22,W,22);x.fillStyle="#fff";x.font="600 13px Barlow, system-ui, sans-serif";x.fillText(t.name+" · "+(rec.place?rec.place+", ":"")+(rec.near||"")+"   ·   10 m scale:",8,H-7);
+      var sx=W-8-10/(mpp*k);x.fillRect(sx,H-11,10/(mpp*k),3);
+      var d=cv.toDataURL("image/jpeg",.74);res(d.slice(d.indexOf(",")+1));
+    }catch(e){rej(e)}};
+    img.onerror=function(){clearTimeout(to);rej("img")};img.src=url;
+  });
+}
+
+/* ---------- record cards ---------- */
+function find(id){var rs=records();for(var i=0;i<rs.length;i++)if(rs[i].id===id)return rs[i];return null}
+function openRecord(id){
+  if(PLACE)return;var r=find(id);if(!r){toast("That pin isn't on the map yet");return}
+  var t=T[r.type]||T.other_hw;var isIssue=t.cat==="issue";
+  if(map.getZoom()<18.5)map.setView([r.lat,r.lng],19.5);else map.panTo([r.lat,r.lng]);
+  var pills=[];
+  if(r._pending)pills.push('<span class="pill info">Sending…</span>');
+  if(isIssue)pills.push(r.status==="fixed"?'<span class="pill ok">Fixed</span>':'<span class="pill bad">Open</span>');
+  if(r.urgent&&r.status!=="fixed")pills.push('<span class="pill bad">Urgent</span>');
+  if(r.cond)pills.push('<span class="pill '+COND[r.cond][1]+'">'+COND[r.cond][0]+'</span>');
+  if(r.ref)pills.push('<span class="pill">'+esc(r.ref)+'</span>');
+  if(r.size)pills.push('<span class="pill">'+(r.size==="?"?"Size?":esc(r.size)+" mm")+'</span>');
+  var h='<div class="head"><span class="ic" style="background:'+t.col+'22">'+svg(t.g,t.col,2.2)+'</span><div><h2>'+esc((r.label?r.label+" · ":"")+t.name)+'</h2><div class="muted">'+esc((r.place?r.place+", ":"")+(r.near||""))+'</div></div></div>';
+  h+='<div class="opts" style="margin-top:10px">'+pills.join("")+'</div>';
+  if(r.notes)h+='<div class="note">'+esc(r.notes)+'</div>';
+  if(r.status==="fixed")h+='<div class="note"><b>Fixed</b> '+esc(when(r.fixed_at))+(r.fixed_by?" by "+esc(r.fixed_by):"")+(r.fix_notes?"\n"+esc(r.fix_notes):"")+'</div>';
+  h+='<dl class="kv"><dt>Pinned</dt><dd>'+esc(when(r.at))+(r.by?" by "+esc(r.by):"")+'</dd><dt>Position</dt><dd>'+esc(posText(r))+'</dd>'+(r.depth?'<dt>Depth</dt><dd>'+esc(r.depth)+' cm</dd>':'')+(r.slack&&r.slack.link?'<dt>Slack</dt><dd><a href="'+esc(r.slack.link)+'" target="_blank" rel="noopener">Open the post</a></dd>':'')+'<dt>Pin</dt><dd>'+esc(r.id)+'</dd></dl>';
+  if(isIssue&&r.status!=="fixed")h+='<button class="btn go w" id="rFix" style="margin-bottom:8px">Mark fixed</button>';
+  h+='<div class="acts"><button class="btn soft sm" id="rMove">Move pin</button><button class="btn soft sm" id="rEdit">Edit</button><button class="btn soft sm" id="rShare">Share</button><a class="btn soft sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+r.lat+','+r.lng+'">Directions</a></div><button class="btn stop sm w" id="rDel" style="margin-top:8px">Remove pin</button>';
+  var s=sheet(h,{peek:true});
+  if($("#rFix"))$("#rFix").onclick=function(){fixSheet(r)};
+  $("#rMove").onclick=function(){DRAFT={mode:"move",id:r.id,type:r.type,lat:r.lat,lng:r.lng,useGps:true};closeSheet();startPlace()};
+  $("#rEdit").onclick=function(){DRAFT={mode:"edit",id:r.id,type:r.type,lat:r.lat,lng:r.lng,label:r.label,ref:r.ref,cond:r.cond,size:r.size,depth:r.depth,notes:r.notes};details()};
+  $("#rShare").onclick=function(){share(r)};
+  $("#rDel").onclick=function(){delSheet(r)};
+}
+function posText(r){if(r.fixes)return "Phone GPS ±"+r.acc+" m from "+r.fixes+" reading"+(r.fixes==1?"":"s");if(r.gpsAcc!=null&&r.gpsAcc!=="")return "Placed by hand on the aerial ("+fmtM(+r.adj||0)+" from the GPS fix of ±"+r.gpsAcc+" m)";return "Placed by hand on the aerial"}
+function link(r){return PAGE+"?pin="+encodeURIComponent(r.id)+"#"+r.lat.toFixed(6)+","+r.lng.toFixed(6)}
+function share(r){var t=T[r.type];var u=link(r);var title=(r.label?r.label+" · ":"")+t.name;if(navigator.share)navigator.share({title:title,text:title+(r.place?" · "+r.place:""),url:u}).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(u).then(function(){toast("Link copied")});else prompt("Link to this pin",u)}
+function fixSheet(r){
+  var s=sheet('<h2>Mark it fixed</h2><p class="muted">'+esc(T[r.type].name+(r.place?" · "+r.place:""))+'</p><label class="f" for="fNotes">What was done? <span class="faint">(optional)</span></label><textarea class="in" id="fNotes" maxlength="500" placeholder="e.g. replaced the swing joint, backfilled"></textarea>'+whoHtml()+'<div class="row" style="margin-top:16px"><button class="btn go w" id="fGo">Fixed: reply in Slack</button></div>',{onClose:function(){openRecord(r.id)}});
+  wireWho(s);
+  $("#fGo").onclick=function(){if(!who()){toast("Pick your name first");return}var notes=$("#fNotes").value.trim();var w=who();
+    var rec=Object.assign({},r,{status:"fixed",fixed_at:new Date().toISOString(),fixed_by:w[0],fix_notes:notes});
+    var sent=send({kind:"fix",id:r.id,notes:notes});localSave(rec,sent.ev);closeSheet();toast("Marked fixed");};
+}
+function delSheet(r){
+  var s=sheet('<h2>Remove this pin?</h2><p class="muted">Use this for a pin dropped by mistake or hardware that\'s been dug out. It comes off the map and the Cirrus Pro layer; the history is kept.</p><label class="f" for="xWhy">Why? <span class="faint">(optional)</span></label><input class="in" id="xWhy" maxlength="200" placeholder="e.g. dropped by mistake">'+whoHtml()+'<div class="row" style="margin-top:16px"><button class="btn soft" data-close>Keep it</button><button class="btn stop" id="xGo" style="flex:2">Remove</button></div>',{onClose:function(){openRecord(r.id)}});
+  wireWho(s);
+  $("#xGo").onclick=function(){if(!who()){toast("Pick your name first");return}var rec=Object.assign({},r,{status:"removed"});var sent=send({kind:"remove",id:r.id,notes:$("#xWhy").value.trim()});localSave(rec,sent.ev);closeSheet();toast("Removed")};
+}
+function openHead(h){
+  if(PLACE)return;
+  var near=REF.plan.map(function(p){return [dist([h.lat,h.lng],[p[2],p[3]]),p]}).filter(function(x){return x[0]<40}).sort(function(a,b){return a[0]-b[0]}).slice(0,3);
+  var s=sheet('<div class="head"><span class="ic" style="background:#ffffff22">'+svg("head","#64d2ff",2.2)+'</span><div><h2>'+esc(h.n)+'</h2><div class="muted">'+esc(placeOf(h)||"Sprinkler head")+' · CirrusPRO station position</div></div></div><p class="faint" style="font-size:14px">The dot is where CirrusPRO has the station. Some are a few metres out; if this one is, pin its true spot below.</p>'+(near.length?'<h3>As-built valves and pits nearby</h3><div class="list">'+near.map(function(x){var P=PLAN[x[1][1]];return '<button class="li" data-c="'+x[1][0]+'"><span class="ic" style="background:'+P.col+'22">'+svg(P.type==="dp"?"grate":P.type==="do"?"outlet":"valve",P.col)+'</span><span><b>'+esc(x[1][0])+'</b><small>'+esc(P.desc)+' · plan position</small></span><span class="r">'+fmtM(x[0])+' '+bearing([h.lat,h.lng],[x[1][2],x[1][3]])+'</span></button>'}).join("")+'</div>':'')+'<div class="row" style="margin-top:14px"><button class="btn go" id="hLeak" style="flex:2">Report a problem here</button><button class="btn soft sm" id="hPos">Pin its true spot</button></div>',{peek:true});
+  s.querySelectorAll(".li").forEach(function(b){b.onclick=function(){var p=REF.plan.filter(function(x){return x[0]===b.dataset.c})[0];if(p)openPlan(p)}});
+  $("#hLeak").onclick=function(){DRAFT={mode:"add",id:newId(),lat:h.lat,lng:h.lng};closeSheet();var s2=sheet('<h2>What\'s wrong at '+esc(h.n)+'?</h2><div class="tiles">'+tilesHtml(ISSUES)+'</div>',{onClose:function(){DRAFT=null}});s2.querySelectorAll(".tile").forEach(function(b){b.onclick=function(){DRAFT.type=b.dataset.t;closeSheet();startPlace()}})};
+  $("#hPos").onclick=function(){DRAFT={mode:"add",id:newId(),type:"head",ref:h.n,lat:h.lat,lng:h.lng};closeSheet();startPlace()};
+}
+function openPlan(p){
+  if(PLACE)return;
+  var P=PLAN[p[1]];var ll=[p[2],p[3]];var n=nearText(ll);
+  var found=records().filter(function(r){return r.ref===p[0]})[0];
+  var s=sheet('<div class="head"><span class="ic" style="background:'+P.col+'22">'+svg(P.type==="dp"?"grate":P.type==="do"?"outlet":"valve",P.col,2.2)+'</span><div><h2>'+esc(p[0])+'</h2><div class="muted">'+esc(P.desc)+' · '+esc((n.place?n.place+", ":"")+n.text)+'</div></div></div><p class="faint" style="font-size:14px">Position traced from the '+(P.type==="dp"||P.type==="do"?"drainage plans":"2000 irrigation as-built")+'. Not checked on the ground'+(found?'':': it could be several metres out')+'.</p>'+(found?'<div class="note">Found on the ground: '+esc(found.id)+(found.cond?" · "+COND[found.cond][0]:"")+' · '+fmtM(dist(ll,[found.lat,found.lng]))+' from the plan spot</div><div class="row"><button class="btn go w" id="pOpen">Open the GPS pin</button></div>':'<div class="row" style="margin-top:14px"><button class="btn go" id="pFound" style="flex:2">Found it: record GPS</button><a class="btn soft sm" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+p[2]+','+p[3]+'">Directions</a></div>'),{peek:true});
+  if($("#pOpen"))$("#pOpen").onclick=function(){openRecord(found.id)};
+  if($("#pFound"))$("#pFound").onclick=function(){DRAFT={mode:"add",id:newId(),type:P.type,ref:p[0],lat:p[2],lng:p[3]};closeSheet();startPlace()};
+}
+
+/* ---------- search ---------- */
+$("#bSearch").onclick=function(){
+  var s=sheet('<h2>Find</h2><input class="in" id="q" placeholder="7F12, SV-08, IV-27, leak, Josh…" autocomplete="off" autocapitalize="characters"><div class="list" id="qres" style="margin-top:10px"></div>');
+  var q=$("#q");q.focus();
+  function run(){var v=q.value.trim().toUpperCase();var out=[];
+    if(v.length){
+      records().forEach(function(r){var t=T[r.type];var hay=(r.id+" "+r.label+" "+r.ref+" "+t.name+" "+(r.place||"")+" "+(r.by||"")+" "+(r.notes||"")).toUpperCase();if(hay.indexOf(v)>=0)out.push(['r',r.id,(r.label?r.label+" · ":"")+t.name,(r.place||"")+(r.status==="fixed"?" · fixed":""),t])});
+      REF.plan.forEach(function(p){var code=p[0].replace(/^LI-/,"");if(p[0].indexOf(v)>=0||code.indexOf(v)>=0||v===p[0].replace(/-0*/,"-"))out.push(['p',p[0],p[0],PLAN[p[1]].desc+" · as-built",{col:PLAN[p[1]].col,g:p[1]==="dp"?"grate":p[1]==="do"?"outlet":"valve"}])});
+      HEADS.forEach(function(h){if(h.n.indexOf(v)===0)out.push(['h',h.n,h.n,placeOf(h)+" · head",{col:"#64d2ff",g:"head"}])});
+    }
+    $("#qres").innerHTML=out.slice(0,40).map(function(o){return '<button class="li" data-k="'+o[0]+'" data-id="'+esc(o[1])+'"><span class="ic" style="background:'+o[4].col+'22">'+svg(o[4].g,o[4].col)+'</span><span><b>'+esc(o[2])+'</b><small>'+esc(o[3])+'</small></span></button>'}).join("")||(v?'<p class="faint">Nothing matches</p>':'<p class="faint">Heads, as-built valves and pits, and every pin.</p>');
+  }
+  q.oninput=run;run();
+  $("#qres").onclick=function(e){var b=e.target.closest(".li");if(!b)return;var k=b.dataset.k,id=b.dataset.id;closeSheet();
+    if(k==="r")openRecord(id);
+    else if(k==="p"){var p=REF.plan.filter(function(x){return x[0]===id})[0];SHOW.plan=true;ls("hw.show",SHOW);map.setView([p[2],p[3]],20);setTimeout(function(){openPlan(p)},350)}
+    else{var h=HEADS.filter(function(x){return x.n===id})[0];SHOW.heads=true;ls("hw.show",SHOW);map.setView([h.lat,h.lng],20);setTimeout(function(){openHead(h)},350)}
+    counts()};
+};
+
+/* ---------- lists and Cirrus Pro layers ---------- */
+$("#bMenu").onclick=function(){
+  var recs=records();var open=recs.filter(function(r){return T[r.type].cat==="issue"&&r.status!=="fixed"});
+  var h='<h2>Problems and layers</h2>';
+  h+='<h3>Open problems</h3>'+(open.length?'<div class="list">'+open.sort(function(a,b){return (b.at||"").localeCompare(a.at||"")}).map(function(r){var t=T[r.type];return '<button class="li" data-id="'+r.id+'"><span class="ic" style="background:'+t.col+'22">'+svg(t.g,t.col)+'</span><span><b>'+esc(t.name)+(r.urgent?' · urgent':'')+'</b><small>'+esc((r.place||"")+" · "+when(r.at)+(r.by?" · "+r.by:""))+'</small></span></button>'}).join("")+'</div>':'<p class="faint">None open.</p>');
+  h+='<h3>Cirrus Pro layers</h3><p class="muted" style="font-size:14.5px">One small layer per type. Import the KML with the Layer Import Tool: new layers come in switched off on every device. Keep each under '+CIRRUS_SMALL+' points so it stays Small and doesn\'t bog phones down. Never import these as images.</p>';
+  var rows=layerSets(recs);
+  var CI=LIVE.cirrus||{};
+  h+='<table class="lay">'+(rows.length?rows.map(function(L,i){var ci=CI[L.name];return '<tr><td><span class="sw" style="background:'+L.col+'"></span>'+esc(L.name)+(ci?'<br><small class="faint">In Cirrus: '+ci.count+' from '+esc(when(ci.imported))+(ci.count!==L.items.length?' · out of date':'')+'</small>':'<br><small class="faint">Not in Cirrus yet</small>')+'</td><td class="n">'+L.items.length+'</td><td class="n" style="width:1%"><button class="btn soft sm" data-i="'+i+'">KML</button></td></tr>'}).join(""):'<tr><td class="faint">No hardware pinned yet. As-built valves and pits are already in Cirrus as the Irrigation and Drainage layers.</td></tr>')+'</table>';
+  h+='<div class="row" style="margin-top:12px"><button class="btn soft sm" id="mCsv">Everything as CSV</button><button class="btn soft sm" id="mJson">GeoJSON</button></div>';
+  var s=sheet(h);
+  s.querySelectorAll(".li").forEach(function(b){b.onclick=function(){closeSheet();openRecord(b.dataset.id)}});
+  s.querySelectorAll("button[data-i]").forEach(function(b){b.onclick=function(){var L=rows[+b.dataset.i];download(L.file+".kml",kml(L),"application/vnd.google-earth.kml+xml")}});
+  $("#mCsv").onclick=function(){download("ranfurlie-hardware-"+new Date().toISOString().slice(0,10)+".csv",csv(recs),"text/csv")};
+  $("#mJson").onclick=function(){download("ranfurlie-hardware-"+new Date().toISOString().slice(0,10)+".geojson",JSON.stringify(geojson(recs)),"application/geo+json")};
+};
+/* hardware only (problems don't go into Cirrus); split any type over the Small limit by hole groups */
+function layerSets(recs){
+  var out=[];
+  ASSETS.forEach(function(k){
+    var items=recs.filter(function(r){return r.type===k&&!r._pending});if(!items.length)return;var t=T[k];
+    var base="HW "+t.plural;
+    if(items.length<CIRRUS_SMALL-20){out.push({name:base,file:base.replace(/\W+/g,"_"),col:t.col,items:items});return}
+    var groups=[[1,4],[5,9],[10,13],[14,18],[0,0]];
+    groups.forEach(function(g){var it=items.filter(function(r){var h=r.hole||0;return g[0]?h>=g[0]&&h<=g[1]:!h});if(it.length){var nm=base+(g[0]?" holes "+g[0]+"-"+g[1]:" practice and other");out.push({name:nm,file:nm.replace(/\W+/g,"_"),col:t.col,items:it})}});
+  });
+  return out;
+}
+function kmlColor(hex){var h=hex.replace("#","");return "ff"+h.slice(4,6)+h.slice(2,4)+h.slice(0,2)}
+function xesc(s){return String(s==null?"":s).replace(/[<>&'"]/g,function(c){return {"<":"&lt;",">":"&gt;","&":"&amp;","'":"&apos;",'"':"&quot;"}[c]})}
+function tip(r){var t=T[r.type];var d=new Date(r.at);var dd=isNaN(d)?"":d.toLocaleDateString("en-AU",{day:"numeric",month:"short"});
+  return [r.label||r.ref||t.name,r.cond?COND[r.cond][0]:"",r.size&&r.size!=="?"?r.size+" mm":"",r.depth?r.depth+" cm deep":"",(r.fixes?"GPS ±"+r.acc+" m":"placed on aerial")+(dd?" "+dd:"")].filter(Boolean).join(" · ")}
+function kml(L){var c=kmlColor(L.col);
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>'+xesc(L.name)+'</name><Style id="s"><IconStyle><color>'+c+'</color><scale>0.8</scale></IconStyle><LineStyle><color>'+c+'</color><width>2</width></LineStyle><PolyStyle><color>'+c+'</color></PolyStyle></Style>\n'+
+  L.items.map(function(r){return '<Placemark><name>'+xesc(tip(r))+'</name><styleUrl>#s</styleUrl><Point><coordinates>'+r.lng.toFixed(7)+','+r.lat.toFixed(7)+',0</coordinates></Point></Placemark>'}).join("\n")+'\n</Document></kml>\n'}
+function csv(recs){var cols=["id","type","label","ref","cond","size","depth","status","lat","lng","acc","fixes","place","near","notes","by","at","fixed_by","fixed_at","fix_notes"];
+  var q=function(v){v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  return cols.join(",")+"\n"+recs.map(function(r){return cols.map(function(c){return q(c==="type"?T[r.type].name:r[c])}).join(",")}).join("\n")+"\n"}
+function geojson(recs){return {type:"FeatureCollection",features:recs.map(function(r){var p=Object.assign({},r);delete p.lat;delete p.lng;delete p.evs;delete p._pending;p.type_name=T[r.type].name;return {type:"Feature",geometry:{type:"Point",coordinates:[r.lng,r.lat]},properties:p}})}}
+function download(name,text,type){var b=new Blob([text],{type:type});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+
+/* ---------- load ---------- */
+function loadLive(){return fetch("live.json?v="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():{records:[]}}).catch(function(){return null})}
+var DEEP=QS.get("pin"),DEEPAT=(QS.get("at")||decodeURIComponent(location.hash.replace(/^#/,""))||"").split(",").map(Number);
+Promise.all([fetch("ref.json",{cache:"no-cache"}).then(function(r){return r.json()}),loadLive()]).then(function(v){
+  REF=v[0];if(v[1])LIVE=v[1];
+  HEADS=REF.heads.map(function(h){var p=parseHead(h[0]);return {n:h[0],lat:h[1],lng:h[2],hole:p.hole,area:p.area}});
+  buildRef();drawRecords();
+  $("#loading").classList.add("gone");setTimeout(function(){$("#loading").remove()},500);
+  if(DEEP)deepLink();
+  flush();
+}).catch(function(){$("#loading").textContent="Couldn't load the map. Pull down to retry."});
+function deepLink(){
+  var r=find(DEEP);
+  if(r){openRecord(r.id);return}
+  if(DEEPAT.length===2&&!isNaN(DEEPAT[0])){
+    map.setView(DEEPAT,20);
+    var ghost=L.marker(DEEPAT,{icon:L.divIcon({html:'<div class="pin pending issue" style="color:#0a84ff"><svg viewBox="0 0 34 44"><path d="M17 43C17 43 3 27.5 3 17a14 14 0 0 1 28 0c0 10.5-14 26-14 26z" fill="#0a84ff" stroke="#fff" stroke-width="2"/><circle cx="17" cy="17" r="5" fill="#fff"/></svg></div>',className:"",iconSize:[34,44],iconAnchor:[17,43]})}).addTo(LG.tmp);
+    toast("Pin "+DEEP+" is still syncing. It'll appear in a moment.");
+    var tries=0;var iv=setInterval(function(){tries++;loadLive().then(function(d){if(d){LIVE=d;drawRecords()}if(find(DEEP)){clearInterval(iv);LG.tmp.clearLayers();openRecord(DEEP)}else if(tries>12)clearInterval(iv)})},10000);
+  }
+}
+/* refresh the pins every minute while the page is open */
+setInterval(function(){if(document.hidden||PLACE)return;loadLive().then(function(d){if(d){LIVE=d;drawRecords()}})},60000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden){flush();loadLive().then(function(d){if(d){LIVE=d;drawRecords()}})}});
+})();
+</script>
+</html>
