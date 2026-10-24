@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rough Plan · Ranfurlie</title>
+<meta name="description" content="Ranfurlie rough plan for summer 2026–27: where the 4300 mows, where the surrounds mower goes to the bunker edge, what is left to grow and where fescue is seeded.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Ranfurlie Rough Plan, crew view v1 (24 Oct 2026). Read-only copy of the rough plan, in the Ranfurlie glass look
+   (frosted panels over a soft sky, Barlow). Map of the plan with a side card that drills course > hole > area.
+   Map overlay colours sit on the aerial photo, so they stay the same in light and dark. */
+:root{
+  color-scheme:light;
+  --bg:#e4f1f7;
+  --sky1:#7fd3ff; --sky2:#86e8b4; --sky3:#ffe08a; --sky4:#b9c8ff;
+  --glass:rgba(255,255,255,.62); --glass-hi:rgba(255,255,255,.8); --rim:rgba(255,255,255,.9); --edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -18px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231; --muted:#3f5d6e; --faint:#6f8a99; --line:rgba(16,52,72,.12); --chip:rgba(255,255,255,.55);
+  --go:#13a356; --go-soft:rgba(47,210,122,.18); --tank:#0aa6dc; --tank-deep:#0573a8; --warn:#a86000;
+  --mow:#2d93e6; --grow:#e3ad2f; --seed:#34c77b; --surr:#b98cff; --sel:#ff5a36;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:22px; --r2:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark; --bg:#06121b; --sky1:#0a6fa8; --sky2:#0d7a4c; --sky3:#5a4a12; --sky4:#2a2f7a;
+  --glass:rgba(18,40,56,.6); --glass-hi:rgba(28,58,78,.7); --rim:rgba(255,255,255,.2); --edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.12); --chip:rgba(255,255,255,.08);
+  --go:#2fd27a; --go-soft:rgba(47,210,122,.18); --tank:#38c6ff; --tank-deep:#38c6ff; --warn:#ffbc45;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark; --bg:#06121b; --sky1:#0a6fa8; --sky2:#0d7a4c; --sky3:#5a4a12; --sky4:#2a2f7a;
+  --glass:rgba(18,40,56,.6); --glass-hi:rgba(28,58,78,.7); --rim:rgba(255,255,255,.2); --edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb; --muted:#a9c4d2; --faint:#7896a6; --line:rgba(255,255,255,.12); --chip:rgba(255,255,255,.08);
+  --go:#2fd27a; --go-soft:rgba(47,210,122,.18); --tank:#38c6ff; --tank-deep:#38c6ff; --warn:#ffbc45;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1400px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.02;text-wrap:balance}
+button{font:inherit;color:inherit}
+a{color:var(--tank-deep)}
+:focus-visible{outline:3px solid var(--tank);outline-offset:2px;border-radius:10px}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(8px);opacity:.8}
+.sky i:nth-child(1){width:80vmax;height:80vmax;left:-30vmax;top:-34vmax;background:radial-gradient(circle,var(--sky1) 0,transparent 62%);animation:drift1 38s ease-in-out infinite alternate}
+.sky i:nth-child(2){width:75vmax;height:75vmax;right:-34vmax;top:18vh;background:radial-gradient(circle,var(--sky2) 0,transparent 62%);animation:drift2 44s ease-in-out infinite alternate}
+.sky i:nth-child(3){width:60vmax;height:60vmax;left:-10vmax;bottom:-30vmax;background:radial-gradient(circle,var(--sky3) 0,transparent 60%);opacity:.55;animation:drift1 52s ease-in-out infinite alternate-reverse}
+.sky i:nth-child(4){width:55vmax;height:55vmax;right:-20vmax;bottom:-26vmax;background:radial-gradient(circle,var(--sky4) 0,transparent 62%);opacity:.5;animation:drift2 47s ease-in-out infinite alternate-reverse}
+@keyframes drift1{to{transform:translate(8vmax,6vmax) scale(1.08)}}
+@keyframes drift2{to{transform:translate(-7vmax,-5vmax) scale(1.1)}}
+
+.glass{background:linear-gradient(180deg,var(--glass-hi),var(--glass) 38%,var(--glass));-webkit-backdrop-filter:blur(20px) saturate(170%);backdrop-filter:blur(20px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--edge),var(--shadow);border-radius:var(--r)}
+
+/* header */
+.top{position:sticky;top:0;z-index:1000;padding-top:max(10px,env(safe-area-inset-top,0px));padding-bottom:10px}
+.topin{display:flex;flex-direction:column;gap:10px;padding:12px 14px}
+.row1{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
+.brand{flex:1 1 220px;min-width:0}
+.brand h1{font-size:clamp(28px,4vw,38px);text-transform:uppercase;letter-spacing:.02em}
+.brand h1 span{color:var(--go)}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:var(--chip);box-shadow:inset 0 0 0 1px var(--line);font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+.pill b{color:var(--fg);font-weight:700}
+.holes{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}
+.holes button{flex:0 0 auto;min-width:40px;height:38px;padding:0 10px;border:0;border-radius:12px;background:var(--chip);box-shadow:inset 0 0 0 1px var(--line);
+  font-family:var(--display);font-weight:700;font-size:18px;cursor:pointer;font-variant-numeric:tabular-nums}
+.holes button[aria-pressed="true"]{background:var(--go);color:#fff;box-shadow:none}
+
+/* layout */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px;padding-bottom:28px;align-items:start}
+.mapcard{padding:8px;position:sticky;top:132px}
+#map{height:calc(100svh - 200px);min-height:420px;border-radius:16px;background:#26302a}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:10px 6px 4px;font-size:14px;font-weight:600}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{flex:0 0 auto;width:14px;height:14px;border-radius:4px;display:inline-block}
+.sw.mow{background:var(--mow)} .sw.grow{background:var(--grow)} .sw.surr{background:var(--surr)}
+.sw.seed{background:repeating-linear-gradient(45deg,var(--seed) 0 3px,transparent 3px 6px);box-shadow:inset 0 0 0 1.5px var(--seed)}
+.side{padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.back{align-self:flex-start;border:0;background:none;padding:0;color:var(--tank-deep);font-weight:700;cursor:pointer}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0}
+.side h2{font-size:32px}
+.lede{margin:0;color:var(--muted)}
+.prog{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:var(--r2);background:var(--chip);box-shadow:inset 0 0 0 1px var(--line)}
+.prog .big{font-family:var(--display);font-weight:700;font-size:30px;line-height:1}
+.prog .big small{font-family:var(--body);font-size:14px;font-weight:600;color:var(--muted);margin-left:6px}
+.meter{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--go),#6ff0a6);border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.rules{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.rules li{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:15px}
+.rules .sw{margin-top:4px}
+.report{margin:0;padding:12px 14px;border-radius:var(--r2);background:var(--go-soft);box-shadow:inset 0 0 0 1px rgba(19,163,86,.3);font-size:15px}
+.report b{font-weight:700}
+.list{display:flex;flex-direction:column}
+.rowb{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:11px 4px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;cursor:pointer;width:100%}
+.rowb:hover{background:var(--chip)}
+.rowb .tag{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#13201acc;color:#fff;font-family:var(--display);font-weight:700;font-size:16px;box-shadow:0 0 0 1.5px #fff inset}
+.rowb .nm{display:flex;flex-direction:column;min-width:0;font-weight:700}
+.rowb .nm small{font-weight:500;color:var(--muted);font-size:13px}
+.rowb .nm small.ok{color:var(--go);font-weight:700}
+.rowb .ar{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chev{color:var(--faint);font-size:20px}
+.grp{margin:10px 0 2px;font-family:var(--display);font-weight:700;font-size:17px;color:var(--muted)}
+.pic{margin:0;display:flex;flex-direction:column;gap:6px}
+.pic canvas{display:block;width:100%;border-radius:14px;background:#26302a}
+.pic figcaption{font-size:13px;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+.fact{padding:9px 11px;border-radius:12px;background:var(--chip);box-shadow:inset 0 0 0 1px var(--line);display:flex;flex-direction:column;min-width:0}
+.fact .k{font-size:12px;color:var(--muted);font-weight:600}
+.fact .v{font-family:var(--display);font-weight:700;font-size:21px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.fact .v small{font-family:var(--body);font-size:12px;color:var(--muted);margin-left:2px}
+.note{margin:0;padding:12px 14px;border-radius:var(--r2);background:var(--chip);box-shadow:inset 0 0 0 1px var(--line);white-space:pre-wrap}
+.desc{margin:0;font-size:16px;font-weight:600}
+.hist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+.hist li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;font-variant-numeric:tabular-nums}
+.leaflet-container{font-family:var(--body);background:#26302a}
+.leaflet-tooltip.tip{background:#0b2231;color:#fff;border:0;font-weight:700;box-shadow:0 4px 14px #0006}
+.leaflet-tooltip-top.tip::before{border-top-color:#0b2231}
+.htag{display:grid;place-items:center;border-radius:50%;background:#13201acc;color:#fff;border:1.5px solid #fff;font-family:var(--display);font-weight:700;font-size:13px;line-height:1}
+.tick{display:grid;place-items:center;border-radius:50%;background:#fff;color:#13a356;border:2px solid #13a356;font-weight:800;font-size:13px;box-shadow:0 1px 4px #0006}
+.foot{margin:0;color:var(--faint);font-size:12px}
+.loading{padding:30px;text-align:center;color:var(--muted)}
+
+@media (max-width: 900px){
+  .grid{grid-template-columns:1fr}
+  .mapcard{position:relative;top:0}
+  #map{height:58svh;min-height:340px}
+  .top{position:relative}
+}
+@media (prefers-reduced-motion: reduce){.sky i{animation:none}.meter i{transition:none}}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <pattern id="seedHatch" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">
+    <rect width="7" height="7" fill="#34c77b" fill-opacity="0.28"></rect><rect width="3" height="7" fill="#34c77b" fill-opacity="0.95"></rect>
+  </pattern></defs></svg>
+
+<header class="top gut">
+  <div class="wrap glass topin">
+    <div class="row1">
+      <div class="brand"><h1>Rough <span>Plan</span></h1><p>Ranfurlie &middot; summer 2026&ndash;27 &middot; crew view</p></div>
+      <span class="pill" id="upd">Loading&hellip;</span>
+    </div>
+    <nav class="holes" id="holes" aria-label="Choose a hole"></nav>
+  </div>
+</header>
+
+<main class="wrap gut grid">
+  <section class="glass mapcard" aria-label="Course map">
+    <div id="map"></div>
+    <div class="legend">
+      <span><i class="sw mow"></i>Mow (4300)</span>
+      <span><i class="sw surr"></i>Surrounds mower to bunker edge</span>
+      <span><i class="sw grow"></i>Let grow</span>
+      <span><i class="sw seed"></i>Fescue seeding</span>
+    </div>
+  </section>
+  <aside class="glass side" id="side" aria-live="polite"><p class="loading">Loading the plan&hellip;</p></aside>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(async function () {
+  const $ = (s) => document.querySelector(s);
+  const TZ = 'Australia/Melbourne';
+  const TYPE = {
+    mow: { label: 'Mow (4300)', desc: 'One lap of the 4300 at 2.3 m. Mow it.', col: '#2d93e6' },
+    surr: { label: 'Surrounds mower', desc: 'Surrounds or fairway mower goes right to the bunker edge. The 4300 stays out.', col: '#b98cff' },
+    grow: { label: 'Let grow', desc: 'Do not mow. Left to thin out and go wispy.', col: '#e3ad2f' },
+    seed: { label: 'Fescue seeding', desc: 'Bulk fescue seeding behind the bunker. Do not mow.', col: '#34c77b' },
+  };
+  const LINE = { fairways: '#a8ec9a', approaches: '#d2ec8a', greens: '#4ff08f', tees: '#86dbff', bunkers: '#fff2c4', water: '#63b0ff', other: '#e2e2e2' };
+  const CUT = 2.29; // m, Groundsmaster 4300-D width of cut
+  const LAT0 = -38.1207, PHI = LAT0 * Math.PI / 180;
+  const KX = 111412.84 * Math.cos(PHI) - 93.5 * Math.cos(3 * PHI), KY = 111132.954 - 559.822 * Math.cos(2 * PHI) + 1.175 * Math.cos(4 * PHI);
+  const mxy = (c) => [(c[0] - 145.24) * KX, (c[1] - LAT0) * KY];
+  const lonlat = (p) => [p[0] / KX + 145.24, p[1] / KY + LAT0];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const narrow = () => matchMedia('(max-width: 900px)').matches;
+  const dayKey = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: TZ });
+  const today = dayKey(Date.now());
+  const fmtTime = (iso) => new Date(iso).toLocaleTimeString('en-AU', { timeZone: TZ, hour: 'numeric', minute: '2-digit' });
+  const fmtWhen = (iso) => {
+    const k = dayKey(iso); if (k === today) return 'today ' + fmtTime(iso);
+    const days = Math.round((new Date(today) - new Date(k)) / 864e5);
+    if (days === 1) return 'yesterday ' + fmtTime(iso);
+    return new Date(iso).toLocaleDateString('en-AU', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short' });
+  };
+  const fmtArea = (m2) => m2 >= 10000 ? [(m2 / 10000).toFixed(2), 'ha'] : [Math.round(m2).toLocaleString('en-AU'), 'm²'];
+  const holeLabel = (h) => h === 'other' ? 'Practice & other' : 'Hole ' + h;
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+
+  let course, data;
+  try {
+    [course, data] = await Promise.all([fetch('course.json').then((r) => r.json()), fetch('data.json?t=' + Date.now()).then((r) => r.json())]);
+  } catch (e) { $('#side').textContent = 'Couldn’t load the plan. Pull down to refresh.'; return; }
+  const [S0, W0, N0, E0] = course.bounds;
+  const areas = data.areas.map((a) => Object.assign(a, { bb: bboxOf(a.g) }));
+  const byId = Object.fromEntries(areas.map((a) => [a.id, a]));
+  const ticks = (data.ticks || []).slice().sort((a, b) => (a.at < b.at ? 1 : -1));
+  const lastOf = (id, kind) => ticks.find((t) => t.area === id && t.kind === kind) || null;
+  const holes = [...new Set(areas.map((a) => a.hole))].sort((a, b) => (a === 'other') - (b === 'other') || (+a) - (+b));
+  $('#upd').innerHTML = ''; $('#upd').append('Updated ', el('b', null, fmtWhen(data.updated)));
+
+  function bboxOf(g) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    const ps = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+    for (const p of ps) for (const [x, y] of p[0]) { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; }
+    return [x0, y0, x1, y1];
+  }
+  const hit = (a, b) => a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
+  const toLL = (g) => (g.type === 'Polygon' ? [g.coordinates] : g.coordinates).map((p) => p.map((r) => r.map(([x, y]) => [y, x])));
+
+  // ---------- map ----------
+  const map = L.map('map', { zoomSnap: 0.25, zoomDelta: 0.5, maxZoom: 21, minZoom: 14, attributionControl: false, fadeAnimation: !reduce, zoomAnimation: !reduce });
+  const B = [[S0, W0], [N0, E0]];
+  const small = 'aerial_sm.jpg', big = 'aerial.jpg';
+  const aerial = L.imageOverlay(small, B, { interactive: false }).addTo(map); let aerialBig = false;
+  map.on('zoomend', () => { if (!aerialBig && map.getZoom() >= 17.5) { aerial.setUrl(big); aerialBig = true; } });
+  for (const f of course.features) {
+    const fill = f.l === 'bunkers' || f.l === 'water' || f.l === 'greens';
+    L.polygon(toLL(f.g), { interactive: false, color: LINE[f.l] || LINE.other, weight: f.l === 'fairways' || f.l === 'approaches' ? 1.3 : 1, opacity: .85, fill, fillColor: LINE[f.l], fillOpacity: .16 }).addTo(map);
+    if (f.l === 'greens' && /^\d+$/.test(f.h)) {
+      const bb = bboxOf(f.g);
+      L.marker([(bb[1] + bb[3]) / 2, (bb[0] + bb[2]) / 2], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'htag', html: f.h, iconSize: [22, 22], iconAnchor: [11, 11] }) }).addTo(map);
+    }
+  }
+  const layers = {}; const tickLayer = L.layerGroup().addTo(map);
+  const order = { grow: 0, surr: 1, mow: 2, seed: 3 };
+  for (const a of areas.slice().sort((x, y) => order[x.type] - order[y.type])) {
+    const lyr = L.polygon(toLL(a.g), styleOf(a, false, false));
+    lyr.on('click', (e) => { L.DomEvent.stopPropagation(e); go({ area: a.id }, true); });
+    lyr.bindTooltip(a.name, { sticky: true, direction: 'top', className: 'tip', opacity: 1 });
+    lyr.addTo(map); layers[a.id] = lyr;
+  }
+  function styleOf(a, sel, dim) {
+    if (a.type === 'seed') return { color: sel ? '#ff5a36' : TYPE.seed.col, weight: sel ? 3 : 1.6, opacity: dim ? .3 : 1, fillColor: 'url(#seedHatch)', fillOpacity: dim ? .25 : 1, dashArray: '4 3' };
+    const c = TYPE[a.type].col;
+    return { color: sel ? '#ff5a36' : c, weight: sel ? 3.5 : a.type === 'grow' ? 1.2 : 2, opacity: dim ? .3 : .95, fillColor: c,
+      fillOpacity: dim ? .1 : sel ? .6 : a.type === 'grow' ? .4 : a.type === 'surr' ? .5 : .45, dashArray: a.type === 'surr' ? '3 3' : null };
+  }
+  function restyle() {
+    for (const a of areas) { const sel = a.id === state.area, dim = state.hole && a.hole !== state.hole; layers[a.id].setStyle(styleOf(a, sel, dim)); }
+    if (state.area && layers[state.area]) layers[state.area].bringToFront();
+    tickLayer.clearLayers();
+    for (const a of areas) {
+      if (a.type !== 'mow' && a.type !== 'seed') continue;
+      const l = lastOf(a.id, a.type === 'seed' ? 'seed' : 'mow'); if (!l || (a.type === 'mow' && dayKey(l.at) !== today)) continue;
+      if (state.hole && a.hole !== state.hole) continue;
+      const c = labelPoint(a);
+      L.marker([c[1], c[0]], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'tick', html: '✓', iconSize: [20, 20], iconAnchor: [10, 10] }) }).addTo(tickLayer);
+    }
+  }
+  function labelPoint(a) { // a point on the area's biggest ring, so ticks sit on the area itself
+    const ps = a.g.type === 'Polygon' ? [a.g.coordinates] : a.g.coordinates; let best = ps[0], n = 0;
+    for (const p of ps) if (p[0].length > n) { n = p[0].length; best = p; }
+    return best[0][Math.floor(best[0].length / 4)];
+  }
+  const boundsOf = (bb) => L.latLngBounds([bb[1], bb[0]], [bb[3], bb[2]]);
+  function fitArea(id) { map.fitBounds(layers[id].getBounds(), { padding: [40, 40], maxZoom: 19.75, animate: !reduce }); }
+  function fitHole(h) {
+    let bb = null; for (const a of areas) if (a.hole === h) bb = bb ? [Math.min(bb[0], a.bb[0]), Math.min(bb[1], a.bb[1]), Math.max(bb[2], a.bb[2]), Math.max(bb[3], a.bb[3])] : a.bb.slice();
+    if (bb) map.fitBounds(boundsOf(bb), { padding: [20, 20], maxZoom: 19.25, animate: !reduce });
+  }
+  let allBB = null; for (const a of areas) allBB = allBB ? [Math.min(allBB[0], a.bb[0]), Math.min(allBB[1], a.bb[1]), Math.max(allBB[2], a.bb[2]), Math.max(allBB[3], a.bb[3])] : a.bb.slice();
+  map.fitBounds(boundsOf(allBB), { padding: [10, 10] });
+  new ResizeObserver(() => map.invalidateSize()).observe($('#map'));
+  map.on('click', () => { if (state.area) go({ hole: state.hole }); });
+
+  // ---------- hole chips ----------
+  const nav = $('#holes');
+  for (const h of ['all', ...holes]) {
+    const b = el('button', null, h === 'all' ? 'Course' : h === 'other' ? 'Practice' : h); b.type = 'button'; b.dataset.h = h;
+    if (/^\d+$/.test(h)) b.setAttribute('aria-label', 'Hole ' + h);
+    b.addEventListener('click', () => go(h === 'all' ? {} : { hole: h }, false, true)); nav.appendChild(b);
+  }
+
+  // ---------- side card: course > hole > area ----------
+  const state = { hole: null, area: null };
+  function go(next, fromMap, fit) {
+    state.area = next.area || null; state.hole = next.area ? byId[next.area].hole : next.hole || null;
+    nav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.h === (state.hole || 'all'))));
+    restyle(); render();
+    if (state.area && !fromMap) fitArea(state.area); else if (fit) { if (state.hole) fitHole(state.hole); else map.fitBounds(boundsOf(allBB), { padding: [10, 10] }); }
+    const h = state.area ? '#' + state.area : state.hole ? '#hole-' + state.hole : '#'; if (location.hash !== h) history.replaceState(null, '', h === '#' ? location.pathname : h);
+    if (narrow() && (state.area || fromMap)) $('#side').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  }
+  function statusOf(a) {
+    if (a.type === 'mow') { const l = lastOf(a.id, 'mow'); return l ? { t: 'Mown ' + fmtWhen(l.at), ok: dayKey(l.at) === today } : { t: 'Not ticked off yet' }; }
+    if (a.type === 'seed') { const l = lastOf(a.id, 'seed'); return l ? { t: 'Seeded ' + fmtWhen(l.at), ok: true } : { t: 'Not seeded yet' }; }
+    if (a.type === 'surr') return { t: 'Surrounds / fairway mower' };
+    return { t: 'Let grow' };
+  }
+  function areaRow(a) {
+    const b = el('button', 'rowb'); b.type = 'button';
+    const sw = el('i', 'sw ' + a.type);
+    const nm = el('span', 'nm', a.name); const st = statusOf(a); const sm = el('small', st.ok ? 'ok' : null, st.t + (a.note ? ' · note' : '')); nm.appendChild(sm);
+    const [v, u] = fmtArea(a.area); const ar = el('span', 'ar', v + ' ' + u);
+    b.append(sw, nm, ar); b.addEventListener('click', () => go({ area: a.id })); return b;
+  }
+  function rules() {
+    const ul = el('ul', 'rules');
+    for (const k of ['mow', 'surr', 'grow', 'seed']) { const li = el('li'); li.append(el('i', 'sw ' + k)); const t = el('span'); t.append(el('b', null, TYPE[k].label + ': '), TYPE[k].desc); li.append(t); ul.appendChild(li); }
+    return ul;
+  }
+  function report() {
+    const p = el('p', 'report'); p.append(el('b', null, 'Finished an area? '), 'Post it in #rough, e.g. “4300 done 1, 2, 3” or “seeded 9 Seed 2”. It’s ticked off here within a couple of hours.');
+    return p;
+  }
+  function render() {
+    const side = $('#side'); side.textContent = '';
+    if (state.area) return renderArea(side, byId[state.area]);
+    if (state.hole) return renderHole(side, state.hole);
+    side.append(el('p', 'eyebrow', 'Whole course'), el('h2', null, 'Rough this summer'));
+    const mows = areas.filter((a) => a.type === 'mow'), done = mows.filter((a) => { const l = lastOf(a.id, 'mow'); return l && dayKey(l.at) === today; });
+    const pr = el('div', 'prog'); const big = el('span', 'big', done.length + ' of ' + mows.length); big.append(el('small', null, '4300 laps done today'));
+    const m = el('div', 'meter'); const bar = el('i'); bar.style.width = (mows.length ? Math.round(100 * done.length / mows.length) : 0) + '%'; m.appendChild(bar);
+    pr.append(big, m); side.append(pr, rules(), report());
+    const list = el('div', 'list'); side.append(el('p', 'eyebrow', 'Holes'), list);
+    for (const h of holes) {
+      const b = el('button', 'rowb'); b.type = 'button';
+      const tag = el('span', 'tag', h === 'other' ? 'P' : h);
+      const hm = areas.filter((a) => a.hole === h && a.type === 'mow'); const l = hm.map((a) => lastOf(a.id, 'mow')).filter(Boolean).sort((x, y) => (x.at < y.at ? 1 : -1))[0];
+      const nm = el('span', 'nm', holeLabel(h)); const okToday = l && dayKey(l.at) === today;
+      nm.append(el('small', okToday ? 'ok' : null, hm.length ? (l ? '4300 lap ' + fmtWhen(l.at) : '4300 lap not ticked yet') : 'No 4300 lap'));
+      b.append(tag, nm, el('span', 'chev', '›')); b.addEventListener('click', () => go({ hole: h }, false, true)); list.appendChild(b);
+    }
+    side.append(el('p', 'foot', 'Plan from the Ranfurlie rough plan, updated ' + fmtWhen(data.updated) + '. Aerial: MetroMap, Jan 2026. Areas are flat ground areas.'));
+  }
+  function renderHole(side, h) {
+    const back = el('button', 'back', '← Whole course'); back.type = 'button'; back.addEventListener('click', () => go({}, false, true));
+    side.append(back, el('h2', null, holeLabel(h)));
+    const list = el('div', 'list'); const rank = { mow: 0, surr: 1, seed: 2, grow: 3 };
+    let last = null;
+    for (const a of areas.filter((x) => x.hole === h).sort((x, y) => rank[x.type] - rank[y.type] || x.name.localeCompare(y.name, 'en', { numeric: true }))) {
+      if (a.type !== last) { list.append(el('p', 'grp', TYPE[a.type].label)); last = a.type; }
+      list.append(areaRow(a));
+    }
+    side.append(list, report());
+  }
+  function renderArea(side, a) {
+    const back = el('button', 'back', '← ' + holeLabel(a.hole)); back.type = 'button'; back.addEventListener('click', () => go({ hole: a.hole }, false, true));
+    side.append(back, el('p', 'eyebrow', holeLabel(a.hole) + ' · ' + TYPE[a.type].label), el('h2', null, a.name), el('p', 'desc', TYPE[a.type].desc));
+    const fig = el('figure', 'pic'); const cv = el('canvas'); cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', a.name + ' on the aerial photo');
+    fig.append(cv, el('figcaption', null, 'This area outlined; the rest of the plan faded. Tap the map to zoom in.')); side.append(fig);
+    const facts = el('div', 'facts'); const add = (k, v, u) => { const f = el('div', 'fact'); f.append(el('span', 'k', k)); const vv = el('span', 'v', v); if (u) vv.append(el('small', null, u)); f.append(vv); facts.append(f); };
+    const [v, u] = fmtArea(a.area); add('Area', v, u);
+    if (a.type === 'mow') { add('4300 travel', '≈ ' + Math.round(a.area / CUT / 10) * 10, 'm'); const l = lastOf(a.id, 'mow'); add('Last mown', l ? fmtWhen(l.at) : 'Not yet'); }
+    else if (a.type === 'seed') { const rate = a.rate ?? (data.seed && data.seed.rate); if (rate) add('Seed', (a.area * rate / 1000).toFixed(1), 'kg'); const l = lastOf(a.id, 'seed'); add('Seeded', l ? fmtWhen(l.at) : 'Not yet'); }
+    else if (a.type === 'surr') add('Mower', 'Surrounds / fairway'); else add('Mowing', 'None');
+    side.append(facts);
+    if (a.note) { side.append(el('p', 'eyebrow', 'Notes'), el('p', 'note', a.note)); }
+    const hist = ticks.filter((t) => t.area === a.id).slice(0, 8);
+    if (hist.length) { const ul = el('ul', 'hist'); for (const t of hist) ul.append(el('li', null, (t.kind === 'seed' ? 'Seeded ' : 'Mown ') + fmtWhen(t.at))); side.append(el('p', 'eyebrow', 'History'), ul); }
+    if (a.type === 'mow' || a.type === 'seed') side.append(report());
+    requestAnimationFrame(() => drawPic(cv, a));
+  }
+
+  // ---------- area picture ----------
+  const imgs = {}; const imgOf = (src) => { if (!imgs[src]) { const im = imgs[src] = new Image(); im.onload = () => { if (state.area) { const cv = $('#side canvas'); if (cv) drawPic(cv, byId[state.area]); } }; im.src = src; } return imgs[src].complete && imgs[src].naturalWidth ? imgs[src] : null; };
+  let hatch = null;
+  function drawPic(cv, a) {
+    const cw = Math.max(220, cv.parentNode.clientWidth || 340);
+    let [x0, y0] = mxy([a.bb[0], a.bb[1]]), [x1, y1] = mxy([a.bb[2], a.bb[3]]);
+    const pad = Math.max(12, .18 * Math.max(x1 - x0, y1 - y0)); x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+    const ch = Math.min(Math.max(Math.round(cw * (y1 - y0) / (x1 - x0)), Math.round(cw * .56)), Math.round(cw * 1.05));
+    const want = ch / cw, have = (y1 - y0) / (x1 - x0);
+    if (have < want) { const d = ((x1 - x0) * want - (y1 - y0)) / 2; y0 -= d; y1 += d; } else { const d = ((y1 - y0) / want - (x1 - x0)) / 2; x0 -= d; x1 += d; }
+    const dpr = Math.min(devicePixelRatio || 1, 2.5); cv.width = Math.round(cw * dpr); cv.height = Math.round(ch * dpr); cv.style.height = ch + 'px';
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const k = cw / (x1 - x0), X = (p) => (p[0] - x0) * k, Y = (p) => (y1 - p[1]) * k;
+    ctx.fillStyle = '#26302a'; ctx.fillRect(0, 0, cw, ch);
+    const fine = (x1 - x0) / (cw * dpr) <= .5; const im = fine ? (imgOf(big) || imgOf(small)) : imgOf(small);
+    if (im) {
+      const tl = lonlat([x0, y1]), br = lonlat([x1, y0]);
+      const ix0 = (tl[0] - W0) / (E0 - W0) * im.naturalWidth, iy0 = (N0 - tl[1]) / (N0 - S0) * im.naturalHeight;
+      const ix1 = (br[0] - W0) / (E0 - W0) * im.naturalWidth, iy1 = (N0 - br[1]) / (N0 - S0) * im.naturalHeight;
+      try { ctx.drawImage(im, ix0, iy0, ix1 - ix0, iy1 - iy0, 0, 0, cw, ch); } catch (e) {}
+      ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.fillRect(0, 0, cw, ch);
+    }
+    const tl = lonlat([x0, y1]), br = lonlat([x1, y0]), vb = [tl[0], br[1], br[0], tl[1]];
+    const trace = (g) => { const ps = g.type === 'Polygon' ? [g.coordinates] : g.coordinates; ctx.beginPath();
+      for (const rings of ps) for (const r of rings) { r.forEach((c, i) => { const p = mxy(c); i ? ctx.lineTo(X(p), Y(p)) : ctx.moveTo(X(p), Y(p)); }); ctx.closePath(); } };
+    if (!hatch) { const c = document.createElement('canvas'); c.width = c.height = 8; const x = c.getContext('2d'); x.fillStyle = 'rgba(52,199,123,.3)'; x.fillRect(0, 0, 8, 8);
+      x.strokeStyle = 'rgba(52,199,123,.95)'; x.lineWidth = 3; x.beginPath(); x.moveTo(-2, 10); x.lineTo(10, -2); x.moveTo(-2, 2); x.lineTo(2, -2); x.moveTo(6, 10); x.lineTo(10, 6); x.stroke(); hatch = ctx.createPattern(c, 'repeat'); }
+    const al = { grow: .26, surr: .5, mow: .42, seed: .55 };
+    for (const o of areas.slice().sort((p, q) => order[p.type] - order[q.type])) {
+      if (o.id === a.id || !hit(o.bb, vb)) continue; trace(o.g); ctx.globalAlpha = al[o.type]; ctx.fillStyle = o.type === 'seed' ? hatch : TYPE[o.type].col; ctx.fill('evenodd'); ctx.globalAlpha = 1;
+    }
+    for (const f of course.features) { const bb = f.bb || (f.bb = bboxOf(f.g)); if (!hit(bb, vb)) continue; trace(f.g);
+      if (f.l === 'bunkers') { ctx.fillStyle = 'rgba(255,242,196,.5)'; ctx.fill('evenodd'); } ctx.strokeStyle = LINE[f.l] || LINE.other; ctx.lineWidth = f.l === 'bunkers' ? 1 : 1.3; ctx.stroke(); }
+    trace(a.g); ctx.fillStyle = a.type === 'seed' ? hatch : TYPE[a.type].col; ctx.globalAlpha = a.type === 'seed' ? 1 : .62; ctx.fill('evenodd'); ctx.globalAlpha = 1;
+    ctx.lineJoin = 'round'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 3.5; ctx.stroke(); ctx.strokeStyle = TYPE[a.type].col; ctx.lineWidth = 2; ctx.stroke();
+    const span = (x1 - x0) * .3, nice = [2, 5, 10, 20, 50, 100, 200].filter((n) => n <= span).pop() || 2, Lp = nice * k;
+    ctx.fillStyle = 'rgba(19,32,26,.72)'; ctx.fillRect(8, ch - 28, Lp + 16, 20); ctx.fillStyle = '#fff'; ctx.fillRect(16, ch - 15, Lp, 3); ctx.fillRect(16, ch - 20, 2, 8); ctx.fillRect(16 + Lp - 2, ch - 20, 2, 8);
+    ctx.font = '600 11px Barlow, system-ui, sans-serif'; ctx.textBaseline = 'bottom'; ctx.fillText(nice + ' m', 22, ch - 16);
+    ctx.fillStyle = 'rgba(19,32,26,.72)'; ctx.beginPath(); ctx.arc(cw - 18, 18, 11, 0, 2 * Math.PI); ctx.fill(); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('N', cw - 18, 19); ctx.textAlign = 'start';
+  }
+  let rT = null; addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { const cv = $('#side canvas'); if (cv && state.area) drawPic(cv, byId[state.area]); }, 150); });
+
+  // start from the link: #hole-5 or #<area id>
+  const hsh = location.hash.slice(1);
+  if (hsh.startsWith('hole-') && holes.includes(hsh.slice(5))) go({ hole: hsh.slice(5) }, false, true);
+  else if (byId[hsh]) go({ area: hsh });
+  else go({});
+})();
+</script>
+</body>
+</html>
