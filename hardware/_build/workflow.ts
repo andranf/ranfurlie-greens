@@ -13,6 +13,9 @@ import { z } from "zod";
 //   kind "fix"     a problem fixed: thread reply, ✅ on the post, record status fixed.
 //   kind "remove"  pin taken off the map (kept in the file as removed).
 //   kind "purge_test" (with __test "1") drops test records and their files.
+//   kind "net"     a mainline edit from the page: the whole network (pipes, valves, pump, head links) in "net",
+//                  checked and committed as hardware/network.json with a log line (who, what, sid). No Slack post.
+//                  With __test "1" it goes to hardware/network.test.json instead.
 // __test "1": Slack goes to Andy's DM instead of the channel and the record is marked test (the page hides it).
 // Every change is one atomic commit through the Git data API, retried if the branch moved underneath it.
 
@@ -23,6 +26,9 @@ const SLACK = "slack_main";
 const REPO = "https://api.github.com/repos/andranf/ranfurlie-greens";
 const PAGES = "https://andranf.github.io/ranfurlie-greens/hardware/";
 const LIVE_PATH = "hardware/live.json";
+const NET_PATH = "hardware/network.json";
+const NET_TEST_PATH = "hardware/network.test.json";
+const NET_KINDS = ["src", "j", "end", "sv", "mv", "iv", "ov"];
 const IRR_CH = "C06HV77DBQV";
 const DRN_CH = "C0B885SR474";
 const ANDY = "U06BCCG4HT9";
@@ -119,6 +125,32 @@ ${snapPath ? '<meta property="og:image:width" content="640">\n<meta property="og
 <a href="${htmlSafe(to)}">Open the pin on the map</a>
 </html>
 `;
+}
+
+// A mainline file from the page: shape and size checks only (the page is the editor).
+function netProblem(net: any): string {
+  if (!net || typeof net !== "object") return "not JSON";
+  if (!Array.isArray(net.nodes) || !Array.isArray(net.pipes)) return "no nodes or pipes";
+  if (net.nodes.length < 2 || net.nodes.length > 4000 || net.pipes.length < 1 || net.pipes.length > 5000) return "too big or empty";
+  const inBox = (lat: any, lng: any) => typeof lat === "number" && typeof lng === "number" && lat > -38.14 && lat < -38.10 && lng > 145.22 && lng < 145.27;
+  const ids = new Set<string>();
+  for (const n of net.nodes) {
+    if (!n || typeof n.id !== "string" || !/^n\d{1,6}$/.test(n.id) || ids.has(n.id)) return "bad node id";
+    if (!NET_KINDS.includes(n.k)) return `bad node kind ${String(n.k).slice(0, 8)}`;
+    if (!inBox(n.lat, n.lng)) return `node ${n.id} off the course`;
+    ids.add(n.id);
+  }
+  if (!net.nodes.some((n: any) => n.k === "src")) return "no pump";
+  const pids = new Set<string>();
+  for (const p of net.pipes) {
+    if (!p || typeof p.id !== "string" || !/^p\d{1,6}$/.test(p.id) || pids.has(p.id)) return "bad pipe id";
+    if (!ids.has(p.a) || !ids.has(p.b)) return `pipe ${p.id} has a missing end`;
+    if (!Array.isArray(p.pts) || p.pts.length > 2000) return `pipe ${p.id} bad points`;
+    for (const q of p.pts) if (!Array.isArray(q) || !inBox(q[0], q[1])) return `pipe ${p.id} point off the course`;
+    pids.add(p.id);
+  }
+  if (net.feeds && typeof net.feeds !== "object") return "bad feeds";
+  return "";
 }
 
 // ---------- error collection ----------
@@ -297,6 +329,10 @@ const InputSchema = z.object({
   by: z.unknown().nullable().optional(),
   by_slack: z.unknown().nullable().optional(),
   snap: z.unknown().nullable().optional(),
+  net: z.unknown().nullable().optional(),
+  base: z.unknown().nullable().optional(),
+  note: z.unknown().nullable().optional(),
+  sid: z.unknown().nullable().optional(),
   sent_at: z.unknown().nullable().optional(),
   __test: z.unknown().nullable().optional(),
 }).loose();
@@ -317,8 +353,45 @@ const workflow = defineDurable<unknown, unknown>("hardware-map", async (ctx, raw
   const input: any = InputSchema.parse(normalizeInput(rawInput));
 
   const kind = clip(input.kind, 12);
-  if (!["add", "move", "edit", "fix", "remove", "purge_test"].includes(kind)) return { skipped: true, reason: "bad-kind" };
+  if (!["add", "move", "edit", "fix", "remove", "purge_test", "net"].includes(kind)) return { skipped: true, reason: "bad-kind" };
   const isTest = clip(input.__test, 5) === "1";
+
+  if (kind === "net") {
+    const by = clip(input.by, 60) || "Someone";
+    const note = clip(input.note, 200) || "edited";
+    const sid = clip(input.sid, 24);
+    const base = clip(input.base, 30);
+    let net: any = null;
+    try { net = typeof input.net === "string" ? JSON.parse(input.net) : input.net; } catch { net = null; }
+    const bad = netProblem(net);
+    if (bad) {
+      await slackDmAndy(ctx, "dm-net-bad", `Mainline map: an edit from ${slackSafe(by)} wasn't saved (${slackSafe(bad)}).`, false);
+      return { ok: false, kind, reason: bad };
+    }
+    const path = isTest ? NET_TEST_PATH : NET_PATH;
+    const nowN: { iso: string } = await ctx.step("capture-now-net", async () => ({ iso: new Date().toISOString() }));
+    const cur: any = await ctx.step("read-net", async () => {
+      try {
+        const g = await gh(`/contents/${path}?ref=main`, "GET");
+        if (g.status !== 200) return { updated: null };
+        const j = JSON.parse(b64dec(g.json.content));
+        return { updated: j.updated ?? null };
+      } catch (e: any) { return { updated: null, __error: String(e?.message ?? e).slice(0, 200) }; }
+    });
+    const over = cur.updated && base && cur.updated !== base ? cur.updated : null;
+    const out = {
+      v: 1,
+      updated: nowN.iso,
+      source: clip(net.source, 300),
+      nodes: net.nodes,
+      pipes: net.pipes,
+      feeds: net.feeds && typeof net.feeds === "object" ? net.feeds : {},
+      log: [...(Array.isArray(net.log) ? net.log : []).slice(-199), { at: nowN.iso, by, note, ...(sid ? { sid } : {}), ...(over ? { over } : {}) }],
+    };
+    const res = await commit(ctx, "commit-net", `Mainline map: ${note} (${by})${isTest ? " [test]" : ""}`.slice(0, 200), { [path]: b64enc(JSON.stringify(out)) }, null);
+    if (!res?.ok) await slackDmAndy(ctx, "dm-net-fail", `Mainline map: an edit from ${slackSafe(by)} didn't save.\n${slackSafe(errs(ctx).join("\n").slice(0, 600))}`, false);
+    return { ok: !!res?.ok, kind, test: isTest, updated: nowN.iso, nodes: out.nodes.length, pipes: out.pipes.length, overwrote: over };
+  }
 
   if (kind === "purge_test") {
     if (!isTest) return { skipped: true, reason: "purge needs __test" };

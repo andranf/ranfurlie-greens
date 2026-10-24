@@ -20,6 +20,10 @@ The crew pin two kinds of things with phone GPS:
 | `p/<PIN>.html` | One small page per Slack post: its link preview shows the spot, then it opens the map at the pin | Zapier workflow |
 | `snaps/<PIN>.jpg` | The aerial snapshot with the pin drawn on (made by the page when the pin is saved) | Zapier workflow |
 | `og.jpg` | The link preview image for the main page | Claude |
+| `network.json` | The mainline: pipes, sluice / MV / LI-IV valves, the pump, and heads linked to valves | First pass by `_build/build_network.py`; after that only the page (Mainline > Edit > Save) through the Zapier workflow |
+| `network.test.json` | The copy the page uses in test mode (`?test=1`) | Zapier workflow |
+| `tiles/mm/` | MetroMap Jan 2026 aerial (the CirrusPRO backdrop) as map tiles, z14-19 | `_build/make_tiles.py` |
+| `tiles/plan/` | The 2000 irrigation as-built drawing (CirrusPRO layer) as transparent tiles, z15-19 | `_build/make_tiles.py` |
 | `_build/workflow.ts` | Source of the Zapier workflow (keep in step with the published version) | Claude |
 
 ## How a pin gets saved
@@ -30,6 +34,29 @@ pin page (up to about 2.5 minutes) so Slack can show the preview, then posts. Fi
 
 Test mode: open the page with `?test=1`. Slack goes to Andy's DM, records are marked `test` and hidden from everyone
 else. Post `{"kind":"purge_test","__test":"1"}` to the hook to clear them.
+
+## Mainline (the Mainline tab on the map)
+
+- Pipes and valves come from the 2000 as-built drawing in CirrusPRO (`Irrigation_asbuilt_2000_v3.png`). The mainline is a
+  faint dash-dot line on that drawing, so the first pass (24 Oct 2026, `_build/mainline_routes.py`) needs checking on the
+  ground. All 28 sluice valves, 11 MV valves and 74 LI-IVs from the as-built sit on the traced line.
+- The pump is the shed between the dam and the maintenance shed (Andy). The dam postdates the drawing, so the pipe from
+  the pump to the 250 mm mains is an assumption.
+- Sluice and MV valves sit in the main. Each LI-IV sits on a short take-off beside the main, so shutting it only shuts
+  its lateral. Heads feed off the nearest main unless they're linked to a valve (Edit > tap an LI-IV > Link heads).
+- The simulation runs from the pump through every open valve. "Find valves to shut" finds the ring of working valves
+  around a head or pipe; valves logged as seized (in Edit, or as a Failed valve pin on the hardware map) are skipped.
+- Edits: Mainline > Edit. Drag valves and junctions, add valves, draw pipes, delete pipes, link heads, then Save. The page
+  posts the whole network to the hook (`kind: "net"`), which commits `network.json` with a log line. Nothing in the page
+  needs changing when the network changes.
+- `_build/build_network.py` rebuilds the first pass from the drawing. Running it again throws away the crew's edits.
+- Cirrus Pro: the Layers button in the Mainline tab gives the mainline and valve layers as KML, each under 200 points.
+
+## Aerials
+
+The base map is the MetroMap Jan 2026 aerial that is already in CirrusPRO, cut into tiles (light on phones: only the
+tiles on screen load). Esri shows past its edges, and the Layers sheet can switch back to Esri. Slack snapshots use
+the same MetroMap tiles.
 
 ## Cirrus Pro layers: rules
 
@@ -56,3 +83,6 @@ images downsized to 4096 px wide or less.
 
 Re-extract stations and the Irrigation/Drainage vector layers from CirrusPRO into `_build/cirrus_ref.txt`
 (format in `build_ref.py`), then `python3 hardware/_build/build_ref.py`.
+
+The CirrusPRO image layers (MetroMap, the 2000 as-built, the drainage overlay) can be pulled with the GitHub Actions
+workflow "Fetch CirrusPRO image layers" (file names from CirrusPRO's RasterItem list); the result is a build artifact.

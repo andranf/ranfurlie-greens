@@ -128,7 +128,7 @@ button{cursor:pointer}
 .tab b{font-size:13px;min-width:22px;padding:0 6px;border-radius:99px;background:var(--glass-lo);color:var(--fg);line-height:20px;text-align:center}
 .tab[aria-selected="true"]{background:var(--c);color:#fff}
 .tab[aria-selected="true"] b{background:rgba(255,255,255,.25);color:#fff}
-@media (max-width:620px){.tabs .bar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:5px}.tab{flex-direction:column;gap:3px;padding:7px 2px 6px;font-size:clamp(12.5px,3.5vw,16px);letter-spacing:0}.tab span{max-width:100%;overflow:hidden;text-overflow:ellipsis}.tab b{position:absolute;margin:-4px 0 0 30px;font-size:11px;min-width:18px;line-height:17px;padding:0 4px}.tab{position:relative}.tab i{width:11px;height:11px}}
+@media (max-width:620px){.tabs .bar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;padding:5px}.tab{flex-direction:column;gap:3px;padding:7px 2px 6px;font-size:clamp(12.5px,3.5vw,16px);letter-spacing:0}.tab span{max-width:100%;overflow:hidden;text-overflow:ellipsis}.tab b{position:absolute;margin:-4px 0 0 30px;font-size:11px;min-width:18px;line-height:17px;padding:0 4px}.tab{position:relative}.tab i{width:11px;height:11px}}
 
 /* layout */
 main .wrap{display:grid;gap:16px;padding-block:10px 120px}
@@ -327,6 +327,7 @@ input.field:focus,select.field:focus,textarea.field:focus{box-shadow:inset 0 0 0
 .seg button[aria-pressed="true"]{background:var(--c);color:#fff}
 .seg button[aria-pressed="true"] i{background:#fff}
 .note{font-size:14px;color:var(--muted)}
+.mapcard{padding:0;overflow:hidden}.mapcard iframe{display:block;width:100%;height:max(520px,calc(100svh - 200px));border:0}
 </style>
 </head>
 <body data-area="irrigation">
@@ -359,13 +360,14 @@ const HOOK = "https://hooks.zapier.com/hooks/catch/18429017/R9IHP2aX1ajxyU3o/";
 const SLACK = "https://ranfurliegolfclub.slack.com/archives/";
 const CREW = ["Andy Anderson","Ben Hartley","Neil Harper","Kyle Craig","Nathan Drew","Nathan Ferguson","Brodie Macdonald","Nicholas Debrincat","Flynn Sinclair","James King","Joshua Cope","Mitch Mahoney","Samuel Cope","Tremayne Gallagher","Michael K"];
 const AREAS = {
+  map:{label:"Map",c:"#0aa6dc"},
   irrigation:{label:"Irrigation",long:"",c:"#0a7fd0",data:"../irrigation/data.json",full:"../irrigation/",ch:"C06HV77DBQV",chName:"#irrigation",pfx:"IRR"},
   drainage:{label:"Drainage",c:"#6a46f5",data:"../drainage/data.json",full:"../drainage/",ch:"C0B885SR474",chName:"#drainage",pfx:"DRN"},
   bunkers:{label:"Bunkers",c:"#c27a06",data:"../bunkers/data.json",full:"../bunkers/",ch:"C06SNC8QM7T",chName:"#bunkers",pfx:"BNK"},
   topdressing:{label:"Topdressing",c:"#dc5222",ch:"C0AMNEELZND",chName:"#topdressing"},
   grounds:{label:"Grounds",c:"#169552",data:"../grounds/data.json",full:"../grounds/",pfx:""}
 };
-const ORDER = ["irrigation","drainage","bunkers","topdressing","grounds"];
+const ORDER = ["map","irrigation","drainage","bunkers","topdressing","grounds"];
 const GROUNDS = {amstel:{label:"Amstel",c:"#169552",ch:"C06G6PGEJ80",chName:"#amstelgrounds",area:"amstel"},clubhouse:{label:"Clubhouse",c:"#4b6fe0",ch:"C06FWKZN5BK",chName:"#ranfurlieclubhouse",area:"clubhouse"},sand:{label:"Sand counter",c:"#b5841a",ch:"C087R8YRB28",chName:"#sandcounter",area:"sand"}};
 const OPEN = ["Open","In progress","Waiting on parts","Waiting on materials"];
 const PR = {High:0,Medium:1,Low:2};
@@ -579,6 +581,8 @@ function pinsSvg(area,pins){const ord={High:0,Medium:1,Low:2};pins=pins.slice().
   return halo+pins.map(({p,j},i)=>{const r=j.prio==="High"?7:5.5;const pr=esc(j.prio);return `<circle class="pring ${pr}" cx="${p.x}" cy="${p.y}" r="${r}" data-r="${r}" style="animation-delay:${((i%9)*.29).toFixed(2)}s"/><circle class="pin ${pr}${S.sel[area]===j.ref?" sel":""}" cx="${p.x}" cy="${p.y}" r="${r}" data-r="${r}" data-tap="${esc(j.ref)}"><title>${esc(j.ref+" "+j.title)}</title></circle>`}).join("")}
 
 /* ------------------------------------------------------------------ IRRIGATION */
+/* the hardware and mainline map (hardware/index.html) on the front tab: pins, valves, the isolation finder */
+function viewMap(){return `<div class="card mapcard"><iframe src="../hardware/?embed=1" title="Course map: hardware, problems and the mainline" allow="geolocation"></iframe></div><p class="note" style="margin:-6px 4px 0">Problems and hardware pinned by the crew, and the mainline with its valves: tap Mainline, then Find valves to shut. <a href="../hardware/" target="_blank" rel="noopener">Open full screen</a></p>`}
 function viewIrrigation(){
   const d=S.data.irrigation;if(!d)return noData("irrigation");const jobs=jobsOf("irrigation");const open=jobs.filter(isOpen);
   const flow=(d.flow||[]).map(f=>f.reported);const fixed30=jobs.filter(j=>j.status==="Done"&&daysAgo(j.done)!=null&&daysAgo(j.done)<=30).length;
@@ -796,8 +800,9 @@ function render(){
   lastSig=sig();
   document.body.dataset.area=S.tab;$("#title").textContent=AREAS[S.tab].label;document.title=AREAS[S.tab].label+" · Ranfurlie Course Ops";
   renderTabs();facts();
-  const v={irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds}[S.tab]();
-  $("#view").innerHTML=v;wire();
+  const v={map:viewMap,irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds}[S.tab]();
+  if(S.tab==="map"&&$("#view .mapcard")){/* keep the map frame as it is: reloading it would lose the valves you shut */}
+  else{$("#view").innerHTML=v;wire()}
   $("#foot").innerHTML=`Jobs, maps and stock rebuild from Slack and Notion every hour. Stocktakes, sand and Turfco loads from this page show within a minute or two.<br>Separate pages: <a href="../">Greens Live</a> · <a href="../machinery/">Machinery</a> · <a href="../stock.html">Shed stocktake</a> · <a href="../spray/">Spraying</a>`;
 }
 function wire(){
@@ -858,8 +863,8 @@ function wireTd(){
 }
 
 /* ------------------------------------------------------------------ routing */
-function go(tab){if(!AREAS[tab])tab="irrigation";S.tab=tab;LS.set("tab",tab);history.replaceState(null,"","#"+(tab==="grounds"?"grounds-"+S.sub:tab));render();window.scrollTo({top:0})}
-function fromHash(){const h=location.hash.slice(1);if(h.startsWith("grounds")){S.tab="grounds";const s=h.split("-")[1];if(GROUNDS[s])S.sub=s}else if(AREAS[h])S.tab=h;else{S.tab=LS.get("tab","irrigation");S.sub=LS.get("sub","amstel")}}
+function go(tab){if(!AREAS[tab])tab="map";S.tab=tab;LS.set("tab",tab);history.replaceState(null,"","#"+(tab==="grounds"?"grounds-"+S.sub:tab));render();window.scrollTo({top:0})}
+function fromHash(){const h=location.hash.slice(1);if(h.startsWith("grounds")){S.tab="grounds";const s=h.split("-")[1];if(GROUNDS[s])S.sub=s}else if(AREAS[h])S.tab=h;else{S.tab=LS.get("tab","map");S.sub=LS.get("sub","amstel")}}
 window.addEventListener("hashchange",()=>{fromHash();render()});
 
 /* theme: follow the phone, or pick */

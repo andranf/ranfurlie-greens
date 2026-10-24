@@ -15,7 +15,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-/* Ranfurlie Hardware Map v1.0 (24 Oct 2026).
+/* Ranfurlie Hardware Map v1.1 (24 Oct 2026): + Mainline tab (pipes, valves, water simulation, valve finder, editing)
+   and the MetroMap Jan 2026 aerial. v1.0 (24 Oct 2026):
    Crew pin permanent hardware (valves, QCVs, drain pits...) and problems (leaks, wet spots, blocked drains) with phone GPS.
    Problems and failed hardware post to #irrigation / #drainage through the Zapier "Hardware map" hook, with a link back to the pin.
    Records live in hardware/live.json (written by that workflow). Reference layers (Cirrus heads, as-built valves and pits)
@@ -166,7 +167,7 @@ textarea.in{min-height:76px;resize:vertical}
 .cross{position:fixed;left:50%;top:50%;z-index:450;width:76px;height:76px;margin:-38px 0 0 -38px;pointer-events:none;display:none}
 .cross svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 1px 2px rgba(0,0,0,.7))}
 body.placing .cross{display:block}
-body.placing .add,body.placing .fabs .hide-place,body.placing .chips{display:none}
+body.placing .add,body.placing .fabs .hide-place,body.placing .chips,body.placing .mlbar,body.placing .seg{display:none}
 .placebar{position:fixed;left:0;right:0;bottom:0;z-index:600;padding:0 12px calc(12px + var(--safe-b));display:none}
 body.placing .placebar{display:block}
 .placebar .glass{max-width:640px;margin:0 auto;border-radius:24px;padding:12px}
@@ -204,6 +205,43 @@ table.lay{width:100%;border-collapse:collapse;font-size:15px}
 table.lay td{padding:9px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
 table.lay td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
 .sw{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;vertical-align:-1px;box-shadow:0 0 0 1.5px rgba(0,0,0,.25)}
+/* mode switch (hardware / mainline) */
+.row2{pointer-events:auto;display:flex;align-items:center;gap:8px;max-width:760px;margin:0 auto;padding-top:9px}
+.row2 .chips{flex:1;min-width:0;margin:0;padding:0 2px 6px}
+.seg{flex:0 0 auto;display:flex;gap:2px;padding:3px;border-radius:999px;margin-bottom:6px}
+.seg button{border:0;cursor:pointer;border-radius:999px;padding:6px 13px;font-family:var(--display);font-weight:800;font-size:16.5px;background:transparent;color:var(--muted);transition:background .2s,color .2s}
+.seg button[aria-pressed="true"]{background:var(--tank);color:#fff;box-shadow:0 6px 14px -8px var(--tank)}
+body.ml .add{display:none}
+body:not(.ml) .mlbar{display:none}
+
+/* mainline */
+.mlbar{position:fixed;left:0;right:0;bottom:0;z-index:520;padding:0 12px calc(12px + var(--safe-b));pointer-events:none}
+.mlbar>.glass{pointer-events:auto;max-width:640px;margin:0 auto;border-radius:24px;padding:12px}
+.mlbar .st{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.mlbar .st .dot{flex:0 0 14px;height:14px;border-radius:50%;margin-top:5px}
+.mlbar .st b{font-family:var(--display);font-weight:800;font-size:21px;line-height:1.1;display:block}
+.mlbar .st small{display:block;color:var(--muted);font-size:14px;line-height:1.3;margin-top:2px}
+body.ml .fabs{bottom:calc(150px + var(--safe-b))}
+body.ml.mledit .fabs{bottom:calc(178px + var(--safe-b))}
+.mlpipe{stroke-linecap:round;stroke-linejoin:round}
+.mlflow{stroke-linecap:round;stroke-dasharray:1 13;animation:flow .9s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-14}}
+.vlv{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.5);font-family:var(--display);font-weight:800;font-size:11px;color:#fff;line-height:1}
+.vlv.iv{width:17px;height:17px;border-width:2px;font-size:0}
+.vlv.shut{background:#ff3b30!important;border-color:#fff}
+.vlv.shut::after{content:"✕";font-size:13px}
+.vlv.iv.shut::after{font-size:10px}
+.vlv.bad{box-shadow:0 0 0 3px #ffb020,0 2px 6px rgba(0,0,0,.5)}
+.vlv.hit{animation:hit 1.1s ease-in-out infinite}
+@keyframes hit{50%{box-shadow:0 0 0 7px rgba(255,59,48,.45),0 2px 6px rgba(0,0,0,.5)}}
+.vlv.sel{box-shadow:0 0 0 4px var(--tank),0 2px 6px rgba(0,0,0,.5)}
+.pump{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:#0a84ff;border:2.5px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.55)}
+.pump svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.jn{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #0a84ff;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+.tool{position:fixed;left:50%;transform:translateX(-50%);top:calc(122px + var(--safe-t));z-index:600;border-radius:999px;padding:8px 8px 8px 16px;font-family:var(--display);font-weight:700;font-size:17px;display:none;align-items:center;gap:10px;max-width:calc(100vw - 24px)}
+.tool.on{display:flex}
+.tool span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chk{display:grid;gap:6px}
 .loading{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;background:var(--bg);font-family:var(--display);font-weight:700;font-size:22px;color:var(--muted);transition:opacity .4s}
 .loading.gone{opacity:0;pointer-events:none}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -218,7 +256,7 @@ table.lay td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:60
     <button class="ib" id="bSearch" aria-label="Find a valve, head or pin"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></button>
     <button class="ib" id="bMenu" aria-label="Lists and Cirrus Pro layers"><svg viewBox="0 0 24 24"><path d="M12 3 2.5 8 12 13l9.5-5z"/><path d="m2.5 12.5 9.5 5 9.5-5"/><path d="m2.5 17 9.5 5 9.5-5"/></svg></button>
   </div>
-  <nav class="chips" id="chips" aria-label="Show on the map"></nav>
+  <div class="row2"><div class="seg glass" id="seg" role="group" aria-label="Map"><button data-m="hw" aria-pressed="true">Hardware</button><button data-m="ml" aria-pressed="false">Mainline</button></div><nav class="chips" id="chips" aria-label="Show on the map"></nav></div>
 </header>
 
 <div class="fabs">
@@ -230,6 +268,8 @@ table.lay td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:60
 <div class="cross" aria-hidden="true"><svg viewBox="0 0 76 76"><circle cx="38" cy="38" r="15" fill="none" stroke="#fff" stroke-width="3"/><circle cx="38" cy="38" r="15" fill="none" stroke="#0aa6dc" stroke-width="1.4" stroke-dasharray="4 4"/><path d="M38 4v20M38 52v20M4 38h20M52 38h20" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="38" cy="38" r="2.6" fill="#ff3b30" stroke="#fff" stroke-width="1.2"/></svg></div>
 <div class="hint glass" id="hint">Put the cross right on it</div>
 <div class="placebar"><div class="glass" id="placebar"></div></div>
+<div class="mlbar"><div class="glass" id="mlbar"></div></div>
+<div class="tool glass" id="tool"><span id="toolTxt"></span><button class="btn soft sm" id="toolX">Done</button></div>
 <div class="toast glass" id="toast" role="status"></div>
 <div id="layer"></div>
 
@@ -331,7 +371,13 @@ function records(){
 
 /* ---------- map ---------- */
 var map=L.map("map",{zoomControl:false,attributionControl:true,maxZoom:22,minZoom:14,preferCanvas:true,zoomSnap:.25,wheelPxPerZoomLevel:90});
-L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxNativeZoom:19,maxZoom:22,attribution:"Imagery &copy; Esri, Maxar, Earthstar Geographics",crossOrigin:true,keepBuffer:3}).addTo(map);
+/* aerials: MetroMap Jan 2026 (the CirrusPRO backdrop, cut into tiles in tiles/mm) over Esri, which fills in past its edges */
+var MMB=L.latLngBounds([-38.1249177,145.237944],[-38.1165969,145.2511051]);
+var esri=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxNativeZoom:19,maxZoom:22,attribution:"Imagery &copy; Esri, Maxar, Earthstar Geographics",crossOrigin:true,keepBuffer:3}).addTo(map);
+var metro=L.tileLayer("tiles/mm/{z}/{x}/{y}.webp",{minZoom:14,maxNativeZoom:19,maxZoom:22,bounds:MMB,keepBuffer:3,attribution:"Aerial &copy; MetroMap Jan 2026"});
+if(ls("hw.aerial")!=="esri")metro.addTo(map);
+/* the 2000 irrigation as-built drawing (CirrusPRO layer) for checking and tracing the mainline */
+var planLayer=L.tileLayer("tiles/plan/{z}/{x}/{y}.webp",{minZoom:15,maxNativeZoom:19,maxZoom:22,bounds:L.latLngBounds([-38.1242095,145.2379596],[-38.116943,145.2511068]),opacity:.85,zIndex:5});
 var COURSE=L.latLngBounds([-38.1238,145.2378],[-38.1171,145.2507]);
 map.fitBounds(COURSE,{padding:[0,0]});
 var canvas=L.canvas({padding:.4,tolerance:6});
@@ -375,6 +421,7 @@ function drawRecords(){
   counts(recs);
 }
 function counts(recs){
+  if(MODE==="ml"){mlCounts();return}
   recs=recs||records();
   var open=recs.filter(function(r){return (T[r.type]||{}).cat==="issue"&&r.status!=="fixed"}).length;
   var fixed=recs.filter(function(r){return (T[r.type]||{}).cat==="issue"&&r.status==="fixed"}).length;
@@ -383,9 +430,12 @@ function counts(recs){
   var C=[["issues","Problems",open,"#ff3b30"],["assets","Hardware",assets,"#30d158"],["plan","As-built",REF.plan.length,"#ffd60a"],["heads","Heads",HEADS.length,"#ffffff"],["fixed","Fixed",fixed,"#8e8e93"]];
   $("#chips").innerHTML=C.map(function(c){return '<button class="chip glass'+(SHOW[c[0]]?"":" off")+'" data-k="'+c[0]+'"><span class="dot" style="background:'+c[3]+'"></span>'+c[1]+(c[2]!==""?' <span class="n">'+c[2]+'</span>':'')+'</button>'}).join("");
 }
-$("#chips").addEventListener("click",function(e){var b=e.target.closest(".chip");if(!b)return;var k=b.dataset.k;SHOW[k]=!SHOW[k];ls("hw.show",SHOW);applyShow();counts()});
+$("#chips").addEventListener("click",function(e){var b=e.target.closest(".chip");if(!b)return;var k=b.dataset.k;
+  if(MODE==="ml"){MSHOW[k]=!MSHOW[k];ls("ml.show",MSHOW);applyShow();counts();return}
+  SHOW[k]=!SHOW[k];ls("hw.show",SHOW);applyShow();counts()});
 function applyShow(){
   var z=map.getZoom();
+  if(MODE==="ml"){["issues","assets","fixed","heads","plan"].forEach(function(k){map.removeLayer(LG[k])});labelLayer.clearLayers();mlApply();return}
   ["issues","assets","fixed"].forEach(function(k){if(SHOW[k])LG[k].addTo(map);else map.removeLayer(LG[k])});
   if(SHOW.heads&&z>=16.5)LG.heads.addTo(map);else map.removeLayer(LG.heads);
   if(SHOW.plan&&z>=17)LG.plan.addTo(map);else map.removeLayer(LG.plan);
@@ -536,7 +586,7 @@ function keepInputs(){var v=function(id){var e=$(id);return e?e.value.trim():und
 
 /* who */
 function who(){return ls("hw.who")}
-function whoHtml(){var w=who();return '<label class="f">Who\'s pinning it</label><div class="opts" id="dWho">'+CREW.map(function(c){return '<button class="opt'+(w&&w[0]===c[0]?" sel":"")+'" data-n="'+esc(c[0])+'" data-s="'+c[1]+'">'+esc(c[0].split(" ")[0]+(c[0]==="Nathan Ferguson"?" F":c[0]==="Nathan Drew"?" D":c[0]==="Samuel Cope"||c[0]==="Joshua Cope"?" C":""))+'</button>'}).join("")+'<button class="opt'+(w&&!w[1]?" sel":"")+'" data-n="" data-s="">Someone else</button></div><input class="in" id="dWhoOther" placeholder="Your name" maxlength="40" style="margin-top:8px;'+(w&&!w[1]?"":"display:none")+'" value="'+esc(w&&!w[1]?w[0]:"")+'">'}
+function whoHtml(lbl){var w=who();return '<label class="f">'+(lbl||"Who\'s pinning it")+'</label><div class="opts" id="dWho">'+CREW.map(function(c){return '<button class="opt'+(w&&w[0]===c[0]?" sel":"")+'" data-n="'+esc(c[0])+'" data-s="'+c[1]+'">'+esc(c[0].split(" ")[0]+(c[0]==="Nathan Ferguson"?" F":c[0]==="Nathan Drew"?" D":c[0]==="Samuel Cope"||c[0]==="Joshua Cope"?" C":""))+'</button>'}).join("")+'<button class="opt'+(w&&!w[1]?" sel":"")+'" data-n="" data-s="">Someone else</button></div><input class="in" id="dWhoOther" placeholder="Your name" maxlength="40" style="margin-top:8px;'+(w&&!w[1]?"":"display:none")+'" value="'+esc(w&&!w[1]?w[0]:"")+'">'}
 function wireWho(s){var g=s.querySelector("#dWho");if(!g)return;var other=s.querySelector("#dWhoOther");
   g.addEventListener("click",function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");if(b.dataset.n){ls("hw.who",[b.dataset.n,b.dataset.s]);other.style.display="none"}else{other.style.display="";other.focus();if(other.value.trim())ls("hw.who",[other.value.trim(),""]);else localStorage.removeItem("hw.who")}});
   other.addEventListener("input",function(){var v=other.value.trim();if(v)ls("hw.who",[v,""]);else localStorage.removeItem("hw.who")})}
@@ -588,9 +638,11 @@ function snapshot(rec){
     var W=640,H=400,mpp=0.14;var c=merc(rec.lat,rec.lng);var k=1/Math.cos(rec.lat*Math.PI/180);
     var hw=W/2*mpp*k,hh=H/2*mpp*k;var bb=[c[0]-hw,c[1]-hh,c[0]+hw,c[1]+hh];
     var url="https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox="+bb.join(",")+"&bboxSR=3857&imageSR=3857&size="+W+","+H+"&format=jpg&f=image";
-    var img=new Image();img.crossOrigin="anonymous";var to=setTimeout(function(){rej("timeout")},9000);
-    img.onload=function(){clearTimeout(to);try{
+    var img=new Image();img.crossOrigin="anonymous";var to=setTimeout(function(){rej("timeout")},12000);
+    img.onload=function(){clearTimeout(to);
       var cv=document.createElement("canvas");cv.width=W;cv.height=H;var x=cv.getContext("2d");x.drawImage(img,0,0,W,H);
+      metroOnto(x,bb,W,H).then(annotate,annotate);
+      function annotate(){try{
       var px=function(lat,lng){var m=merc(lat,lng);return [(m[0]-bb[0])/(bb[2]-bb[0])*W,(bb[3]-m[1])/(bb[3]-bb[1])*H]};
       x.font="600 13px Barlow, system-ui, sans-serif";
       HEADS.forEach(function(h){var p=px(h.lat,h.lng);if(p[0]<0||p[1]<0||p[0]>W||p[1]>H)return;x.beginPath();x.arc(p[0],p[1],4,0,7);x.fillStyle="#fff";x.fill();x.lineWidth=1.5;x.strokeStyle="#0b2231";x.stroke();x.fillStyle="rgba(6,18,27,.7)";var tw=x.measureText(h.n).width;x.fillRect(p[0]+6,p[1]-8,tw+8,16);x.fillStyle="#fff";x.fillText(h.n,p[0]+10,p[1]+4)});
@@ -602,9 +654,20 @@ function snapshot(rec){
       x.fillStyle="rgba(6,18,27,.72)";x.fillRect(0,H-22,W,22);x.fillStyle="#fff";x.font="600 13px Barlow, system-ui, sans-serif";x.fillText(t.name+" · "+(rec.place?rec.place+", ":"")+(rec.near||""),8,H-7);
       var bw=10/(mpp*k),sx=W-8-bw;x.fillRect(sx,H-11,bw,3);x.fillRect(sx,H-15,2,7);x.fillRect(sx+bw-2,H-15,2,7);x.textAlign="right";x.fillText("10 m",sx-6,H-7);x.textAlign="left";
       var d=cv.toDataURL("image/jpeg",.74);res(d.slice(d.indexOf(",")+1));
-    }catch(e){rej(e)}};
+    }catch(e){rej(e)}}};
     img.onerror=function(){clearTimeout(to);rej("img")};img.src=url;
   });
+}
+/* the MetroMap tiles (same site, so the canvas stays exportable) drawn over the Esri export for the snapshot */
+function metroOnto(x,bb,W,H){
+  if(ls("hw.aerial")==="esri")return Promise.resolve();
+  var R=20037508.34,Z=19,S=256*Math.pow(2,Z);
+  var gx=function(m){return (m+R)/(2*R)*S},gy=function(m){return (R-m)/(2*R)*S};
+  var x0=gx(bb[0]),x1=gx(bb[2]),y0=gy(bb[3]),y1=gy(bb[1]);var sx=W/(x1-x0),sy=H/(y1-y0);
+  var jobs=[];
+  for(var tx=Math.floor(x0/256);tx<=Math.floor(x1/256);tx++)for(var ty=Math.floor(y0/256);ty<=Math.floor(y1/256);ty++)(function(tx,ty){
+    jobs.push(new Promise(function(ok){var im=new Image();var t=setTimeout(function(){ok(null)},6000);im.onload=function(){clearTimeout(t);ok([im,tx,ty])};im.onerror=function(){clearTimeout(t);ok(null)};im.src="tiles/mm/"+Z+"/"+tx+"/"+ty+".webp"}))})(tx,ty);
+  return Promise.all(jobs).then(function(r){r.forEach(function(j){if(!j)return;x.drawImage(j[0],(j[1]*256-x0)*sx,(j[2]*256-y0)*sy,256*sx+.6,256*sy+.6)})});
 }
 
 /* ---------- record cards ---------- */
@@ -674,20 +737,35 @@ $("#bSearch").onclick=function(){
     if(v.length){
       records().forEach(function(r){var t=T[r.type];var hay=(r.id+" "+r.label+" "+r.ref+" "+t.name+" "+(r.place||"")+" "+(r.by||"")+" "+(r.notes||"")).toUpperCase();if(hay.indexOf(v)>=0)out.push(['r',r.id,(r.label?r.label+" · ":"")+t.name,(r.place||"")+(r.status==="fixed"?" · fixed":""),t])});
       REF.plan.forEach(function(p){var code=p[0].replace(/^LI-/,"");if(p[0].indexOf(v)>=0||code.indexOf(v)>=0||v===p[0].replace(/-0*/,"-"))out.push(['p',p[0],p[0],PLAN[p[1]].desc+" · as-built",{col:PLAN[p[1]].col,g:p[1]==="dp"?"grate":p[1]==="do"?"outlet":"valve"}])});
+      if(MODE==="ml"&&NET)NET.nodes.forEach(function(n){if(!isValve(n))return;var nm=vname(n).toUpperCase();if(nm.indexOf(v)>=0||nm.replace(/^LI-/,"").indexOf(v)>=0)out.unshift(['v',n.id,vname(n),VALVE[n.k].name+" · mainline",{col:VALVE[n.k].col,g:"valve"}])});
       HEADS.forEach(function(h){if(h.n.indexOf(v)===0)out.push(['h',h.n,h.n,placeOf(h)+" · head",{col:"#64d2ff",g:"head"}])});
     }
     $("#qres").innerHTML=out.slice(0,40).map(function(o){return '<button class="li" data-k="'+o[0]+'" data-id="'+esc(o[1])+'"><span class="ic" style="background:'+o[4].col+'22">'+svg(o[4].g,o[4].col)+'</span><span><b>'+esc(o[2])+'</b><small>'+esc(o[3])+'</small></span></button>'}).join("")||(v?'<p class="faint">Nothing matches</p>':'<p class="faint">Heads, as-built valves and pits, and every pin.</p>');
   }
   q.oninput=run;run();
   $("#qres").onclick=function(e){var b=e.target.closest(".li");if(!b)return;var k=b.dataset.k,id=b.dataset.id;closeSheet();
-    if(k==="r")openRecord(id);
+    if(k==="v"){var nv=NI[id];map.setView([nv.lat,nv.lng],Math.max(map.getZoom(),19));setTimeout(function(){onNode(nv)},350)}
+    else if(k==="p"&&MODE==="ml"&&NET&&NET.nodes.some(function(n){return n.ref===id})){var nr=NET.nodes.filter(function(n){return n.ref===id})[0];map.setView([nr.lat,nr.lng],Math.max(map.getZoom(),19));setTimeout(function(){onNode(nr)},350)}
+    else if(k==="r")openRecord(id);
     else if(k==="p"){var p=REF.plan.filter(function(x){return x[0]===id})[0];SHOW.plan=true;ls("hw.show",SHOW);map.setView([p[2],p[3]],20);setTimeout(function(){openPlan(p)},350)}
     else{var h=HEADS.filter(function(x){return x.n===id})[0];SHOW.heads=true;ls("hw.show",SHOW);map.setView([h.lat,h.lng],20);setTimeout(function(){openHead(h)},350)}
     counts()};
 };
 
 /* ---------- lists and Cirrus Pro layers ---------- */
+function aerialHtml(){var e=ls("hw.aerial")==="esri";return '<h3>Aerial photo</h3><div class="opts" id="aer"><button class="opt'+(e?"":" sel")+'" data-v="mm">MetroMap · Jan 2026</button><button class="opt'+(e?" sel":"")+'" data-v="esri">Esri · latest</button></div>'}
+function wireAerial(s){var g=s.querySelector("#aer");if(!g)return;g.onclick=function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");ls("hw.aerial",b.dataset.v==="esri"?"esri":"mm");if(b.dataset.v==="esri")map.removeLayer(metro);else metro.addTo(map)}}
+function mlMenu(){
+  var sets=netKmlSets();var lg=(NET&&NET.log||[]).slice(-8).reverse();
+  var h='<h2>Mainline</h2><p class="muted" style="font-size:14.5px">'+esc(NET?NET.source||"":"")+' Pipes are where the drawing puts them, not dug up and checked. Fix anything wrong with Edit.</p>';
+  h+='<h3>Cirrus Pro layers</h3><p class="muted" style="font-size:14.5px">Import with the Layer Import Tool: KML layers come in switched off on every device. Each file stays under '+CIRRUS_SMALL+' points.</p><table class="lay">'+sets.map(function(S,i){return '<tr><td><span class="sw" style="background:'+S.col+'"></span>'+esc(S.name)+'</td><td class="n">'+kmlCount(S)+'</td><td class="n" style="width:1%"><button class="btn soft sm" data-k="'+i+'">KML</button></td></tr>'}).join("")+'</table>';
+  h+=aerialHtml();
+  h+='<h3>Recent changes</h3>'+(lg.length?'<div class="list">'+lg.map(function(l){return '<div class="li"><span><b>'+esc(l.note||"Edited")+'</b><small>'+esc(when(l.at)+(l.by?" · "+l.by:""))+'</small></span></div>'}).join("")+'</div>':'<p class="faint">No edits yet.</p>');
+  var s=sheet(h);wireAerial(s);
+  s.querySelectorAll("button[data-k]").forEach(function(b){b.onclick=function(){var S=sets[+b.dataset.k];download(S.file+".kml",netKml(S),"application/vnd.google-earth.kml+xml")}});
+}
 $("#bMenu").onclick=function(){
+  if(MODE==="ml"){mlMenu();return}
   var recs=records();var open=recs.filter(function(r){return T[r.type].cat==="issue"&&r.status!=="fixed"});
   var h='<h2>Problems and layers</h2>';
   h+='<h3>Open problems</h3>'+(open.length?'<div class="list">'+open.sort(function(a,b){return (b.at||"").localeCompare(a.at||"")}).map(function(r){var t=T[r.type];return '<button class="li" data-id="'+r.id+'"><span class="ic" style="background:'+t.col+'22">'+svg(t.g,t.col)+'</span><span><b>'+esc(t.name)+(r.urgent?' · urgent':'')+'</b><small>'+esc((r.place||"")+" · "+when(r.at)+(r.by?" · "+r.by:""))+'</small></span></button>'}).join("")+'</div>':'<p class="faint">None open.</p>');
@@ -696,7 +774,8 @@ $("#bMenu").onclick=function(){
   var CI=LIVE.cirrus||{};
   h+='<table class="lay">'+(rows.length?rows.map(function(L,i){var ci=CI[L.name];return '<tr><td><span class="sw" style="background:'+L.col+'"></span>'+esc(L.name)+(ci?'<br><small class="faint">In Cirrus: '+ci.count+' from '+esc(when(ci.imported))+(ci.count!==L.items.length?' · out of date':'')+'</small>':'<br><small class="faint">Not in Cirrus yet</small>')+'</td><td class="n">'+L.items.length+'</td><td class="n" style="width:1%"><button class="btn soft sm" data-i="'+i+'">KML</button></td></tr>'}).join(""):'<tr><td class="faint">No hardware pinned yet. As-built valves and pits are already in Cirrus as the Irrigation and Drainage layers.</td></tr>')+'</table>';
   h+='<div class="row" style="margin-top:12px"><button class="btn soft sm" id="mCsv">Everything as CSV</button><button class="btn soft sm" id="mJson">GeoJSON</button></div>';
-  var s=sheet(h);
+  h+=aerialHtml();
+  var s=sheet(h);wireAerial(s);
   s.querySelectorAll(".li").forEach(function(b){b.onclick=function(){closeSheet();openRecord(b.dataset.id)}});
   s.querySelectorAll("button[data-i]").forEach(function(b){b.onclick=function(){var L=rows[+b.dataset.i];download(L.file+".kml",kml(L),"application/vnd.google-earth.kml+xml")}});
   $("#mCsv").onclick=function(){download("ranfurlie-hardware-"+new Date().toISOString().slice(0,10)+".csv",csv(recs),"text/csv")};
@@ -727,6 +806,324 @@ function csv(recs){var cols=["id","type","label","ref","cond","size","depth","st
 function geojson(recs){return {type:"FeatureCollection",features:recs.map(function(r){var p=Object.assign({},r);delete p.lat;delete p.lng;delete p.evs;delete p._pending;p.type_name=T[r.type].name;return {type:"Feature",geometry:{type:"Point",coordinates:[r.lng,r.lat]},properties:p}})}}
 function download(name,text,type){var b=new Blob([text],{type:type});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
 
+/* ---------- mainline: pipes, valves, water simulation, isolation finder, editing ----------
+   network.json: nodes {id,k,lat,lng,ref?,name?,cond?,note?} (k: src pump, j junction, end, sv sluice valve, mv MV valve,
+   iv lateral isolation valve on a stub off the main, ov other valve), pipes {id,a,b,pts[[lat,lng]..],mm?,run?,stub?},
+   feeds {head: nodeId} (heads linked to a valve; the rest feed off the nearest main), log [{at,by,note}].
+   The page is the only editor: Save posts the whole file to the hook ("net"), which commits it. */
+var MODE=ls("hw.mode")==="ml"?"ml":"hw";
+var NET=null,NETBASE=null,NI={},ADJ={},HEADFEED=null;
+var ML={closed:{},edit:false,undo:[],tool:null,ops:[],sel:null,hit:{},target:null,saving:null};
+var MSHOW=Object.assign({valves:true,iv:true,heads:true,plan:false},ls("ml.show")||{});
+var svgR=L.svg({padding:.5});
+var LGM={pipes:L.layerGroup(),valves:L.layerGroup(),heads:L.layerGroup(),edit:L.layerGroup(),draw:L.layerGroup()};
+var VALVE={sv:{name:"Sluice valve",short:"SV",col:"#0a84ff"},mv:{name:"MV valve",short:"MV",col:"#8e8cff"},iv:{name:"Lateral isolation valve",short:"LI-IV",col:"#30d158"},ov:{name:"Other valve",short:"V",col:"#5ad8cf"}};
+var NETFILE=TEST?"network.test.json":"network.json";
+function isValve(n){return !!(n&&VALVE[n.k])}
+function vname(n){if(!n)return "";if(n.k==="src")return n.name||"Pump";if(isValve(n))return n.ref||n.name||VALVE[n.k].short;return n.k==="end"?"Pipe end":"Junction"}
+function m2(a,b){return dist(a,b)}
+function plen(p){var c=pipeLL(p),s=0;for(var i=1;i<c.length;i++)s+=m2(c[i-1],c[i]);return s}
+function pipeLL(p){return [[NI[p.a].lat,NI[p.a].lng]].concat(p.pts||[],[[NI[p.b].lat,NI[p.b].lng]])}
+function netIndex(){NI={};ADJ={};NET.nodes.forEach(function(n){NI[n.id]=n});NET.pipes.forEach(function(p){(ADJ[p.a]=ADJ[p.a]||[]).push(p);(ADJ[p.b]=ADJ[p.b]||[]).push(p)});HEADFEED=null;NET.feeds=NET.feeds||{};NET.log=NET.log||[]}
+function nextId(pre,arr){var m=0;arr.forEach(function(x){var v=+String(x.id).slice(1);if(v>m)m=v});return pre+(m+1)}
+/* local metres around the course, for nearest-pipe sums */
+var K0=Math.cos(-38.12*Math.PI/180);
+function xy(ll){return [ll[1]*111320*K0,ll[0]*110574]}
+function projSeg(p,a,b){var dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1e-9;var t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2));var q=[a[0]+t*dx,a[1]+t*dy];return {t:t,q:q,d:Math.hypot(q[0]-p[0],q[1]-p[1])}}
+function nearestPipe(ll,opt){opt=opt||{};var P=xy(ll),best=null;
+  NET.pipes.forEach(function(p){if(opt.noStub&&p.stub)return;var c=pipeLL(p).map(xy);for(var i=1;i<c.length;i++){var r=projSeg(P,c[i-1],c[i]);if(!best||r.d<best.d)best={p:p,i:i-1,t:r.t,d:r.d,q:r.q}}});
+  if(best){best.ll=[best.q[1]/110574,best.q[0]/(111320*K0)]}return best}
+function headFeeds(){if(HEADFEED)return HEADFEED;HEADFEED={};HEADS.forEach(function(h){var f=NET.feeds[h.n];if(f&&NI[f]){HEADFEED[h.n]={node:f};return}var np=nearestPipe([h.lat,h.lng],{noStub:true});HEADFEED[h.n]=np?{pipe:np.p.id,d:np.d}:{}});return HEADFEED}
+
+/* ---- water: Dijkstra from the pump(s) through open nodes ---- */
+function simulate(closed){
+  closed=closed||ML.closed;var d={},wet={},done={},list=[];
+  NET.nodes.forEach(function(n){if(n.k==="src"){d[n.id]=0;list.push(n.id)}});
+  while(list.length){var bi=0;for(var i=1;i<list.length;i++)if(d[list[i]]<d[list[bi]])bi=i;var u=list.splice(bi,1)[0];if(done[u])continue;done[u]=1;wet[u]=1;if(closed[u])continue;
+    (ADJ[u]||[]).forEach(function(p){var v=p.a===u?p.b:p.a;var nd=d[u]+(p._len||(p._len=plen(p)));if(d[v]==null||nd<d[v]){d[v]=nd;list.push(v)}})}
+  var pw={};NET.pipes.forEach(function(p){pw[p.id]=(wet[p.a]&&!closed[p.a])||(wet[p.b]&&!closed[p.b])});
+  var hf=headFeeds(),hd={};HEADS.forEach(function(h){var f=hf[h.n];var ok=f.node?(wet[f.node]&&!closed[f.node]):f.pipe?pw[f.pipe]:true;if(!ok)hd[h.n]=1});
+  return {d:d,wet:wet,pw:pw,dry:hd};
+}
+function dryText(dry,max){var g={},order=[];Object.keys(dry).forEach(function(n){var h=HEADS.filter(function(x){return x.n===n})[0];if(!h)return;var k=placeOf(h)||"Other";if(!g[k]){g[k]=0;order.push(k)}g[k]++});
+  order.sort(function(a,b){var ha=parseInt(a)||99,hb=parseInt(b)||99;return ha-hb||a.localeCompare(b)});
+  var parts=order.map(function(k){return k+" ("+g[k]+")"});return {n:Object.keys(dry).length,groups:order.length,text:parts.slice(0,max||99).join(", ")+(parts.length>(max||99)?" and "+(parts.length-max)+" more":""),list:order.map(function(k){return [k,g[k]]})}}
+
+/* valves the crew have logged as failed on the hardware map count as seized */
+function hwValve(n){if(!isValve(n))return null;var best=null;records().forEach(function(r){var t=T[r.type];if(!t||!t.valve||t.cat!=="asset")return;var d=dist([n.lat,n.lng],[r.lat,r.lng]);if((n.ref&&r.ref===n.ref)||d<=6){if(!best||(r.at||"")>(best.at||""))best=r}});return best}
+function seized(n){if(!isValve(n))return false;if(n.cond==="fail")return true;var r=hwValve(n);return !!(r&&r.cond==="fail")}
+
+/* ---- isolation finder: the ring of working valves around a pipe or a valve's lateral ---- */
+function enclose(target){
+  var bound={},seen={},stack=[],passed=[];
+  function push(u){if(!seen[u])stack.push(u)}
+  if(target.node){var n0=NI[target.node];if(isValve(n0)&&!seized(n0))return {valves:[target.node],passed:[]};push(target.node)}
+  else{var p0=NET.pipes.filter(function(p){return p.id===target.pipe})[0];if(!p0)return {fail:"nopipe"};
+    [p0.a,p0.b].forEach(function(e){var n=NI[e];if(isValve(n)&&!seized(n)&&(ADJ[e]||[]).length>1){bound[e]=1;seen[e]=1}else push(e)})}
+  while(stack.length){var u=stack.pop();if(seen[u])continue;seen[u]=1;var n=NI[u];
+    if(n.k==="src")return {fail:"pump",passed:passed};
+    var deg=(ADJ[u]||[]).length;
+    if(isValve(n)&&deg>1&&!(target.node===u)){if(seized(n))passed.push(u);else{bound[u]=1;continue}}
+    (ADJ[u]||[]).forEach(function(p){push(p.a===u?p.b:p.a)})}
+  return {valves:Object.keys(bound),passed:passed};
+}
+
+/* ---- drawing ---- */
+function vIcon(n){var V=VALVE[n.k];var cls="vlv "+n.k+(ML.closed[n.id]?" shut":"")+(seized(n)?" bad":"")+(ML.hit[n.id]?" hit":"")+(ML.sel===n.id?" sel":"");
+  return L.divIcon({className:"",html:'<div class="'+cls+'" style="background:'+V.col+'">'+(n.k==="iv"||ML.closed[n.id]?"":V.short)+'</div>',iconSize:n.k==="iv"?[17,17]:[24,24],iconAnchor:n.k==="iv"?[8.5,8.5]:[12,12]})}
+var PUMPI='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 5v14M5 12h14"/></svg>';
+var SIM=null;
+function drawNet(){
+  LGM.pipes.clearLayers();LGM.valves.clearLayers();LGM.edit.clearLayers();if(!NET)return;
+  SIM=simulate();var z=map.getZoom();ML.zb=zBucket();var w=z>=18?5:z>=16.5?4:3;
+  NET.pipes.forEach(function(p){
+    var ll=pipeLL(p);var wet=SIM.pw[p.id];
+    if(wet){var da=SIM.d[p.a],db=SIM.d[p.b];var fa=ML.closed[p.a]?Infinity:da,fb=ML.closed[p.b]?Infinity:db;if(fb<fa)ll=ll.slice().reverse()}
+    var hit=ML.target&&ML.target.pipe===p.id;
+    var base=L.polyline(ll,{renderer:svgR,color:wet?(p.stub?"#1d8a4a":"#0569a0"):"#5b6670",weight:(p.stub?w-1:w)+3,opacity:wet?.9:.75,className:"mlpipe",interactive:true,bubblingMouseEvents:false});
+    base.on("click",function(e){L.DomEvent.stop(e);onPipe(p,e.latlng)});base.addTo(LGM.pipes);
+    if(hit)L.polyline(ll,{renderer:svgR,color:"#ffcc00",weight:w+7,opacity:.55,interactive:false}).addTo(LGM.pipes);
+    L.polyline(ll,{renderer:svgR,color:wet?"#9be7ff":"#c4ccd2",weight:p.stub?w-2:w-1,opacity:wet?1:.8,dashArray:wet?null:"5 6",className:"mlpipe",interactive:false}).addTo(LGM.pipes);
+    if(wet&&!ML.edit&&!p.stub)L.polyline(ll,{renderer:svgR,color:"#ffffff",weight:w-1,opacity:.95,className:"mlflow",interactive:false}).addTo(LGM.pipes);
+  });
+  NET.nodes.forEach(function(n){
+    if(n.k==="src"){var pm=L.marker([n.lat,n.lng],{icon:L.divIcon({className:"",html:'<div class="pump">'+PUMPI+'</div>',iconSize:[34,34],iconAnchor:[17,17]}),zIndexOffset:900,draggable:ML.edit,keyboard:false});pm.on("click",function(){onNode(n)});pm.on("dragend",function(e){moveNode(n,e.target.getLatLng())});pm.addTo(LGM.valves);return}
+    if(isValve(n)){if(n.k==="iv"?!MSHOW.iv:!MSHOW.valves){if(!ML.closed[n.id]&&!ML.hit[n.id])return}
+      if(n.k==="iv"&&z<16.5&&!ML.closed[n.id]&&!ML.hit[n.id])return;
+      var m=L.marker([n.lat,n.lng],{icon:vIcon(n),zIndexOffset:n.k==="iv"?600:800,draggable:ML.edit,keyboard:false});
+      m.on("click",function(){onNode(n)});m.on("dragend",function(e){moveNode(n,e.target.getLatLng())});m.addTo(LGM.valves);return}
+    if(ML.edit&&z>=17){var j=L.marker([n.lat,n.lng],{icon:L.divIcon({className:"",html:'<div class="jn"></div>',iconSize:[12,12],iconAnchor:[6,6]}),draggable:true,zIndexOffset:400,keyboard:false});j.on("click",function(){onNode(n)});j.on("dragend",function(e){moveNode(n,e.target.getLatLng())});j.addTo(LGM.edit)}
+  });
+  drawMlHeads();mlBar();mlCounts();
+}
+function drawMlHeads(){
+  LGM.heads.clearLayers();if(!NET||!MSHOW.heads)return;var z=map.getZoom();var dry=SIM?SIM.dry:{};var any=Object.keys(dry).length;
+  if(z<16.5&&!any)return;
+  var linking=ML.tool&&ML.tool.k==="link";
+  HEADS.forEach(function(h){var isDry=!!dry[h.n];if(z<16.5&&!isDry)return;
+    var linked=linking&&NET.feeds[h.n]===ML.tool.valve;
+    var m=L.circleMarker([h.lat,h.lng],{renderer:canvas,radius:linked?6:isDry?5:3.4,weight:linked?2.5:1.3,color:linked?"#30d158":isDry?"#fff":"#0b2231",fillColor:linked?"#30d158":isDry?"#ff3b30":"#e9f8ff",fillOpacity:.95,opacity:.9});
+    m.on("click",function(e){L.DomEvent.stop(e);onHead(h)});m.addTo(LGM.heads)});
+}
+function mlLabels(){
+  labelLayer.clearLayers();if(map.getZoom()<18.5||!NET)return;var b=map.getBounds().pad(.05);var n=0;
+  NET.nodes.forEach(function(v){if(!isValve(v)||n>120||!b.contains([v.lat,v.lng]))return;if(v.k==="iv"?!MSHOW.iv:!MSHOW.valves)return;n++;L.tooltip({permanent:true,direction:"right",offset:[10,0],className:"lbl-tip plan",interactive:false}).setLatLng([v.lat,v.lng]).setContent(esc(vname(v))).addTo(labelLayer)});
+  if(MSHOW.heads&&map.getZoom()>=19.5)HEADS.forEach(function(h){if(n>220||!b.contains([h.lat,h.lng]))return;n++;L.tooltip({permanent:true,direction:"left",offset:[-6,0],className:"lbl-tip",interactive:false}).setLatLng([h.lat,h.lng]).setContent(h.n).addTo(labelLayer)});
+}
+function zBucket(){var z=map.getZoom();return z<16.5?0:z<17?1:z<18?2:3}
+function mlApply(force){
+  var on=MODE==="ml";
+  ["pipes","valves","heads","edit","draw"].forEach(function(k){if(on)LGM[k].addTo(map);else map.removeLayer(LGM[k])});
+  if(on&&(MSHOW.plan||ML.edit))planLayer.addTo(map);else map.removeLayer(planLayer);
+  if(on){var zb=zBucket();if(force||zb!==ML.zb)drawNet();mlLabels()}
+}
+function mlCounts(){
+  if(MODE!=="ml")return;
+  var nv=0,niv=0,km=0;if(NET){NET.nodes.forEach(function(n){if(n.k==="sv"||n.k==="mv"||n.k==="ov")nv++;if(n.k==="iv")niv++});NET.pipes.forEach(function(p){if(!p.stub)km+=p._len||(p._len=plen(p))})}
+  $("#sub").textContent=NET?(km/1000).toFixed(1)+" km of main · "+nv+" sluice/MV · "+niv+" LI-IV"+(TEST?" · TEST":""):"Loading the mainline…";
+  var C=[["valves","Sluice valves",nv,"#0a84ff"],["iv","LI-IVs",niv,"#30d158"],["heads","Heads",HEADS.length,"#ffffff"],["plan","2000 plan","","#d9d9d9"]];
+  $("#chips").innerHTML=C.map(function(c){return '<button class="chip glass'+(MSHOW[c[0]]?"":" off")+'" data-k="'+c[0]+'"><span class="dot" style="background:'+c[3]+'"></span>'+c[1]+(c[2]!==""?' <span class="n">'+c[2]+'</span>':'')+'</button>'}).join("");
+}
+
+/* ---- the bottom panel ---- */
+function mlBar(){
+  if(MODE!=="ml")return;var el=$("#mlbar");if(!NET){el.innerHTML='<div class="st"><span class="dot" style="background:#8e8e93"></span><div><b>Loading the mainline…</b></div></div>';return}
+  var shut=Object.keys(ML.closed);var dr=dryText(SIM?SIM.dry:{},4);var h="";
+  if(ML.edit){
+    var n=ML.ops.length;
+    h='<div class="st"><span class="dot" style="background:#ffb020"></span><div><b>Editing the mainline'+(n?' · '+n+' change'+(n===1?'':'s'):'')+'</b><small>Drag valves and junctions to move them. Tap a pipe or valve to change it. Nothing is shared until you save.</small></div></div>'+
+      '<div class="row"><button class="btn soft sm" id="eValve">Add valve</button><button class="btn soft sm" id="ePipe">Draw pipe</button>'+(ML.undo.length?'<button class="btn soft sm" id="eUndo">Undo</button>':'')+'</div><div class="row" style="margin-top:8px"><button class="btn soft sm" id="eCancel">'+(n?"Discard":"Stop editing")+'</button><button class="btn go" id="eSave" style="flex:2"'+(n?"":" disabled")+'>Save for everyone</button></div>';
+  }else{
+    if(!shut.length)h='<div class="st"><span class="dot" style="background:#2fd27a"></span><div><b>Water everywhere</b><small>Tap a valve to shut it, or find the valves to shut off a spot.</small></div></div>';
+    else h='<div class="st"><span class="dot" style="background:#ff3b30"></span><div><b>'+shut.length+' valve'+(shut.length===1?'':'s')+' shut · '+(dr.n?dr.n+' head'+(dr.n===1?'':'s')+' off':'nothing off')+'</b><small>'+(dr.n?esc(dr.text):'Water still gets around through other pipes.')+'</small></div></div>';
+    h+='<div class="row"><button class="btn go" id="mFind" style="flex:2">Find valves to shut</button>'+(shut.length?'<button class="btn soft sm" id="mOpen">Open all</button>':'')+(shut.length&&dr.n?'<button class="btn soft sm" id="mList">Details</button>':'')+'<button class="btn soft sm" id="mEdit">Edit</button></div>';
+    if(ML.saving)h='<div class="opts" style="margin:-2px 0 8px"><span class="pill info">Saving the mainline…</span></div>'+h;
+  }
+  el.innerHTML=h;
+  var b=function(id,f){var x=$(id);if(x)x.onclick=f};
+  b("#mFind",function(){setTool({k:"find",txt:"Tap the head or pipe you need to work on"})});
+  b("#mOpen",function(){ML.closed={};ML.hit={};ML.target=null;drawNet()});
+  b("#mList",function(){shutSheet()});
+  b("#mEdit",startEdit);
+  b("#eValve",function(){setTool({k:"addValve",txt:"Tap the pipe where the valve is"})});
+  b("#ePipe",function(){setTool({k:"pipe",txt:"Tap where the pipe starts",pts:[]})});
+  b("#eUndo",undo);b("#eCancel",cancelEdit);b("#eSave",saveSheet);
+}
+function shutSheet(){var dr=dryText(SIM.dry);var shut=Object.keys(ML.closed).map(function(id){return NI[id]}).filter(Boolean);
+  var s=sheet('<h2>What\'s shut off</h2><h3>Valves shut</h3><div class="list">'+shut.map(valveLi).join("")+'</div><h3>Heads with no water · '+dr.n+'</h3>'+(dr.n?'<table class="lay">'+dr.list.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td class="n">'+x[1]+'</td></tr>'}).join("")+'</table>':'<p class="faint">None. Water still gets around.</p>'),{peek:true});
+  wireValveLi(s)}
+function valveLi(n){var V=VALVE[n.k]||VALVE.ov;var nt=nearText([n.lat,n.lng]);return '<button class="li" data-v="'+n.id+'"><span class="ic" style="background:'+V.col+'22">'+svg("valve",V.col)+'</span><span><b>'+esc(vname(n))+(seized(n)?' · seized':'')+'</b><small>'+esc(V.name+" · "+((nt.place?nt.place+", ":"")+(nt.text||"")))+'</small></span></button>'}
+function wireValveLi(s){s.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){var n=NI[b.dataset.v];closeSheet();map.setView([n.lat,n.lng],Math.max(map.getZoom(),19));setTimeout(function(){onNode(n)},300)}})}
+
+/* ---- tools (one tap on the map does the next thing) ---- */
+function setTool(t){ML.tool=t;var el=$("#tool");if(!t){el.classList.remove("on");LGM.draw.clearLayers();drawMlHeads();return}$("#toolTxt").textContent=t.txt;$("#toolX").textContent=t.k==="pipe"&&t.pts&&t.pts.length>1?"Finish":t.k==="pipe"?"Cancel":"Done";el.classList.add("on");if(t.k==="link")drawMlHeads()}
+$("#toolX").onclick=function(){var t=ML.tool;if(t&&t.k==="pipe"&&t.pts.length>1){finishPipe();return}setTool(null)};
+function screenD(a,b){var p=map.latLngToContainerPoint(a),q=map.latLngToContainerPoint(b);return Math.hypot(p.x-q.x,p.y-q.y)}
+function nearNode(ll,px,filter){var best=null;NET.nodes.forEach(function(n){if(filter&&!filter(n))return;var d=screenD(ll,[n.lat,n.lng]);if(d<=px&&(!best||d<best[0]))best=[d,n]});return best&&best[1]}
+function nearHead(ll,px){var best=null;HEADS.forEach(function(h){var d=screenD(ll,[h.lat,h.lng]);if(d<=px&&(!best||d<best[0]))best=[d,h]});return best&&best[1]}
+map.on("click",function(e){if(MODE!=="ml"||PLACE)return;var t=ML.tool;if(!t)return;var ll=[e.latlng.lat,e.latlng.lng];
+  if(t.k==="find"){var h=nearHead(ll,22);if(h){onHead(h);return}var np=nearestPipe(ll);if(np&&screenD(ll,np.ll)<=26){findFor({pipe:np.p.id},np.p.run?"this pipe ("+np.p.run+")":"this pipe");return}toast("Tap right on a head or a pipe");return}
+  if(t.k==="addValve"){var np2=nearestPipe(ll);if(!np2||screenD(ll,np2.ll)>28){toast("Tap right on the pipe");return}setTool(null);newValveSheet(np2);return}
+  if(t.k==="pipe"){t.pts.push(ll);drawSketch();$("#toolTxt").textContent=t.pts.length===1?"Tap along the pipe, then Finish":"Keep tapping along it, then Finish";$("#toolX").textContent=t.pts.length>1?"Finish":"Cancel";return}
+  if(t.k==="link"||t.k==="feed"){var h2=nearHead(ll,22);if(h2)onHead(h2);return}
+});
+function drawSketch(){LGM.draw.clearLayers();var t=ML.tool;if(!t||!t.pts)return;L.polyline(t.pts,{color:"#ffcc00",weight:5,dashArray:"8 6",interactive:false}).addTo(LGM.draw);t.pts.forEach(function(p){L.circleMarker(p,{radius:5,color:"#fff",weight:2,fillColor:"#ffcc00",fillOpacity:1,interactive:false}).addTo(LGM.draw)})}
+
+/* ---- taps on the network ---- */
+function onHead(h){
+  var t=ML.tool;
+  if(t&&t.k==="link"){mutate("link "+h.n);if(NET.feeds[h.n]===t.valve)delete NET.feeds[h.n];else NET.feeds[h.n]=t.valve;HEADFEED=null;drawNet();var c=Object.keys(NET.feeds).filter(function(k){return NET.feeds[k]===t.valve}).length;$("#toolTxt").textContent=c+" head"+(c===1?"":"s")+" on "+vname(NI[t.valve])+" · tap more";return}
+  if(t&&t.k==="find"){setTool(null);findFor(feedTarget(h),h.n);return}
+  var f=headFeeds()[h.n];var dry=SIM&&SIM.dry[h.n];
+  var src=f.node?"Linked to "+vname(NI[f.node]):"Off the nearest main"+(f.pipe?(function(){var p=NET.pipes.filter(function(x){return x.id===f.pipe})[0];return p&&p.run?" ("+p.run+")":""})():"");
+  var h2='<div class="head"><span class="ic" style="background:#ffffff22">'+svg("head",dry?"#ff3b30":"#64d2ff",2.2)+'</span><div><h2>'+esc(h.n)+'</h2><div class="muted">'+esc(placeOf(h)||"Sprinkler head")+'</div></div></div><div class="opts" style="margin-top:10px">'+(dry?'<span class="pill bad">No water</span>':'<span class="pill ok">Has water</span>')+'<span class="pill">'+esc(src)+'</span></div>';
+  h2+='<div class="row" style="margin-top:14px"><button class="btn go" id="hFind" style="flex:2">Valves to shut it off</button></div>';
+  if(ML.edit)h2+='<h3>Which valve feeds it</h3><p class="faint" style="font-size:14px">If its lateral comes off an LI-IV, link it so shutting that valve shuts it.</p><div class="row"><button class="btn soft sm" id="hPick">Link to a valve</button>'+(f.node?'<button class="btn soft sm" id="hAuto">Unlink</button>':'')+'</div>';
+  var s=sheet(h2,{peek:true});
+  $("#hFind").onclick=function(){closeSheet();findFor(feedTarget(h),h.n)};
+  if($("#hPick"))$("#hPick").onclick=function(){closeSheet();setTool({k:"feed",head:h.n,txt:"Tap the valve that feeds "+h.n})};
+  if($("#hAuto"))$("#hAuto").onclick=function(){mutate("unlink "+h.n);delete NET.feeds[h.n];HEADFEED=null;closeSheet();drawNet()};
+}
+function feedTarget(h){var f=headFeeds()[h.n];return f.node?{node:f.node}:{pipe:f.pipe}}
+function onPipe(p,latlng){
+  if(MODE!=="ml"||PLACE)return;var t=ML.tool;var ll=[latlng.lat,latlng.lng];
+  if(t){map.fire("click",{latlng:latlng});return}
+  var len=p._len||(p._len=plen(p));var wet=SIM&&SIM.pw[p.id];
+  var h='<h2>'+esc(p.run||"Mainline")+'</h2><div class="opts" style="margin-top:6px">'+(wet?'<span class="pill info">Has water</span>':'<span class="pill bad">No water</span>')+(p.mm?'<span class="pill">'+esc(p.mm)+'</span>':'')+(p.stub?'<span class="pill">Lateral take-off</span>':'')+'<span class="pill">'+fmtM(len)+' between '+esc(vname(NI[p.a]))+' and '+esc(vname(NI[p.b]))+'</span></div>'+(p.note?'<div class="note">'+esc(p.note)+'</div>':'');
+  h+='<div class="row" style="margin-top:14px"><button class="btn go" id="pFind" style="flex:2">Valves to shut this off</button></div>';
+  if(ML.edit)h+='<h3>Change</h3><div class="row"><button class="btn soft sm" id="pValve">Add a valve here</button><button class="btn soft sm" id="pSize">Size / name</button><button class="btn stop sm" id="pDel">Delete pipe</button></div>';
+  var s=sheet(h,{peek:true});
+  $("#pFind").onclick=function(){closeSheet();findFor({pipe:p.id},(p.run||"this pipe"))};
+  if($("#pValve"))$("#pValve").onclick=function(){closeSheet();var np=nearestPipe(ll);newValveSheet(np&&np.p.id===p.id?np:{p:p,i:0,t:.5,ll:pipeLL(p)[0]})};
+  if($("#pSize"))$("#pSize").onclick=function(){pipeSheet(p)};
+  if($("#pDel"))$("#pDel").onclick=function(){mutate("delete pipe");delPipe(p);closeSheet();drawNet()};
+}
+function onNode(n){
+  if(MODE!=="ml"||PLACE)return;var t=ML.tool;
+  if(t&&t.k==="feed"){if(!isValve(n)&&n.k!=="j"){toast("Tap a valve");return}mutate("link "+t.head);NET.feeds[t.head]=n.id;HEADFEED=null;setTool(null);drawNet();toast(t.head+" linked to "+vname(n));return}
+  if(t&&t.k==="pipe"){map.fire("click",{latlng:L.latLng(n.lat,n.lng)});return}
+  if(t&&t.k==="find"){if(isValve(n)){setTool(null);findFor({node:n.id},vname(n));return}}
+  if(n.k==="src"){sheet('<div class="head"><span class="ic" style="background:#0a84ff22">'+svg("dot","#0a84ff",2.2)+'</span><div><h2>'+esc(n.name||"Pump")+'</h2><div class="muted">Where the water comes from</div></div></div>'+(n.note?'<div class="note">'+esc(n.note)+'</div>':'')+(ML.edit?'<p class="faint">Drag it on the map to move it.</p>':''),{peek:true});return}
+  if(!isValve(n)){if(ML.edit)nodeEditSheet(n);return}
+  var V=VALVE[n.k];var nt=nearText([n.lat,n.lng]);var r=hwValve(n);var shut=!!ML.closed[n.id];
+  var alone=simulate(Object.assign({},ML.closed,(function(){var o={};o[n.id]=1;return o})()));var base=simulate();var extra={};Object.keys(alone.dry).forEach(function(k){if(!base.dry[k])extra[k]=1});var dr=dryText(shut?SIM.dry:extra,6);
+  var linked=Object.keys(NET.feeds).filter(function(k){return NET.feeds[k]===n.id}).length;
+  var h='<div class="head"><span class="ic" style="background:'+V.col+'22">'+svg("valve",V.col,2.2)+'</span><div><h2>'+esc(vname(n))+'</h2><div class="muted">'+esc(V.name+" · "+((nt.place?nt.place+", ":"")+(nt.text||"")))+'</div></div></div>';
+  h+='<div class="opts" style="margin-top:10px">'+(shut?'<span class="pill bad">Shut</span>':'<span class="pill ok">Open</span>')+(seized(n)?'<span class="pill warn">Seized or won\'t shut</span>':n.cond==="work"||(r&&r.cond==="work")?'<span class="pill warn">Needs work</span>':'')+(n.k==="iv"?'<span class="pill">'+linked+' head'+(linked===1?'':'s')+' linked</span>':'')+'</div>';
+  if(n.note)h+='<div class="note">'+esc(n.note)+'</div>';
+  h+='<p class="muted" style="margin-top:10px">'+(shut?"Shut, so these are off: ":"Shutting it would turn off: ")+(dr.n?'<b>'+esc(dr.text)+'</b>':(n.k==="iv"&&!linked?"nothing yet: no heads are linked to this LI-IV.":"nothing on its own. Water gets around it."))+'</p>';
+  if(seized(n))h+='<p class="faint" style="font-size:14px">Logged as seized, so the valve finder works around it.</p>';
+  h+='<div class="row" style="margin-top:12px"><button class="btn '+(shut?"soft":"go")+'" id="vTog" style="flex:2">'+(shut?"Open it":"Shut it")+'</button><a class="btn soft sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+n.lat+','+n.lng+'">Directions</a></div>';
+  h+='<div class="row" style="margin-top:8px"><button class="btn soft sm" id="vLog">Log its condition</button>'+(r?'<button class="btn soft sm" id="vPin">Open its pin</button>':'')+'</div>';
+  if(ML.edit)h+='<h3>Change</h3><div class="row"><button class="btn soft sm" id="vEdit">Type, tag, notes</button>'+(n.k==="iv"?'<button class="btn soft sm" id="vLink">Link heads</button>':'')+'<button class="btn stop sm" id="vDel">Remove valve</button></div><p class="faint" style="font-size:13.5px;margin-top:6px">Drag it on the map to move it.</p>';
+  ML.sel=n.id;drawNet();var s=sheet(h,{peek:true,onClose:function(){ML.sel=null;drawNet()}});
+  $("#vTog").onclick=function(){if(shut)delete ML.closed[n.id];else ML.closed[n.id]=1;ML.hit={};ML.target=null;ML.sel=null;closeSheet();drawNet()};
+  $("#vLog").onclick=function(){var ty=n.k==="ov"?"other_hw":n.k;DRAFT={mode:"add",id:newId(),type:T[ty]?ty:"other_hw",ref:n.ref||"",lat:n.lat,lng:n.lng};closeSheet();ML.sel=null;startPlace()};
+  if($("#vPin"))$("#vPin").onclick=function(){closeSheet();setMode("hw");setTimeout(function(){openRecord(r.id)},200)};
+  if($("#vEdit"))$("#vEdit").onclick=function(){valveEditSheet(n)};
+  if($("#vLink"))$("#vLink").onclick=function(){closeSheet();ML.sel=null;setTool({k:"link",valve:n.id,txt:"Tap the heads "+vname(n)+" feeds"})};
+  if($("#vDel"))$("#vDel").onclick=function(){mutate("remove "+vname(n));removeValve(n);closeSheet();ML.sel=null;drawNet()};
+}
+
+/* ---- the valve finder ---- */
+function findFor(target,label){
+  ML.closed={};ML.hit={};ML.target=target.pipe?{pipe:target.pipe}:null;
+  var r=enclose(target);
+  if(r.fail==="pump"){drawNet();var s0=sheet('<h2>The pumps are the only way</h2><p class="muted">No ring of working valves closes off '+esc(label)+'. Water gets to it straight from the pump shed'+(r.passed&&r.passed.length?', past valves logged as seized':'')+'.</p>'+(r.passed&&r.passed.length?'<h3>Seized valves in the way</h3><div class="list">'+r.passed.map(function(id){return valveLi(NI[id])}).join("")+'</div>':''),{peek:true});wireValveLi(s0);return}
+  if(!r.valves||!r.valves.length){drawNet();toast("Couldn't find a valve for that");return}
+  r.valves.forEach(function(id){ML.closed[id]=1;ML.hit[id]=1});drawNet();
+  var dr=dryText(SIM.dry);var vs=r.valves.map(function(id){return NI[id]});
+  var b=L.latLngBounds(vs.map(function(n){return [n.lat,n.lng]}));map.fitBounds(b.pad(.25),{maxZoom:19,paddingTopLeft:[0,130],paddingBottomRight:[0,Math.round(window.innerHeight*.5)]});
+  var s=sheet('<h2>Shut '+vs.length+' valve'+(vs.length===1?'':'s')+'</h2><p class="muted">To work on '+esc(label)+'.</p><div class="list">'+vs.map(valveLi).join("")+'</div>'+(r.passed&&r.passed.length?'<p class="faint" style="font-size:14px;margin-top:8px">Goes around '+r.passed.length+' valve'+(r.passed.length===1?'':'s')+' logged as seized: '+esc(r.passed.map(function(id){return vname(NI[id])}).join(", "))+'.</p>':'')+'<h3>That also turns off · '+dr.n+' head'+(dr.n===1?'':'s')+'</h3>'+(dr.n?'<table class="lay">'+dr.list.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td class="n">'+x[1]+'</td></tr>'}).join("")+'</table>':'<p class="faint">No heads, just the pipe.</p>')+'<div class="row" style="margin-top:14px"><button class="btn soft" id="fOpen">Open them all again</button></div>',{peek:true});
+  wireValveLi(s);$("#fOpen").onclick=function(){ML.closed={};ML.hit={};ML.target=null;closeSheet();drawNet()};
+}
+
+/* ---- editing ---- */
+function startEdit(){if(!who()){var s=sheet('<h2>Who\'s editing?</h2><p class="muted">Edits to the mainline are saved for everyone, with your name on them.</p>'+whoHtml("Who\'s editing")+'<div class="row" style="margin-top:14px"><button class="btn go w" id="wGo">Start editing</button></div>');wireWho(s);$("#wGo").onclick=function(){if(!who()){toast("Pick your name first");return}closeSheet();startEdit()};return}
+  ML.edit=true;ML.closed={};ML.hit={};ML.target=null;document.body.classList.add("mledit");mlApply(true);if(map.getZoom()<17)toast("Zoom in to see junctions you can drag")}
+function stopEdit(){ML.edit=false;ML.undo=[];ML.ops=[];setTool(null);document.body.classList.remove("mledit");try{localStorage.removeItem("ml.draft")}catch(e){}mlApply(true)}
+function cancelEdit(){if(!ML.ops.length){stopEdit();return}var s=sheet('<h2>Throw away '+ML.ops.length+' change'+(ML.ops.length===1?'':'s')+'?</h2><div class="row" style="margin-top:14px"><button class="btn soft" data-close>Keep editing</button><button class="btn stop" id="cGo" style="flex:2">Throw them away</button></div>');$("#cGo").onclick=function(){closeSheet();loadNet(true).then(function(){stopEdit()})}}
+function mutate(what){ML.undo.push(JSON.stringify(NET));if(ML.undo.length>60)ML.undo.shift();ML.ops.push(what);draft()}
+function draft(){ls("ml.draft",{base:NETBASE,net:NET,ops:ML.ops,test:TEST})}
+function undo(){var s=ML.undo.pop();if(!s)return;NET=JSON.parse(s);ML.ops.pop();netIndex();draft();drawNet()}
+function moveNode(n,latlng){mutate("move "+vname(n));n.lat=+latlng.lat.toFixed(7);n.lng=+latlng.lng.toFixed(7);(ADJ[n.id]||[]).forEach(function(p){p._len=null});HEADFEED=null;drawNet()}
+function splitPipe(np,kind,props){
+  var p=np.p;var ll=pipeLL(p);var idx=np.i;var at=np.ll;
+  var nid=nextId("n",NET.nodes);var node=Object.assign({id:nid,k:kind,lat:+at[0].toFixed(7),lng:+at[1].toFixed(7)},props||{});NET.nodes.push(node);
+  var before=ll.slice(1,idx+1),after=ll.slice(idx+1,ll.length-1);
+  var p2={id:nextId("p",NET.pipes),a:nid,b:p.b,pts:after.map(function(x){return [x[0],x[1]]})};["mm","run"].forEach(function(k){if(p[k])p2[k]=p[k]});
+  p.b=nid;p.pts=before.map(function(x){return [x[0],x[1]]});p._len=null;NET.pipes.push(p2);netIndex();return node}
+function newValveSheet(np){
+  var k0="sv";var s=sheet('<h2>Add a valve</h2><p class="muted">'+esc(np.p.run||"On the main")+'</p><h3>What is it?</h3><div class="opts" id="nvK">'+["sv","mv","iv","ov"].map(function(k){return '<button class="opt'+(k===k0?" sel":"")+'" data-v="'+k+'">'+VALVE[k].name+'</button>'}).join("")+'</div><label class="f" for="nvTag">Tag or number <span class="faint">(optional)</span></label><input class="in" id="nvTag" maxlength="24" placeholder="e.g. SV-29"><label class="f" for="nvNote">Notes <span class="faint">(optional)</span></label><input class="in" id="nvNote" maxlength="200" placeholder="e.g. found when we dug up the 6th tee"><p class="faint" style="font-size:13.5px;margin-top:8px">An LI-IV goes on a short take-off beside the main, so shutting it only shuts its lateral.</p><div class="row" style="margin-top:14px"><button class="btn go w" id="nvGo">Add it</button></div>');
+  var g=s.querySelector("#nvK");g.onclick=function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");k0=b.dataset.v};
+  $("#nvGo").onclick=function(){var tag=$("#nvTag").value.trim(),note=$("#nvNote").value.trim();mutate("add "+(tag||VALVE[k0].short));
+    var props={};if(tag)props.ref=tag;if(note)props.note=note;
+    if(k0==="iv"){var tap=splitPipe(np,"j",{});var off=offsetLL([tap.lat,tap.lng],np,4);var vid=nextId("n",NET.nodes);NET.nodes.push(Object.assign({id:vid,k:"iv",lat:off[0],lng:off[1]},props));NET.pipes.push({id:nextId("p",NET.pipes),a:tap.id,b:vid,pts:[],run:"LI stub",stub:1});netIndex()}
+    else splitPipe(np,k0,props);
+    closeSheet();drawNet();toast("Valve added")};
+}
+function offsetLL(ll,np,m){var c=pipeLL(np.p).map(xy);var a=c[np.i],b=c[np.i+1]||c[np.i];var dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;var P=xy(ll);var q=[P[0]-dy/L*m,P[1]+dx/L*m];return [+(q[1]/110574).toFixed(7),+(q[0]/(111320*K0)).toFixed(7)]}
+function valveEditSheet(n){var k0=n.k;var s=sheet('<h2>'+esc(vname(n))+'</h2><h3>What is it?</h3><div class="opts" id="veK">'+["sv","mv","iv","ov"].map(function(k){return '<button class="opt'+(k===k0?" sel":"")+'" data-v="'+k+'">'+VALVE[k].name+'</button>'}).join("")+'</div><h3>Does it work?</h3><div class="opts" id="veC">'+[["","Works / not checked"],["work","Needs work"],["fail","Seized or won't shut"]].map(function(c){return '<button class="opt'+((n.cond||"")===c[0]?" sel":"")+'" data-v="'+c[0]+'">'+c[1]+'</button>'}).join("")+'</div><label class="f" for="veTag">Tag or number</label><input class="in" id="veTag" maxlength="24" value="'+esc(n.ref||"")+'"><label class="f" for="veNote">Notes</label><input class="in" id="veNote" maxlength="200" value="'+esc(n.note||"")+'"><div class="row" style="margin-top:14px"><button class="btn go w" id="veGo">Done</button></div>');
+  var c0=n.cond||"";function grp(id,f){var g=s.querySelector(id);g.onclick=function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");f(b.dataset.v)}}
+  grp("#veK",function(v){k0=v});grp("#veC",function(v){c0=v});
+  $("#veGo").onclick=function(){var tag=$("#veTag").value.trim(),note=$("#veNote").value.trim();mutate("edit "+vname(n));n.k=k0;if(tag)n.ref=tag;else delete n.ref;if(note)n.note=note;else delete n.note;if(c0)n.cond=c0;else delete n.cond;closeSheet();drawNet()}}
+function nodeEditSheet(n){var deg=(ADJ[n.id]||[]).length;var s=sheet('<h2>'+esc(vname(n))+'</h2><p class="muted">'+deg+' pipe'+(deg===1?'':'s')+' meet here. Drag it to move it.</p><div class="row" style="margin-top:12px"><button class="btn soft sm" id="neV">Make it a valve</button>'+(deg===2?'<button class="btn soft sm" id="neM">Remove the bend</button>':'')+'</div>',{peek:true});
+  $("#neV").onclick=function(){mutate("valve at junction");n.k="sv";closeSheet();valveEditSheet(n)};
+  if($("#neM"))$("#neM").onclick=function(){mutate("merge pipes");mergeAt(n);closeSheet();drawNet()}}
+function pipeSheet(p){var s=sheet('<h2>Pipe</h2><label class="f" for="psRun">Name of the run</label><input class="in" id="psRun" maxlength="40" value="'+esc(p.run||"")+'"><label class="f">Size</label><div class="opts" id="psMm">'+["50mm","65mm","80mm","100mm","150mm","200mm","250mm",""].map(function(v){return '<button class="opt'+((p.mm||"")===v?" sel":"")+'" data-v="'+v+'">'+(v||"Not sure")+'</button>'}).join("")+'</div><div class="row" style="margin-top:14px"><button class="btn go w" id="psGo">Done</button></div>');
+  var mm=p.mm||"";var g=s.querySelector("#psMm");g.onclick=function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");mm=b.dataset.v};
+  $("#psGo").onclick=function(){mutate("edit pipe");var r=$("#psRun").value.trim();if(r)p.run=r;else delete p.run;if(mm)p.mm=mm;else delete p.mm;closeSheet();drawNet()}}
+function delPipe(p){NET.pipes=NET.pipes.filter(function(x){return x!==p});netIndex();
+  [p.a,p.b].forEach(function(id){var n=NI[id];if(!n)return;var deg=(ADJ[id]||[]).length;if(deg===0&&n.k!=="src"){NET.nodes=NET.nodes.filter(function(x){return x.id!==id});Object.keys(NET.feeds).forEach(function(h){if(NET.feeds[h]===id)delete NET.feeds[h]})}else if(deg===1&&n.k==="j")n.k="end"});netIndex()}
+function removeValve(n){var deg=(ADJ[n.id]||[]).length;Object.keys(NET.feeds).forEach(function(h){if(NET.feeds[h]===n.id)delete NET.feeds[h]});
+  if(n.k==="iv"&&deg===1){var stub=ADJ[n.id][0];delPipe(stub);return}
+  n.k=deg===1?"end":"j";delete n.ref;delete n.cond;delete n.note;delete ML.closed[n.id];if(deg===2)mergeAt(n);netIndex()}
+function mergeAt(n){var ps=ADJ[n.id]||[];if(ps.length!==2||n.k==="src")return;var a=ps[0],b=ps[1];
+  var la=pipeLL(a),lb=pipeLL(b);if(a.b!==n.id)la.reverse();if(b.a!==n.id)lb.reverse();
+  var start=a.a===n.id?a.b:a.a,end=b.a===n.id?b.b:b.a;if(start===end)return;
+  var keep={id:a.id,a:start,b:end,pts:la.slice(1,la.length-1).concat([[n.lat,n.lng]],lb.slice(1,lb.length-1))};["mm","run","note"].forEach(function(k){if(a[k]||b[k])keep[k]=a[k]||b[k]});
+  NET.pipes=NET.pipes.filter(function(x){return x!==a&&x!==b});NET.pipes.push(keep);NET.nodes=NET.nodes.filter(function(x){return x!==n});netIndex()}
+function finishPipe(){var t=ML.tool;var pts=t.pts;if(pts.length<2){setTool(null);return}
+  mutate("draw pipe");
+  function anchor(ll){var n=nearNode(ll,22);if(n)return n;var np=nearestPipe(ll);if(np&&screenD(ll,np.ll)<=20)return splitPipe(np,"j",{});var id=nextId("n",NET.nodes);var e={id:id,k:"end",lat:+ll[0].toFixed(7),lng:+ll[1].toFixed(7)};NET.nodes.push(e);netIndex();return e}
+  var a=anchor(pts[0]);var b=anchor(pts[pts.length-1]);
+  [a,b].forEach(function(n){if(n.k==="end"&&(ADJ[n.id]||[]).length>=1)n.k="j"});
+  NET.pipes.push({id:nextId("p",NET.pipes),a:a.id,b:b.id,pts:pts.slice(1,pts.length-1).map(function(x){return [+x[0].toFixed(7),+x[1].toFixed(7)]}),run:"Added on the map"});netIndex();
+  setTool(null);drawNet();pipeSheet(NET.pipes[NET.pipes.length-1])}
+
+/* ---- saving: the whole network goes to the hook, which commits it ---- */
+function saveSheet(){var s=sheet('<h2>Save '+ML.ops.length+' change'+(ML.ops.length===1?'':'s')+'</h2><p class="muted">Everyone sees the new mainline once it\'s saved (about a minute).</p><label class="f" for="svNote">What changed?</label><input class="in" id="svNote" maxlength="200" placeholder="e.g. moved SV-12 to where we found it" value="'+esc(summaryOps())+'">'+whoHtml("Who\'s saving it")+'<div class="row" style="margin-top:14px"><button class="btn go w" id="svGo">Save for everyone</button></div>');
+  wireWho(s);$("#svGo").onclick=function(){if(!who()){toast("Pick your name first");return}var note=$("#svNote").value.trim()||summaryOps();
+    var sid=evId();var out=JSON.parse(JSON.stringify(NET));out.pipes.forEach(function(p){delete p._len});
+    send({kind:"net",net:JSON.stringify(out),base:NETBASE||"",note:note,sid:sid});
+    ML.saving={sid:sid,net:out,at:Date.now()};ls("ml.saving",ML.saving);closeSheet();ML.edit=false;ML.undo=[];ML.ops=[];setTool(null);document.body.classList.remove("mledit");try{localStorage.removeItem("ml.draft")}catch(e){}mlApply(true);toast("Saving the mainline…");pollSave()}}
+function summaryOps(){var c={};ML.ops.forEach(function(o){var k=o.split(" ")[0];c[k]=(c[k]||0)+1});var w={move:"moved",add:"added",edit:"edited",remove:"removed",link:"linked heads",unlink:"unlinked heads",draw:"drew pipes",delete:"deleted pipes",merge:"tidied pipes",valve:"new valves"};return Object.keys(c).map(function(k){return (w[k]||k)+" ×"+c[k]}).join(", ")}
+function pollSave(){if(!ML.saving)return;var tries=0;var iv=setInterval(function(){tries++;fetch(NETFILE+"?v="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.log||[]).some(function(l){return l.sid===ML.saving.sid})){clearInterval(iv);ML.saving=null;try{localStorage.removeItem("ml.saving")}catch(e){}NET=d;NETBASE=d.updated;netIndex();drawNet();toast("Mainline saved")}else if(tries>30){clearInterval(iv);toast("Still saving. It'll show when it's through.")}}).catch(function(){})},8000)}
+function loadNet(fresh){return fetch(NETFILE+"?v="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok&&TEST)return fetch("network.json?v="+Date.now(),{cache:"no-store"});return r}).then(function(r){return r.ok?r.json():null}).then(function(d){
+  if(!d)return;NET=d;NETBASE=d.updated;
+  var sv=ls("ml.saving");if(sv&&!fresh&&!(d.log||[]).some(function(l){return l.sid===sv.sid})&&Date.now()-sv.at<15*60000){NET=sv.net;ML.saving=sv;pollSave()}
+  var dr=ls("ml.draft");if(dr&&!fresh&&!!dr.test===TEST&&dr.ops&&dr.ops.length){NET=dr.net;ML.ops=dr.ops;ML.edit=true;document.body.classList.add("mledit");if(dr.base!==d.updated)toast("Your unsaved mainline edits are back. Someone saved since, so check before saving.");else toast("Your unsaved mainline edits are back")}
+  netIndex();if(MODE==="ml")mlApply(true)}).catch(function(){})}
+
+/* ---- mode switch ---- */
+function setMode(m){MODE=m;ls("hw.mode",m);document.body.classList.toggle("ml",m==="ml");$("#seg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===m))});$(".bar h1").textContent=m==="ml"?"Mainline":"Hardware map";if(m!=="ml")setTool(null);closeSheet();applyShow();counts();if(m==="ml"){mlApply(true);mlBar()}}
+$("#seg").onclick=function(e){var b=e.target.closest("button");if(b&&b.dataset.m!==MODE)setMode(b.dataset.m)};
+
+/* ---- Cirrus Pro: mainline and valves as small KML layers ---- */
+function netKmlSets(){var out=[];if(!NET)return out;
+  var runs={};NET.pipes.forEach(function(p){if(p.stub)return;var k=p.run||"Mainline";(runs[k]=runs[k]||[]).push(p)});
+  var parts=[],cur=[],n=0;Object.keys(runs).forEach(function(k){runs[k].forEach(function(p){var c=pipeLL(p).length;if(n+c>CIRRUS_SMALL-10&&cur.length){parts.push(cur);cur=[];n=0}cur.push(p);n+=c})});if(cur.length)parts.push(cur);
+  parts.forEach(function(ps,i){out.push({name:"HW Mainline"+(parts.length>1?" part "+(i+1)+" of "+parts.length:""),file:"HW_Mainline"+(parts.length>1?"_"+(i+1):""),col:"#38c6ff",lines:ps})});
+  var sv=NET.nodes.filter(function(n){return n.k==="sv"||n.k==="mv"||n.k==="ov"}),iv=NET.nodes.filter(function(n){return n.k==="iv"});
+  if(sv.length)out.push({name:"HW Mainline valves",file:"HW_Mainline_valves",col:"#0a84ff",pts:sv});
+  if(iv.length)out.push({name:"HW LI-IV valves",file:"HW_LI-IV_valves",col:"#30d158",pts:iv});
+  return out}
+function netKml(S){var c=kmlColor(S.col);var body;
+  if(S.lines)body=S.lines.map(function(p){return '<Placemark><name>'+xesc((p.run||"Mainline")+(p.mm?" "+p.mm:""))+'</name><styleUrl>#s</styleUrl><LineString><coordinates>'+pipeLL(p).map(function(q){return q[1].toFixed(7)+","+q[0].toFixed(7)+",0"}).join(" ")+'</coordinates></LineString></Placemark>'}).join("\n");
+  else body=S.pts.map(function(n){return '<Placemark><name>'+xesc(vname(n)+(n.cond==="fail"?" · seized":""))+'</name><styleUrl>#s</styleUrl><Point><coordinates>'+n.lng.toFixed(7)+','+n.lat.toFixed(7)+',0</coordinates></Point></Placemark>'}).join("\n");
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>'+xesc(S.name)+'</name><Style id="s"><IconStyle><color>'+c+'</color><scale>0.8</scale></IconStyle><LineStyle><color>'+c+'</color><width>3</width></LineStyle></Style>\n'+body+'\n</Document></kml>\n'}
+function kmlCount(S){return S.lines?S.lines.reduce(function(a,p){return a+pipeLL(p).length},0):S.pts.length}
+
 /* ---------- load ---------- */
 function loadLive(){return fetch("live.json?v="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():{records:[]}}).catch(function(){return null})}
 var DEEP=QS.get("pin"),DEEPAT=(QS.get("at")||decodeURIComponent(location.hash.replace(/^#/,""))||"").split(",").map(Number);
@@ -734,6 +1131,8 @@ Promise.all([fetch("ref.json",{cache:"no-cache"}).then(function(r){return r.json
   REF=v[0];if(v[1])LIVE=v[1];
   HEADS=REF.heads.map(function(h){var p=parseHead(h[0]);return {n:h[0],lat:h[1],lng:h[2],hole:p.hole,area:p.area}});
   buildRef();drawRecords();
+  if(MODE==="ml"||QS.get("map")==="mainline")setMode("ml");
+  loadNet();
   $("#loading").classList.add("gone");setTimeout(function(){$("#loading").remove()},500);
   if(DEEP)deepLink();
   flush();
