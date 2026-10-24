@@ -1,0 +1,1 @@
+{"v":1,"updated":"2026-10-24T05:39:56.560Z","source":"test","nodes":[{"id":"n0","k":"src","lat":-38.1188,"lng":145.2494},{"id":"n1","k":"sv","lat":-38.1186,"lng":145.248,"ref":"SV-T"}],"pipes":[{"id":"p0","a":"n0","b":"n1","pts":[]}],"feeds":{},"log":[{"at":"2026-10-24T05:39:56.560Z","by":"Andy Anderson","note":"draft test","sid":"drafttest1"}]}
