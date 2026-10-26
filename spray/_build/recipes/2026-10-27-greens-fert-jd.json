@@ -1,0 +1,104 @@
+{
+  "slug": "2026-10-27-greens-fert-jd",
+  "title": "Fert, Greens (100 L partial tank)",
+  "sheet_name": "JD - 300L/Ha - Fert + PGR to Greens (partial tank, 100 L)",
+  "sprayer": "JD sprayer",
+  "applicator": [
+    "Mitch Mahoney",
+    "U08K55E3QJU"
+  ],
+  "date": "Tue 27 Oct",
+  "date_long": "Tue 27 Oct 2026",
+  "date_iso": "2026-10-27",
+  "area_ha": 0.3333,
+  "rate_lha": 300,
+  "mix_l": 100,
+  "tank_cap_l": 600,
+  "fill_l": 65,
+  "nozzles": "Grey Wilger",
+  "speed": "6.4 km/h",
+  "pressure": "2.8 bar",
+  "last_load": "Run clean water through the boom first",
+  "site_check": "Spray signs out on the greens being sprayed. Greens mown, clippings and debris cleared",
+  "weather": "Delta T 2–8 · wind under 15 km/h · showers cleared, dry leaf",
+  "extra_checks": [
+    [
+      "rinse",
+      "Clean water run through the boom first",
+      "Filters and nozzles clean"
+    ],
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 2.8 bar",
+      "300 L/ha at 6.4 km/h needs 1.6 L/min on 50 cm nozzle spacing (2.4 L/min on 75 cm). If it's out, call Andy before you fill"
+    ],
+    [
+      "dry",
+      "Showers cleared and the leaf is dry",
+      "Foliar pass: it has to dry on the leaf"
+    ]
+  ],
+  "products": [
+    {
+      "id": "companion",
+      "rate": "300 mL/ha",
+      "rate_lha": 0.3,
+      "unit": "mL",
+      "sheet": 1,
+      "why": "The label says Companion goes in first, before anything else. There's no copper in this tank, so its copper restraint is clear."
+    },
+    {
+      "id": "greenmaxx",
+      "rate": "35 L/ha",
+      "rate_lha": 35,
+      "unit": "L",
+      "sheet": 2,
+      "why": "Acidic (pH 2–3). Goes in once the Companion is through the tank. You're at {before} L."
+    }
+  ],
+  "ppe_note": "Companion damages eyes and GreenMaxx is a strong acid: face shield or goggles, elbow gloves and apron when you pour. Eyewash on the rig.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "Greens mown, clippings and debris cleared. Dry leaf only: wait until the showers have cleared (forecast to about midday)",
+    "Spray when Delta T is 2 to 8 and wind is under 15 km/h. Gusts are forecast 30–35 km/h through the afternoon and easing from about 7pm: check the 6th green station first and stop if it's blowing off target",
+    "Foliar pass: do NOT water in. No irrigation or hand watering on these greens for 24 h",
+    "Men's Stableford is off the 1st until about 3:15pm. Never spray a green with golfers on or near it, and keep people off each green until it's dry"
+  ],
+  "spray_more": "GreenMaxx SDS: stir the IBC before drawing (it can settle), and keep it away from strong bases. Companion label: don't use with copper products.",
+  "post_checks": [
+    [
+      "irrig",
+      "Irrigation off on the sprayed greens for 24 h and nobody hand watering them",
+      "Foliar pass: it has to stay on the leaf"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "Wind and showers: the window is late afternoon or evening",
+      "d": "Open-Meteo at 9:45am: 14 km/h gusting 30, light showers (0.2 mm/h, 55–60%) until about midday, then dry. Gusts 31–35 km/h from 10am to 4pm, 28 at 5pm, 22 at 7pm, 14 at 8pm. Delta T 2.5–4 all day. This morning's Turf Watch called it no-go until 7:30–9pm; the dawn brief's WeatherCockpit read had gusts topping out at 20. On 26 Oct the 6th station read much lighter than the model, so check it at the shed before deciding.",
+      "s": "Open-Meteo 27 Oct 9:45am · #spraying Turf Watch 27 Oct · #dailycoursesetup brief 27 Oct"
+    },
+    {
+      "c": "",
+      "t": "Grey nozzle maths: check the boom spacing",
+      "d": "Grey is ISO size 06: about 2.3 L/min at 2.8 bar. At 6.4 km/h that's about 430 L/ha on 50 cm nozzle spacing, or about 290 L/ha on 75 cm. On 50 cm spacing, holding 300 L/ha would take the pressure down to about 1.4 bar, below most air-induction tips' range (Red, size 04, at about 2.8 bar fits). With a fixed 100 L mix, 430 L/ha covers about 0.23 ha, not 0.33. The bucket test is on the rig checklist.",
+      "s": "ISO 10625 nozzle colour code · L/ha = 600 × L/min ÷ (km/h × spacing m)"
+    },
+    {
+      "c": "info",
+      "t": "No PGR in this tank",
+      "d": "The sheet is named Fert + PGR to Greens but only lists Companion and GreenMaxx. This morning's Turf Watch has greens trinexapac at 112/200 GDD, due about 3 Nov.",
+      "s": "GreenKeeper sheet · #spraying Turf Watch 27 Oct"
+    },
+    {
+      "c": "info",
+      "t": "Nitrogen: about 9 kg N/ha",
+      "d": "GreenMaxx at 35 L/ha is about 9 kg N/ha (SG 1.31, 20% w/w) as stabilised urea, plus 1% Mg and 6% Fe. If its 20% is w/v, it's 7 kg N/ha.",
+      "s": "GreenMaxx SDS Dec 2024 · Greenway brochure"
+    }
+  ]
+}
