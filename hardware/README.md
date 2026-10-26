@@ -32,6 +32,11 @@ The page queues every change in the phone's outbox (so it survives no signal) an
 The workflow makes one atomic commit (live.json plus any snapshot and pin page), waits for GitHub Pages to serve the
 pin page (up to about 2.5 minutes) so Slack can show the preview, then posts. Fixed problems get a thread reply and a ✅.
 
+Zapier can drop a run (for example when its daily compute limit is hit, as on 27 Oct 2026, until 00:00 UTC). So the phone
+keeps every pin change, shutdown and mainline save until it shows up in `live.json` / `network.json`, and sends it
+again every 15 minutes for up to 12 hours (the hook ignores repeats by `ev`; a re-sent pin goes without its snapshot).
+A mainline save that someone else's save has overtaken is handed back as unsaved edits instead of being sent again.
+
 Test mode: open the page with `?test=1`. Slack goes to Andy's DM, records are marked `test` and hidden from everyone
 else. Post `{"kind":"purge_test","__test":"1"}` to the hook to clear them.
 
@@ -60,6 +65,23 @@ else. Post `{"kind":"purge_test","__test":"1"}` to the hook to clear them.
 - `_build/build_network.py` rebuilds the first pass from the drawing. Running it again throws away the crew's edits.
 - `_build/smooth_network.py` evens out wobbly runs in place (keeps every valve, link and edit; ran once on 24 Oct 2026).
 - Cirrus Pro: the Layers button in the Mainline tab gives the mainline and valve layers as KML, each under 200 points.
+
+## Valves shut on the course
+
+"Try it on the map" and "Find valves" only change your own map. Once valves are really shut:
+
+- Tap the valve > **I've shut it**, or in the finder **We've shut them**. Say what it's for, pick *Today* or *Staying off
+  for now*, and who. The page posts `kind: "shut"`; the workflow adds it to `live.json` under `shuts` and posts
+  ":no_entry: Water off" to #irrigation (what for, valves, what's off, who, time, link to the map).
+- Everyone's map shows those valves red and pulsing, the heads they feed dry, and "Water off on the course" in the
+  Mainline panel. **What's shut** lists every open shutdown with *It's back on*, *Show*, *Staying off* and the Slack thread.
+- Back on: tap the valve > **It's back on** (one valve), or **All back on**. The thread gets a reply with how long it was
+  off; when the last valve is back on the post gets a ✅. Some valves back on gets a "still shut: ..." reply.
+- Reminders in the thread while anything is still shut. *Today*: 3pm, then 7pm tagging Andy, Ben and Neil (before night
+  irrigation), then 7am each morning. *Staying off*: 7am each morning. They stop once all are back on (14 at most).
+- The Slack link (`?shut=SHUT-ID`) opens the mainline map with that shutdown's list.
+- Test mode: with `?test=1` it all goes to Andy's DM. `"__fast": "1"` with `__test` runs the three reminders 20 s apart.
+  `purge_test` also clears test shutdowns.
 
 ## Aerials
 

@@ -16,6 +16,11 @@ import { z } from "zod";
 //   kind "net"     a mainline edit from the page: the whole network (pipes, valves, pump, head links) in "net",
 //                  checked and committed as hardware/network.json with a log line (who, what, sid). No Slack post.
 //                  With __test "1" it goes to hardware/network.test.json instead.
+//   kind "shut"    valves shut on the course (mainline map): logged in live.json "shuts", posted to #irrigation.
+//                  Reminders in the thread while they stay shut: back on today -> 3pm, then 7pm with Andy, Ben and
+//                  Neil tagged, then each morning at 7am; staying off -> each morning at 7am. Stops once all are open.
+//   kind "open"    some or all of a shutdown's valves back on: thread reply; all back on -> ✅ on the post.
+//   kind "keep"    a shutdown is staying off for now (reminders move to the mornings).
 // __test "1": Slack goes to Andy's DM instead of the channel and the record is marked test (the page hides it).
 // Every change is one atomic commit through the Git data API, retried if the branch moved underneath it.
 
@@ -100,7 +105,23 @@ function permalink(ch: string, ts: string): string {
   return `https://ranfurliegolfclub.slack.com/archives/${ch}/p${ts.replace(".", "")}`;
 }
 function blankLive(): any {
-  return { v: 1, updated: null, records: [], events: [], cirrus: {} };
+  return { v: 1, updated: null, records: [], events: [], cirrus: {}, shuts: [] };
+}
+// Melbourne wall clock: minutes since midnight and the date (only call inside a step)
+function melClock(d: Date): { mins: number; date: string } {
+  const parts = new Intl.DateTimeFormat("en-AU", { timeZone: "Australia/Melbourne", hour: "2-digit", minute: "2-digit", hour12: false, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(d);
+  const g = (t: string) => parts.find((x) => x.type === t)?.value ?? "0";
+  return { mins: (Number(g("hour")) % 24) * 60 + Number(g("minute")), date: `${g("year")}-${g("month")}-${g("day")}` };
+}
+function fmtDur(ms: number): string {
+  const m = Math.max(1, Math.round(ms / 60000));
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60), r = m % 60;
+  if (h < 48) return r ? `${h} h ${r} min` : `${h} h`;
+  return `${Math.round(h / 24)} days`;
+}
+function shutUrl(id: string): string {
+  return `${PAGES}?shut=${id}`;   // no & in Slack links (Slack escapes it to &amp;)
 }
 function pinUrl(id: string, lat: number, lng: number): string {
   return `${PAGES}?pin=${id}#${lat.toFixed(6)},${lng.toFixed(6)}`;
@@ -333,7 +354,14 @@ const InputSchema = z.object({
   base: z.unknown().nullable().optional(),
   note: z.unknown().nullable().optional(),
   sid: z.unknown().nullable().optional(),
+  valves: z.unknown().nullable().optional(),
+  target: z.unknown().nullable().optional(),
+  why: z.unknown().nullable().optional(),
+  keep: z.unknown().nullable().optional(),
+  off_n: z.unknown().nullable().optional(),
+  off_text: z.unknown().nullable().optional(),
   sent_at: z.unknown().nullable().optional(),
+  __fast: z.unknown().nullable().optional(),
   __test: z.unknown().nullable().optional(),
 }).loose();
 
@@ -353,7 +381,7 @@ const workflow = defineDurable<unknown, unknown>("hardware-map", async (ctx, raw
   const input: any = InputSchema.parse(normalizeInput(rawInput));
 
   const kind = clip(input.kind, 12);
-  if (!["add", "move", "edit", "fix", "remove", "purge_test", "net"].includes(kind)) return { skipped: true, reason: "bad-kind" };
+  if (!["add", "move", "edit", "fix", "remove", "purge_test", "net", "shut", "open", "keep"].includes(kind)) return { skipped: true, reason: "bad-kind" };
   const isTest = clip(input.__test, 5) === "1";
 
   if (kind === "net") {
@@ -393,6 +421,151 @@ const workflow = defineDurable<unknown, unknown>("hardware-map", async (ctx, raw
     return { ok: !!res?.ok, kind, test: isTest, updated: nowN.iso, nodes: out.nodes.length, pipes: out.pipes.length, overwrote: over };
   }
 
+  // ---------------- valves shut on the course ----------------
+  if (kind === "shut" || kind === "open" || kind === "keep") {
+    const sid = clip(input.id, 20).toUpperCase();
+    if (!/^SHUT-[A-Z0-9]{4,12}$/.test(sid)) return { skipped: true, reason: "bad-id" };
+    const ev = clip(input.ev, 24) || "";
+    const by = clip(input.by, 60) || "Someone";
+    const bySlackRaw = clip(input.by_slack, 16);
+    const bySlack = /^U[A-Z0-9]{6,14}$/.test(bySlackRaw) ? bySlackRaw : "";
+    const who = bySlack ? `<@${bySlack}>` : slackSafe(by);
+    let list: any[] = [];
+    try { const v = typeof input.valves === "string" ? JSON.parse(input.valves) : input.valves; if (Array.isArray(v)) list = v; } catch { list = []; }
+    const live = await readLive(ctx, `read-live-${kind}`);
+    const rec0: any = (live.shuts || []).find((r: any) => r.id === sid) || null;
+    const now: { iso: string; time: string; ms: number; offMs: number } = await ctx.step(`capture-now-${kind}`, async () => {
+      const d = new Date();
+      const t0 = rec0?.at ? Date.parse(rec0.at) : NaN;
+      return { iso: d.toISOString(), time: melTime(d), ms: d.getTime(), offMs: Number.isFinite(t0) ? d.getTime() - t0 : 0 };
+    });
+    if (rec0 && ev && (rec0.evs || []).includes(ev)) return { skipped: true, reason: "duplicate", id: sid };
+    const send = async (name: string, text: string, threadTs: string | null, testRec: boolean): Promise<string | null> => {
+      if (testRec) { await slackDmAndy(ctx, name, `Test (would go to #irrigation${threadTs ? ", in the thread" : ""}):\n${text}`, false); return null; }
+      return slackPost(ctx, name, IRR_CH, text, threadTs, false);
+    };
+
+    if (kind === "shut") {
+      if (rec0) return { skipped: true, reason: "id exists", id: sid };
+      const valves = list.map((v: any) => ({ id: clip(v?.id, 10), name: clip(v?.name, 24) })).filter((v) => /^n\d{1,6}$/.test(v.id) && v.name).slice(0, 30);
+      if (!valves.length) return { skipped: true, reason: "no valves" };
+      const target = clip(input.target, 80);
+      const why = clip(input.why, 160);
+      const keep = clip(input.keep, 8) === "longer" ? "longer" : "today";
+      const offN = Math.max(0, Math.min(999, Math.round(num(input.off_n) ?? 0)));
+      const offText = clip(input.off_text, 300);
+      const rec: any = { id: sid, at: now.iso, by, bySlack, target, why, keep, valves, opened: [], off: { n: offN, text: offText }, status: "shut", evs: ev ? [ev] : [], ...(isTest ? { test: true } : {}) };
+      const saved = await commit(ctx, "commit-shut", `Mainline: ${valves.map((v) => v.name).join(", ")} shut${isTest ? " (test)" : ""}`.slice(0, 200), {}, (lv) => {
+        lv.shuts = lv.shuts || [];
+        if (lv.shuts.some((r: any) => r.id === sid)) return;
+        lv.shuts.push(rec);
+        lv.shuts = lv.shuts.filter((r: any) => r.status === "shut" || r.id === sid).concat(lv.shuts.filter((r: any) => r.status !== "shut" && r.id !== sid).slice(-60));
+        lv.events.push({ at: now.iso, kind, id: sid, by, ...(isTest ? { test: true } : {}) });
+      });
+      const names = valves.map((v) => v.name).join(", ");
+      const text = [`:no_entry: *Water off* · ${slackSafe(why || target || "repair")}`,
+        `Shut: ${slackSafe(names)}`,
+        ...(offText ? [`Off: ${slackSafe(offText)}`] : []),
+        `${who} · ${now.time} · ${keep === "longer" ? "staying off for now" : "back on today"}`,
+        `<${shutUrl(sid)}|Open the mainline map>`].join("\n");
+      const ts = await send("post-shut", text, null, isTest);
+      if (ts) {
+        await commit(ctx, "commit-shut-slack", `Mainline: Slack link for ${sid}`, {}, (lv) => {
+          const r = (lv.shuts || []).find((x: any) => x.id === sid);
+          if (r) r.slack = { ch: IRR_CH, ts, link: permalink(IRR_CH, ts) };
+        });
+      }
+      await reportErrors(ctx, sid, isTest);
+      if (!saved?.ok) return { ok: false, kind, id: sid };
+
+      // reminders while they stay shut
+      let keepNow = keep;
+      let shutDate = "";
+      const fast = isTest && clip(input.__fast, 2) === "1";   // test only: 3pm, 7pm and morning reminders 20 s apart
+      for (let i = 0; i < (fast ? 3 : 14); i++) {
+        const plan: { mins: number; date: string } = await ctx.step(`plan-reminder-${i}`, async () => melClock(new Date()));
+        if (i === 0) shutDate = plan.date;
+        const sameDay = plan.date === shutDate;
+        // next slot: same day 15:00 / 19:00 while "back on today", otherwise 07:00 the next morning
+        let at = 7 * 60 + 24 * 60, slot = "morning";
+        if (keepNow === "today" && sameDay && plan.mins < 15 * 60 - 20) { at = 15 * 60; slot = "3pm"; }
+        else if (keepNow === "today" && sameDay && plan.mins < 19 * 60 - 10) { at = 19 * 60; slot = "7pm"; }
+        else if (plan.mins < 7 * 60) at = 7 * 60;
+        if (fast) slot = keepNow === "longer" ? "morning" : ["3pm", "7pm", "morning"][i];
+        await ctx.wait(`wait-reminder-${i}`, fast ? 20 : Math.max(300, (at - plan.mins) * 60));
+        const cur: any = await ctx.step(`check-shut-${i}`, async () => {
+          try {
+            const g = await gh(`/contents/${LIVE_PATH}?ref=main`, "GET");
+            if (g.status !== 200) return { found: false, error: `GET ${g.status}` };
+            const lv = JSON.parse(b64dec(g.json.content));
+            const r = (lv.shuts || []).find((x: any) => x.id === sid);
+            if (!r) return { found: false };
+            const still = (r.valves || []).filter((v: any) => !(r.opened || []).includes(v.id)).map((v: any) => v.name);
+            return { found: true, status: r.status, keep: r.keep, still, ts: r.slack?.ts ?? null, ms: Date.now() };
+          } catch (e: any) { return { found: false, error: String(e?.message ?? e).slice(0, 120) }; }
+        });
+        if (cur.error) continue;                       // couldn't read: try again at the next slot
+        if (!cur.found || cur.status !== "shut" || !cur.still?.length) return { ok: true, kind, id: sid, reminders: i };
+        const wasToday = keepNow === "today";
+        keepNow = cur.keep === "longer" ? "longer" : "today";
+        if (!wasToday && slot !== "morning") continue;
+        if (keepNow === "longer" && slot !== "morning") continue;   // switched to staying off since: wait for the morning
+        const still = slackSafe(cur.still.join(", "));
+        const forWhat = slackSafe(why || target || "repair");
+        const since = fmtDur(cur.ms - now.ms);
+        let msg: string;
+        if (slot === "3pm") msg = `:warning: Still shut: ${still} · ${forWhat}\nTurn them back on before tonight's irrigation, or mark them Staying off on the map. ${who}`;
+        else if (slot === "7pm") msg = `:rotating_light: Still shut at 7pm: ${still} · ${forWhat}\nTonight's irrigation won't reach what they feed. ${who} ${[ANDY, BEN, NEIL].filter((u) => u !== bySlack).map((u) => `<@${u}>`).join(" ")}`;
+        else msg = `:droplet: Still shut (${since}): ${still} · ${forWhat}\n<${shutUrl(sid)}|Open the mainline map> · ${who}`;
+        await send(`remind-${i}`, msg, cur.ts, isTest);
+      }
+      return { ok: true, kind, id: sid, reminders: "max" };
+    }
+
+    if (!rec0) return { skipped: true, reason: "no such shutdown", id: sid };
+    const testRec = !!rec0.test || isTest;
+    const sl = rec0.slack || null;
+
+    if (kind === "keep") {
+      const res = await commit(ctx, "commit-keep", `Mainline: ${sid} staying off`, {}, (lv) => {
+        const r = (lv.shuts || []).find((x: any) => x.id === sid);
+        if (!r) return;
+        r.keep = "longer"; r.evs = [...(r.evs || []), ev].filter(Boolean).slice(-20);
+        lv.events.push({ at: now.iso, kind, id: sid, by, ...(testRec ? { test: true } : {}) });
+      });
+      await send("reply-keep", `:pushpin: Staying off for now · ${who} · ${now.time}`, sl?.ts ?? null, testRec);
+      await reportErrors(ctx, sid, testRec);
+      return { ok: !!res?.ok, kind, id: sid };
+    }
+
+    // open: some or all back on
+    const valveIds = (rec0.valves || []).map((v: any) => v.id);
+    let ids = list.map((x: any) => clip(x, 10)).filter((x: string) => valveIds.includes(x));
+    if (!ids.length) ids = valveIds;
+    const already: string[] = rec0.opened || [];
+    const nowOpen = ids.filter((x: string) => !already.includes(x));
+    const openedAll = [...already, ...nowOpen];
+    const allOn = valveIds.every((x: string) => openedAll.includes(x));
+    const res = await commit(ctx, "commit-open", `Mainline: ${sid} ${allOn ? "back on" : "partly back on"}`, {}, (lv) => {
+      const r = (lv.shuts || []).find((x: any) => x.id === sid);
+      if (!r) return;
+      r.opened = Array.from(new Set([...(r.opened || []), ...ids]));
+      r.opens = [...(r.opens || []), { at: now.iso, by, ids }].slice(-20);
+      if ((r.valves || []).every((v: any) => r.opened.includes(v.id))) { r.status = "open"; r.opened_at = now.iso; r.opened_by = by; }
+      r.evs = [...(r.evs || []), ev].filter(Boolean).slice(-20);
+      lv.events.push({ at: now.iso, kind, id: sid, by, ...(testRec ? { test: true } : {}) });
+    });
+    const nameOf = (id: string) => (rec0.valves.find((v: any) => v.id === id)?.name ?? id);
+    const onNames = slackSafe((nowOpen.length ? nowOpen : ids).map(nameOf).join(", "));
+    let text: string;
+    if (allOn) text = `:white_check_mark: *Water back on* · ${onNames} · ${who} · ${now.time} · off ${fmtDur(now.offMs)}`;
+    else text = `:large_blue_circle: ${onNames} back on · still shut: ${slackSafe(valveIds.filter((x: string) => !openedAll.includes(x)).map(nameOf).join(", "))} · ${who} · ${now.time}`;
+    await send("reply-open", text, sl?.ts ?? null, testRec);
+    if (allOn && sl?.ts && !testRec) await slackReact(ctx, "react-open", sl.ch, sl.ts, "white_check_mark");
+    await reportErrors(ctx, sid, testRec);
+    return { ok: !!res?.ok, kind, id: sid, allOn };
+  }
+
   if (kind === "purge_test") {
     if (!isTest) return { skipped: true, reason: "purge needs __test" };
     const live0 = await readLive(ctx, "read-live-purge");
@@ -405,6 +578,7 @@ const workflow = defineDurable<unknown, unknown>("hardware-map", async (ctx, raw
     const res = await commit(ctx, "commit-purge-tests", `Hardware map: remove ${gone.length} test pins`, files, (live) => {
       live.records = (live.records || []).filter((r: any) => !r.test);
       live.events = (live.events || []).filter((e: any) => !e.test);
+      live.shuts = (live.shuts || []).filter((r: any) => !r.test);
     });
     return { ok: !!res?.ok, purged: gone };
   }

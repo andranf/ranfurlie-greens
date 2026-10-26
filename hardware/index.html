@@ -230,6 +230,14 @@ body.ml.mledit .fabs{bottom:calc(178px + var(--safe-b))}
 .vlv.iv{width:17px;height:17px;border-width:2px;font-size:0}
 .vlv.shut{background:#ff3b30!important;border-color:#fff}
 .vlv.shut::after{content:"✕";font-size:13px}
+.vlv.field{background:#ff3b30!important;border-color:#fff;box-shadow:0 0 0 3px #ff3b30,0 0 0 6px rgba(255,255,255,.85),0 2px 8px rgba(0,0,0,.55);animation:fieldp 1.8s ease-in-out infinite}
+.vlv.field::after{content:"✕";font-size:13px}
+.vlv.iv.field::after{font-size:10px}
+@keyframes fieldp{50%{box-shadow:0 0 0 3px #ff3b30,0 0 0 9px rgba(255,59,48,.35),0 2px 8px rgba(0,0,0,.55)}}
+.shutcard{border-radius:18px;padding:12px;background:var(--poison-bg);margin:8px 0}
+.shutcard b{font-family:var(--display);font-size:19px;display:block;line-height:1.1}
+.shutcard .meta{color:var(--muted);font-size:14px;margin-top:3px}
+.vchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .vlv.iv.shut::after{font-size:10px}
 .vlv{position:relative}
 .vlv.bad{box-shadow:0 0 0 3px #ffb020,0 2px 6px rgba(0,0,0,.5)}
@@ -441,7 +449,8 @@ function counts(recs){
   var open=recs.filter(function(r){return (T[r.type]||{}).cat==="issue"&&r.status!=="fixed"}).length;
   var fixed=recs.filter(function(r){return (T[r.type]||{}).cat==="issue"&&r.status==="fixed"}).length;
   var assets=recs.filter(function(r){return (T[r.type]||{}).cat==="asset"}).length;
-  $("#sub").textContent=(open?open+" open problem"+(open===1?"":"s"):"No open problems")+" · "+assets+" hardware pinned"+(TEST?" · TEST":"");
+  var nShut=0;fieldShuts().forEach(function(x){nShut+=x.still.length});
+  $("#sub").textContent=(nShut?"Water off at "+nShut+" valve"+(nShut===1?"":"s")+" · ":"")+(open?open+" open problem"+(open===1?"":"s"):"No open problems")+" · "+assets+" hardware pinned"+(TEST?" · TEST":"");
   var C=[["issues","Problems",open,"#ff3b30"],["assets","Hardware",assets,"#30d158"],["plan","As-built",REF.plan.length,"#ffd60a"],["heads","Heads",HEADS.length,"#ffffff"],["fixed","Fixed",fixed,"#8e8e93"]];
   $("#chips").innerHTML=C.map(function(c){return '<button class="chip glass'+(SHOW[c[0]]?"":" off")+'" data-k="'+c[0]+'"><span class="dot" style="background:'+c[3]+'"></span>'+c[1]+(c[2]!==""?' <span class="n">'+c[2]+'</span>':'')+'</button>'}).join("");
 }
@@ -622,14 +631,14 @@ function flush(){
 }
 window.addEventListener("online",flush);setInterval(flush,20000);
 
-function localSave(rec,ev){LOCAL[rec.id]={rec:rec,ev:ev};ls("hw.local",LOCAL);drawRecords()}
+function localSave(rec,ev,p){var o=LOCAL[rec.id];var ps=(o&&o.ps)||[];if(p){var q=Object.assign({},p);delete q.snap;ps=ps.concat([q]).slice(-6)}LOCAL[rec.id]={rec:rec,ev:ev,t:Date.now(),ps:ps};ls("hw.local",LOCAL);drawRecords()}
 function baseRec(){var w=who()||["",""];var n=nearText([DRAFT.lat,DRAFT.lng]);var t=T[DRAFT.type];
   return {id:DRAFT.id,cat:t.cat,type:DRAFT.type,lat:DRAFT.lat,lng:DRAFT.lng,acc:DRAFT.acc,fixes:DRAFT.fixes||0,gpsAcc:DRAFT.gpsAcc,adj:DRAFT.adj,label:DRAFT.label||"",ref:DRAFT.ref||"",cond:DRAFT.cond||"",size:DRAFT.size||"",depth:DRAFT.depth||"",notes:DRAFT.notes||"",urgent:!!DRAFT.urgent,near:n.text,place:n.place,hole:n.hole,by:w[0],at:new Date().toISOString(),status:t.cat==="issue"?"open":"active"}}
 function needsSlack(r){var t=T[r.type];return t.cat==="issue"||r.cond==="work"||r.cond==="fail"}
 function sendAdd(){
   var rec=baseRec();var d=DRAFT;DRAFT=null;closeSheet();
   var p={kind:"add",id:rec.id,type:rec.type,lat:rec.lat,lng:rec.lng,acc:rec.acc==null?"":rec.acc,fixes:rec.fixes,gps_acc:rec.gpsAcc==null?"":rec.gpsAcc,adj:rec.adj==null?"":rec.adj,label:rec.label,ref:rec.ref,cond:rec.cond,size:rec.size,depth:rec.depth,notes:rec.notes,urgent:rec.urgent?"1":"",near:rec.near,place:rec.place,hole:rec.hole==null?"":rec.hole};
-  var go=function(snap){if(snap)p.snap=snap;var sent=send(p);localSave(rec,sent.ev);
+  var go=function(snap){if(snap)p.snap=snap;var sent=send(p);localSave(rec,sent.ev,sent);
     toast(needsSlack(rec)?"Pinned and sent to #"+(T[rec.type].fam==="drn"?"drainage":"irrigation"):"Pinned");};
   if(needsSlack(rec))snapshot(rec).then(go,function(){go(null)});else go(null);
 }
@@ -637,13 +646,13 @@ function sendMove(){
   var r=find(DRAFT.id);var id=DRAFT.id;var n=nearText([DRAFT.lat,DRAFT.lng]);
   var rec=Object.assign({},r,{lat:DRAFT.lat,lng:DRAFT.lng,acc:DRAFT.acc,fixes:DRAFT.fixes||0,gpsAcc:DRAFT.gpsAcc,adj:DRAFT.adj,near:n.text,place:n.place,hole:n.hole});
   var sent=send({kind:"move",id:id,lat:DRAFT.lat,lng:DRAFT.lng,acc:DRAFT.acc==null?"":DRAFT.acc,fixes:DRAFT.fixes||0,gps_acc:DRAFT.gpsAcc==null?"":DRAFT.gpsAcc,adj:DRAFT.adj==null?"":DRAFT.adj,near:n.text,place:n.place,hole:n.hole==null?"":n.hole});
-  localSave(rec,sent.ev);DRAFT=null;toast("Pin moved");setTimeout(function(){openRecord(id)},300);
+  localSave(rec,sent.ev,sent);DRAFT=null;toast("Pin moved");setTimeout(function(){openRecord(id)},300);
 }
 function sendEdit(){
   var r=find(DRAFT.id);var id=DRAFT.id;
   var rec=Object.assign({},r,{label:DRAFT.label||"",ref:DRAFT.ref||"",cond:DRAFT.cond||"",size:DRAFT.size||"",depth:DRAFT.depth||"",notes:DRAFT.notes||""});
   var sent=send({kind:"edit",id:id,label:rec.label,ref:rec.ref,cond:rec.cond,size:rec.size,depth:rec.depth,notes:rec.notes});
-  localSave(rec,sent.ev);DRAFT=null;closeSheet();toast("Saved");setTimeout(function(){openRecord(id)},300);
+  localSave(rec,sent.ev,sent);DRAFT=null;closeSheet();toast("Saved");setTimeout(function(){openRecord(id)},300);
 }
 
 /* aerial snapshot with the pin drawn on, so the Slack post shows exactly where */
@@ -720,12 +729,12 @@ function fixSheet(r){
   wireWho(s);
   $("#fGo").onclick=function(){if(!who()){toast("Pick your name first");return}var notes=$("#fNotes").value.trim();var w=who();
     var rec=Object.assign({},r,{status:"fixed",fixed_at:new Date().toISOString(),fixed_by:w[0],fix_notes:notes});
-    var sent=send({kind:"fix",id:r.id,notes:notes});localSave(rec,sent.ev);closeSheet();toast("Marked fixed");};
+    var sent=send({kind:"fix",id:r.id,notes:notes});localSave(rec,sent.ev,sent);closeSheet();toast("Marked fixed");};
 }
 function delSheet(r){
   var s=sheet('<h2>Remove this pin?</h2><p class="muted">Use this for a pin dropped by mistake or hardware that\'s been dug out. It comes off the map and the Cirrus Pro layer; the history is kept.</p><label class="f" for="xWhy">Why? <span class="faint">(optional)</span></label><input class="in" id="xWhy" maxlength="200" placeholder="e.g. dropped by mistake">'+whoHtml()+'<div class="row" style="margin-top:16px"><button class="btn soft" data-close>Keep it</button><button class="btn stop" id="xGo" style="flex:2">Remove</button></div>',{onClose:function(){openRecord(r.id)}});
   wireWho(s);
-  $("#xGo").onclick=function(){if(!who()){toast("Pick your name first");return}var rec=Object.assign({},r,{status:"removed"});var sent=send({kind:"remove",id:r.id,notes:$("#xWhy").value.trim()});localSave(rec,sent.ev);closeSheet();toast("Removed")};
+  $("#xGo").onclick=function(){if(!who()){toast("Pick your name first");return}var rec=Object.assign({},r,{status:"removed"});var sent=send({kind:"remove",id:r.id,notes:$("#xWhy").value.trim()});localSave(rec,sent.ev,sent);closeSheet();toast("Removed")};
 }
 function openHead(h){
   if(PLACE)return;
@@ -852,13 +861,13 @@ function headFeeds(){if(HEADFEED)return HEADFEED;HEADFEED={};HEADS.forEach(funct
 
 /* ---- water: Dijkstra from the pump(s) through open nodes ---- */
 function simulate(closed){
-  closed=closed||ML.closed;var d={},wet={},done={},list=[];
+  closed=closed||allClosed();var d={},wet={},done={},list=[];
   NET.nodes.forEach(function(n){if(n.k==="src"){d[n.id]=0;list.push(n.id)}});
   while(list.length){var bi=0;for(var i=1;i<list.length;i++)if(d[list[i]]<d[list[bi]])bi=i;var u=list.splice(bi,1)[0];if(done[u])continue;done[u]=1;wet[u]=1;if(closed[u])continue;
     (ADJ[u]||[]).forEach(function(p){var v=p.a===u?p.b:p.a;var nd=d[u]+(p._len||(p._len=plen(p)));if(d[v]==null||nd<d[v]){d[v]=nd;list.push(v)}})}
   var pw={};NET.pipes.forEach(function(p){pw[p.id]=(wet[p.a]&&!closed[p.a])||(wet[p.b]&&!closed[p.b])});
   var hf=headFeeds(),hd={};HEADS.forEach(function(h){var f=hf[h.n];var ok=f.node?(wet[f.node]&&!closed[f.node]):f.pipe?pw[f.pipe]:true;if(!ok)hd[h.n]=1});
-  return {d:d,wet:wet,pw:pw,dry:hd};
+  return {d:d,wet:wet,pw:pw,dry:hd,closed:closed};
 }
 function dryText(dry,max){var g={},order=[];Object.keys(dry).forEach(function(n){var h=HEADS.filter(function(x){return x.n===n})[0];if(!h)return;var k=placeOf(h)||"Other";if(!g[k]){g[k]=0;order.push(k)}g[k]++});
   order.sort(function(a,b){var ha=parseInt(a)||99,hb=parseInt(b)||99;return ha-hb||a.localeCompare(b)});
@@ -884,8 +893,8 @@ function enclose(target){
 }
 
 /* ---- drawing ---- */
-function vIcon(n){var V=VALVE[n.k];var cls="vlv "+n.k+(ML.closed[n.id]?" shut":"")+(seized(n)?" bad":"")+(ML.hit[n.id]?" hit":"")+(ML.sel===n.id?" sel":"");
-  return L.divIcon({className:"",html:'<div class="'+cls+'" style="background:'+V.col+'">'+(n.k==="iv"||ML.closed[n.id]?"":V.short)+'</div>',iconSize:n.k==="iv"?[17,17]:[24,24],iconAnchor:n.k==="iv"?[8.5,8.5]:[12,12]})}
+function vIcon(n){var V=VALVE[n.k];var fc=fieldClosed();var cls="vlv "+n.k+(fc[n.id]?" field":ML.closed[n.id]?" shut":"")+(seized(n)?" bad":"")+(ML.hit[n.id]?" hit":"")+(ML.sel===n.id?" sel":"");
+  return L.divIcon({className:"",html:'<div class="'+cls+'" style="background:'+V.col+'">'+(n.k==="iv"||ML.closed[n.id]||fc[n.id]?"":V.short)+'</div>',iconSize:n.k==="iv"?[17,17]:[24,24],iconAnchor:n.k==="iv"?[8.5,8.5]:[12,12]})}
 var PUMPI='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 5v14M5 12h14"/></svg>';
 var SIM=null;
 function drawNet(){
@@ -893,7 +902,7 @@ function drawNet(){
   SIM=simulate();var z=map.getZoom();ML.zb=zBucket();var w=z>=18?5:z>=16.5?4:3;
   NET.pipes.forEach(function(p){
     var ll=pipeLL(p);var wet=SIM.pw[p.id];
-    if(wet){var da=SIM.d[p.a],db=SIM.d[p.b];var fa=ML.closed[p.a]?Infinity:da,fb=ML.closed[p.b]?Infinity:db;if(fb<fa)ll=ll.slice().reverse()}
+    if(wet){var AC=SIM.closed||{};var da=SIM.d[p.a],db=SIM.d[p.b];var fa=AC[p.a]?Infinity:da,fb=AC[p.b]?Infinity:db;if(fb<fa)ll=ll.slice().reverse()}
     var hit=ML.target&&ML.target.pipe===p.id;
     var base=L.polyline(ll,{renderer:svgR,color:wet?(p.stub?"#1d8a4a":"#0569a0"):"#5b6670",weight:(p.stub?w-1:w)+3,opacity:wet?.9:.75,className:"mlpipe",interactive:true,bubblingMouseEvents:false});
     base.on("click",function(e){L.DomEvent.stop(e);onPipe(p,e.latlng)});base.addTo(LGM.pipes);
@@ -903,8 +912,8 @@ function drawNet(){
   });
   NET.nodes.forEach(function(n){
     if(n.k==="src"){var pm=L.marker([n.lat,n.lng],{icon:L.divIcon({className:"",html:'<div class="pump">'+PUMPI+'</div>',iconSize:[34,34],iconAnchor:[17,17]}),zIndexOffset:900,draggable:ML.edit,keyboard:false});pm.on("click",function(){onNode(n)});pm.on("dragend",function(e){moveNode(n,e.target.getLatLng())});pm.addTo(LGM.valves);return}
-    if(isValve(n)){if(n.k==="iv"?!MSHOW.iv:!MSHOW.valves){if(!ML.closed[n.id]&&!ML.hit[n.id])return}
-      if(n.k==="iv"&&z<16.5&&!ML.closed[n.id]&&!ML.hit[n.id])return;
+    if(isValve(n)){var fcl=fieldClosed()[n.id];if(n.k==="iv"?!MSHOW.iv:!MSHOW.valves){if(!ML.closed[n.id]&&!ML.hit[n.id]&&!fcl)return}
+      if(n.k==="iv"&&z<16.5&&!ML.closed[n.id]&&!ML.hit[n.id]&&!fcl)return;
       var m=L.marker([n.lat,n.lng],{icon:vIcon(n),zIndexOffset:n.k==="iv"?600:800,draggable:ML.edit,keyboard:false});
       m.on("click",function(){onNode(n)});m.on("dragend",function(e){var q=e.target.getLatLng();relocateValve(n,[q.lat,q.lng])});m.addTo(LGM.valves);return}
     if(ML.edit&&z>=17){var tee=(ADJ[n.id]||[]).filter(function(p){return !p.stub}).length>=3;var j=L.marker([n.lat,n.lng],{icon:L.divIcon({className:"",html:'<div class="jn'+(tee?' tee':'')+'"></div>',iconSize:tee?[16,16]:[12,12],iconAnchor:tee?[8,8]:[6,6]}),draggable:true,zIndexOffset:400,keyboard:false});j.on("click",function(){onNode(n)});j.on("dragend",function(e){moveNode(n,e.target.getLatLng())});j.addTo(LGM.edit)}
@@ -935,7 +944,8 @@ function mlApply(force){
 function mlCounts(){
   if(MODE!=="ml")return;
   var nv=0,niv=0,km=0;if(NET){NET.nodes.forEach(function(n){if(n.k==="sv"||n.k==="mv"||n.k==="ov")nv++;if(n.k==="iv")niv++});NET.pipes.forEach(function(p){if(!p.stub)km+=p._len||(p._len=plen(p))})}
-  $("#sub").textContent=NET?(km/1000).toFixed(1)+" km of main · "+nv+" sluice/MV · "+niv+" LI-IV"+(TEST?" · TEST":""):"Loading the mainline…";
+  var nShut=0;fieldShuts().forEach(function(x){nShut+=x.still.length});
+  $("#sub").textContent=NET?(nShut?nShut+" shut on the course · ":"")+(km/1000).toFixed(1)+" km of main · "+nv+" sluice/MV · "+niv+" LI-IV"+(TEST?" · TEST":""):"Loading the mainline…";
   var C=[["valves","Sluice valves",nv,"#0a84ff"],["iv","LI-IVs",niv,"#30d158"],["heads","Heads",HEADS.length,"#ffffff"],["plan","2000 plan","","#d9d9d9"]];
   $("#chips").innerHTML=C.map(function(c){return '<button class="chip glass'+(MSHOW[c[0]]?"":" off")+'" data-k="'+c[0]+'"><span class="dot" style="background:'+c[3]+'"></span>'+c[1]+(c[2]!==""?' <span class="n">'+c[2]+'</span>':'')+'</button>'}).join("");
 }
@@ -943,15 +953,17 @@ function mlCounts(){
 /* ---- the bottom panel ---- */
 function mlBar(){
   if(MODE!=="ml")return;var el=$("#mlbar");if(!NET){el.innerHTML='<div class="st"><span class="dot" style="background:#8e8e93"></span><div><b>Loading the mainline…</b></div></div>';return}
-  var shut=Object.keys(ML.closed);var dr=dryText(SIM?SIM.dry:{},4);var h="";
+  var shut=Object.keys(ML.closed);var dr=dryText(SIM?planDry():{},4);var h="";
   if(ML.edit){
     var n=ML.ops.length;
     h='<div class="st"><span class="dot" style="background:#ffb020"></span><div><b>Editing the mainline'+(n?' · '+n+' change'+(n===1?'':'s'):'')+'</b><small>Tap a pipe to reshape or redraw it. Drag a valve onto the pipe it\'s really on. Tap an orange tee for valves on its legs. Nothing is shared until you save.</small></div></div>'+
       '<div class="row"><button class="btn soft sm" id="eValve">Add valve</button><button class="btn soft sm" id="ePipe">Draw pipe</button>'+(ML.undo.length?'<button class="btn soft sm" id="eUndo">Undo</button>':'')+'</div><div class="row" style="margin-top:8px"><button class="btn soft sm" id="eCancel">'+(n?"Discard":"Stop editing")+'</button><button class="btn go" id="eSave" style="flex:2"'+(n?"":" disabled")+'>Save for everyone</button></div>';
   }else{
-    if(!shut.length)h='<div class="st"><span class="dot" style="background:#2fd27a"></span><div><b>Water everywhere</b><small>Tap a valve to shut it, or find the valves to shut off a spot.</small></div></div>';
-    else h='<div class="st"><span class="dot" style="background:#ff3b30"></span><div><b>'+shut.length+' valve'+(shut.length===1?'':'s')+' shut · '+(dr.n?dr.n+' head'+(dr.n===1?'':'s')+' off':'nothing off')+'</b><small>'+(dr.n?esc(dr.text):'Water still gets around through other pipes.')+'</small></div></div>';
-    h+='<div class="row"><button class="btn go" id="mFind" style="flex:2">Find valves to shut</button>'+(shut.length?'<button class="btn soft sm" id="mOpen">Open all</button>':'')+(shut.length&&dr.n?'<button class="btn soft sm" id="mList">Details</button>':'')+'<button class="btn soft sm" id="mEdit">Edit</button></div>';
+    var fs=fieldShuts();var fv=[];fs.forEach(function(x){x.still.forEach(function(v){fv.push(v.name)})});
+    if(fs.length)h='<div class="st"><span class="dot" style="background:#ff3b30"></span><div><b>Water off on the course · '+fv.length+' valve'+(fv.length===1?'':'s')+'</b><small>'+esc(fv.join(", "))+' · '+esc(fs.map(function(x){return (x.why||x.target||"")+(x.by?" ("+x.by.split(" ")[0]+" "+when(x.at)+")":"")}).join("; "))+'</small></div></div>';
+    if(shut.length)h+='<div class="st"><span class="dot" style="background:#ffb020"></span><div><b>On your map only · '+shut.length+' valve'+(shut.length===1?'':'s')+' · '+(dr.n?dr.n+' head'+(dr.n===1?'':'s')+' off':'nothing off')+'</b><small>'+(dr.n?esc(dr.text):'Water still gets around through other pipes.')+'</small></div></div>';
+    if(!fs.length&&!shut.length)h='<div class="st"><span class="dot" style="background:#2fd27a"></span><div><b>Water everywhere</b><small>Find the valves to shut off a spot, or tap a valve.</small></div></div>';
+    h+='<div class="row">'+(fs.length?'<button class="btn go" id="mShuts" style="flex:2">What\'s shut</button>':'')+'<button class="btn '+(fs.length?'soft sm':'go')+'" id="mFind"'+(fs.length?'':' style="flex:2"')+'>'+(fs.length?'Find valves':'Find valves to shut')+'</button>'+(shut.length?'<button class="btn soft sm" id="mOpen">Clear</button>':'')+(shut.length&&dr.n?'<button class="btn soft sm" id="mList">Details</button>':'')+'<button class="btn soft sm" id="mEdit">Edit</button></div>';
     if(ML.saving)h='<div class="opts" style="margin:-2px 0 8px"><span class="pill info">Saving the mainline…</span></div>'+h;
   }
   el.innerHTML=h;
@@ -959,13 +971,16 @@ function mlBar(){
   b("#mFind",function(){setTool({k:"find",txt:"Tap the head or pipe you need to work on"})});
   b("#mOpen",function(){ML.closed={};ML.hit={};ML.target=null;drawNet()});
   b("#mList",function(){shutSheet()});
+  b("#mShuts",function(){shutsSheet()});
   b("#mEdit",function(){startEdit()});
   b("#eValve",function(){setTool({k:"addValve",txt:"Tap the pipe where the valve is"})});
   b("#ePipe",function(){setTool({k:"pipe",txt:"Tap where the pipe starts",pts:[]})});
   b("#eUndo",undo);b("#eCancel",cancelEdit);b("#eSave",saveSheet);
 }
-function shutSheet(){var dr=dryText(SIM.dry);var shut=Object.keys(ML.closed).map(function(id){return NI[id]}).filter(Boolean);
-  var s=sheet('<h2>What\'s shut off</h2><h3>Valves shut</h3><div class="list">'+shut.map(valveLi).join("")+'</div><h3>Heads with no water · '+dr.n+'</h3>'+(dr.n?'<table class="lay">'+dr.list.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td class="n">'+x[1]+'</td></tr>'}).join("")+'</table>':'<p class="faint">None. Water still gets around.</p>'),{peek:true});
+/* heads off because of valves shut on this map only (not the ones shut on the course) */
+function planDry(){var f=fieldClosed();var ks=Object.keys(f);if(!ks.length)return SIM.dry;var base={};ks.forEach(function(k){base[k]=1});var a=simulate(base).dry;var d={};Object.keys(SIM.dry).forEach(function(k){if(!a[k])d[k]=1});return d}
+function shutSheet(){var dr=dryText(planDry());var shut=Object.keys(ML.closed).map(function(id){return NI[id]}).filter(Boolean);
+  var s=sheet('<h2>On your map</h2><h3>Valves shut on the map</h3><div class="list">'+shut.map(valveLi).join("")+'</div><h3>Heads with no water · '+dr.n+'</h3>'+(dr.n?'<table class="lay">'+dr.list.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td class="n">'+x[1]+'</td></tr>'}).join("")+'</table>':'<p class="faint">None. Water still gets around.</p>'),{peek:true});
   wireValveLi(s)}
 function valveLi(n){var V=VALVE[n.k]||VALVE.ov;var nt=nearText([n.lat,n.lng]);return '<button class="li" data-v="'+n.id+'"><span class="ic" style="background:'+V.col+'22">'+svg("valve",V.col)+'</span><span><b>'+esc(vname(n))+(seized(n)?' · seized':'')+'</b><small>'+esc(V.name+" · "+((nt.place?nt.place+", ":"")+(nt.text||"")))+'</small></span></button>'}
 function wireValveLi(s){s.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){var n=NI[b.dataset.v];closeSheet();map.setView([n.lat,n.lng],Math.max(map.getZoom(),19));setTimeout(function(){onNode(n)},300)}})}
@@ -1034,22 +1049,28 @@ function onNode(n){
   if(t&&t.k==="find"){if(isValve(n)){setTool(null);findFor({node:n.id},vname(n));return}}
   if(n.k==="src"){sheet('<div class="head"><span class="ic" style="background:#0a84ff22">'+svg("dot","#0a84ff",2.2)+'</span><div><h2>'+esc(n.name||"Pump")+'</h2><div class="muted">Where the water comes from</div></div></div>'+(n.note?'<div class="note">'+esc(n.note)+'</div>':'')+(ML.edit?'<p class="faint">Drag it on the map to move it.</p>':''),{peek:true});return}
   if(!isValve(n)){if(ML.edit)nodeEditSheet(n);return}
-  var V=VALVE[n.k];var nt=nearText([n.lat,n.lng]);var r=hwValve(n);var shut=!!ML.closed[n.id];
-  var alone=simulate(Object.assign({},ML.closed,(function(){var o={};o[n.id]=1;return o})()));var base=simulate();var extra={};Object.keys(alone.dry).forEach(function(k){if(!base.dry[k])extra[k]=1});var dr=dryText(shut?SIM.dry:extra,6);
+  var V=VALVE[n.k];var nt=nearText([n.lat,n.lng]);var r=hwValve(n);var fsh=fieldClosed()[n.id];var shut=!!ML.closed[n.id]||!!fsh;
+  var alone=simulate(Object.assign({},allClosed(),(function(){var o={};o[n.id]=1;return o})()));var base=simulate();var extra={};Object.keys(alone.dry).forEach(function(k){if(!base.dry[k])extra[k]=1});var dr=dryText(shut?SIM.dry:extra,6);
   var linked=Object.keys(NET.feeds).filter(function(k){return NET.feeds[k]===n.id}).length;
   var h='<div class="head"><span class="ic" style="background:'+V.col+'22">'+svg("valve",V.col,2.2)+'</span><div><h2>'+esc(vname(n))+'</h2><div class="muted">'+esc(V.name+" · "+((nt.place?nt.place+", ":"")+(nt.text||"")))+'</div></div></div>';
-  h+='<div class="opts" style="margin-top:10px">'+(shut?'<span class="pill bad">Shut</span>':'<span class="pill ok">Open</span>')+(seized(n)?'<span class="pill warn">Seized or won\'t shut</span>':n.cond==="work"||(r&&r.cond==="work")?'<span class="pill warn">Needs work</span>':'')+(n.k==="iv"?'<span class="pill">'+linked+' head'+(linked===1?'':'s')+' linked</span>':'')+'</div>';
+  if(fsh)h+=shutCardHtml(fsh,n.id);
+  h+='<div class="opts" style="margin-top:10px">'+(fsh?'<span class="pill bad">Shut on the course</span>':shut?'<span class="pill bad">Shut on the map only</span>':'<span class="pill ok">Open</span>')+(seized(n)?'<span class="pill warn">Seized or won\'t shut</span>':n.cond==="work"||(r&&r.cond==="work")?'<span class="pill warn">Needs work</span>':'')+(n.k==="iv"?'<span class="pill">'+linked+' head'+(linked===1?'':'s')+' linked</span>':'')+'</div>';
   if(n.note)h+='<div class="note">'+esc(n.note)+'</div>';
-  h+='<p class="muted" style="margin-top:10px">'+(shut?"Shut, so these are off: ":"Shutting it would turn off: ")+(dr.n?'<b>'+esc(dr.text)+'</b>':(n.k==="iv"&&!linked?"nothing yet: no heads are linked to this LI-IV.":"nothing on its own. Water gets around it."))+'</p>';
+  if(!fsh)h+='<p class="muted" style="margin-top:10px">'+(shut?"Shut, so these are off: ":"Shutting it would turn off: ")+(dr.n?'<b>'+esc(dr.text)+'</b>':(n.k==="iv"&&!linked?"nothing yet: no heads are linked to this LI-IV.":"nothing on its own. Water gets around it."))+'</p>';
   if(seized(n))h+='<p class="faint" style="font-size:14px">Logged as seized, so the valve finder works around it.</p>';
-  h+='<div class="row" style="margin-top:12px"><button class="btn '+(shut?"soft":"go")+'" id="vTog" style="flex:2">'+(shut?"Open it":"Shut it")+'</button><a class="btn soft sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+n.lat+','+n.lng+'">Directions</a></div>';
+  if(fsh)h+='<div class="row" style="margin-top:12px"><button class="btn go" id="vBack" style="flex:2">It\'s back on</button>'+(fsh.still.length>1?'<button class="btn soft sm" id="vAllBack">All '+fsh.still.length+' back on</button>':'')+'</div>';
+  else h+='<div class="row" style="margin-top:12px"><button class="btn go" id="vReal" style="flex:2">I\'ve shut it</button><button class="btn soft sm" id="vTog">'+(shut?"Open on the map":"Try it on the map")+'</button></div>';
+  h+='<div class="row" style="margin-top:8px"><a class="btn soft sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+n.lat+','+n.lng+'">Directions</a></div>';
   h+='<div class="row" style="margin-top:8px"><button class="btn soft sm" id="vMove">Move it</button><button class="btn soft sm" id="vEdit">Change</button><button class="btn soft sm" id="vLog">Log its condition</button>'+(r?'<button class="btn soft sm" id="vPin">Open its pin</button>':'')+'</div>';
   var tee=n.k!=="iv"&&(ADJ[n.id]||[]).filter(function(p){return !p.stub}).length>=3;
   if(tee)h+='<div class="note"><b>Sits right on a tee</b>, so shutting it closes every way out. If it\'s really on one leg, <a href="#" id="vLegs">put it on its leg</a>.</div>';
   var pins=nearPins(n);if(pins.length)h+='<p class="faint" style="font-size:14px;margin-top:8px">GPS pin nearby: '+pins.map(function(x){return '<a href="#" data-pin="'+x[1].id+'">'+esc((x[1].ref||x[1].label||T[x[1].type].name)+" · "+fmtM(x[0]))+'</a>'}).join(", ")+' <span class="faint">(tap to move the valve onto it)</span></p>';
   if(ML.edit)h+='<h3>More</h3><div class="row">'+(n.k==="iv"?'<button class="btn soft sm" id="vLink">Link heads</button>':'')+'<button class="btn stop sm" id="vDel">Remove valve</button></div>';
   ML.sel=n.id;drawNet();var s=sheet(h,{peek:true,onClose:function(){ML.sel=null;drawNet()}});
-  $("#vTog").onclick=function(){if(shut)delete ML.closed[n.id];else ML.closed[n.id]=1;ML.hit={};ML.target=null;ML.sel=null;closeSheet();drawNet()};
+  if($("#vTog"))$("#vTog").onclick=function(){if(ML.closed[n.id])delete ML.closed[n.id];else ML.closed[n.id]=1;ML.hit={};ML.target=null;ML.sel=null;closeSheet();drawNet()};
+  if($("#vReal"))$("#vReal").onclick=function(){ML.sel=null;logShutSheet([n],"")};
+  if($("#vBack"))$("#vBack").onclick=function(){ML.sel=null;backOn(fsh,[n.id])};
+  if($("#vAllBack"))$("#vAllBack").onclick=function(){ML.sel=null;backOn(fsh,fsh.still.map(function(v){return v.id}))};
   $("#vLog").onclick=function(){var ty=n.k==="ov"?"other_hw":n.k;DRAFT={mode:"add",id:newId(),type:T[ty]?ty:"other_hw",ref:n.ref||"",lat:n.lat,lng:n.lng};closeSheet();ML.sel=null;startPlace()};
   if($("#vPin"))$("#vPin").onclick=function(){closeSheet();setMode("hw");setTimeout(function(){openRecord(r.id)},200)};
   $("#vEdit").onclick=function(){withEdit(function(){valveEditSheet(n)})};
@@ -1060,6 +1081,68 @@ function onNode(n){
   if($("#vDel"))$("#vDel").onclick=function(){mutate("remove "+vname(n));removeValve(n);closeSheet();ML.sel=null;drawNet()};
 }
 
+/* ---- valves shut on the course: shared through live.json "shuts", posted to #irrigation by the hook ----
+   A shutdown {id SHUT-x, valves [{id,name}], opened [ids], target, why, keep today|longer, status shut|open, by, at, slack}.
+   Changes made on this phone show straight away (SHUTPEND) until live.json has them (each op's ev lands in the record's evs). */
+var SHUTPEND=ls("ml.shutpend")||[];
+function shutPend(op){SHUTPEND.push(op);ls("ml.shutpend",SHUTPEND)}
+function fieldShuts(){
+  var by={},order=[];(LIVE.shuts||[]).forEach(function(x){if(x.test&&!TEST)return;by[x.id]=JSON.parse(JSON.stringify(x));order.push(x.id)});
+  var keep=[];var now=Date.now();
+  SHUTPEND.forEach(function(op){var r=by[op.id];
+    if(r&&(r.evs||[]).indexOf(op.ev)>=0)return;            /* the hook has it */
+    if(now-op.t>GIVEUP_MS)return;                            /* never arrived: drop it */
+    keep.push(op);var slow=now-op.t>10*60000;
+    if(op.kind==="shut"&&!r){by[op.id]=JSON.parse(JSON.stringify(op.rec));by[op.id]._pending=true;by[op.id]._slow=slow;order.push(op.id);return}
+    if(!r)return;
+    if(op.kind==="open"){r.opened=(r.opened||[]).concat(op.ids.filter(function(v){return (r.opened||[]).indexOf(v)<0}));r._pending=true;r._slow=slow;if(r.valves.every(function(v){return r.opened.indexOf(v.id)>=0}))r.status="open"}
+    if(op.kind==="keep"){r.keep=op.keep;r._pending=true;r._slow=slow}});
+  if(keep.length!==SHUTPEND.length){SHUTPEND=keep;ls("ml.shutpend",SHUTPEND)}
+  return order.map(function(id){return by[id]}).filter(function(x){return x&&x.status==="shut"}).map(function(x){x.still=x.valves.filter(function(v){return (x.opened||[]).indexOf(v.id)<0});return x}).filter(function(x){return x.still.length});
+}
+function fieldClosed(){var o={};fieldShuts().forEach(function(x){x.still.forEach(function(v){if(NI[v.id])o[v.id]=x})});return o}
+function allClosed(){var o={};var f=fieldClosed();Object.keys(f).forEach(function(k){o[k]=1});Object.keys(ML.closed).forEach(function(k){o[k]=1});return o}
+function shutCardHtml(x){return '<div class="shutcard"><b>'+esc(x.why||("For "+(x.target||"a repair")))+'</b><div class="meta">'+esc((x.target&&x.why?"For "+x.target+" · ":"")+"Shut by "+(x.by||"someone")+" "+when(x.at)+(x.keep==="longer"?" · staying off":" · back on today"))+(x._pending?(x._slow?' · not through yet, still trying':' · sending…'):'')+'</div><div class="vchips">'+x.valves.map(function(v){var on=(x.opened||[]).indexOf(v.id)>=0;return '<span class="pill '+(on?'ok':'bad')+'">'+esc(v.name)+(on?' · on':'')+'</span>'}).join("")+'</div>'+(x.off&&x.off.text?'<div class="meta">Off: '+esc(x.off.text)+'</div>':'')+'</div>'}
+function offFor(ids){var f=fieldClosed();var base={};Object.keys(f).forEach(function(k){base[k]=1});var w=Object.assign({},base);ids.forEach(function(id){w[id]=1});
+  var a=simulate(base),b=simulate(w);var extra={};Object.keys(b.dry).forEach(function(k){if(!a.dry[k])extra[k]=1});return dryText(extra,8)}
+function shutId(){var n=Math.floor(Date.now()/1000)-1767225600;var a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";return "SHUT-"+n.toString(36).toUpperCase().slice(-5)+a[Math.floor(Math.random()*a.length)]}
+function logShutSheet(vs,label){
+  vs=vs.filter(Boolean);var dr=offFor(vs.map(function(n){return n.id}));var keep="today";
+  var h='<h2>Log '+(vs.length===1?esc(vname(vs[0]))+' as shut':vs.length+' valves as shut')+'</h2><p class="muted">Everyone\'s map shows them shut and it goes to #irrigation.</p><div class="vchips">'+vs.map(function(n){return '<span class="pill bad">'+esc(vname(n))+'</span>'}).join("")+'</div>'+
+    '<p class="muted" style="font-size:14.5px">'+(dr.n?'Off: <b>'+esc(dr.text)+'</b>':'No heads lose water on their own.')+'</p>'+
+    '<label class="f" for="lsWhy">What\'s it for?</label><input class="in" id="lsWhy" maxlength="160" placeholder="e.g. QCV riser on the 7th green">'+
+    '<label class="f">Back on</label><div class="opts" id="lsKeep"><button class="opt sel" data-v="today">Today</button><button class="opt" data-v="longer">Staying off for now</button></div>'+
+    '<p class="faint" style="font-size:13.5px;margin-top:6px">Today: a reminder in the thread at 3pm, and at 7pm with Andy, Ben and Neil tagged if they\'re still shut. Staying off: a reminder each morning.</p>'+
+    whoHtml("Who shut them")+'<div class="row" style="margin-top:14px"><button class="btn go w" id="lsGo">Post to #irrigation</button></div>';
+  var s=sheet(h);wireWho(s);
+  var g=s.querySelector("#lsKeep");g.onclick=function(e){var b=e.target.closest(".opt");if(!b)return;g.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel")});b.classList.add("sel");keep=b.dataset.v};
+  $("#lsGo").onclick=function(){var w=who();if(!w){toast("Pick your name first");return}var why=$("#lsWhy").value.trim();if(!why){toast("Add what it's for");$("#lsWhy").focus();return}
+    var id=shutId();var valves=vs.map(function(n){return {id:n.id,name:vname(n)}});
+    var sent=send({kind:"shut",id:id,valves:JSON.stringify(valves),target:label||"",why:why,keep:keep,off_n:dr.n,off_text:dr.text});
+    shutPend({kind:"shut",id:id,ev:sent.ev,t:Date.now(),p:sent,rec:{id:id,valves:valves,opened:[],target:label||"",why:why,keep:keep,status:"shut",by:w[0],at:new Date().toISOString(),off:{n:dr.n,text:dr.text},evs:[]}});
+    vs.forEach(function(n){delete ML.closed[n.id]});ML.hit={};ML.target=null;closeSheet();drawNet();toast("Logged · posted to #irrigation")};
+}
+function backOn(x,ids){
+  if(!who()){var s=sheet('<h2>Who\'s turning it back on?</h2>'+whoHtml("Your name")+'<div class="row" style="margin-top:14px"><button class="btn go w" id="boGo">Done</button></div>');wireWho(s);$("#boGo").onclick=function(){if(!who()){toast("Pick your name first");return}closeSheet();backOn(x,ids)};return}
+  var sent=send({kind:"open",id:x.id,valves:JSON.stringify(ids)});shutPend({kind:"open",id:x.id,ev:sent.ev,t:Date.now(),p:sent,ids:ids});
+  var all=x.still.every(function(v){return ids.indexOf(v.id)>=0});closeSheet();drawNet();toast(all?"Water back on · posted in the thread":"Logged as back on")}
+function shutsSheet(focus){
+  var fs=fieldShuts();if(focus&&!fs.some(function(x){return x.id===focus})){var gone=(LIVE.shuts||[]).filter(function(x){return x.id===focus})[0];if(gone&&gone.status==="open"){toast("Water's back on for that one");return}}
+  if(!fs.length){toast("Nothing shut on the course");return}
+  var h='<h2>What\'s shut on the course</h2>';
+  fs.forEach(function(x,i){h+=shutCardHtml(x)+'<div class="row" style="margin:-2px 0 8px"><button class="btn go w" data-all="'+i+'">'+(x.still.length>1?'All '+x.still.length+' back on':'It\'s back on')+'</button></div><div class="row" style="margin:0 0 16px"><button class="btn soft sm" data-show="'+i+'">Show</button>'+(x.keep!=="longer"?'<button class="btn soft sm" data-keep="'+i+'">Staying off</button>':'')+(x.slack&&x.slack.link?'<a class="btn soft sm" target="_blank" rel="noopener" href="'+esc(x.slack.link)+'">Thread</a>':'')+'</div>'});
+  h+='<p class="faint" style="font-size:13.5px">To turn just one valve back on, tap it on the map.</p>';
+  var s=sheet(h,{peek:true});
+  s.querySelectorAll("[data-all]").forEach(function(b){b.onclick=function(){var x=fs[+b.dataset.all];backOn(x,x.still.map(function(v){return v.id}))}});
+  s.querySelectorAll("[data-show]").forEach(function(b){b.onclick=function(){showShut(fs[+b.dataset.show])}});
+  s.querySelectorAll("[data-keep]").forEach(function(b){b.onclick=function(){var x=fs[+b.dataset.keep];
+    var go=function(){var sent=send({kind:"keep",id:x.id,keep:"longer"});shutPend({kind:"keep",id:x.id,ev:sent.ev,t:Date.now(),p:sent,keep:"longer"});closeSheet();drawNet();toast("Staying off: reminders move to each morning")};
+    if(who())go();else{var s2=sheet('<h2>Who\'s this?</h2>'+whoHtml("Your name")+'<div class="row" style="margin-top:14px"><button class="btn go w" id="kpGo">Done</button></div>');wireWho(s2);$("#kpGo").onclick=function(){if(!who()){toast("Pick your name first");return}go()}}}});
+  if(focus){var fx=fs.filter(function(x){return x.id===focus})[0];if(fx)showShut(fx,true)}
+}
+function showShut(x,keepSheet){var pts=x.still.map(function(v){return NI[v.id]}).filter(Boolean).map(function(n){return [n.lat,n.lng]});if(!pts.length)return;if(!keepSheet)closeSheet();
+  map.fitBounds(L.latLngBounds(pts).pad(.4),{maxZoom:19,paddingTopLeft:[0,130],paddingBottomRight:[0,Math.round(window.innerHeight*(keepSheet?.55:.3))]})}
+
 /* ---- the valve finder ---- */
 function findFor(target,label){
   ML.closed={};ML.hit={};ML.target=target.pipe?{pipe:target.pipe}:null;
@@ -1067,10 +1150,11 @@ function findFor(target,label){
   if(r.fail==="pump"){drawNet();var s0=sheet('<h2>The pumps are the only way</h2><p class="muted">No ring of working valves closes off '+esc(label)+'. Water gets to it straight from the pump shed'+(r.passed&&r.passed.length?', past valves logged as seized':'')+'.</p>'+(r.passed&&r.passed.length?'<h3>Seized valves in the way</h3><div class="list">'+r.passed.map(function(id){return valveLi(NI[id])}).join("")+'</div>':''),{peek:true});wireValveLi(s0);return}
   if(!r.valves||!r.valves.length){drawNet();toast("Couldn't find a valve for that");return}
   r.valves.forEach(function(id){ML.closed[id]=1;ML.hit[id]=1});drawNet();
-  var dr=dryText(SIM.dry);var vs=r.valves.map(function(id){return NI[id]});
+  var dr=dryText(planDry());var vs=r.valves.map(function(id){return NI[id]});
   var b=L.latLngBounds(vs.map(function(n){return [n.lat,n.lng]}));map.fitBounds(b.pad(.25),{maxZoom:19,paddingTopLeft:[0,130],paddingBottomRight:[0,Math.round(window.innerHeight*.5)]});
-  var s=sheet('<h2>Shut '+vs.length+' valve'+(vs.length===1?'':'s')+'</h2><p class="muted">To work on '+esc(label)+'.</p><div class="list">'+vs.map(valveLi).join("")+'</div>'+(r.passed&&r.passed.length?'<p class="faint" style="font-size:14px;margin-top:8px">Goes around '+r.passed.length+' valve'+(r.passed.length===1?'':'s')+' logged as seized: '+esc(r.passed.map(function(id){return vname(NI[id])}).join(", "))+'.</p>':'')+'<h3>That also turns off · '+dr.n+' head'+(dr.n===1?'':'s')+'</h3>'+(dr.n?'<table class="lay">'+dr.list.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td class="n">'+x[1]+'</td></tr>'}).join("")+'</table>':'<p class="faint">No heads, just the pipe.</p>')+'<div class="row" style="margin-top:14px"><button class="btn soft" id="fOpen">Open them all again</button></div>',{peek:true});
+  var s=sheet('<h2>Shut '+vs.length+' valve'+(vs.length===1?'':'s')+'</h2><p class="muted">To work on '+esc(label)+'.</p><div class="list">'+vs.map(valveLi).join("")+'</div>'+(r.passed&&r.passed.length?'<p class="faint" style="font-size:14px;margin-top:8px">Goes around '+r.passed.length+' valve'+(r.passed.length===1?'':'s')+' logged as seized: '+esc(r.passed.map(function(id){return vname(NI[id])}).join(", "))+'.</p>':'')+'<h3>That also turns off · '+dr.n+' head'+(dr.n===1?'':'s')+'</h3>'+(dr.n?'<table class="lay">'+dr.list.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td class="n">'+x[1]+'</td></tr>'}).join("")+'</table>':'<p class="faint">No heads, just the pipe.</p>')+'<div class="row" style="margin-top:14px"><button class="btn go" id="fReal" style="flex:2">We\'ve shut them</button><button class="btn soft sm" id="fOpen">Clear</button></div><p class="faint" style="font-size:13.5px;margin-top:6px">Shown on your map only. Once they\'re shut on the course, tap We\'ve shut them: everyone\'s map shows it and it goes to #irrigation.</p>',{peek:true});
   wireValveLi(s);$("#fOpen").onclick=function(){ML.closed={};ML.hit={};ML.target=null;closeSheet();drawNet()};
+  $("#fReal").onclick=function(){logShutSheet(vs,/^this pipe/.test(label)?"":label)};
 }
 
 /* ---- editing ---- */
@@ -1212,13 +1296,13 @@ function finishPipe(){var t=ML.tool;var pts=t.pts;if(pts.length<2){setTool(null)
 function saveSheet(){var s=sheet('<h2>Save '+ML.ops.length+' change'+(ML.ops.length===1?'':'s')+'</h2><p class="muted">Everyone sees the new mainline once it\'s saved (about a minute).</p><label class="f" for="svNote">What changed?</label><input class="in" id="svNote" maxlength="200" placeholder="e.g. moved SV-12 to where we found it" value="'+esc(summaryOps())+'">'+whoHtml("Who\'s saving it")+'<div class="row" style="margin-top:14px"><button class="btn go w" id="svGo">Save for everyone</button></div>');
   wireWho(s);$("#svGo").onclick=function(){if(!who()){toast("Pick your name first");return}var note=$("#svNote").value.trim()||summaryOps();
     var sid=evId();var out=JSON.parse(JSON.stringify(NET));out.pipes.forEach(function(p){delete p._len});
-    send({kind:"net",net:JSON.stringify(out),base:NETBASE||"",note:note,sid:sid});
-    ML.saving={sid:sid,net:out,at:Date.now()};ls("ml.saving",ML.saving);closeSheet();ML.edit=false;ML.undo=[];ML.ops=[];setTool(null);document.body.classList.remove("mledit");try{localStorage.removeItem("ml.draft")}catch(e){}mlApply(true);toast("Saving the mainline…");pollSave()}}
+    var sent=send({kind:"net",net:JSON.stringify(out),base:NETBASE||"",note:note,sid:sid});
+    var sp=Object.assign({},sent);delete sp.net;ML.saving={sid:sid,net:out,at:Date.now(),p:sp};ls("ml.saving",ML.saving);closeSheet();ML.edit=false;ML.undo=[];ML.ops=[];setTool(null);document.body.classList.remove("mledit");try{localStorage.removeItem("ml.draft")}catch(e){}mlApply(true);toast("Saving the mainline…");pollSave()}}
 function summaryOps(){var c={};ML.ops.forEach(function(o){var k=o.split(" ")[0];c[k]=(c[k]||0)+1});var w={move:"moved",add:"added",edit:"edited",remove:"removed",link:"linked heads",unlink:"unlinked heads",draw:"drew pipes",delete:"deleted pipes",merge:"tidied pipes",valve:"new valves"};return Object.keys(c).map(function(k){return (w[k]||k)+" ×"+c[k]}).join(", ")}
-function pollSave(){if(!ML.saving)return;var tries=0;var iv=setInterval(function(){tries++;fetch(NETFILE+"?v="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.log||[]).some(function(l){return l.sid===ML.saving.sid})){clearInterval(iv);ML.saving=null;try{localStorage.removeItem("ml.saving")}catch(e){}NET=d;NETBASE=d.updated;netIndex();drawNet();toast("Mainline saved")}else if(tries>30){clearInterval(iv);toast("Still saving. It'll show when it's through.")}}).catch(function(){})},8000)}
+function pollSave(){if(!ML.saving)return;ML.polling=true;var tries=0;var iv=setInterval(function(){tries++;fetch(NETFILE+"?v="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.log||[]).some(function(l){return l.sid===ML.saving.sid})){clearInterval(iv);ML.saving=null;try{localStorage.removeItem("ml.saving")}catch(e){}NET=d;NETBASE=d.updated;netIndex();drawNet();toast("Mainline saved");ML.polling=false}else if(tries>30){clearInterval(iv);ML.polling=false;toast("Still saving. It'll show when it's through.")}}).catch(function(){})},8000)}
 function loadNet(fresh){return fetch(NETFILE+"?v="+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok&&TEST)return fetch("network.json?v="+Date.now(),{cache:"no-store"});return r}).then(function(r){return r.ok?r.json():null}).then(function(d){
   if(!d)return;NET=d;NETBASE=d.updated;
-  var sv=ls("ml.saving");if(sv&&!fresh&&!(d.log||[]).some(function(l){return l.sid===sv.sid})&&Date.now()-sv.at<15*60000){NET=sv.net;ML.saving=sv;pollSave()}
+  var sv=ls("ml.saving");if(sv&&!fresh&&!(d.log||[]).some(function(l){return l.sid===sv.sid})&&Date.now()-sv.at<GIVEUP_MS){NET=sv.net;ML.saving=sv;pollSave()}
   var dr=ls("ml.draft");if(dr&&!fresh&&!!dr.test===TEST&&dr.ops&&dr.ops.length){NET=dr.net;ML.ops=dr.ops;ML.edit=true;document.body.classList.add("mledit");if(dr.base!==d.updated)toast("Your unsaved mainline edits are back. Someone saved since, so check before saving.");else toast("Your unsaved mainline edits are back")}
   netIndex();if(MODE==="ml")mlApply(true)}).catch(function(){})}
 
@@ -1253,11 +1337,11 @@ Promise.all([fetch("ref.json",{cache:"no-cache"}).then(function(r){return r.json
   REF=v[0];if(v[1])LIVE=v[1];
   HEADS=REF.heads.map(function(h){var p=parseHead(h[0]);return {n:h[0],lat:h[1],lng:h[2],hole:p.hole,area:p.area}});
   buildRef();drawRecords();
-  if(MODE==="ml"||QS.get("map")==="mainline")setMode("ml");
-  loadNet();
+  if(MODE==="ml"||QS.get("map")==="mainline"||QS.get("shut"))setMode("ml");
+  loadNet().then(function(){var sh=QS.get("shut");if(sh&&NET)setTimeout(function(){shutsSheet(sh)},300)});
   $("#loading").classList.add("gone");setTimeout(function(){$("#loading").remove()},500);
   if(DEEP)deepLink();
-  flush();
+  flush();setTimeout(retryUnsent,5000);
 }).catch(function(){$("#loading").textContent="Couldn't load the map. Pull down to retry."});
 function deepLink(){
   var r=find(DEEP);
@@ -1270,8 +1354,27 @@ function deepLink(){
   }
 }
 /* refresh the pins every minute while the page is open */
-setInterval(function(){if(document.hidden||PLACE)return;loadLive().then(function(d){if(d){LIVE=d;drawRecords()}})},60000);
-document.addEventListener("visibilitychange",function(){if(!document.hidden){flush();loadLive().then(function(d){if(d){LIVE=d;drawRecords()}})}});
+function liveIn(d){if(!d)return;LIVE=d;drawRecords();if(MODE==="ml"&&NET&&!ML.edit)drawNet();retryUnsent()}
+/* Anything sent that hasn't shown up after 15 minutes goes again (a run can be dropped on Zapier's side); the hook
+   ignores repeats by their ev. Gives up after 12 hours. */
+var RETRY_MS=15*60000,GIVEUP_MS=12*3600000;
+function resend(p){if(PREVIEW||!p)return;var q=JSON.parse(JSON.stringify(p));var a=outbox();if(a.some(function(x){return x.ev===q.ev}))return;q.sent_at=new Date().toISOString();a.push(q);ls("hw.outbox",a);flush()}
+function retryUnsent(){var now=Date.now(),ch=false;
+  var by={};(LIVE.records||[]).forEach(function(r){by[r.id]=r});
+  Object.keys(LOCAL).forEach(function(id){var L=LOCAL[id];if(!L.ps||!L.ps.length||!L.t)return;var r=by[id];if(r&&(r.evs||[]).indexOf(L.ev)>=0)return;
+    if(now-L.t>GIVEUP_MS||now-(L.last||L.t)<RETRY_MS)return;L.last=now;ch=true;L.ps.forEach(resend)});
+  if(ch)ls("hw.local",LOCAL);
+  var sh={};(LIVE.shuts||[]).forEach(function(x){sh[x.id]=x});ch=false;
+  SHUTPEND.forEach(function(op){if(!op.p)return;var r=sh[op.id];if(r&&(r.evs||[]).indexOf(op.ev)>=0)return;
+    if(now-op.t>GIVEUP_MS||now-(op.last||op.t)<RETRY_MS)return;op.last=now;ch=true;resend(op.p)});
+  if(ch)ls("ml.shutpend",SHUTPEND);
+  var sv=ML.saving;if(!sv||!sv.p||ML.polling||now-(sv.last||sv.at)<RETRY_MS)return;sv.last=now;ls("ml.saving",sv);
+  fetch(NETFILE+"?v="+now,{cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(d){if(!d||ML.saving!==sv)return;
+    if((d.log||[]).some(function(l){return l.sid===sv.sid})){ML.saving=null;try{localStorage.removeItem("ml.saving")}catch(e){}NET=d;NETBASE=d.updated;netIndex();drawNet();toast("Mainline saved");return}
+    if(now-sv.at>GIVEUP_MS||d.updated!==sv.p.base){ML.saving=null;try{localStorage.removeItem("ml.saving")}catch(e){}ls("ml.draft",{net:sv.net,ops:["edit"],base:sv.p.base,test:TEST});toast("Your mainline save didn't go through. Your edits are back to check and save.");loadNet();return}
+    var q=Object.assign({},sv.p,{net:JSON.stringify(sv.net)});resend(q)}).catch(function(){})}
+setInterval(function(){if(document.hidden||PLACE)return;loadLive().then(liveIn)},60000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden){flush();loadLive().then(liveIn)}});
 })();
 </script>
 </html>
