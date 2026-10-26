@@ -72,6 +72,7 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted)}
 .gt{font-size:.8rem;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}.gt b{color:var(--fg)}
 .gb{padding:0 8px 8px}
 .gb .card{margin:6px 0;border-radius:12px;background:color-mix(in srgb,var(--panel) 90%,var(--bg));animation:none}
+html.embed body{background:transparent}html.embed .wrap{max-width:none}html.embed h1{font-size:1rem}
 </style>
 </head>
 <body>
@@ -101,10 +102,10 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted)}
 <script>
 (function(){
 const $=(s)=>document.querySelector(s);
-const KEY='rgc-stock-v1';let D=null,BY={},G={},state={},type='All',showZero=false,lowOnly=false,view='ai',aisel='';
+const KEY='rgc-stock-v1';const EMBED=new URLSearchParams(location.search).has('embed');if(EMBED)document.documentElement.classList.add('embed');let started='',sentAt=0,D=null,BY={},G={},state={},type='All',showZero=false,lowOnly=false,view='ai',aisel='';
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}};
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({snap:D&&D.snapshot,who:$('#who').value,state,extra:$('#extra').value,view}))}catch(e){}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({snap:D&&D.snapshot,who:$('#who').value,state,extra:$('#extra').value,view,started,at:Date.now(),sentAt}))}catch(e){}};
 const fmt=(v)=>(Math.round(v*100)/100).toLocaleString('en-AU',{maximumFractionDigits:2});
 const money=(v)=>v.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=(t)=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -120,7 +121,7 @@ const gOn=(g)=>g.members.reduce((t,id)=>{const i=BY[id];return t+(i?onHand(i,sta
 const gLow=(g)=>!!(g.calc&&g.level&&gOn(g)<=g.level+1e-9);
 function isLow(i,s){const g=grpOf(i);if(g&&g.calc)return gLow(g);return !!i.reorder_at&&onHand(i,s||{})<=i.reorder_at+1e-9}
 const lowish=(i)=>{const s=state[i.id];return !!(i.reorder||isLow(i,s)||(s&&s.ro))};
-function setS(id,cur){if(!cur.st&&!cur.ro&&!cur.note)delete state[id];else state[id]=cur}
+function setS(id,cur){if(!cur.st&&!cur.ro&&!cur.note)delete state[id];else state[id]=cur;if(!started&&Object.keys(state).length)started=new Date().toISOString();sentAt=0}
 function lvlTxt(i,s,inG){if(i.reorder)return['onl',`On re-order list · ${dmy(i.reorder.date)} · ${i.reorder.by}`];const g=grpOf(i);
   if(g&&g.calc){if(inG)return['',''];if(gLow(g))return['lowt',`Low across all ${g.name} products`];return['',i.covered||''];}
   if(!i.reorder_at)return['',''];const lo=isLow(i,s);return[lo?'lowt':'',(lo?(hasCnt(s)?'Low after count · ':'Low · '):'')+`re-order at ${fmt(i.reorder_at)} ${i.unit}`]}
@@ -137,7 +138,7 @@ function pills(i){const g=grpOf(i);if(!g)return'';let p='';if(g.pick===i.id&&i.u
 let k=0;
 function cardEl(i,inG){
   const s=state[i.id]||{};const c=document.createElement('div');c.className='card'+(s.st==='ok'?' ok':s.st==='diff'?' diff':'')+(!inG&&isLow(i,s)?' low':'');if(!inG)c.style.animationDelay=Math.min(k++,14)*25+'ms';
-  const last=i.last_count?`<div class="last">Last counted ${i.last_count.date} by ${esc(i.last_count.by)}: ${fmt(i.last_count.counted)} ${i.unit}</div>`:'';
+  const last=i.last_count?`<div class="last">Last counted ${dmy(i.last_count.date)} by ${esc(i.last_count.by)}: ${fmt(i.last_count.counted)} ${i.unit}</div>`:'';
   c.innerHTML=`<div class="row"><div>${aiLine(i,inG)}<div class="nm"></div><div class="exp">${expTxt(i)}</div>${i.flag?`<div class="flag">⚠ ${esc(i.flag)}</div>`:''}${last}${metaHtml(i)}${inG?pills(i):''}<div class="lvl"></div>${i.reorder?'<button class="ro req" disabled>✓ On re-order list</button>':`<button class="ro" aria-pressed="${!!s.ro}">${s.ro?'✓ Re-order':'Re-order'}</button>`}</div>
     <div class="btns"><button class="b okb" aria-pressed="${s.st==='ok'}" aria-label="Matches">✓</button><button class="b dfb" aria-pressed="${s.st==='diff'}" aria-label="Different">≠</button></div></div>
     <div class="edit">${i.cont?`<label>Full ${fmt(i.cont)} ${i.unit} containers<input type="number" inputmode="decimal" min="0" step="1" class="full" value="${s.full??''}"></label>`:''}
@@ -198,21 +199,21 @@ function body(){
   done().forEach(([id,s])=>{if(s.st==='ok')ok.push(id);else{const i=BY[id];cnt.push(`CNT ${id} | ${fmt(total(i,s))} ${i.unit} | exp ${i.expected} | ${i.name}${s.note?' | '+s.note.replace(/\|/g,'/'):''}`)}});
   const ex=$('#extra').value.trim().split(/\n+/).filter(Boolean).map(l=>'NEW | '+l.replace(/\|/g,'/'));
   const ro=ros().map(([id,s])=>{const i=BY[id];const oh=hasCnt(s)||s.st==='ok'?`${fmt(onHand(i,s))} ${i.unit}`:`~${fmt(i.expected)} ${i.unit} (not counted)`;return `REORDER ${id} | ${i.name.replace(/\|/g,'/')} | on hand ${oh}`});
-  return [`STOCKTAKE v1 | snapshot ${D.snapshot} | by ${$('#who').value.trim()} | sent ${new Date().toISOString()}`,ok.length?'OK '+ok.join(','):'',...cnt,...ro,...ex,'END'].filter(Boolean).join('\n');
+  return [`STOCKTAKE v1 | snapshot ${D.snapshot} | by ${$('#who').value.trim()} | sent ${new Date().toISOString()}${started?' | started '+started:''}`,ok.length?'OK '+ok.join(','):'',...cnt,...ro,...ex,'END'].filter(Boolean).join('\n');
 }
 $('#send').onclick=()=>{const b=body(),n=done().length,r=ros().length;const sub=`Ranfurlie stocktake | ${new Date().toISOString().slice(0,10)} | ${$('#who').value.trim()} | ${n} items`+(r?` + ${r} re-order`:'');
-  location.href=`mailto:${D.send_to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(b)}`;toast('Opening your email app — press Send there');};
+  sentAt=Date.now();save();const u=`mailto:${D.send_to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(b)}`;try{(EMBED?window.top:window).location.href=u}catch(e){location.href=u}toast('Opening your email app — press Send there');};
 $('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(body());toast('Copied. Paste into an email to Andy')}catch(e){prompt('Copy this text',body())}};
-$('#clear').onclick=()=>{if(confirm('Clear this count and start again?')){state={};$('#extra').value='';save();render();tick()}};
+$('#clear').onclick=()=>{if(confirm('Clear this count and start again?')){state={};started='';sentAt=0;$('#extra').value='';save();render();tick()}};
 ['#who','#extra'].forEach(s=>$(s).addEventListener('input',()=>{save();tick()}));$('#q').addEventListener('input',render);
 $('#aisel').addEventListener('change',e=>{aisel=e.target.value;render()});
 function setView(v){view=v;document.querySelectorAll('#view button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));save();render()}
 document.querySelectorAll('#view button').forEach(b=>b.onclick=()=>setView(b.dataset.v));
 fetch('stock.json?x='+Date.now()).then(r=>r.json()).then(d=>{D=d;D.items.forEach(i=>{BY[i.id]=i});(d.groups||[]).forEach(g=>{G[g.id]=g});
-  const s=load();if(s.snap===d.snapshot||s.snap){state=s.state||{};$('#extra').value=s.extra||''}$('#who').value=s.who||'';if(s.view==='product')view='product';
+  const s=load();if(s.snap&&!s.sentAt&&s.at&&Date.now()-s.at<4*864e5){state=s.state||{};$('#extra').value=s.extra||'';started=s.started||''}$('#who').value=s.who||'';if(s.view==='product')view='product';
   document.querySelectorAll('#view button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===view)));
   const ais=[...new Set(d.items.flatMap(i=>(i.ai||[]).map(a=>a.name)))].sort((a,b)=>a.localeCompare(b));const sel=$('#aisel');ais.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;sel.appendChild(o)});
-  const n=d.items.filter(i=>i.expected>0).length;$('#sub').textContent=`${n} products expected on the shelf (KD stocktake + purchases − GreenKeeper use) · updated ${d.built}`+(d.counted_30d?` · ${d.counted_30d} counted in the last 30 days`:'')+(d.low_count?` · ${d.low_count} at or below re-order level`:'');
+  const n=d.items.filter(i=>i.expected>0).length;$('#sub').textContent=`${n} products expected on the shelf (last count + purchases since − GreenKeeper use since) · updated ${d.built}`+(d.counted_30d?` · ${d.counted_30d} counted in the last 30 days`:'')+(d.low_count?` · ${d.low_count} at or below re-order level`:'');
   const types=['All',...new Set(d.items.map(i=>i.type))];const C=$('#chips');
   types.forEach(t=>{const b=document.createElement('button');b.className='chip';b.textContent=t;b.dataset.t=t;b.setAttribute('aria-pressed',t===type);b.onclick=()=>{type=t;[...C.querySelectorAll('[data-t]')].forEach(x=>x.setAttribute('aria-pressed',x.dataset.t===t));render()};C.appendChild(b)});
   const lw=document.createElement('button');lw.className='chip lowc';lw.textContent='Low stock';lw.setAttribute('aria-pressed','false');lw.onclick=()=>{lowOnly=!lowOnly;lw.setAttribute('aria-pressed',String(lowOnly));render()};C.insertBefore(lw,C.children[1]||null);
