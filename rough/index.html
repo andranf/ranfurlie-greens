@@ -395,13 +395,16 @@ body.mapfull.picked .side{display:flex;position:fixed;left:0;right:0;bottom:0;z-
   const isFull = () => document.body.classList.contains('mapfull');
   const sheetH = () => isFull() && state.area ? Math.round(innerHeight * 0.46) + 16 : 0;
   function fitHdr() { document.body.style.setProperty('--hdr', isFull() ? Math.ceil($('.top').getBoundingClientRect().height) + 'px' : '0px'); }
-  function setFull(on) {
+  let driven = false; // full screen because Course Ops made this page full screen
+  function setFull(on, quiet) {
     document.body.classList.toggle('mapfull', on); fitHdr();
     if (fsBtn) { fsBtn.innerHTML = on ? FSI.off : FSI.on; fsBtn.setAttribute('aria-label', on ? 'Smaller map' : 'Full screen map'); }
-    if (on && !(history.state && history.state.mapfull)) history.pushState({ mapfull: 1 }, '', location.href);
-    requestAnimationFrame(() => { map.invalidateSize(); if (!state.area && state.hole) fitHole(state.hole); if (state.area && on) map.panInside(layers[state.area].getBounds().getCenter(), { paddingTopLeft: [20, 20], paddingBottomRight: [20, sheetH() + 20] }); });
+    if (on && !quiet && !(history.state && history.state.mapfull)) history.pushState({ mapfull: 1 }, '', location.href);
+    requestAnimationFrame(() => { map.invalidateSize(); if (!state.area && state.hole) fitHole(state.hole); else if (!state.area) map.fitBounds(boundsOf(allBB), { padding: [10, 10] }); if (state.area && on) map.panInside(layers[state.area].getBounds().getCenter(), { paddingTopLeft: [20, 20], paddingBottomRight: [20, sheetH() + 20] }); });
   }
-  const closeFull = () => { if (!isFull()) return; if (history.state && history.state.mapfull) history.back(); else setFull(false); };
+  const closeFull = () => { if (!isFull()) return; if (driven) { try { parent.postMessage({ closeBig: true }, location.origin); } catch (e) { setFull(false, true); } return; }
+    if (history.state && history.state.mapfull) history.back(); else setFull(false); };
+  addEventListener('message', (e) => { if (e.origin !== location.origin || !e.data || typeof e.data.fullMap !== 'boolean') return; driven = e.data.fullMap; setFull(e.data.fullMap, true); });
   const FS = L.Control.extend({ options: { position: 'topright' }, onAdd() {
     const b = L.DomUtil.create('button', 'fsbtn'); b.type = 'button'; b.innerHTML = FSI.on; b.setAttribute('aria-label', 'Full screen map');
     L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b, 'click', () => (isFull() ? closeFull() : setFull(true))); fsBtn = b; return b; } });

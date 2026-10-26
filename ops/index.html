@@ -849,13 +849,15 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#sheet").hid
 /* full screen maps: a course map (area key) or an embedded page ("e:"+tab). The back button closes it. */
 S.big=null;
 function bigEl(k){return k.startsWith("e:")?$(`#view .mapcard[data-mc="${k.slice(2)}"]`):$(`#view .mapwrap[data-mw="${k}"]`)}
-function setBig(k){if(S.big)unBig();S.big=k;const el=bigEl(k);if(el)el.classList.add("big");document.body.classList.add("bigmap");
+function tellFrame(k,on){const el=k&&k.startsWith("e:")?bigEl(k):null;const f=el&&$("iframe",el);try{if(f&&f.contentWindow)f.contentWindow.postMessage({fullMap:on},location.origin)}catch(e){}}
+function setBig(k){if(S.big)unBig();S.big=k;const el=bigEl(k);if(el)el.classList.add("big");document.body.classList.add("bigmap");tellFrame(k,true);
   if(!(history.state&&history.state.big))history.pushState({big:k},"",location.href);bigCtl(k);requestAnimationFrame(()=>{if(S.mapApi[k])S.mapApi[k].refit()})}
-function unBig(){const k=S.big;S.big=null;$$("#view .mapwrap.big,#view .mapcard.big").forEach(x=>x.classList.remove("big"));document.body.classList.remove("bigmap");
+function unBig(){const k=S.big;S.big=null;tellFrame(k,false);$$("#view .mapwrap.big,#view .mapcard.big").forEach(x=>x.classList.remove("big"));document.body.classList.remove("bigmap");
   if(k){bigCtl(k);requestAnimationFrame(()=>{if(S.mapApi[k])S.mapApi[k].refit()})}}
 function bigCtl(k){if(k.startsWith("e:"))return;const b=$(`#map-${k} .ctl [data-z="big"]`);if(b){const on=S.big===k;b.innerHTML=on?ICON.shrink:ICON.expand;b.setAttribute("aria-label",on?"Smaller map":"Full screen map")}}
 function closeBig(){if(!S.big)return;if(history.state&&history.state.big)history.back();else unBig()}
 window.addEventListener("popstate",()=>{if(S.big)unBig()});
+window.addEventListener("message",e=>{if(e.origin===location.origin&&e.data&&e.data.closeBig)closeBig()});
 window.addEventListener("resize",()=>{if(S.big&&S.mapApi[S.big])S.mapApi[S.big].refit()});
 let toastT=null;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3600)}
 function openFull(area){const a=AREAS[area];$("#fullTitle").textContent=a.label+" · 3D map & history";$("#fullOpen").href=a.full;$("#fullFrame").src=a.full;$("#full").hidden=false;document.body.style.overflow="hidden"}
