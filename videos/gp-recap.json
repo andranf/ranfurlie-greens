@@ -1,6 +1,6 @@
 {
  "build_label": "week of 27 October 2026",
- "built": "2026-10-27T06:31+1100",
+ "built": "2026-10-27T07:36+1100",
  "asof": "2026-10-26",
  "asof_label": "Mon 26 Oct",
  "asof_long": "Monday 26 October 2026",
@@ -234,8 +234,8 @@
   "cool14_prev": 0.673,
   "warm14": 0.21909026229279613,
   "warm14_prev": 0.11213773058628669,
-  "clip14": 4.76,
-  "gvx21": 20.4
+  "clip14": 9.34,
+  "gvx21": 30.4
  },
  "headline_hist": "Greens GP is <em>holding</em> steady",
  "forecast": {
