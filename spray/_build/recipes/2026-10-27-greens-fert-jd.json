@@ -2,7 +2,7 @@
   "slug": "2026-10-27-greens-fert-jd",
   "title": "Fert, Greens (100 L partial tank)",
   "sheet_name": "JD - 300L/Ha - Fert + PGR to Greens (partial tank, 100 L)",
-  "sprayer": "JD sprayer",
+  "sprayer": "JD HD200",
   "applicator": [
     "Mitch Mahoney",
     "U08K55E3QJU"
@@ -13,7 +13,7 @@
   "area_ha": 0.3333,
   "rate_lha": 300,
   "mix_l": 100,
-  "tank_cap_l": 600,
+  "tank_cap_l": 757,
   "fill_l": 65,
   "nozzles": "Grey Wilger",
   "speed": "6.4 km/h",
