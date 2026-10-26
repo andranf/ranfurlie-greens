@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-10-27-greens-fert-jd",
+   "title": "Fert, Greens (100 L partial tank)",
+   "sprayer": "JD sprayer",
+   "date_iso": "2026-10-27",
+   "date": "Tue 27 Oct",
+   "applicator": "Mitch Mahoney",
+   "method": "boom"
+  },
+  {
    "slug": "2026-10-21-greens-fert-pgr",
    "title": "Fert + PGR, Greens",
    "sprayer": "Toro 5800",
