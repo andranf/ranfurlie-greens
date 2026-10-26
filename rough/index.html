@@ -170,6 +170,16 @@ a{color:var(--tank-deep)}
   .top{position:relative}
 }
 @media (prefers-reduced-motion: reduce){.sky i{animation:none}.meter i{transition:none}}
+/* full screen map: the expand button on the map. Tap an area and its card slides up over the map. Back or the button shrinks it. */
+.fsbtn{width:42px;height:42px;border:0;border-radius:12px;background:#fff;color:#13201a;box-shadow:0 2px 10px #0005;display:grid;place-items:center;cursor:pointer;padding:0}
+.fsbtn svg{width:22px;height:22px}
+body.mapfull{overflow:hidden}
+body.mapfull .mapcard,body.mapfull main.grid{-webkit-backdrop-filter:none;backdrop-filter:none}
+body.mapfull .top{position:fixed;top:0;left:0;right:0;z-index:1001;padding-bottom:6px;background:var(--bg)}
+body.mapfull .top .row1{display:none}
+body.mapfull #map{position:fixed!important;left:0;right:0;bottom:0;top:var(--hdr,0px);height:auto;min-height:0;z-index:1000;border-radius:0}
+body.mapfull .side{display:none}
+body.mapfull.picked .side{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:1002;max-height:46svh;overflow:auto;border-radius:22px 22px 0 0;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
 </style>
 </head>
 <body>
@@ -370,7 +380,7 @@ a{color:var(--tank-deep)}
     return best[0][Math.floor(best[0].length / 4)];
   }
   const boundsOf = (bb) => L.latLngBounds([bb[1], bb[0]], [bb[3], bb[2]]);
-  function fitArea(id) { map.fitBounds(layers[id].getBounds(), { padding: [40, 40], maxZoom: 19.75, animate: !reduce }); }
+  function fitArea(id) { map.fitBounds(layers[id].getBounds(), { paddingTopLeft: [40, 40], paddingBottomRight: [40, 40 + sheetH()], maxZoom: 19.75, animate: !reduce }); }
   function fitHole(h) {
     let bb = null; for (const a of areas) if (a.hole === h) bb = bb ? [Math.min(bb[0], a.bb[0]), Math.min(bb[1], a.bb[1]), Math.max(bb[2], a.bb[2]), Math.max(bb[3], a.bb[3])] : a.bb.slice();
     if (bb) map.fitBounds(boundsOf(bb), { padding: [20, 20], maxZoom: 19.25, animate: !reduce });
@@ -378,6 +388,27 @@ a{color:var(--tank-deep)}
   let allBB = null; for (const a of areas) allBB = allBB ? [Math.min(allBB[0], a.bb[0]), Math.min(allBB[1], a.bb[1]), Math.max(allBB[2], a.bb[2]), Math.max(allBB[3], a.bb[3])] : a.bb.slice();
   map.fitBounds(boundsOf(allBB), { padding: [10, 10] });
   new ResizeObserver(() => map.invalidateSize()).observe($('#map'));
+  // ---------- full screen map ----------
+  const FSI = { on: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+    off: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>' };
+  let fsBtn = null;
+  const isFull = () => document.body.classList.contains('mapfull');
+  const sheetH = () => isFull() && state.area ? Math.round(innerHeight * 0.46) + 16 : 0;
+  function fitHdr() { document.body.style.setProperty('--hdr', isFull() ? Math.ceil($('.top').getBoundingClientRect().height) + 'px' : '0px'); }
+  function setFull(on) {
+    document.body.classList.toggle('mapfull', on); fitHdr();
+    if (fsBtn) { fsBtn.innerHTML = on ? FSI.off : FSI.on; fsBtn.setAttribute('aria-label', on ? 'Smaller map' : 'Full screen map'); }
+    if (on && !(history.state && history.state.mapfull)) history.pushState({ mapfull: 1 }, '', location.href);
+    requestAnimationFrame(() => { map.invalidateSize(); if (!state.area && state.hole) fitHole(state.hole); if (state.area && on) map.panInside(layers[state.area].getBounds().getCenter(), { paddingTopLeft: [20, 20], paddingBottomRight: [20, sheetH() + 20] }); });
+  }
+  const closeFull = () => { if (!isFull()) return; if (history.state && history.state.mapfull) history.back(); else setFull(false); };
+  const FS = L.Control.extend({ options: { position: 'topright' }, onAdd() {
+    const b = L.DomUtil.create('button', 'fsbtn'); b.type = 'button'; b.innerHTML = FSI.on; b.setAttribute('aria-label', 'Full screen map');
+    L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b, 'click', () => (isFull() ? closeFull() : setFull(true))); fsBtn = b; return b; } });
+  new FS().addTo(map);
+  addEventListener('popstate', () => { if (isFull() && !(history.state && history.state.mapfull)) setFull(false); });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFull(); });
+  addEventListener('resize', fitHdr);
   map.on('click', () => { if (state.area) go({ hole: state.hole }); });
 
   // ---------- hole chips ----------
@@ -394,9 +425,11 @@ a{color:var(--tank-deep)}
     state.area = next.area || null; state.hole = next.area ? byId[next.area].hole : next.hole || null;
     nav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.h === (state.hole || 'all'))));
     restyle(); render();
+    document.body.classList.toggle('picked', !!state.area);
     if (state.area && !fromMap) fitArea(state.area); else if (fit) { if (state.hole) fitHole(state.hole); else map.fitBounds(boundsOf(allBB), { padding: [10, 10] }); }
+    if (state.area && fromMap && isFull()) map.panInside(layers[state.area].getBounds().getCenter(), { paddingTopLeft: [20, 20], paddingBottomRight: [20, sheetH() + 20] });
     const h = state.area ? '#' + state.area : state.hole ? '#hole-' + state.hole : '#'; if (location.hash !== h) history.replaceState(null, '', h === '#' ? location.pathname : h);
-    if (narrow() && (state.area || fromMap)) $('#side').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    if (narrow() && !isFull() && (state.area || fromMap)) $('#side').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   }
   function statusOf(a) {
     if (a.type === 'mow') { const l = lastOf(a.id, 'mow'); if (l && thisWeek(l.at)) return { t: 'Mown ' + fmtWhen(l.at) + byWho(l), ok: true }; return l ? { t: 'Not this week · last ' + fmtWhen(l.at) + byWho(l) } : { t: 'Not mown yet' }; }

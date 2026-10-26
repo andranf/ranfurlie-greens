@@ -356,6 +356,21 @@ input.field:focus,select.field:focus,textarea.field:focus{box-shadow:inset 0 0 0
 @keyframes kshim{to{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){.kskel{animation:none}}
 .mapcard{padding:0;overflow:hidden}.mapcard iframe{display:block;width:100%;height:max(520px,calc(100svh - 200px));border:0}
+/* any map can fill the screen: the expand button; Done or the phone's back button shrinks it again */
+.mapcard .mhead{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 16px}
+.mapcard .mhead b{flex:1;min-width:0;font-family:var(--display);font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdone{display:none}
+.mapcard.big{position:fixed;inset:0;z-index:45;border-radius:0;display:flex;flex-direction:column;background:var(--bg);padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.mapcard.big iframe{flex:1;height:auto;min-height:0}
+.mapcard.big .mexp{display:none}.mapcard.big .mdone{display:inline-flex}
+.mapwrap.big{position:fixed;inset:0;z-index:45;background:var(--bg);display:flex;flex-direction:column;gap:8px;padding:max(10px,env(safe-area-inset-top,0px)) 10px max(10px,env(safe-area-inset-bottom,0px))}
+.mapwrap.big .mapbar{margin:0}.mapwrap.big .lg{margin:0}
+.mapwrap.big .map{flex:1;min-height:0;aspect-ratio:auto;border-radius:16px}
+.mapwrap.big .mdone{display:inline-flex;margin-left:auto}
+.map .ctl button svg{width:20px;height:20px}
+body.bigmap{overflow:hidden}
+body.bigmap .card{-webkit-backdrop-filter:none;backdrop-filter:none}
+body.bigmap .in{animation:none}
 </style>
 </head>
 <body data-area="irrigation">
@@ -535,6 +550,8 @@ function spark(vals,opt={}){if(!vals||!vals.length)return"";const w=120,h=26,max
   return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${vals.map((v,i)=>`<rect x="${(i*bw+1).toFixed(1)}" y="${(h-(v/max)*(h-2)).toFixed(1)}" width="${Math.max(1,bw-2).toFixed(1)}" height="${((v/max)*(h-2)).toFixed(1)}" rx="1.5" fill="${opt.c||"var(--acc)"}" opacity="${i===vals.length-1?1:.55}"/>`).join("")}</svg>`}
 function meter(v,max){const p=Math.max(0,Math.min(1,max?v/max:0));return `<svg viewBox="0 0 120 26" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="9" width="120" height="8" rx="4" fill="var(--acc-soft)"/><rect x="0" y="9" width="${(120*p).toFixed(1)}" height="8" rx="4" fill="var(--acc)"/></svg>`}
 const ICON={
+  expand:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+  shrink:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>',
   load:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   sand:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18c3-4 6-6 9-6s6 2 9 6"/><path d="M12 3v6M9 6l3 3 3-3"/></svg>',
   count:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
@@ -562,13 +579,17 @@ function mapCard(area,inner,opts={}){
   const holes=Object.keys(B.holes).sort((a,b)=>a-b);
   const bk=area==="bunkers"?"":S.data.bunkers?(S.data.bunkers.bunkers||[]).filter(b=>(b.p||[]).length).map(b=>`<path class="p-bunker" d="${b.p.map(r=>ptsPath(r)).join("")}"/>`).join(""):(B.bkLayer||"");
   const glow=`<defs><radialGradient id="glow-${area}"><stop offset="0%" style="stop-color:var(--hi);stop-opacity:.38"/><stop offset="100%" style="stop-color:var(--hi);stop-opacity:0"/></radialGradient></defs>`;
-  return `<div class="mapbar"><select aria-label="Zoom to a hole" data-hole="${area}"><option value="">Whole course</option>${holes.map(h=>`<option value="${h}">Hole ${h}</option>`).join("")}</select>${opts.bar||""}</div>
+  const big=S.big===area;
+  return `<div class="mapwrap${big?" big":""}" data-mw="${area}"><div class="mapbar"><select aria-label="Zoom to a hole" data-hole="${area}"><option value="">Whole course</option>${holes.map(h=>`<option value="${h}">Hole ${h}</option>`).join("")}</select>${opts.bar||""}<button class="btn small mdone" data-bigdone>Done</button></div>
   <div class="map" id="map-${area}"><svg viewBox="${v.join(" ")}" data-area="${area}" xmlns="http://www.w3.org/2000/svg">${glow}<rect x="${x0-200}" y="${y0-200}" width="${x1-x0+400}" height="${y1-y0+400}" fill="transparent"/>${B.svg}${bk}${opts.under||""}${holeLabels(B)}${inner}</svg>
-  <div class="ctl"><button data-z="in" aria-label="Zoom in">+</button><button data-z="out" aria-label="Zoom out">−</button><button data-z="all" aria-label="Whole course">⤢</button></div>${opts.hint?`<div class="hint">${opts.hint}</div>`:""}</div>${opts.legend?`<div class="lg">${opts.legend}</div>`:""}`;
+  <div class="ctl"><button data-z="big" aria-label="${big?"Smaller map":"Full screen map"}">${big?ICON.shrink:ICON.expand}</button><button data-z="in" aria-label="Zoom in">+</button><button data-z="out" aria-label="Zoom out">−</button><button data-z="all" aria-label="Whole course">⤢</button></div>${opts.hint?`<div class="hint">${opts.hint}</div>`:""}</div>${opts.legend?`<div class="lg">${opts.legend}</div>`:""}</div>`;
 }
 function wireMap(area,onTap){
   const box=$("#map-"+area);if(!box)return;const svg=$("svg",box);const B=baseLayers();const [x0,y0,x1,y1]=B.bounds;const full=[x0,y0,x1-x0,y1-y0];
-  let v=(S.views[area]||full).slice();S.focus=S.focus||{};svg.dataset.hole=S.focus[area]||"";
+  let v=(S.views[area]||full).slice();S.focus=S.focus||{};S.allv=S.allv||{};svg.dataset.hole=S.focus[area]||"";
+  const ar=()=>{const r=box.getBoundingClientRect();return r.width>0&&r.height>0?r.height/r.width:full[3]/full[2]};
+  const fitAll=()=>{const a=ar();let w=full[2],h=w*a;if(h<full[3]){h=full[3];w=h/a}v=[x0+full[2]/2-w/2,y0+full[3]/2-h/2,w,h];apply();S.allv[area]=true};
+  const centre=(nv)=>{const cx=nv[0]+nv[2]/2,cy=nv[1]+nv[3]/2;v=[0,0,nv[2],nv[2]*ar()];v[0]=cx-v[2]/2;v[1]=cy-v[3]/2;clamp();apply()};
   const apply=()=>{svg.setAttribute("viewBox",v.map(n=>n.toFixed(1)).join(" "));S.views[area]=v.slice();const z=full[2]/v[2];
     const scr=Math.max(1,full[2]/(svg.getBoundingClientRect().width||full[2]));svg.dataset.z=z>=1.9*Math.max(1,scr*.7)?"2":"1";
     const k=v[2]/full[2],pf=Math.max(1,scr*.5)*Math.max(.35,k),f=Math.max(1,scr*1.05);
@@ -578,28 +599,29 @@ function wireMap(area,onTap){
     $$(".bn",svg).forEach(t=>{t.setAttribute("font-size",(10*f*k).toFixed(2));t.setAttribute("stroke-width",(2.4*f*k).toFixed(2));t.style.opacity=(z>=thr||(focus&&t.dataset.h===focus&&z>1.4))?"1":"0"});
     $$(".hn",svg).forEach(t=>t.setAttribute("font-size",(13*Math.max(1,scr*.85)*Math.sqrt(k)).toFixed(2)));
     $$(".pit",svg).forEach(r=>{const h=Number(r.dataset.s||4.2)*pf,x=Number(r.dataset.x),y=Number(r.dataset.y);r.setAttribute("x",(x-h).toFixed(2));r.setAttribute("y",(y-h).toFixed(2));r.setAttribute("width",(h*2).toFixed(2));r.setAttribute("height",(h*2).toFixed(2))})};
-  const clamp=()=>{v[2]=Math.min(full[2]*1.05,Math.max(full[2]/12,v[2]));v[3]=v[2]*full[3]/full[2];v[0]=Math.min(x1-v[2]*.3,Math.max(x0-v[2]*.7,v[0]));v[1]=Math.min(y1-v[3]*.3,Math.max(y0-v[3]*.7,v[1]))};
-  const zoomAt=(f,cx,cy)=>{const nw=v[2]*f,nh=v[3]*f;v=[cx-(cx-v[0])*f,cy-(cy-v[1])*f,nw,nh];clamp();apply()};
+  const clamp=()=>{const a=ar();v[2]=Math.min(Math.max(full[2],full[3]/a)*1.05,Math.max(full[2]/12,v[2]));v[3]=v[2]*a;v[0]=Math.min(x1-v[2]*.3,Math.max(x0-v[2]*.7,v[0]));v[1]=Math.min(y1-v[3]*.3,Math.max(y0-v[3]*.7,v[1]))};
+  const zoomAt=(f,cx,cy)=>{S.allv[area]=false;const nw=v[2]*f,nh=v[3]*f;v=[cx-(cx-v[0])*f,cy-(cy-v[1])*f,nw,nh];clamp();apply()};
   const toSvg=(clientX,clientY)=>{const r=svg.getBoundingClientRect();return[v[0]+(clientX-r.left)/r.width*v[2],v[1]+(clientY-r.top)/r.height*v[3]]};
-  apply();
-  S.mapApi[area]={set(nv){v=nv.slice();clamp();apply()}};
-  $$(".ctl button",box).forEach(b=>b.onclick=e=>{e.stopPropagation();const z=b.dataset.z;if(z==="all"){v=full.slice();svg.dataset.hole=S.focus[area]="";apply();const s=$(`select[data-hole="${area}"]`);if(s)s.value="";return}zoomAt(z==="in"?.6:1/.6,v[0]+v[2]/2,v[1]+v[3]/2)});
-  const sel=$(`select[data-hole="${area}"]`);if(sel&&S.focus[area])sel.value=S.focus[area];if(sel)sel.onchange=()=>{const h=B.holes[sel.value];svg.dataset.hole=S.focus[area]=h?sel.value:"";if(!h){v=full.slice();apply();return}
+  if(S.views[area]&&!S.allv[area])centre(v);else fitAll();
+  S.mapApi[area]={set(nv){S.allv[area]=false;centre(nv)},refit(){if(S.allv[area])fitAll();else centre(v)}};
+  $$(".ctl button",box).forEach(b=>b.onclick=e=>{e.stopPropagation();const z=b.dataset.z;if(z==="big"){if(S.big===area)closeBig();else setBig(area);return}if(z==="all"){svg.dataset.hole=S.focus[area]="";fitAll();const s=$(`select[data-hole="${area}"]`);if(s)s.value="";return}zoomAt(z==="in"?.6:1/.6,v[0]+v[2]/2,v[1]+v[3]/2)});
+  const sel=$(`select[data-hole="${area}"]`);if(sel&&S.focus[area])sel.value=S.focus[area];if(sel)sel.onchange=()=>{const h=B.holes[sel.value];svg.dataset.hole=S.focus[area]=h?sel.value:"";if(!h){fitAll();return}
     const xs=[h.g[0],h.t[0]],ys=[h.g[1],h.t[1]];const pad=60;let bx0=Math.min(...xs)-pad,bx1=Math.max(...xs)+pad,by0=Math.min(...ys)-pad,by1=Math.max(...ys)+pad;
     if(opts_greenFocus[area]){bx0=h.g[0]-70;bx1=h.g[0]+70;by0=h.g[1]-50;by1=h.g[1]+50}
-    let w=bx1-bx0,hh=by1-by0;const ar=full[2]/full[3];if(w/hh<ar){w=hh*ar}else{hh=w/ar}v=[(bx0+bx1)/2-w/2,(by0+by1)/2-hh/2,w,hh];clamp();apply()};
+    let w=bx1-bx0,hh=by1-by0;const wr=1/ar();if(w/hh<wr){w=hh*wr}else{hh=w/wr}S.allv[area]=false;v=[(bx0+bx1)/2-w/2,(by0+by1)/2-hh/2,w,hh];clamp();apply()};
   box.addEventListener("wheel",e=>{e.preventDefault();const [cx,cy]=toSvg(e.clientX,e.clientY);zoomAt(e.deltaY>0?1.15:1/1.15,cx,cy)},{passive:false});
   const pts=new Map();let moved=false,start=null,pinch=null,lastTap=0;
   box.addEventListener("pointerdown",e=>{if(e.target.closest(".ctl"))return;box.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=false;start={x:e.clientX,y:e.clientY,v:v.slice(),target:e.target};
     if(pts.size===2){const [a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),v:v.slice(),c:toSvg((a[0]+b[0])/2,(a[1]+b[1])/2)}}});
   box.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,[e.clientX,e.clientY]);
-    if(pts.size===2&&pinch){const [a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);const f=pinch.d/d;v=pinch.v.slice();const [cx,cy]=pinch.c;v=[cx-(cx-v[0])*f,cy-(cy-v[1])*f,v[2]*f,v[3]*f];clamp();apply();moved=true;return}
-    if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;if(!moved)return;const r=svg.getBoundingClientRect();v=[start.v[0]-dx/r.width*v[2],start.v[1]-dy/r.height*v[3],v[2],v[3]];clamp();apply()});
+    if(pts.size===2&&pinch){const [a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);const f=pinch.d/d;v=pinch.v.slice();const [cx,cy]=pinch.c;v=[cx-(cx-v[0])*f,cy-(cy-v[1])*f,v[2]*f,v[3]*f];clamp();apply();moved=true;S.allv[area]=false;return}
+    if(!start)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;if(!moved)return;const r=svg.getBoundingClientRect();v=[start.v[0]-dx/r.width*v[2],start.v[1]-dy/r.height*v[3],v[2],v[3]];clamp();apply();S.allv[area]=false});
   const up=e=>{const had=pts.has(e.pointerId);pts.delete(e.pointerId);if(pts.size<2)pinch=null;if(!had)return;
     if(!moved&&start&&pts.size===0){const now=Date.now();const t=document.elementFromPoint(e.clientX,e.clientY);const hit=t&&t.closest("[data-tap]");
       if(hit&&onTap){onTap(hit.dataset.tap,hit)}else if(now-lastTap<320){const [cx,cy]=toSvg(e.clientX,e.clientY);zoomAt(.5,cx,cy)}lastTap=now}
     if(pts.size===0)start=null};
   box.addEventListener("pointerup",up);box.addEventListener("pointercancel",up);
+  const done=$("[data-bigdone]",box.closest(".mapwrap"));if(done)done.onclick=closeBig;
 }
 const opts_greenFocus={topdressing:true};
 
@@ -629,8 +651,9 @@ function pinsSvg(area,pins){const ord={High:0,Medium:1,Low:2};pins=pins.slice().
 
 /* ------------------------------------------------------------------ IRRIGATION */
 /* the hardware and mainline map (hardware/index.html) on the front tab: pins, valves, the isolation finder */
-function viewEmbed(k){const a=AREAS[k];return `<div class="card mapcard" data-embed="${k}"><iframe src="${a.embed}" title="${esc(a.embedTitle)}" allow="geolocation"></iframe></div><p class="note" style="margin:-6px 4px 0"><a href="${a.embed}" target="_blank" rel="noopener">Open full screen</a></p>`}
-function viewMap(){return `<div class="card mapcard"><iframe src="../hardware/?embed=1" title="Course map: hardware, problems and the mainline" allow="geolocation"></iframe></div><p class="note" style="margin:-6px 4px 0">Problems and hardware pinned by the crew, and the mainline with its valves: tap Mainline, then Find valves to shut. <a href="../hardware/" target="_blank" rel="noopener">Open full screen</a></p>`}
+function mapHead(k,title){return `<div class="mhead"><b>${esc(title)}</b><button class="btn small mexp" data-big="e:${k}">${ICON.expand}Full screen</button><button class="btn small primary mdone" data-bigdone>Done</button></div>`}
+function viewEmbed(k){const a=AREAS[k];return `<div class="card mapcard" data-embed="${k}" data-mc="${k}">${mapHead(k,a.label==="Safety"?"Safety":a.label+" map")}<iframe src="${a.embed}" title="${esc(a.embedTitle)}" allow="geolocation"></iframe></div><p class="note" style="margin:-6px 4px 0"><a href="${a.embed}" target="_blank" rel="noopener">Open full screen</a></p>`}
+function viewMap(){return `<div class="card mapcard" data-mc="map">${mapHead("map","Course map")}<iframe src="../hardware/?embed=1" title="Course map: hardware, problems and the mainline" allow="geolocation"></iframe></div><p class="note" style="margin:-6px 4px 0">Problems and hardware pinned by the crew, and the mainline with its valves: tap Mainline, then Find valves to shut. <a href="../hardware/" target="_blank" rel="noopener">Open full screen</a></p>`}
 function viewIrrigation(){
   const d=S.data.irrigation;if(!d)return noData("irrigation");const jobs=jobsOf("irrigation");const open=jobs.filter(isOpen);
   const flow=(d.flow||[]).map(f=>f.reported);const fixed30=jobs.filter(j=>j.status==="Done"&&daysAgo(j.done)!=null&&daysAgo(j.done)<=30).length;
@@ -822,7 +845,18 @@ let sheetOnClose=null;
 function openSheet(html,wire){$("#sheetBody").innerHTML=html;$("#sheet").hidden=false;document.body.style.overflow="hidden";wire&&wire();const f=$("#sheetBody input:not([hidden]),#sheetBody button");}
 function closeSheet(){$("#sheet").hidden=true;document.body.style.overflow="";if(sheetOnClose){sheetOnClose();sheetOnClose=null}}
 $$("#sheet [data-close]").forEach(b=>b.onclick=closeSheet);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(!$("#full").hidden)closeFull()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(!$("#full").hidden)closeFull();else if(S.big)closeBig()}});
+/* full screen maps: a course map (area key) or an embedded page ("e:"+tab). The back button closes it. */
+S.big=null;
+function bigEl(k){return k.startsWith("e:")?$(`#view .mapcard[data-mc="${k.slice(2)}"]`):$(`#view .mapwrap[data-mw="${k}"]`)}
+function setBig(k){if(S.big)unBig();S.big=k;const el=bigEl(k);if(el)el.classList.add("big");document.body.classList.add("bigmap");
+  if(!(history.state&&history.state.big))history.pushState({big:k},"",location.href);bigCtl(k);requestAnimationFrame(()=>{if(S.mapApi[k])S.mapApi[k].refit()})}
+function unBig(){const k=S.big;S.big=null;$$("#view .mapwrap.big,#view .mapcard.big").forEach(x=>x.classList.remove("big"));document.body.classList.remove("bigmap");
+  if(k){bigCtl(k);requestAnimationFrame(()=>{if(S.mapApi[k])S.mapApi[k].refit()})}}
+function bigCtl(k){if(k.startsWith("e:"))return;const b=$(`#map-${k} .ctl [data-z="big"]`);if(b){const on=S.big===k;b.innerHTML=on?ICON.shrink:ICON.expand;b.setAttribute("aria-label",on?"Smaller map":"Full screen map")}}
+function closeBig(){if(!S.big)return;if(history.state&&history.state.big)history.back();else unBig()}
+window.addEventListener("popstate",()=>{if(S.big)unBig()});
+window.addEventListener("resize",()=>{if(S.big&&S.mapApi[S.big])S.mapApi[S.big].refit()});
 let toastT=null;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3600)}
 function openFull(area){const a=AREAS[area];$("#fullTitle").textContent=a.label+" · 3D map & history";$("#fullOpen").href=a.full;$("#fullFrame").src=a.full;$("#full").hidden=false;document.body.style.overflow="hidden"}
 function closeFull(){$("#full").hidden=true;$("#fullFrame").src="about:blank";document.body.style.overflow="";if(S.tab==="keys"){loadKeys().then(()=>{if(S.tab==="keys")render()})}}
@@ -859,6 +893,7 @@ function wire(){
   $$("[data-act=stocktake]").forEach(b=>b.onclick=()=>stocktakeSheet(b.dataset.area));
   $$("[data-act=delivery]").forEach(b=>b.onclick=()=>deliverySheet(b.dataset.area));
   $$("[data-act=full]").forEach(b=>b.onclick=()=>openFull(b.dataset.area));
+  $$("[data-big]").forEach(b=>b.onclick=()=>setBig(b.dataset.big));$$(".mapcard [data-bigdone]").forEach(b=>b.onclick=closeBig);
   $$("[data-sub]").forEach(b=>b.onclick=()=>{S.sub=b.dataset.sub;history.replaceState(null,"","#grounds-"+S.sub);LS.set("sub",S.sub);render()});
   $$("[data-pickjob]").forEach(a=>a.onclick=e=>{e.preventDefault();pickJob(S.tab,a.dataset.pickjob)});
   $$(".job[data-job]").forEach(r=>r.addEventListener("click",e=>{if(e.target.closest("a"))return;pickJob(S.tab,r.dataset.job,true)}));
