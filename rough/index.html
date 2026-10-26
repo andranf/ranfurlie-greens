@@ -131,6 +131,37 @@ a{color:var(--tank-deep)}
 .tick{display:grid;place-items:center;border-radius:50%;background:#fff;color:#13a356;border:2px solid #13a356;font-weight:800;font-size:13px;box-shadow:0 1px 4px #0006}
 .foot{margin:0;color:var(--faint);font-size:12px}
 .loading{padding:30px;text-align:center;color:var(--muted)}
+/* v2: tick off from the map, weekly mowing, seeding with mixes */
+.tick.sd{color:#fff;background:#1f9d5b;border-color:#fff}
+.tick.old{color:#8a6a00;border-color:#e3ad2f}
+.acts{display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:var(--r2);background:var(--chip);box-shadow:inset 0 0 0 1px var(--line)}
+.acts h3{font-size:22px}
+.btn{border:0;border-radius:14px;padding:12px 16px;min-height:52px;font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:.02em;cursor:pointer;background:var(--go);color:#fff;box-shadow:0 6px 16px -8px rgba(19,163,86,.8)}
+.btn.sd{background:#1f9d5b}
+.btn.alt{background:var(--glass-hi);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line);font-size:17px;min-height:44px}
+.btn.sm{min-height:34px;padding:4px 12px;font-size:15px}
+.btn:active{transform:scale(.98)}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted);min-width:0}
+.fld select,.fld input{font:inherit;font-size:16px;color:var(--fg);background:var(--glass-hi);border:0;border-radius:12px;padding:10px 12px;box-shadow:inset 0 0 0 1px var(--line);width:100%;min-width:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.calc{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.calc b{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;color:var(--go)}
+.calc span{color:var(--muted);font-size:14px;font-weight:600}
+.hint{margin:0;font-size:13px;color:var(--muted)}
+.okmsg{margin:0;padding:10px 12px;border-radius:12px;background:var(--go-soft);font-weight:700}
+.sw2{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:var(--r2);background:var(--chip);box-shadow:inset 0 0 0 1px var(--line)}
+.sw2 b{display:block}.sw2 small{color:var(--muted)}
+.tg{flex:0 0 auto;width:54px;height:32px;border-radius:99px;border:0;background:var(--line);position:relative;cursor:pointer}
+.tg::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0005;transition:left .2s}
+.tg[aria-checked="true"]{background:#1f9d5b}.tg[aria-checked="true"]::after{left:25px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mixrow{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)}
+.mixrow b{font-variant-numeric:tabular-nums}
+.hist li{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hist .pend{color:var(--warn);font-weight:700;font-size:12px}
+.who{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.who button{border:0;background:none;color:var(--tank-deep);font-weight:700;cursor:pointer;padding:0}
+#outbox{background:rgba(255,188,69,.25)}
 
 @media (max-width: 900px){
   .grid{grid-template-columns:1fr}
@@ -153,6 +184,7 @@ a{color:var(--tank-deep)}
     <div class="row1">
       <div class="brand"><h1>Rough <span>Plan</span></h1><p>Ranfurlie &middot; summer 2026&ndash;27 &middot; crew view</p></div>
       <span class="pill" id="upd">Loading&hellip;</span>
+      <span class="pill" id="outbox" hidden><span></span></span>
     </div>
     <nav class="holes" id="holes" aria-label="Choose a hole"></nav>
   </div>
@@ -164,8 +196,9 @@ a{color:var(--tank-deep)}
     <div class="legend">
       <span><i class="sw mow"></i>Mow (4300)</span>
       <span><i class="sw surr"></i>Surrounds mower to bunker edge</span>
-      <span><i class="sw grow"></i>Let grow</span>
+      <span id="lgGrow"><i class="sw grow"></i>Let grow</span>
       <span><i class="sw seed"></i>Fescue seeding</span>
+      <span>✓ mown this week · 🌱 seeded</span>
     </div>
   </section>
   <aside class="glass side" id="side" aria-live="polite"><p class="loading">Loading the plan&hellip;</p></aside>
@@ -203,15 +236,79 @@ a{color:var(--tank-deep)}
   const holeLabel = (h) => h === 'other' ? 'Practice & other' : 'Hole ' + h;
   const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 
-  let course, data;
+  // ---------- v2: live ticks from the map (Zapier hook -> rough/live.json), weekly mowing, seeding ----------
+  const HOOK = 'https://hooks.zapier.com/hooks/catch/18429017/GrEKprgQv0KYjuXL/';
+  const TEST = /[?&]test=1/.test(location.search);
+  const LS = {
+    get(k, d) { try { const v = localStorage.getItem('rough.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('rough.' + k, JSON.stringify(v)); } catch (e) {} },
+  };
+  const DEFAULT_MIXES = [{ name: 'Ranfurlie rough mix', rate: 35, min: 30, max: 40, use: 'Rough and no-mow' }];
+  const getLive = () => fetch('live.json?t=' + Date.now()).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  let course, data, live;
   try {
-    [course, data] = await Promise.all([fetch('course.json').then((r) => r.json()), fetch('data.json?t=' + Date.now()).then((r) => r.json())]);
+    [course, data, live] = await Promise.all([fetch('course.json').then((r) => r.json()), fetch('data.json?t=' + Date.now()).then((r) => r.json()), getLive()]);
   } catch (e) { $('#side').textContent = 'Couldn’t load the plan. Pull down to refresh.'; return; }
+  live = live || { ticks: [], mixes: [], settings: {} };
   const [S0, W0, N0, E0] = course.bounds;
   const areas = data.areas.map((a) => Object.assign(a, { bb: bboxOf(a.g) }));
   const byId = Object.fromEntries(areas.map((a) => [a.id, a]));
-  const ticks = (data.ticks || []).slice().sort((a, b) => (a.at < b.at ? 1 : -1));
+  let ticks = [];
+  function buildTicks() {
+    const m = new Map();
+    for (const t of data.ticks || []) m.set(t.id || 'p-' + t.area + t.at, Object.assign({}, t));
+    for (const t of live.ticks || []) {
+      if (t.test && !TEST) continue;
+      if (t.undone) { m.delete(t.id); continue; }
+      m.set(t.id, { id: t.id, area: t.area, kind: t.act, at: t.at, by: t.by, m2: t.m2, mix: t.mix, rate: t.rate, kg: t.kg, part: t.part, map: true });
+    }
+    const liveIds = new Set((live.ticks || []).map((t) => t.id));
+    const mine = LS.get('mine', []).filter((t) => !liveIds.has(t.id) && Date.now() - Date.parse(t.at) < 3 * 864e5);
+    LS.set('mine', mine.concat(LS.get('mine', []).filter((t) => liveIds.has(t.id) && Date.now() - Date.parse(t.at) < 864e5)));
+    for (const t of mine) { if (t.undone) { m.delete(t.id); continue; } if (!m.has(t.id)) m.set(t.id, Object.assign({ pending: true }, t)); }
+    for (const id of LS.get('undone', [])) m.delete(id);
+    ticks = [...m.values()].filter((t) => byId[t.area]).sort((a, b) => (a.at < b.at ? 1 : -1));
+  }
+  buildTicks();
   const lastOf = (id, kind) => ticks.find((t) => t.area === id && t.kind === kind) || null;
+  const mixes = () => { const out = []; for (const m of [...DEFAULT_MIXES, ...(data.mixes || []), ...((live.mixes || []).filter((x) => !x.test || TEST))]) { const i = out.findIndex((o) => o.name.toLowerCase() === m.name.toLowerCase()); if (i >= 0) out[i] = Object.assign({}, out[i], m); else out.push(m); } return out; };
+  const growAsSeed = () => !!(live.settings && live.settings.growAsSeed);
+  const asSeed = (a) => a.type === 'seed' || (a.type === 'grow' && (growAsSeed() || !!lastOf(a.id, 'seed')));
+  const effType = (a) => (asSeed(a) ? 'seed' : a.type);
+  const weekStart = (() => { const d = new Date(dayKey(Date.now()) + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); return d.toISOString().slice(0, 10); })();
+  const thisWeek = (iso) => dayKey(iso) >= weekStart;
+  const byWho = (t) => (t && t.by ? ' · ' + t.by : '');
+  const kgFmt = (n) => (n >= 100 ? Math.round(n).toLocaleString('en-AU') : (Math.round(n * 10) / 10).toLocaleString('en-AU'));
+  const myName = () => LS.get('name', '');
+  function askName() { let n = myName(); if (n) return n; n = (prompt('Your first name (saved on this phone)') || '').trim().slice(0, 30); if (n) LS.set('name', n); return n; }
+  function outbox() { return LS.get('outbox', []); }
+  function showOutbox() { const n = outbox().length; const el = $('#outbox'); el.hidden = !n; if (n) el.firstChild.textContent = n + ' waiting to send'; }
+  let flushing = false;
+  function flush() {
+    if (flushing) return; const a = outbox(); if (!a.length) return; flushing = true; const item = a[0];
+    const body = new URLSearchParams(); Object.keys(item).forEach((k) => body.append(k, item[k] == null ? '' : String(item[k])));
+    fetch(HOOK, { method: 'POST', mode: 'no-cors', body }).then(() => { const b = outbox(); b.shift(); LS.set('outbox', b); flushing = false; showOutbox(); flush(); }, () => { flushing = false; showOutbox(); });
+  }
+  function send(p) { p.sent_at = new Date().toISOString(); if (TEST) p.__test = '1'; LS.set('outbox', outbox().concat([p])); showOutbox(); flush(); }
+  addEventListener('online', flush); setInterval(flush, 30000); showOutbox(); flush();
+  const newId = () => 'TK-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
+  function tickArea(a, act, extra) {
+    const by = askName(); if (!by) return false;
+    const t = Object.assign({ id: newId(), area: a.id, kind: act, at: new Date().toISOString(), by }, extra || {});
+    LS.set('mine', LS.get('mine', []).concat([t]));
+    send(Object.assign({ kind: 'tick', id: t.id, area: a.id, name: a.name, hole: a.hole, type: a.type, act, at: t.at, by }, extra || {}));
+    buildTicks(); restyle(); render(); return true;
+  }
+  function undoTick(t) {
+    if (!confirm('Take back this tick?')) return;
+    const mine = LS.get('mine', []); const i = mine.findIndex((x) => x.id === t.id); if (i >= 0) { mine[i].undone = true; LS.set('mine', mine); }
+    LS.set('undone', LS.get('undone', []).concat([t.id]).slice(-200));
+    if (/^TK-/.test(t.id)) send({ kind: 'undo', id: t.id, by: askName() || 'Someone' });
+    buildTicks(); restyle(); render();
+  }
+  async function refreshLive() { const l = await getLive(); if (l) { live = l; buildTicks(); restyle(); if (!document.querySelector('#side input:focus,#side select:focus')) render(); } }
+  setInterval(() => { if (document.visibilityState === 'visible') refreshLive(); }, 120000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshLive(); });
   const holes = [...new Set(areas.map((a) => a.hole))].sort((a, b) => (a === 'other') - (b === 'other') || (+a) - (+b));
   $('#upd').innerHTML = ''; $('#upd').append('Updated ', el('b', null, fmtWhen(data.updated)));
 
@@ -247,7 +344,7 @@ a{color:var(--tank-deep)}
     lyr.addTo(map); layers[a.id] = lyr;
   }
   function styleOf(a, sel, dim) {
-    if (a.type === 'seed') return { color: sel ? '#ff5a36' : TYPE.seed.col, weight: sel ? 3 : 1.6, opacity: dim ? .3 : 1, fillColor: 'url(#seedHatch)', fillOpacity: dim ? .25 : 1, dashArray: '4 3' };
+    if (effType(a) === 'seed') return { color: sel ? '#ff5a36' : TYPE.seed.col, weight: sel ? 3 : 1.6, opacity: dim ? .3 : 1, fillColor: 'url(#seedHatch)', fillOpacity: dim ? .25 : 1, dashArray: '4 3' };
     const c = TYPE[a.type].col;
     return { color: sel ? '#ff5a36' : c, weight: sel ? 3.5 : a.type === 'grow' ? 1.2 : 2, opacity: dim ? .3 : .95, fillColor: c,
       fillOpacity: dim ? .1 : sel ? .6 : a.type === 'grow' ? .4 : a.type === 'surr' ? .5 : .45, dashArray: a.type === 'surr' ? '3 3' : null };
@@ -256,12 +353,15 @@ a{color:var(--tank-deep)}
     for (const a of areas) { const sel = a.id === state.area, dim = state.hole && a.hole !== state.hole; layers[a.id].setStyle(styleOf(a, sel, dim)); }
     if (state.area && layers[state.area]) layers[state.area].bringToFront();
     tickLayer.clearLayers();
+    $('#lgGrow').hidden = growAsSeed();
     for (const a of areas) {
-      if (a.type !== 'mow' && a.type !== 'seed') continue;
-      const l = lastOf(a.id, a.type === 'seed' ? 'seed' : 'mow'); if (!l || (a.type === 'mow' && dayKey(l.at) !== today)) continue;
       if (state.hole && a.hole !== state.hole) continue;
+      let cls = null, html = '✓';
+      if (a.type === 'mow') { const l = lastOf(a.id, 'mow'); if (l && thisWeek(l.at)) cls = 'tick'; }
+      else if (asSeed(a)) { const l = lastOf(a.id, 'seed'); if (l) { cls = 'tick sd'; html = '🌱'; } }
+      if (!cls) continue;
       const c = labelPoint(a);
-      L.marker([c[1], c[0]], { interactive: false, keyboard: false, icon: L.divIcon({ className: 'tick', html: '✓', iconSize: [20, 20], iconAnchor: [10, 10] }) }).addTo(tickLayer);
+      L.marker([c[1], c[0]], { interactive: false, keyboard: false, icon: L.divIcon({ className: cls, html, iconSize: [22, 22], iconAnchor: [11, 11] }) }).addTo(tickLayer);
     }
   }
   function labelPoint(a) { // a point on the area's biggest ring, so ticks sit on the area itself
@@ -299,14 +399,14 @@ a{color:var(--tank-deep)}
     if (narrow() && (state.area || fromMap)) $('#side').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   }
   function statusOf(a) {
-    if (a.type === 'mow') { const l = lastOf(a.id, 'mow'); return l ? { t: 'Mown ' + fmtWhen(l.at), ok: dayKey(l.at) === today } : { t: 'Not ticked off yet' }; }
-    if (a.type === 'seed') { const l = lastOf(a.id, 'seed'); return l ? { t: 'Seeded ' + fmtWhen(l.at), ok: true } : { t: 'Not seeded yet' }; }
+    if (a.type === 'mow') { const l = lastOf(a.id, 'mow'); if (l && thisWeek(l.at)) return { t: 'Mown ' + fmtWhen(l.at) + byWho(l), ok: true }; return l ? { t: 'Not this week · last ' + fmtWhen(l.at) + byWho(l) } : { t: 'Not mown yet' }; }
+    if (asSeed(a)) { const l = lastOf(a.id, 'seed'); return l ? { t: 'Seeded ' + fmtWhen(l.at) + byWho(l) + (l.kg ? ' · ' + kgFmt(l.kg) + ' kg' : ''), ok: true } : { t: a.type === 'grow' ? 'No-mow, ready to seed' : 'Not seeded yet' }; }
     if (a.type === 'surr') return { t: 'Surrounds / fairway mower' };
     return { t: 'Let grow' };
   }
   function areaRow(a) {
     const b = el('button', 'rowb'); b.type = 'button';
-    const sw = el('i', 'sw ' + a.type);
+    const sw = el('i', 'sw ' + effType(a));
     const nm = el('span', 'nm', a.name); const st = statusOf(a); const sm = el('small', st.ok ? 'ok' : null, st.t + (a.note ? ' · note' : '')); nm.appendChild(sm);
     const [v, u] = fmtArea(a.area); const ar = el('span', 'ar', v + ' ' + u);
     b.append(sw, nm, ar); b.addEventListener('click', () => go({ area: a.id })); return b;
@@ -317,25 +417,59 @@ a{color:var(--tank-deep)}
     return ul;
   }
   function report() {
-    const p = el('p', 'report'); p.append(el('b', null, 'Finished an area? '), 'Post it in #rough, e.g. “4300 done 1, 2, 3” or “seeded 9 Seed 2”. It’s ticked off here within a couple of hours.');
+    const p = el('p', 'report'); p.append(el('b', null, 'Finished an area? '), 'Tap it on the map and press Mown or Seeded. It shows for everyone in about a minute. Posting in #rough still works too.');
     return p;
+  }
+  function whoLine() {
+    const w = el('div', 'who'); const n = myName();
+    w.append(el('span', null, n ? 'Ticking off as ' + n : 'You’ll be asked your name once'));
+    if (n) { const b = el('button', null, 'Not you?'); b.type = 'button'; b.addEventListener('click', () => { LS.set('name', ''); askName(); render(); }); w.append(b); }
+    return w;
+  }
+  function seedStats() {
+    const seeds = ticks.filter((t) => t.kind === 'seed');
+    const box = el('div', 'acts'); box.append(el('h3', null, 'Seeding this season'));
+    if (!seeds.length) { box.append(el('p', 'hint', 'Nothing seeded yet. Tap a seed or no-mow area to log seeding; the kilos are worked out from the area and rate.')); return box; }
+    const kg = seeds.reduce((s, t) => s + (t.kg || 0), 0), m2 = seeds.reduce((s, t) => s + (t.m2 || byId[t.area].area || 0), 0);
+    const stats = el('div', 'stats'); const f = (k, v, u) => { const d = el('div', 'fact'); d.append(el('span', 'k', k)); const vv = el('span', 'v', v); if (u) vv.append(el('small', null, u)); d.append(vv); stats.append(d); };
+    const [av, au] = fmtArea(m2); f('Seed used', kgFmt(kg), 'kg'); f('Area seeded', av, au); f('Areas', String(new Set(seeds.map((t) => t.area)).size));
+    box.append(stats);
+    const by = {}; for (const t of seeds) { const k = t.mix || 'Mix not recorded'; by[k] = by[k] || { kg: 0, m2: 0, n: 0 }; by[k].kg += t.kg || 0; by[k].m2 += t.m2 || 0; by[k].n++; }
+    for (const [k, v] of Object.entries(by).sort((x, y) => y[1].kg - x[1].kg)) { const r = el('div', 'mixrow'); r.append(el('span', null, k + ' · ' + v.n + (v.n === 1 ? ' area' : ' areas')), el('b', null, kgFmt(v.kg) + ' kg')); box.append(r); }
+    const mon = {}; for (const t of seeds) { const k = new Date(t.at).toLocaleDateString('en-AU', { timeZone: TZ, month: 'short', year: 'numeric' }); mon[k] = (mon[k] || 0) + (t.kg || 0); }
+    if (Object.keys(mon).length > 1) box.append(el('p', 'hint', 'By month: ' + Object.entries(mon).map(([k, v]) => k + ' ' + kgFmt(v) + ' kg').join(' · ')));
+    box.append(el('p', 'eyebrow', 'Latest'));
+    const ul = el('ul', 'hist');
+    for (const t of seeds.slice(0, 6)) { const li = el('li'); const a = byId[t.area]; const s = el('span', null, a.name + ' · ' + fmtWhen(t.at) + byWho(t)); li.append(s, el('b', null, t.kg ? kgFmt(t.kg) + ' kg' : '')); li.style.cursor = 'pointer'; li.addEventListener('click', () => go({ area: a.id })); ul.append(li); }
+    box.append(ul); return box;
+  }
+  function growToggle() {
+    const w = el('div', 'sw2'); const t = el('span'); t.append(el('b', null, 'No-mow areas are seed areas'), el('small', null, growAsSeed() ? 'On: every no-mow area shows as a seed area' : 'Off: no-mow areas are left to grow'));
+    const b = el('button', 'tg'); b.type = 'button'; b.setAttribute('role', 'switch'); b.setAttribute('aria-checked', String(growAsSeed())); b.setAttribute('aria-label', 'No-mow areas are seed areas');
+    b.addEventListener('click', () => {
+      const on = !growAsSeed(); if (!confirm(on ? 'Switch every no-mow area to a seed area for everyone?' : 'Switch no-mow areas back to let grow for everyone?')) return;
+      const by = askName(); if (!by) return; live.settings = Object.assign({}, live.settings, { growAsSeed: on }); send({ kind: 'setting', growAsSeed: on ? '1' : '0', by }); restyle(); render();
+    });
+    w.append(t, b); return w;
   }
   function render() {
     const side = $('#side'); side.textContent = '';
     if (state.area) return renderArea(side, byId[state.area]);
     if (state.hole) return renderHole(side, state.hole);
     side.append(el('p', 'eyebrow', 'Whole course'), el('h2', null, 'Rough this summer'));
-    const mows = areas.filter((a) => a.type === 'mow'), done = mows.filter((a) => { const l = lastOf(a.id, 'mow'); return l && dayKey(l.at) === today; });
-    const pr = el('div', 'prog'); const big = el('span', 'big', done.length + ' of ' + mows.length); big.append(el('small', null, '4300 laps done today'));
+    const mows = areas.filter((a) => a.type === 'mow'), done = mows.filter((a) => { const l = lastOf(a.id, 'mow'); return l && thisWeek(l.at); });
+    const pr = el('div', 'prog'); const big = el('span', 'big', done.length + ' of ' + mows.length); big.append(el('small', null, '4300 laps done this week'));
     const m = el('div', 'meter'); const bar = el('i'); bar.style.width = (mows.length ? Math.round(100 * done.length / mows.length) : 0) + '%'; m.appendChild(bar);
-    pr.append(big, m); side.append(pr, rules(), report());
+    const left = mows.filter((a) => !done.includes(a)).map((a) => a.hole === 'other' ? 'Practice' : a.hole);
+    pr.append(big, m, el('small', null, 'Week from Mon ' + new Date(weekStart + 'T12:00:00Z').toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) + ' · starts again each Monday' + (left.length && left.length < mows.length ? ' · still to do: ' + left.join(', ') : '')));
+    side.append(pr, seedStats(), growToggle(), rules(), report());
     const list = el('div', 'list'); side.append(el('p', 'eyebrow', 'Holes'), list);
     for (const h of holes) {
       const b = el('button', 'rowb'); b.type = 'button';
       const tag = el('span', 'tag', h === 'other' ? 'P' : h);
       const hm = areas.filter((a) => a.hole === h && a.type === 'mow'); const l = hm.map((a) => lastOf(a.id, 'mow')).filter(Boolean).sort((x, y) => (x.at < y.at ? 1 : -1))[0];
-      const nm = el('span', 'nm', holeLabel(h)); const okToday = l && dayKey(l.at) === today;
-      nm.append(el('small', okToday ? 'ok' : null, hm.length ? (l ? '4300 lap ' + fmtWhen(l.at) : '4300 lap not ticked yet') : 'No 4300 lap'));
+      const nm = el('span', 'nm', holeLabel(h)); const okWk = l && thisWeek(l.at);
+      nm.append(el('small', okWk ? 'ok' : null, hm.length ? (l ? (okWk ? '4300 lap ' : 'Not this week · last ') + fmtWhen(l.at) + byWho(l) : '4300 lap not mown yet') : 'No 4300 lap'));
       b.append(tag, nm, el('span', 'chev', '›')); b.addEventListener('click', () => go({ hole: h }, false, true)); list.appendChild(b);
     }
     side.append(el('p', 'foot', 'Plan from the Ranfurlie rough plan, updated ' + fmtWhen(data.updated) + '. Aerial: MetroMap, Jan 2026. Areas are flat ground areas.'));
@@ -345,28 +479,85 @@ a{color:var(--tank-deep)}
     side.append(back, el('h2', null, holeLabel(h)));
     const list = el('div', 'list'); const rank = { mow: 0, surr: 1, seed: 2, grow: 3 };
     let last = null;
-    for (const a of areas.filter((x) => x.hole === h).sort((x, y) => rank[x.type] - rank[y.type] || x.name.localeCompare(y.name, 'en', { numeric: true }))) {
-      if (a.type !== last) { list.append(el('p', 'grp', TYPE[a.type].label)); last = a.type; }
+    for (const a of areas.filter((x) => x.hole === h).sort((x, y) => rank[effType(x)] - rank[effType(y)] || x.name.localeCompare(y.name, 'en', { numeric: true }))) {
+      if (effType(a) !== last) { last = effType(a); list.append(el('p', 'grp', TYPE[last].label)); }
       list.append(areaRow(a));
     }
     side.append(list, report());
   }
   function renderArea(side, a) {
     const back = el('button', 'back', '← ' + holeLabel(a.hole)); back.type = 'button'; back.addEventListener('click', () => go({ hole: a.hole }, false, true));
-    side.append(back, el('p', 'eyebrow', holeLabel(a.hole) + ' · ' + TYPE[a.type].label), el('h2', null, a.name), el('p', 'desc', TYPE[a.type].desc));
+    const et = effType(a);
+    side.append(back, el('p', 'eyebrow', holeLabel(a.hole) + ' · ' + TYPE[et].label + (a.type === 'grow' && et === 'seed' ? ' (no-mow)' : '')), el('h2', null, a.name), el('p', 'desc', a.type === 'grow' && et === 'seed' ? 'No-mow area to seed with fescue. Do not mow.' : TYPE[a.type].desc));
+    const acts = actions(a); if (acts) side.append(acts);
     const fig = el('figure', 'pic'); const cv = el('canvas'); cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', a.name + ' on the aerial photo');
     fig.append(cv, el('figcaption', null, 'This area outlined; the rest of the plan faded. Tap the map to zoom in.')); side.append(fig);
     const facts = el('div', 'facts'); const add = (k, v, u) => { const f = el('div', 'fact'); f.append(el('span', 'k', k)); const vv = el('span', 'v', v); if (u) vv.append(el('small', null, u)); f.append(vv); facts.append(f); };
     const [v, u] = fmtArea(a.area); add('Area', v, u);
-    if (a.type === 'mow') { add('4300 travel', '≈ ' + Math.round(a.area / CUT / 10) * 10, 'm'); const l = lastOf(a.id, 'mow'); add('Last mown', l ? fmtWhen(l.at) : 'Not yet'); }
-    else if (a.type === 'seed') { const rate = a.rate ?? (data.seed && data.seed.rate); if (rate) add('Seed', (a.area * rate / 1000).toFixed(1), 'kg'); const l = lastOf(a.id, 'seed'); add('Seeded', l ? fmtWhen(l.at) : 'Not yet'); }
+    if (a.type === 'mow') { add('4300 travel', '≈ ' + Math.round(a.area / CUT / 10) * 10, 'm'); const l = lastOf(a.id, 'mow'); add(l && thisWeek(l.at) ? 'This week' : 'Last mown', l ? fmtWhen(l.at) : 'Not yet'); if (l && l.by) add('By', l.by); }
+    else if (asSeed(a)) { const mx = mixes()[0]; const rate = a.rate ?? (data.seed && data.seed.rate) ?? mx.rate; add('Seed needed', kgFmt(a.area * rate / 1000), 'kg'); const l = lastOf(a.id, 'seed'); add('Seeded', l ? fmtWhen(l.at) : 'Not yet'); if (l && l.kg) add('Used', kgFmt(l.kg), 'kg'); }
     else if (a.type === 'surr') add('Mower', 'Surrounds / fairway'); else add('Mowing', 'None');
     side.append(facts);
     if (a.note) { side.append(el('p', 'eyebrow', 'Notes'), el('p', 'note', a.note)); }
-    const hist = ticks.filter((t) => t.area === a.id).slice(0, 8);
-    if (hist.length) { const ul = el('ul', 'hist'); for (const t of hist) ul.append(el('li', null, (t.kind === 'seed' ? 'Seeded ' : 'Mown ') + fmtWhen(t.at))); side.append(el('p', 'eyebrow', 'History'), ul); }
-    if (a.type === 'mow' || a.type === 'seed') side.append(report());
+    const hist = ticks.filter((t) => t.area === a.id).slice(0, 12);
+    if (hist.length) {
+      const ul = el('ul', 'hist');
+      for (const t of hist) {
+        const li = el('li'); const s = el('span', null, (t.kind === 'seed' ? 'Seeded ' : 'Mown ') + fmtWhen(t.at) + byWho(t) + (t.kind === 'seed' && t.kg ? ' · ' + kgFmt(t.kg) + ' kg' + (t.mix ? ' ' + t.mix : '') : ''));
+        li.append(s);
+        if (t.pending) li.append(el('span', 'pend', 'sending'));
+        else if (/^TK-/.test(t.id || '') && Date.now() - Date.parse(t.at) < 2 * 864e5) { const u = el('button', 'btn alt sm', 'Undo'); u.type = 'button'; u.addEventListener('click', () => undoTick(t)); li.append(u); }
+        ul.append(li);
+      }
+      side.append(el('p', 'eyebrow', 'History'), ul);
+    }
+    if (a.type === 'mow' || asSeed(a)) side.append(report());
     requestAnimationFrame(() => drawPic(cv, a));
+  }
+
+  // ---------- tick-off panel ----------
+  let flash = null;
+  function actions(a) {
+    const box = el('div', 'acts');
+    if (flash && flash.area === a.id && Date.now() - flash.t < 15000) box.append(el('p', 'okmsg', flash.msg));
+    if (a.type === 'mow') {
+      const l = lastOf(a.id, 'mow');
+      box.append(el('h3', null, l && thisWeek(l.at) ? 'Mown this week ✓' : 'Mow this area'));
+      const b = el('button', 'btn', '✓  Mown (4300 lap)'); b.type = 'button';
+      b.addEventListener('click', () => { if (tickArea(a, 'mow')) { flash = { area: a.id, t: Date.now(), msg: 'Ticked off: ' + a.name + ' mown ' + fmtTime(new Date().toISOString()) + '.' }; render(); } });
+      box.append(b, whoLine()); return box;
+    }
+    if (!asSeed(a) && a.type !== 'grow') return null;
+    const all = mixes();
+    box.append(el('h3', null, a.type === 'grow' && !asSeed(a) ? 'Seed this no-mow area' : 'Log seeding'));
+    const fm = el('label', 'fld', 'Seed mix'); const sel = el('select');
+    for (const m of all) { const o = el('option', null, m.name); o.value = m.name; sel.append(o); }
+    const oo = el('option', null, 'Other mix…'); oo.value = '__other'; sel.append(oo);
+    const last = LS.get('mix', ''); if (last && all.some((m) => m.name === last)) sel.value = last;
+    fm.append(sel);
+    const on = el('label', 'fld', 'Mix name'); const nameIn = el('input'); nameIn.placeholder = 'e.g. Fescue blend B'; on.append(nameIn); on.hidden = true;
+    const two = el('div', 'two');
+    const fr = el('label', 'fld', 'Rate (kg / 100 m²)'); const rateIn = el('input'); rateIn.type = 'number'; rateIn.inputMode = 'decimal'; rateIn.step = '0.25'; rateIn.min = '0.5'; rateIn.max = '20'; fr.append(rateIn);
+    const fa = el('label', 'fld', 'Area seeded (m²)'); const m2In = el('input'); m2In.type = 'number'; m2In.inputMode = 'numeric'; m2In.min = '1'; m2In.value = String(Math.round(a.area)); fa.append(m2In);
+    two.append(fr, fa);
+    const calc = el('div', 'calc'); const kgB = el('b'); const kgS = el('span'); calc.append(kgB, kgS);
+    const hint = el('p', 'hint');
+    const cur = () => all.find((m) => m.name === sel.value);
+    function setRate() { const m = cur(); rateIn.value = m ? String(m.rate / 10) : rateIn.value || '3.5'; hint.textContent = m && m.min && m.max ? m.name + ': ' + m.min / 10 + ' to ' + m.max / 10 + ' kg per 100 m²' + (m.use ? ' · ' + m.use : '') : 'Whole area is ' + Math.round(a.area).toLocaleString('en-AU') + ' m². Change it if you only did part.'; }
+    function upd() { const r = Number(rateIn.value) * 10, m2 = Number(m2In.value); const ok = r > 0 && m2 > 0; kgB.textContent = ok ? kgFmt(m2 * r / 1000) + ' kg' : '–'; kgS.textContent = ok ? 'of seed for ' + Math.round(m2).toLocaleString('en-AU') + ' m² at ' + rateIn.value + ' kg/100 m²' : 'Enter a rate and area'; }
+    sel.addEventListener('change', () => { on.hidden = sel.value !== '__other'; if (sel.value !== '__other') setRate(); upd(); });
+    rateIn.addEventListener('input', upd); m2In.addEventListener('input', upd);
+    setRate(); upd();
+    const b = el('button', 'btn sd', '🌱  Seeded'); b.type = 'button';
+    b.addEventListener('click', () => {
+      const other = sel.value === '__other'; const mix = other ? nameIn.value.trim().slice(0, 50) : sel.value; const r = Number(rateIn.value) * 10, m2 = Math.round(Number(m2In.value));
+      if (!mix) { alert('Name the seed mix.'); return; } if (!(r >= 5 && r <= 200)) { alert('Check the rate (kg per 100 m²).'); return; } if (!(m2 > 0 && m2 <= 60000)) { alert('Check the area.'); return; }
+      const kg = Math.round(m2 * r / 100) / 10;
+      if (other) send({ kind: 'mix', mix, rate: r, by: myName() || askName() || 'Someone' });
+      if (tickArea(a, 'seed', { mix, rate: r, m2, kg, part: m2 < a.area * 0.95 ? '1' : '' })) { LS.set('mix', mix); flash = { area: a.id, t: Date.now(), msg: 'Logged: ' + kgFmt(kg) + ' kg of ' + mix + ' on ' + a.name + '.' }; render(); }
+    });
+    box.append(fm, on, two, calc, hint, b, whoLine());
+    return box;
   }
 
   // ---------- area picture ----------
