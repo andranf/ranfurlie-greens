@@ -63,6 +63,7 @@ body[data-area="drainage"]{--accL:#6a46f5;--accD:#a68dff;--deepL:#4527c2;--deepD
 body[data-area="bunkers"]{--accL:#c27a06;--accD:#f5bd4c;--deepL:#7f4f00;--deepD:#ffe0a1}
 body[data-area="topdressing"]{--accL:#dc5222;--accD:#ff8f62;--deepL:#9b3412;--deepD:#ffc3ab}
 body[data-area="grounds"]{--accL:#169552;--accD:#3ddc8a;--deepL:#0c6a3a;--deepD:#a5f0c8}
+body[data-area="keys"]{--accL:#c8336b;--accD:#ff7aa8;--deepL:#8f1d48;--deepD:#ffc2d6}
 body{--acc:var(--accL);--acc-deep:var(--deepL);--acc-ink:#fff}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body{--acc:var(--accD);--acc-deep:var(--deepD);--acc-ink:#03141d}}
 :root[data-theme="dark"] body{--acc:var(--accD);--acc-deep:var(--deepD);--acc-ink:#03141d}
@@ -128,7 +129,7 @@ button{cursor:pointer}
 .tab b{font-size:13px;min-width:22px;padding:0 6px;border-radius:99px;background:var(--glass-lo);color:var(--fg);line-height:20px;text-align:center}
 .tab[aria-selected="true"]{background:var(--c);color:#fff}
 .tab[aria-selected="true"] b{background:rgba(255,255,255,.25);color:#fff}
-@media (max-width:620px){.tabs .bar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;padding:5px}.tab{flex-direction:column;gap:3px;padding:7px 2px 6px;font-size:clamp(12.5px,3.5vw,16px);letter-spacing:0}.tab span{max-width:100%;overflow:hidden;text-overflow:ellipsis}.tab b{position:absolute;margin:-4px 0 0 30px;font-size:11px;min-width:18px;line-height:17px;padding:0 4px}.tab{position:relative}.tab i{width:11px;height:11px}}
+@media (max-width:620px){.tabs .bar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:5px}.tab{flex-direction:column;gap:3px;padding:7px 1px 6px;font-size:clamp(12px,3.3vw,16px);letter-spacing:0}.tab span{max-width:100%;overflow:hidden;text-overflow:ellipsis}.tab b{position:absolute;margin:-4px 0 0 30px;font-size:11px;min-width:18px;line-height:17px;padding:0 4px}.tab{position:relative}.tab i{width:11px;height:11px}}
 
 /* layout */
 main .wrap{display:grid;gap:16px;padding-block:10px 120px}
@@ -327,6 +328,28 @@ input.field:focus,select.field:focus,textarea.field:focus{box-shadow:inset 0 0 0
 .seg button[aria-pressed="true"]{background:var(--c);color:#fff}
 .seg button[aria-pressed="true"] i{background:#fff}
 .note{font-size:14px;color:var(--muted)}
+/* keys */
+.kout{display:grid;gap:10px}
+.krow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:12px 14px;border-radius:18px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line)}
+.krow.hi{background:var(--hi-bg);box-shadow:inset 0 0 0 1.5px var(--hi)}
+.kno{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;min-width:2.2ch;text-align:center;color:var(--acc-deep)}
+.krow.hi .kno{color:var(--hi)}
+.kwho{font-weight:700;font-size:19px;line-height:1.2}
+.kmeta{color:var(--muted);font-size:14px;display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:2px}
+.kallin{display:flex;gap:14px;align-items:center}
+.kallin .ok{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--ok-bg);color:var(--ok);flex:none}
+.kallin .ok svg{width:26px;height:26px}
+.kallin b{font-family:var(--display);font-size:28px;line-height:1.05;display:block}
+.kboard{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.kpill{display:inline-flex;align-items:center;gap:8px;border-radius:99px;padding:6px 12px 6px 8px;font-weight:700;font-size:15px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--line)}
+.kpill i{width:11px;height:11px;border-radius:50%;background:var(--ok)}
+.kpill.Out i{background:var(--med)} .kpill.Lost i,.kpill.late i{background:var(--hi)}
+.kacts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kacts .btn{min-height:64px;font-size:19px;border-radius:18px}
+.kacts .btn svg{width:22px;height:22px}
+.kskel{height:86px;border-radius:18px;background:linear-gradient(90deg,var(--glass-lo),var(--glass-hi),var(--glass-lo));background-size:200% 100%;animation:kshim 1.4s linear infinite}
+@keyframes kshim{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.kskel{animation:none}}
 .mapcard{padding:0;overflow:hidden}.mapcard iframe{display:block;width:100%;height:max(520px,calc(100svh - 200px));border:0}
 </style>
 </head>
@@ -365,9 +388,13 @@ const AREAS = {
   drainage:{label:"Drainage",c:"#6a46f5",data:"../drainage/data.json",full:"../drainage/",ch:"C0B885SR474",chName:"#drainage",pfx:"DRN"},
   bunkers:{label:"Bunkers",c:"#c27a06",data:"../bunkers/data.json",full:"../bunkers/",ch:"C06SNC8QM7T",chName:"#bunkers",pfx:"BNK"},
   topdressing:{label:"Topdressing",c:"#dc5222",ch:"C0AMNEELZND",chName:"#topdressing"},
-  grounds:{label:"Grounds",c:"#169552",data:"../grounds/data.json",full:"../grounds/",pfx:""}
+  grounds:{label:"Grounds",c:"#169552",data:"../grounds/data.json",full:"../grounds/",pfx:""},
+  keys:{label:"Keys",c:"#c8336b"}
 };
-const ORDER = ["map","irrigation","drainage","bunkers","topdressing","grounds"];
+const ORDER = ["map","irrigation","drainage","bunkers","topdressing","grounds","keys"];
+/* Shed key register lives on the Ranfurlie Safety site (keys.html + its Apps Script register) */
+const KEYS_API = "https://script.google.com/macros/s/AKfycbyqLHwwPqJumh5_J5VXVVeTZvoJ8onW6vO9BWHVRu4owCzTT09riW7mKt0wkghRIpKj/exec";
+const KEYS_PAGE = "https://andranf.github.io/ranfurlie-safety/keys.html";
 const GROUNDS = {amstel:{label:"Amstel",c:"#169552",ch:"C06G6PGEJ80",chName:"#amstelgrounds",area:"amstel"},clubhouse:{label:"Clubhouse",c:"#4b6fe0",ch:"C06FWKZN5BK",chName:"#ranfurlieclubhouse",area:"clubhouse"},sand:{label:"Sand counter",c:"#b5841a",ch:"C087R8YRB28",chName:"#sandcounter",area:"sand"}};
 const OPEN = ["Open","In progress","Waiting on parts","Waiting on materials"];
 const PR = {High:0,Medium:1,Low:2};
@@ -777,17 +804,18 @@ $$("#sheet [data-close]").forEach(b=>b.onclick=closeSheet);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(!$("#full").hidden)closeFull()}});
 let toastT=null;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3600)}
 function openFull(area){const a=AREAS[area];$("#fullTitle").textContent=a.label+" · 3D map & history";$("#fullOpen").href=a.full;$("#fullFrame").src=a.full;$("#full").hidden=false;document.body.style.overflow="hidden"}
-function closeFull(){$("#full").hidden=true;$("#fullFrame").src="about:blank";document.body.style.overflow=""}
+function closeFull(){$("#full").hidden=true;$("#fullFrame").src="about:blank";document.body.style.overflow="";if(S.tab==="keys"){loadKeys().then(()=>{if(S.tab==="keys")render()})}}
 $("#fullClose").onclick=closeFull;
 
 /* ------------------------------------------------------------------ render */
 function openCount(area){const j=jobsOf(area==="grounds"?"grounds":area);return area==="topdressing"?tdJobs().filter(j=>j.status==="In progress").length:j.filter(isOpen).length}
 function renderTabs(){
-  $("#tabs").innerHTML=ORDER.map(k=>{const a=AREAS[k];const n=S.data[k]||k==="topdressing"?openCount(k):0;return `<button class="tab" role="tab" aria-selected="${k===S.tab}" data-tab="${k}" style="--c:${a.c}"><i></i><span>${a.label}</span>${n?`<b>${n}</b>`:""}</button>`}).join("");
+  $("#tabs").innerHTML=ORDER.map(k=>{const a=AREAS[k];const n=k==="keys"?keysOut().length:(S.data[k]||k==="topdressing"?openCount(k):0);return `<button class="tab" role="tab" aria-selected="${k===S.tab}" data-tab="${k}" style="--c:${a.c}"><i></i><span>${a.label}</span>${n?`<b>${n}</b>`:""}</button>`}).join("");
   $$("#tabs .tab").forEach(b=>b.onclick=()=>go(b.dataset.tab));
 }
 function facts(){
   const k=S.tab;const d=S.data[k];const f=[];
+  if(k==="keys"){const K=S.keys;if(K&&K.keys){const o=keysOut();const lost=o.filter(x=>x.status==="Lost").length,out=o.length-lost,late=o.filter(x=>x.overdue&&x.status!=="Lost").length;if(!o.length)f.push(`<span class="fact acc">All in</span>`);if(out)f.push(`<span class="fact acc">${out} out</span>`);if(late)f.push(`<span class="fact">${late} overdue</span>`);if(lost)f.push(`<span class="fact${out?"":" acc"}">${lost} missing</span>`);if(K.at)f.push(`<span class="fact">Checked ${melTime(new Date(K.at))}</span>`)}$("#facts").innerHTML=f.join("");return}
   if(k==="topdressing"){const c=S.live?.td?.call;if(c&&c.date===today()&&c.loads)f.push(`<span class="fact acc">Call ~${c.loads} loads · ${c.mm} mm</span>`)}
   else if(d){const j=jobsOf(k);const o=j.filter(isOpen);f.push(`<span class="fact acc">${o.length} open</span>`);const h=o.filter(x=>x.prio==="High").length;if(h)f.push(`<span class="fact">${h} high</span>`)}
   const gen=k==="topdressing"?(S.live?.updated?melTime(new Date(S.live.updated))+" "+shortDate(melYmd(new Date(S.live.updated))):""):(d?.generated?melTime(new Date(genUtc(d.generated)))+" "+shortDate(d.generated):"");
@@ -795,12 +823,12 @@ function facts(){
   $("#facts").innerHTML=f.join("");
 }
 let lastSig="";
-function sig(){return [S.tab,S.sub,S.live&&S.live.updated,...["irrigation","drainage","bunkers","grounds"].map(k=>S.data[k]&&S.data[k].generated),JSON.stringify(pending()),outbox().length].join("|")}
+function sig(){return [S.tab,S.sub,S.keys&&S.keys.at,S.keys&&S.keys.err,S.live&&S.live.updated,...["irrigation","drainage","bunkers","grounds"].map(k=>S.data[k]&&S.data[k].generated),JSON.stringify(pending()),outbox().length].join("|")}
 function render(){
   lastSig=sig();
   document.body.dataset.area=S.tab;$("#title").textContent=AREAS[S.tab].label;document.title=AREAS[S.tab].label+" · Ranfurlie Course Ops";
   renderTabs();facts();
-  const v={map:viewMap,irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds}[S.tab]();
+  const v={map:viewMap,irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds,keys:viewKeys}[S.tab]();
   if(S.tab==="map"&&$("#view .mapcard")){/* keep the map frame as it is: reloading it would lose the valves you shut */}
   else{$("#view").innerHTML=v;wire()}
   $("#foot").innerHTML=`Jobs, maps and stock rebuild from Slack and Notion every hour. Stocktakes, sand and Turfco loads from this page show within a minute or two.<br>Separate pages: <a href="../">Greens Live</a> · <a href="../machinery/">Machinery</a> · <a href="../stock.html">Shed stocktake</a> · <a href="../spray/">Spraying</a>`;
@@ -818,12 +846,59 @@ function wire(){
       $("#bkList").innerHTML=list.map(b=>`<button class="chip" data-bk="${b.n}">${b.n} · ${esc(b.d)}</button>`).join("")||'<span class="note">No bunkers on this hole</span>';$$("#bkList [data-bk]").forEach(x=>x.onclick=()=>bunkerSheet(Number(x.dataset.bk)));
       const s=$('select[data-hole="bunkers"]');if(s){s.value=String(h);s.onchange()}})}
   if(S.tab==="topdressing")wireTd();
+  if(S.tab==="keys")wireKeys();
 }
 function pickJob(area,ref,fromList){
   S.sel[area]=ref;const j=jobsOf(area).find(x=>x.ref===ref);if(!j)return;
   $$(".job").forEach(r=>r.classList.toggle("sel",r.dataset.job===ref));$$(`#map-${area} .pin`).forEach(c=>c.classList.toggle("sel",c.dataset.tap===ref));
   const box=$("#pick-"+area);if(box)box.innerHTML=`<div style="margin-top:10px">${jobRow(j,area)}</div>${j.note?`<p class="note" style="margin:6px 4px 0">${esc(j.note)}</p>`:""}`;
   if(fromList){const pin=$(`#map-${area} .pin[data-tap="${ref}"]`);if(pin&&S.mapApi[area]){const B=baseLayers();const cx=Number(pin.getAttribute("cx")),cy=Number(pin.getAttribute("cy"));const w=(B.bounds[2]-B.bounds[0])/4;S.mapApi[area].set([cx-w/2,cy-w*0.354,w,w*0.708]);$(`#map-${area}`).scrollIntoView({behavior:"smooth",block:"center"})}}
+}
+
+/* ------------------------------------------------------------------ keys (shed key register) */
+const KEY_ICON={out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>',
+  ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'};
+let keysBusy=null;
+function keysOut(){return ((S.keys&&S.keys.keys)||[]).filter(k=>k.status!=="In")}
+function keyNo(k){const m=String(k||"").match(/#?\s*(\d+)\s*$/);return m?"#"+m[1]:esc(String(k||"").replace(/^key\s*/i,""))}
+function loadKeys(){
+  if(keysBusy)return keysBusy;
+  keysBusy=fetch(KEYS_API,{method:"POST",redirect:"follow",body:JSON.stringify({action:"keys"})}).then(r=>r.json()).then(r=>{
+    if(!r||r.ok!==true)throw new Error((r&&r.error)||"no answer");
+    S.keys={at:new Date().toISOString(),keys:r.keys||[],recent:Array.isArray(r.recent)?r.recent:null,dueRule:r.dueRule||""};LS.set("keys",S.keys);
+  }).catch(e=>{S.keys=Object.assign({},S.keys||{},{err:String(e.message||e)})}).finally(()=>{keysBusy=null});
+  return keysBusy;
+}
+function keyStatusTag(s){const t=String(s||"").toLowerCase();
+  if(t==="out")return '<span class="tag Medium">Still out</span>';if(t==="lost")return '<span class="tag High">Missing</span>';
+  if(t==="returned late")return '<span class="tag Medium">Back late</span>';if(t==="written off")return '<span class="tag High">Written off</span>';if(t==="cancelled")return '<span class="tag Low">Cancelled</span>';
+  return '<span class="tag ok">Back</span>'}
+function viewKeys(){
+  const K=S.keys;const acts=`<div class="kacts"><button class="btn primary" data-keys="out">${KEY_ICON.out}Take a key</button><button class="btn ghost" data-keys="in">${KEY_ICON.back}Return a key</button></div>`;
+  if(!K||!K.keys){return `${acts}<div class="card in">${K&&K.err?`<div class="head"><h2>Couldn't reach the key register</h2></div><p class="note">Check signal and try again. The shed QR codes still work.</p><div class="row" style="margin-top:10px"><button class="btn small" data-keys="retry">Try again</button></div>`:`<div class="head"><h2>Checking the key register…</h2></div><div class="kskel"></div>`}</div>`}
+  const out=keysOut().sort((a,b)=>(b.status==="Lost")-(a.status==="Lost")||(b.overdue-a.overdue));
+  const rec=K.recent;
+  let hero;
+  if(out.length){
+    hero=`<div class="card in"><div class="head"><h2>${(()=>{const l=out.filter(k=>k.status==="Lost").length,n=out.length-l;return [n?(n===1?"1 key out":n+" keys out"):"",l?l+" missing":""].filter(Boolean).join(" · ")})()}</h2>${K.dueRule&&out.some(k=>k.status!=="Lost")?`<span class="sub">due back ${esc(K.dueRule)}</span>`:""}</div><div class="kout">${out.map(k=>{const bad=k.overdue||k.status==="Lost";
+      return `<div class="krow${bad?" hi":""}"><div class="kno">${keyNo(k.key)}</div><div><div class="kwho">${esc(k.with||"Unknown")}</div><div class="kmeta"><span>Taken ${esc(k.since||"")}${k.sinceIso?` · <span data-ago="${k.sinceIso}">${ago(k.sinceIso)}</span>`:""}</span>${k.status==="Lost"?"<span>Reported missing</span>":k.due?`<span>Due back ${esc(k.due)}</span>`:""}</div></div>${k.status==="Lost"?'<span class="tag High">Missing</span>':k.overdue?'<span class="tag High">Overdue</span>':'<span class="tag Medium">Out</span>'}</div>`}).join("")}</div>
+      ${keyBoard(K.keys)}</div>`;
+  }else{
+    hero=`<div class="card in"><div class="kallin"><span class="ok">${KEY_ICON.ok}</span><div><b>All keys are in</b><span class="note">${K.keys.length} spare key${K.keys.length===1?"":"s"} on the board</span></div></div>
+      ${keyBoard(K.keys)}</div>`;
+  }
+  const recent=rec&&rec.length?`<div class="card in"><div class="head"><h2>${out.length?"Recent sign-outs":"Last taken"}</h2><span class="sub">newest first</span></div><div class="jobs">${rec.slice(0,8).map(r=>`<div class="job"><span class="kno" style="font-size:24px;min-width:2.4ch">${keyNo(r.key)}</span><div class="t">${esc(r.who)}</div>${keyStatusTag(r.status)}<div class="m"><span>Out ${esc(r.out)}</span>${r.back?`<span>Back ${esc(r.back)}${r.by&&r.by!==r.who?" · by "+esc(r.by.replace(/\s*\(for .*\)\s*$/,"")):""}</span>`:""}</div></div>`).join("")}</div></div>`
+    :rec?`<div class="card in"><div class="head"><h2>Recent sign-outs</h2></div><p class="empty">No keys signed out yet.</p></div>`:"";
+  return `${hero}${acts}<p class="note" style="margin:-4px 4px 0;text-align:center"><a href="#" data-keys="lost">Lost or missing key?</a></p>${recent}
+  <p class="note" style="margin:0 4px">Take a key and Return a key open the same page as the shed QR codes (name, key SWP check, sign-off). Keys still out at ${esc(K.dueRule||"10am Tuesday")} get called out in Slack.</p>`;
+}
+function keyBoard(keys){return `<div class="kboard">${keys.map(k=>`<span class="kpill ${k.status}${k.overdue?" late":""}" title="${esc(k.key)}: ${k.status==="In"?"in":k.status==="Lost"?"missing":"with "+esc(k.with)}"><i></i>${keyNo(k.key)} ${k.status==="In"?"In":k.status==="Lost"?"Missing":esc((k.with||"").split(" ")[0])}</span>`).join("")}</div>`}
+function openKeys(mode){
+  const t={out:"Take a key",in:"Return a key",lost:"Lost or missing key"}[mode]||"Shed keys";const url=KEYS_PAGE+"?"+mode;
+  $("#fullTitle").textContent=t;$("#fullOpen").href=url;$("#fullFrame").src=url;$("#full").hidden=false;document.body.style.overflow="hidden"}
+function wireKeys(){
+  $$("[data-keys]").forEach(b=>b.onclick=e=>{e.preventDefault();const m=b.dataset.keys;if(m==="retry"){S.keys=null;render();loadKeys().then(render);return}openKeys(m)});
 }
 
 /* topdressing wiring */
@@ -873,11 +948,13 @@ $("#theme").onclick=()=>{const t=LS.get("theme","auto");const n=t==="auto"?(matc
 $("#who").onclick=()=>openSheet(`<h3>Who's using this phone?</h3><p class="sub">Your name goes on stocktakes, sand and loads you log here.</p><div class="sec">${whoField()}</div><div class="sec"><button class="btn primary wide" id="whoGo">Save</button></div>`,()=>{wireWho();$("#whoGo").onclick=()=>{if(readWho()){closeSheet();toast("Saved")}}});
 
 /* ------------------------------------------------------------------ start */
-applyTheme();if(TEST)$("#testbar").hidden=false;fromHash();showOutbox();
+applyTheme();if(TEST)$("#testbar").hidden=false;fromHash();showOutbox();S.keys=LS.get("keys",null);if(S.keys)delete S.keys.err;
+loadKeys().then(()=>{if(S.tab==="keys")render();else if($("#tabs .tab"))renderTabs()});
 loadAll().then(()=>{render();flush()});
 let lastLive=Date.now();
-async function tick(all){if(document.hidden)return;if(all)await loadAll();else await loadLive();lastLive=Date.now();if($("#sheet").hidden&&$("#full").hidden&&sig()!==lastSig)render()}
-setInterval(()=>{if(S.tab==="topdressing"||Date.now()-lastLive>45000)tick(false)},20000);
+let lastKeys=Date.now();
+async function tick(all){if(document.hidden)return;if(S.tab==="keys"&&(all||Date.now()-lastKeys>55000)){lastKeys=Date.now();await loadKeys()}if(all)await loadAll();else await loadLive();lastLive=Date.now();if($("#sheet").hidden&&$("#full").hidden&&sig()!==lastSig)render()}
+setInterval(()=>{if(S.tab==="topdressing"||S.tab==="keys"||Date.now()-lastLive>45000)tick(false)},20000);
 setInterval(()=>tick(true),300000);
 setInterval(()=>$$("[data-ago]").forEach(el=>el.textContent=ago(el.dataset.ago).replace(el.dataset.trim||"\u0000","")),30000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){tick(false);flush()}});
