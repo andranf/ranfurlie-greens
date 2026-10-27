@@ -1,0 +1,129 @@
+{
+  "slug": "2026-10-28-greens-iron-sulphate",
+  "title": "Iron Sulphate + Regulate, Greens",
+  "sheet_name": "JD 600L/Ha - Iron Sulphate to greens",
+  "sprayer": "JD HD200",
+  "applicator": [
+    "Mitch Mahoney",
+    "U08K55E3QJU"
+  ],
+  "date": "Wed 28 Oct",
+  "date_long": "Wed 28 Oct 2026",
+  "date_iso": "2026-10-28",
+  "area_ha": 1.25,
+  "rate_lha": 600,
+  "mix_l": 750,
+  "tank_cap_l": 757,
+  "fill_l": 500,
+  "nozzles": "White",
+  "speed": "4.9 km/h",
+  "pressure": "4.1 bar",
+  "last_load": "Fert, Greens (100 L partial tank), Tue 27 Oct",
+  "site_check": "Spray signs out on the greens, the Himalayan and the nursery. The 4th green is NOT sprayed",
+  "weather": "Delta T 2–8 · wind under 15 km/h · finished before the gusts build (about 11am)",
+  "extra_checks": [
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 4.1 bar",
+      "600 L/ha at 4.9 km/h needs about 3.7 L/min on 75 cm nozzle spacing (2.45 L/min on 50 cm). If it's out, call Andy before you fill"
+    ],
+    [
+      "water",
+      "Irrigation ready to water in each green straight after it's sprayed",
+      "2–3 minutes a green"
+    ]
+  ],
+  "products": [
+    {
+      "id": "companion",
+      "rate": "600 mL/ha",
+      "rate_lha": 0.6,
+      "unit": "mL",
+      "sheet": 1,
+      "why": "The label says Companion goes in first, before anything else. There's no copper in this tank, so its copper restraint is clear."
+    },
+    {
+      "id": "ironsulphate",
+      "rate": "64 kg/ha",
+      "rate_lha": 64,
+      "unit": "kg",
+      "sheet": 2
+    },
+    {
+      "id": "regulate",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "unit": "L",
+      "sheet": 3
+    }
+  ],
+  "ppe_note": "Iron sulphate dust stings the eyes and the mix rust-stains everything: goggles, elbow gloves and a dust mask when you tip the bags. Regulate: gloves and eye protection.",
+  "spray_ppe": [
+    "overalls",
+    "gloves",
+    "goggles"
+  ],
+  "spray_rules": [
+    "Greens only and skip the 4th. Then the Himalayan, and run any left over out on the nursery",
+    "Get on early: gusts build to 28–32 km/h from about 8am and 40 after midday. Spray when Delta T is 2 to 8 and stop if it's blowing off target",
+    "Water in each green straight after it's sprayed: 2–3 minutes",
+    "Keep the boom and tyres off paths and concrete, and hose off any drips straight away: iron sulphate stains",
+    "Members Guest Day is off two tees: check the start time at pre-start and stay ahead of the field. Keep people off each green until it's dry"
+  ],
+  "spray_more": "Proforce Regulate label: water in with 4–6 mm; not above 32 °C or on stressed, waterlogged or freshly cored turf; no DMI fungicides within 7 days; don't scarify or topdress the greens while the Poa is being regulated; no re-entry until dry. Iron sulphate SDS: keep it away from alkalis.",
+  "post_checks": [
+    [
+      "water",
+      "Every sprayed green got its 2–3 minute water-in",
+      ""
+    ],
+    [
+      "flush2",
+      "Tank, boom and filters flushed twice with clean water",
+      "Iron sulphate corrodes and stains if it's left in the rig"
+    ],
+    [
+      "paths",
+      "Paths and concrete checked for drips and hosed off",
+      ""
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "Water-in: 2–3 minutes vs the label's 4–6 mm",
+      "d": "Proforce Regulate's label says water in immediately with 4–6 mm of sprinkler irrigation. At the greens heads' usual 15.7 mm/hr, 2–3 minutes is about 0.5–0.8 mm (the 8th's part-circle heads run 41–68 mm/hr). The page says 2–3 minutes, as you asked.",
+      "s": "APVMA 88674 label · Cirrus Pro precip rates"
+    },
+    {
+      "c": "",
+      "t": "Wind: first light to about 8am is the window",
+      "d": "Open-Meteo at 2pm Tue: 13 km/h gusting 23–24 at 5–6am, 14–15 gusting 27–32 from 7 to 11am, 40+ after midday. Delta T 2.2–2.9 all morning, dry, max 16 °C.",
+      "s": "Open-Meteo 27 Oct 2pm"
+    },
+    {
+      "c": "",
+      "t": "Iron sulphate at 64 kg/ha",
+      "d": "About 12.9 kg Fe/ha (ferrous sulphate heptahydrate is 20% Fe), 6.4 g/m². A cool day (max 16 °C) keeps the blackening risk down. 80 kg in the 500 L first fill is 160 g/L, well under its 360 g/L solubility, but it needs adding slowly with the agitator running.",
+      "s": "Amgrow SDS Nov 2021"
+    },
+    {
+      "c": "info",
+      "t": "Nozzles: white on 75 cm spacing adds up",
+      "d": "White is ISO size 08: about 3.7 L/min at 4.1 bar. At 4.9 km/h that's about 600 L/ha on 75 cm nozzle spacing, or about 900 on 50 cm. This setup and yesterday's grey-nozzle sheet both only add up on 75 cm, so the JD boom is very likely 75 cm and today's 50 cm warning was probably a false alarm. The bucket test on the rig checklist settles it.",
+      "s": "ISO 10625 nozzle colour code · L/ha = 600 × L/min ÷ (km/h × spacing m)"
+    },
+    {
+      "c": "info",
+      "t": "DMI window is clear",
+      "d": "The Regulate label says no DMI fungicides within 7 days. The last DMI on the greens on the spray pages is Evolution Advance (tebuconazole) on 19–20 Oct, 8–9 days before.",
+      "s": "APVMA 88674 label · spray pages 19–20 Oct"
+    },
+    {
+      "c": "info",
+      "t": "Regulate 1.0 L/ha is in the growth-regulation range",
+      "d": "Label: 0.5–2 L/ha (1–2 L/ha every 4–8 weeks) for growth regulation, 2.0–2.8 L/ha for Poa suppression. 600 L/ha is inside its 400–800 L/ha water volume.",
+      "s": "APVMA 88674 label"
+    }
+  ]
+}
