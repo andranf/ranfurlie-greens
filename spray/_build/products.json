@@ -521,5 +521,54 @@
   ],
   "why": "Near neutral and its SDS says keep it from strong acids, so it goes in last, into a well-diluted tank after the iron and GreenMaxx. You're at {before} L.",
   "src": "Oasis Turf Grass Roots label + SDS"
+ },
+ "ironsulphate": {
+  "name": "Iron Sulphate",
+  "gk_name": "Iron Sulfate Heptahydrate-Soluble (0-0-0)",
+  "sig": "Not hazardous",
+  "sigc": "",
+  "form": "Soluble crystals",
+  "what": "Ferrous sulphate heptahydrate, about 20% Fe. Strongly acidic in solution (pH about 2)",
+  "haz": "Dust irritates eyes. Rust-stains concrete, metal and clothes.",
+  "soft": true,
+  "hazFull": "SDS: not classified as hazardous, harmful if swallowed. Glasses or goggles, elbow-length impervious gloves and face protection when handling, dust mask if it's dusty. pH about 2 (1% solution). Keep away from alkalis, carbonates and oxidisers. Dissolves to 360 g/L at 25 °C. Stains concrete, paths, paintwork and clothing.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles",
+   "mask"
+  ],
+  "l_per_kg": 0.53,
+  "how": [
+   "Agitator on",
+   "Add {amt} slowly, a bag at a time",
+   "Let each bag dissolve before the next. No lumps left on the strainer",
+   "Hose any spilt crystals off concrete straight away: it stains"
+  ],
+  "why": "Goes in once the Companion is through, into a tank two-thirds full so it dissolves properly. You're at {before} L.",
+  "src": "SDS Amgrow Nov 2021 · <a href=\"https://www.nuturf.com.au/images/product-tech-sds/Ferrous-Sulfate-Hepta-GHS-Nov-2021.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+ },
+ "regulate": {
+  "name": "Proforce Regulate",
+  "gk_name": "Proforce Regulate (AU)",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Suspension concentrate (SC)",
+  "what": "Paclobutrazol 200 g/L growth regulator",
+  "haz": "Avoid eye and skin contact. Don't breathe spray mist.",
+  "hazFull": "Label: CAUTION. Protective gloves and eye or face protection, don't breathe spray mist. Growth regulation 0.5–2 L/ha in 400–800 L/ha (Poa suppression 2.0–2.8 L/ha). Water in immediately with 4–6 mm of sprinkler irrigation. No DMI (sterol inhibitor) fungicides within 7 days. Not above 32 °C, or on stressed, waterlogged, thinned or freshly cored or scarified turf. Don't scarify or topdress greens while the Poa is being regulated. No re-entry until dry.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Shake the drum well",
+   "Measure {amt}",
+   "Pour in, agitator on",
+   "Rinse the jug into the tank"
+  ],
+  "why": "A suspension: goes in last, into the mixed tank, so it stays spread through it. You're at {before} L.",
+  "src": "Label APVMA 88674/121954 · <a href=\"https://www.nuturf.com.au/images/product-tech-sds/ProForce_Regulate_PGR_2.5L_Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.nuturf.com.au/images/product-tech-sds/ProForce_Regulate_PGR_200SC_Technical_Sheet.pdf\" target=\"_blank\" rel=\"noopener\">tech sheet</a>"
  }
 }
