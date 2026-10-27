@@ -1,14 +1,14 @@
 {
- "build_label": "week of 27 October 2026",
- "built": "2026-10-27T07:36+1100",
- "asof": "2026-10-26",
- "asof_label": "Mon 26 Oct",
- "asof_long": "Monday 26 October 2026",
+ "build_label": "week of 28 October 2026",
+ "built": "2026-10-28T06:27+1100",
+ "asof": "2026-10-27",
+ "asof_label": "Tue 27 Oct",
+ "asof_long": "Tuesday 27 October 2026",
  "latest": {
-  "t": 12.1,
-  "cool": 0.356,
-  "warm": 0.0261,
-  "label": "Mon 26 Oct"
+  "t": 11.3,
+  "cool": 0.286,
+  "warm": 0.0191,
+  "label": "Tue 27 Oct"
  },
  "model": {
   "cool_opt": 20.0,
@@ -18,13 +18,6 @@
   "crossover": 24.84
  },
  "hist": [
-  {
-   "d": "2026-09-27",
-   "lab": "27 Sep",
-   "t": 11.6,
-   "c": 0.312,
-   "w": 0.0215
-  },
   {
    "d": "2026-09-28",
    "lab": "28 Sep",
@@ -227,40 +220,36 @@
    "t": 12.1,
    "c": 0.356,
    "w": 0.0261
+  },
+  {
+   "d": "2026-10-27",
+   "lab": "27 Oct",
+   "t": 11.3,
+   "c": 0.286,
+   "w": 0.0191
   }
  ],
  "stats": {
-  "cool14": 0.724,
-  "cool14_prev": 0.673,
-  "warm14": 0.21909026229279613,
-  "warm14_prev": 0.11213773058628669,
-  "clip14": 9.34,
-  "gvx21": 30.4
+  "cool14": 0.719,
+  "cool14_prev": 0.639,
+  "warm14": 0.21858595938716693,
+  "warm14_prev": 0.10539479166624637,
+  "clip14": 9.97,
+  "gvx21": 28.5
  },
  "headline_hist": "Greens GP is <em>holding</em> steady",
  "forecast": {
   "source": "Open-Meteo",
   "days": [
    {
-    "d": "2026-10-27",
-    "dow": "Tue",
-    "lab": "27 Oct",
-    "tmax": 14.3,
-    "tmin": 7.8,
-    "t": 11.1,
-    "c": 0.2661,
-    "w": 0.0172,
-    "hot": false
-   },
-   {
     "d": "2026-10-28",
     "dow": "Wed",
     "lab": "28 Oct",
-    "tmax": 15.9,
-    "tmin": 8.8,
-    "t": 12.4,
-    "c": 0.3801,
-    "w": 0.0287,
+    "tmax": 16.0,
+    "tmin": 9.1,
+    "t": 12.6,
+    "c": 0.3996,
+    "w": 0.031,
     "hot": false
    },
    {
@@ -279,30 +268,30 @@
     "dow": "Fri",
     "lab": "30 Oct",
     "tmax": 24.8,
-    "tmin": 8.0,
+    "tmin": 8.1,
     "t": 16.4,
-    "c": 0.8072,
-    "w": 0.1136,
+    "c": 0.812,
+    "w": 0.1153,
     "hot": false
    },
    {
     "d": "2026-10-31",
     "dow": "Sat",
     "lab": "31 Oct",
-    "tmax": 20.5,
-    "tmin": 12.9,
-    "t": 16.7,
-    "c": 0.8353,
-    "w": 0.1241,
+    "tmax": 20.6,
+    "tmin": 12.7,
+    "t": 16.6,
+    "c": 0.8307,
+    "w": 0.1223,
     "hot": false
    },
    {
     "d": "2026-11-01",
     "dow": "Sun",
     "lab": "1 Nov",
-    "tmax": 19.6,
-    "tmin": 10.5,
-    "t": 15.1,
+    "tmax": 18.4,
+    "tmin": 11.7,
+    "t": 15.0,
     "c": 0.667,
     "w": 0.0746,
     "hot": false
@@ -311,30 +300,41 @@
     "d": "2026-11-02",
     "dow": "Mon",
     "lab": "2 Nov",
-    "tmax": 20.8,
-    "tmin": 9.4,
-    "t": 15.1,
-    "c": 0.6724,
-    "w": 0.0758,
+    "tmax": 21.1,
+    "tmin": 9.2,
+    "t": 15.2,
+    "c": 0.6779,
+    "w": 0.077,
+    "hot": false
+   },
+   {
+    "d": "2026-11-03",
+    "dow": "Tue",
+    "lab": "3 Nov",
+    "tmax": 26.1,
+    "tmin": 11.7,
+    "t": 18.9,
+    "c": 0.9802,
+    "w": 0.2245,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  11.1,
-  16.7
+  12.6,
+  18.9
  ],
- "headline_fc": "Slow start, then <em>warming</em> from Thu",
+ "headline_fc": "Slow start, then <em>warming</em> from Fri",
  "takeaways": [
   {
    "tone": "cool",
-   "head": "Greens: slow to Wed, picking up from Thu",
-   "detail": "Bent and Poa GP averages 32% Tue to Wed, then 71% from Thu."
+   "head": "Greens: slow to Thu, picking up from Fri",
+   "detail": "Bent and Poa GP averages 48% Wed to Thu, then 79% from Fri."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 7%, best on Sat at 12%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 10%, best on Tue at 22%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
