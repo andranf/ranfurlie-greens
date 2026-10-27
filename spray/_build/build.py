@@ -72,9 +72,16 @@ def main():
             sys.exit(f"'{e['id']}' is not in products.json. Read its label and SDS and add it first.")
         p = dict(base)
         p.update({k: v for k, v in e.items() if k not in ("rate_lha", "unit")})
-        amt = e["rate_lha"] * R["area_ha"]
+        unit = e.get("unit", "L")
+        if unit in ("kg", "g"):
+            # Solids (27 Oct 2026, iron sulphate): show the weight, count the litres it adds to the tank (l_per_kg).
+            mass = e["rate_lha"] * R["area_ha"]
+            p["show"], p["u"] = (f"{mass:.1f}", "kg") if unit == "kg" else (f"{round(mass * 1000):d}", "g")
+            amt = mass * float(e.get("l_per_kg", base.get("l_per_kg", 0.55)))
+        else:
+            amt = e["rate_lha"] * R["area_ha"]
+            p["show"], p["u"] = shown(amt, unit)
         p["amt"] = round(amt, 4)
-        p["show"], p["u"] = shown(amt, e.get("unit", "L"))
         prods.append(p)
     R["products"] = prods
 
