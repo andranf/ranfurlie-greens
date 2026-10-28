@@ -175,7 +175,7 @@ function pills(i){const g=grpOf(i);if(!g)return'';let p='';if(g.pick===i.id&&i.u
 let k=0;
 function cardEl(i,inG){
   const s=state[i.id]||{};const c=document.createElement('div');c.className='card'+(s.st==='ok'?' ok':s.st==='diff'?' diff':'')+(!inG&&isLow(i,s)?' low':'');if(!inG)c.style.animationDelay=Math.min(k++,14)*25+'ms';
-  const last=i.last_count?`<div class="last">Last counted ${dmy(i.last_count.date)} by ${esc(i.last_count.by)}: ${fmt(i.last_count.counted)} ${i.unit}</div>`:'';
+  const last=(i.last_count?`<div class="last">Last counted ${dmy(i.last_count.date)} by ${esc(i.last_count.by)}: ${fmt(i.last_count.counted)} ${i.unit}</div>`:'')+(i.recv?`<div class="last">Received ${dmy(i.recv.date)} by ${esc(i.recv.by)}: +${fmt(i.recv.qty)} ${i.unit}</div>`:'');
   c.innerHTML=`<div class="row"><div>${aiLine(i,inG)}<div class="nm"></div><div class="exp">${expTxt(i)}</div>${i.flag?`<div class="flag">⚠ ${esc(i.flag)}</div>`:''}${last}${metaHtml(i)}${inG?pills(i):''}<div class="lvl"></div>${i.reorder?'<button class="ro req" disabled>✓ On re-order list</button>':`<button class="ro" aria-pressed="${!!s.ro}">${s.ro?'✓ Re-order':'Re-order'}</button>`}</div>
     <div class="btns"><button class="b okb" aria-pressed="${s.st==='ok'}" aria-label="Matches">✓</button><button class="b dfb" aria-pressed="${s.st==='diff'}" aria-label="Different">≠</button></div></div>
     <div class="edit">${i.cont?`<label>Full ${fmt(i.cont)} ${i.unit} containers<input type="number" inputmode="decimal" min="0" step="1" class="full" value="${s.full??''}"></label>`:''}
@@ -265,7 +265,7 @@ document.querySelectorAll('#view button').forEach(b=>b.onclick=()=>setView(b.dat
     return [`RECEIVED v1 | by ${clean($('#rcvWho').value)} | sent ${new Date().toISOString()}${sup?' | supplier '+sup:''}${doc?' | docket '+doc:''}`,...lines().map(l=>'IN | '+clean(l)),'END','','(Docket photo attached)'].join('\n')};
   $('#rcvSend').onclick=()=>{const who=$('#rcvWho').value.trim(),n=lines().length;if(!who||!n)return;
     const sup=$('#rcvSup').value.trim(),doc=$('#rcvDoc').value.trim();
-    const sub=`Ranfurlie stock received | ${new Date().toLocaleDateString('en-CA')} | ${who} | ${n} line${n>1?'s':''}${sup?' | '+sup:''}${doc?' #'+doc:''}`;
+    const sub=`Ranfurlie stocktake | ${new Date().toLocaleDateString('en-CA')} | ${who} | stock received, ${n} line${n>1?'s':''}${sup?' | '+sup:''}${doc?' #'+doc:''}`;
     const to=(D&&D.send_to)||'andrew@ranfurlie.com.au';const u=`mailto:${to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body())}`;
     try{localStorage.setItem(RK+'-last',JSON.stringify({sub,body:body(),at:Date.now()}));localStorage.removeItem(RK)}catch(e){}
     try{(EMBED?window.top:window).location.href=u}catch(e){location.href=u}
