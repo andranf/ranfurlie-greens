@@ -73,14 +73,35 @@ details{margin:12px 0}summary{cursor:pointer;color:var(--muted)}
 .gb{padding:0 8px 8px}
 .gb .card{margin:6px 0;border-radius:12px;background:color-mix(in srgb,var(--panel) 90%,var(--bg));animation:none}
 html.embed body{background:transparent}html.embed .wrap{max-width:none}html.embed h1{font-size:1rem}
+
+.rcvb{margin-left:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;background:var(--ok);color:#fff;border:0;border-radius:14px;padding:12px 16px;min-height:52px;font:inherit;font-weight:700;font-size:1rem;cursor:pointer;box-shadow:0 2px 8px color-mix(in srgb,var(--ok) 35%,transparent);touch-action:manipulation}
+.rcvb svg{width:22px;height:22px;flex:0 0 auto}
+.rcvb:active{transform:scale(.97)}
+@media (max-width:420px){.rcvb{padding:10px 12px;font-size:.92rem}.top h1{font-size:1rem}}
+.rcv{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center}
+.rcv.open{display:flex}
+.rcv .card{margin:0;width:100%;max-width:560px;max-height:92dvh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));animation:rise .25s ease-out both}
+@media (min-width:600px){.rcv{align-items:center}.rcv .card{border-radius:18px}}
+.rcv h2{margin:0 0 4px;font-size:1.25rem}
+.rcv ol{margin:10px 0 14px;padding-left:22px;font-size:1rem;line-height:1.5}.rcv ol li{margin:4px 0}.rcv ol b{color:var(--fg)}
+.rcv label{display:block;font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+.rcv input,.rcv textarea{width:100%}
+.rcv textarea{min-height:150px;font-size:1rem}
+.rcv .two{display:flex;gap:8px}.rcv .two>div{flex:1 1 0;min-width:0}
+.rcv .acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.rcv .acts .send{min-height:52px;font-size:1.02rem;background:var(--ok)}
+.rcv .x{float:right;background:none;border:0;font-size:1.6rem;line-height:1;color:var(--muted);cursor:pointer;padding:0 4px}
+.rcv .cnt{font-size:.8rem;color:var(--muted);margin-top:4px}
 </style>
 </head>
 <body>
 <header><div class="wrap">
   <div class="top">
     <svg class="ring" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="var(--line)" stroke-width="5"/><circle id="ringfg" cx="23" cy="23" r="19" fill="none" stroke="var(--ok)" stroke-width="5" stroke-linecap="round" transform="rotate(-90 23 23)" stroke-dasharray="119.4" stroke-dashoffset="119.4"/><text id="ringtx" x="23" y="27" text-anchor="middle" font-size="11" font-weight="600" fill="var(--fg)">0%</text></svg>
-    <div><h1>Shed stocktake</h1><div class="sub" id="sub">Loading…</div></div>
+    <div style="min-width:0"><h1>Shed stocktake</h1></div>
+  <button type="button" class="rcvb" id="rcvOpen" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>Receive stock</button>
   </div>
+  <div class="sub" id="sub" style="margin-top:6px">Loading…</div>
   <div class="bar"><input type="text" id="who" placeholder="Your name" autocomplete="name" style="flex:0 1 150px"><input type="search" id="q" placeholder="Search products or active ingredients"></div>
   <div class="bar"><div class="seg" id="view" role="group" aria-label="Organise by"><button data-v="ai">By active ingredient</button><button data-v="product">By product</button></div><select id="aisel" aria-label="Active ingredient"><option value="">All active ingredients</option></select></div>
   <div class="chips" id="chips" role="group" aria-label="Product type"></div>
@@ -98,6 +119,22 @@ html.embed body{background:transparent}html.embed .wrap{max-width:none}html.embe
   <button class="ghost" id="clear" title="Start again">Reset</button>
   <div class="sum" id="sum"></div>
 </div></footer>
+<div class="rcv" id="rcv" role="dialog" aria-modal="true" aria-labelledby="rcvT"><div class="card">
+  <button type="button" class="x" id="rcvX" aria-label="Close">×</button>
+  <h2 id="rcvT">Receive stock</h2>
+  <div class="sub">A delivery has arrived. Log it here so the stock levels get updated.</div>
+  <ol>
+    <li><b>List what came in</b>, one line each: how many, the size and the product.<br><span class="sub">e.g. 4 × 5 L ProMark</span></li>
+    <li><b>Press Send.</b> Your email opens with the list filled in.</li>
+    <li><b>Take a photo of the delivery docket</b>, attach it to the email and send.</li>
+  </ol>
+  <label for="rcvWho">Your name</label><input type="text" id="rcvWho" autocomplete="name" placeholder="Your name">
+  <div class="two"><div><label for="rcvSup">Supplier</label><input type="text" id="rcvSup" placeholder="e.g. Oasis Turf"></div><div><label for="rcvDoc">Docket no.</label><input type="text" id="rcvDoc" inputmode="numeric" placeholder="optional"></div></div>
+  <label for="rcvList">Products and quantities</label>
+  <textarea id="rcvList" placeholder="4 × 5 L ProMark&#10;2 × 20 L Methar Tri-Kombi"></textarea>
+  <div class="cnt" id="rcvCnt"></div>
+  <div class="acts"><button type="button" class="send" id="rcvSend" disabled>Send</button><button type="button" class="ghost" id="rcvCopy">Copy</button></div>
+</div></div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
@@ -209,6 +246,32 @@ $('#clear').onclick=()=>{if(confirm('Clear this count and start again?')){state=
 $('#aisel').addEventListener('change',e=>{aisel=e.target.value;render()});
 function setView(v){view=v;document.querySelectorAll('#view button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===v)));save();render()}
 document.querySelectorAll('#view button').forEach(b=>b.onclick=()=>setView(b.dataset.v));
+/* Receive stock (Andy, 29 Oct 2026): big button top right, list products + quantities, photo of the docket goes on the email */
+(function(){
+  const RK='rgc-stock-in-v1',box=$('#rcv'),L=$('#rcvList');
+  const rl=()=>{try{return JSON.parse(localStorage.getItem(RK)||'{}')}catch(e){return{}}};
+  const rs=()=>{try{localStorage.setItem(RK,JSON.stringify({sup:$('#rcvSup').value,doc:$('#rcvDoc').value,list:L.value,at:Date.now()}))}catch(e){}};
+  const lines=()=>L.value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const upd=()=>{const n=lines().length;$('#rcvCnt').textContent=n?`${n} line${n>1?'s':''}`:'';$('#rcvSend').disabled=!(n&&$('#rcvWho').value.trim())};
+  const r=rl();if(r.at&&Date.now()-r.at<2*864e5){$('#rcvSup').value=r.sup||'';$('#rcvDoc').value=r.doc||'';L.value=r.list||''}
+  const open=()=>{$('#rcvWho').value=$('#rcvWho').value||$('#who').value;box.classList.add('open');upd();setTimeout(()=>($('#rcvWho').value.trim()?L:$('#rcvWho')).focus(),60)};
+  const close=()=>box.classList.remove('open');
+  $('#rcvOpen').onclick=open;$('#rcvX').onclick=close;box.addEventListener('click',e=>{if(e.target===box)close()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&box.classList.contains('open'))close()});
+  ['#rcvSup','#rcvDoc','#rcvList'].forEach(q=>$(q).addEventListener('input',()=>{rs();upd()}));
+  $('#rcvWho').addEventListener('input',()=>{if(!$('#who').value.trim()){$('#who').value=$('#rcvWho').value;save()}upd()});
+  const clean=(t)=>t.replace(/\|/g,'/').trim();
+  const body=()=>{const sup=clean($('#rcvSup').value),doc=clean($('#rcvDoc').value);
+    return [`RECEIVED v1 | by ${clean($('#rcvWho').value)} | sent ${new Date().toISOString()}${sup?' | supplier '+sup:''}${doc?' | docket '+doc:''}`,...lines().map(l=>'IN | '+clean(l)),'END','','(Docket photo attached)'].join('\n')};
+  $('#rcvSend').onclick=()=>{const who=$('#rcvWho').value.trim(),n=lines().length;if(!who||!n)return;
+    const sup=$('#rcvSup').value.trim(),doc=$('#rcvDoc').value.trim();
+    const sub=`Ranfurlie stock received | ${new Date().toLocaleDateString('en-CA')} | ${who} | ${n} line${n>1?'s':''}${sup?' | '+sup:''}${doc?' #'+doc:''}`;
+    const to=(D&&D.send_to)||'andrew@ranfurlie.com.au';const u=`mailto:${to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body())}`;
+    try{localStorage.setItem(RK+'-last',JSON.stringify({sub,body:body(),at:Date.now()}));localStorage.removeItem(RK)}catch(e){}
+    try{(EMBED?window.top:window).location.href=u}catch(e){location.href=u}
+    L.value='';$('#rcvSup').value='';$('#rcvDoc').value='';upd();close();toast('Email opening. Attach the docket photo, then press Send');};
+  $('#rcvCopy').onclick=async()=>{const t=body();try{await navigator.clipboard.writeText(t);toast('Copied. Paste into an email to Andy with the docket photo')}catch(e){prompt('Copy this text',t)}};
+})();
 fetch('stock.json?x='+Date.now()).then(r=>r.json()).then(d=>{D=d;D.items.forEach(i=>{BY[i.id]=i});(d.groups||[]).forEach(g=>{G[g.id]=g});
   const s=load();if(s.snap&&!s.sentAt&&s.at&&Date.now()-s.at<4*864e5){state=s.state||{};$('#extra').value=s.extra||'';started=s.started||''}$('#who').value=s.who||'';if(s.view==='product')view='product';
   document.querySelectorAll('#view button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===view)));
