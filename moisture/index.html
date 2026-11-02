@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Greens Moisture Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e4f1f7;--sky1:#7fd3ff;--sky2:#86e8b4;--sky3:#ffe08a;--glass:rgba(255,255,255,.62);--glass-hi:rgba(255,255,255,.82);--solid:rgba(246,251,253,.96);
+--fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);--rim:rgba(255,255,255,.9);--tank:#0aa6dc;--tank-deep:#0573a8;
+--ok:#13a356;--warn:#a86000;--bad:#e0313b;--shadow:0 18px 40px -18px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+--fair:rgba(70,150,80,.22);--tee:rgba(70,150,80,.32);--bunker:rgba(222,196,140,.85);--appr:rgba(70,150,80,.16);--r:22px}
+@media (prefers-color-scheme:dark){:root{--bg:#06121b;--sky1:#0a6fa8;--sky2:#0d7a4c;--sky3:#5a4a12;--glass:rgba(18,40,56,.62);--glass-hi:rgba(28,58,78,.72);
+--solid:rgba(14,34,48,.97);--fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);--rim:rgba(255,255,255,.16);
+--ok:#2fd27a;--warn:#ffbc45;--bad:#ff5c5c;--shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+--fair:rgba(90,170,100,.18);--tee:rgba(90,170,100,.26);--bunker:rgba(190,165,115,.55);--appr:rgba(90,170,100,.12)}}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--fg);background:var(--bg);min-height:100vh;
+ background-image:radial-gradient(60% 40% at 10% 0%,color-mix(in srgb,var(--sky1) 55%,transparent),transparent 70%),radial-gradient(50% 40% at 95% 10%,color-mix(in srgb,var(--sky2) 50%,transparent),transparent 70%),radial-gradient(60% 50% at 50% 100%,color-mix(in srgb,var(--sky3) 35%,transparent),transparent 70%);background-attachment:fixed;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px 48px}
+h1,h2,.num{font-family:"Barlow Condensed","Arial Narrow",system-ui,sans-serif}
+h1{font-size:2.1rem;line-height:1;margin:6px 0 4px;letter-spacing:.01em}
+h2{font-size:1.25rem;margin:0 0 10px;letter-spacing:.02em}
+.sub{color:var(--muted);font-size:.9rem}
+.card{background:var(--glass);border:1px solid var(--rim);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin:12px 0;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--glass-hi);border:1px solid var(--line);font-size:.85rem;font-weight:600}
+.chip b{font-family:"Barlow Condensed";font-size:1.05rem}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.scrub{position:sticky;top:0;z-index:5;margin:0 -16px;padding:10px 16px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.scrub .row{display:flex;align-items:center;gap:10px}
+.when{font-family:"Barlow Condensed";font-size:1.5rem;font-weight:700;min-width:7.5em}
+.when small{display:block;font-family:"Barlow";font-size:.75rem;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+input[type=range]{flex:1;accent-color:var(--tank);height:28px}
+.jump{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+button{font:inherit}
+.btn{border:1px solid var(--line);background:var(--glass-hi);color:var(--fg);border-radius:999px;padding:6px 12px;font-weight:600;font-size:.85rem;cursor:pointer}
+.btn.on{background:var(--tank);color:#fff;border-color:transparent}
+.play{width:40px;height:40px;border-radius:50%;border:0;background:var(--tank);color:#fff;font-size:1rem;cursor:pointer;flex:none}
+.legend{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:.78rem;color:var(--muted)}
+.ramp{flex:1;height:10px;border-radius:6px}
+.ticks{display:flex;justify-content:space-between;font-size:.72rem;color:var(--faint);margin-top:2px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (min-width:600px){.tiles{grid-template-columns:repeat(6,1fr)}}
+.tile{background:var(--glass-hi);border:1px solid var(--line);border-radius:16px;padding:6px 6px 8px;text-align:center;cursor:pointer;position:relative}
+.tile canvas{width:100%;aspect-ratio:1;display:block}
+.tile .h{position:absolute;left:8px;top:6px;font-family:"Barlow Condensed";font-weight:800;font-size:1.1rem}
+.tile .v{font-family:"Barlow Condensed";font-weight:700;font-size:1.15rem;line-height:1}
+.tile .m{font-size:.72rem;color:var(--muted)}
+.tile.flag{outline:2px solid var(--bad);outline-offset:-2px}
+.spot{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.spot:first-child{border-top:0}
+.spot .sw{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-family:"Barlow Condensed";font-weight:800;color:#fff;font-size:1.1rem;flex:none}
+.spot .t{font-weight:700}.spot .d{font-size:.85rem;color:var(--muted)}
+.empty{color:var(--muted);font-size:.92rem;padding:4px 0}
+svg.map{width:100%;height:auto;display:block;touch-action:manipulation}
+.sheet{position:fixed;inset:0;z-index:20;display:none;background:rgba(4,16,26,.45);backdrop-filter:blur(3px)}
+.sheet.open{display:block}
+.panel{position:absolute;left:0;right:0;bottom:0;max-height:94vh;overflow:auto;background:var(--solid);border-radius:26px 26px 0 0;padding:14px 16px 32px;box-shadow:var(--shadow);max-width:820px;margin:0 auto}
+.panel .top{display:flex;align-items:center;justify-content:space-between}
+.x{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--glass-hi);color:var(--fg);font-size:1.1rem;cursor:pointer}
+.big{width:100%;max-width:520px;aspect-ratio:1;display:block;margin:6px auto 0;touch-action:none}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.stat{background:var(--glass-hi);border:1px solid var(--line);border-radius:14px;padding:8px;text-align:center}
+.stat .num{font-size:1.4rem;font-weight:700;line-height:1}.stat .l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+td{padding:7px 4px;border-bottom:1px solid var(--line)}
+td.n{font-family:"Barlow Condensed";font-weight:700;font-size:1.05rem}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:.82rem;color:#0b2231}
+.note{font-size:.85rem;color:var(--muted);line-height:1.45}
+.src{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;font-size:.88rem;align-items:center}
+.src .w{color:var(--muted);font-size:.8rem;text-align:right}
+details summary{cursor:pointer;font-weight:700;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary:after{content:" +";color:var(--tank)}details[open] summary:after{content:" −"}
+.fc{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--warn)}
+.tip{position:absolute;pointer-events:none;background:var(--solid);border:1px solid var(--line);border-radius:10px;padding:4px 8px;font-weight:700;font-size:.85rem;box-shadow:var(--shadow);display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sub" id="upd">Loading…</div>
+  <h1>Greens Moisture <span style="color:var(--tank)">Live</span></h1>
+  <div class="sub">Surface moisture on every green, carried forward hour by hour from this morning's TurfRad scan.</div>
+  <div class="chips" id="chips"></div>
+
+  <div class="scrub">
+    <div class="row">
+      <button class="play" id="play" aria-label="Play">▶</button>
+      <div class="when" id="when">–</div>
+      <input type="range" id="rng" min="0" max="0" value="0" aria-label="Time">
+    </div>
+    <div class="jump" id="jump"></div>
+    <div class="legend"><span>Dry</span><div class="ramp" id="ramp"></div><span>Wet</span></div>
+    <div class="ticks"><span>10%</span><span>14</span><span>18</span><span>22</span><span>26</span><span>30</span><span>34%</span></div>
+  </div>
+
+  <div class="card">
+    <h2 id="spotsTitle">Driest spots</h2>
+    <div id="spots"></div>
+  </div>
+
+  <div class="card">
+    <h2>All greens</h2>
+    <div class="tiles" id="tiles"></div>
+    <div class="note" style="margin-top:8px">Each green is drawn with the front at the bottom. Tap a green for the detail and each sprinkler head.</div>
+  </div>
+
+  <div class="card">
+    <h2>Course</h2>
+    <div style="position:relative"><svg class="map" id="map"></svg><div class="tip" id="tip"></div></div>
+    <div class="jump"><button class="btn" id="fwBtn">Show fairway scan</button></div>
+    <div class="note" id="fwNote" style="display:none;margin-top:6px">Fairway dots: this morning's TurfRad scan per sprinkler, coloured against that hole's average (orange = drier than the rest of the hole, blue = wetter). Not carried forward yet.</div>
+  </div>
+
+  <div class="card">
+    <h2>Probes</h2>
+    <div id="probes"></div>
+  </div>
+
+  <div class="card">
+    <details><summary>How this map works</summary>
+    <div class="note" id="how"></div></details>
+  </div>
+
+  <div class="card">
+    <h2>Data</h2>
+    <div class="src" id="sources"></div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet"><div class="panel">
+  <div class="top"><div><div class="sub" id="dSub"></div><h1 id="dTitle" style="font-size:1.9rem"></h1></div><button class="x" id="close" aria-label="Close">✕</button></div>
+  <div class="note" id="dNote"></div>
+  <div style="position:relative"><canvas class="big" id="big" width="520" height="520"></canvas><div class="tip" id="btip"></div></div>
+  <div class="stats" id="dStats"></div>
+  <canvas id="spark" style="width:100%;height:70px;display:block" height="70"></canvas>
+  <h2 style="margin-top:12px">Sprinkler heads</h2>
+  <table><thead><tr><th>Head</th><th>Where</th><th id="thSel">Now</th><th>4pm</th><th>10pm</th></tr></thead><tbody id="dHeads"></tbody></table>
+  <div class="note" style="margin-top:8px">Each head's number is the average of the green surface closest to it.</div>
+</div></div>
+
+<script>
+const STOPS=[[9,[165,0,38]],[12,[215,48,39]],[14,[244,109,67]],[16,[253,174,97]],[18,[254,224,139]],[20,[166,217,106]],[23,[102,189,99]],[26,[26,152,80]],[29,[65,182,196]],[33,[44,127,184]],[38,[37,52,148]]];
+function rgb(v){if(v==null||isNaN(v))return[150,160,168];if(v<=STOPS[0][0])return STOPS[0][1];for(let i=1;i<STOPS.length;i++){if(v<=STOPS[i][0]){const[a,ca]=STOPS[i-1],[b,cb]=STOPS[i],t=(v-a)/(b-a);return ca.map((c,k)=>Math.round(c+(cb[k]-c)*t))}}return STOPS[STOPS.length-1][1]}
+const col=v=>`rgb(${rgb(v).join(',')})`;
+const ink=v=>{const c=rgb(v);return (0.299*c[0]+0.587*c[1]+0.114*c[2])>150?'#0b2231':'#fff'};
+let D,G,fi=0,timer=null,showFw=false;const $=id=>document.getElementById(id);
+const fmtT=s=>{const d=new Date(s);let h=d.getHours(),m=d.getMinutes();const ap=h>=12?'pm':'am';h=h%12||12;return h+(m?':'+String(m).padStart(2,'0'):'')+ap};
+const day=s=>new Date(s).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+const ord=h=>{const n=+h;if(isNaN(n))return h;const s=(n%100>=11&&n%100<=13)?'th':({1:'st',2:'nd',3:'rd'}[n%10]||'th');return n+s};
+const SECT=['N','NE','E','SE','S','SW','W','NW'];const sect=d=>SECT[Math.round(((d%360)+360)%360/45)%8];
+function pip(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const[xi,yi]=p[i],[xj,yj]=p[j];if((yi>y)!=(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
+function idw(x,y,pts,f){let n=0,d=0;for(const p of pts){const dx=x-p.x,dy=y-p.y,q=dx*dx+dy*dy;if(q<.01)return p.v[f];const w=1/q;n+=w*p.v[f];d+=w}return d?n/d:null}
+function prep(g){ // 1 m cells inside the green, head ownership, rotation
+  if(g._c)return;const xs=g.poly.map(p=>p[0]),ys=g.poly.map(p=>p[1]);g._c=[];
+  for(let x=Math.floor(Math.min(...xs));x<=Math.max(...xs);x++)for(let y=Math.floor(Math.min(...ys));y<=Math.max(...ys);y++){const cx=x+.5,cy=y+.5;if(pip(cx,cy,g.poly))g._c.push([cx,cy])}
+  g._own=g._c.map(([x,y])=>{let b=null,bd=1e9;for(const h of g.heads){const d=(h.x-x)**2+(h.y-y)**2;if(d<bd){bd=d;b=h.n}}return b});
+  const r=(g.play||0)*Math.PI/180;g._cos=Math.cos(r);g._sin=Math.sin(r);
+}
+function cellVals(g,f){prep(g);if(g.qa!=='turfrad')return g._c.map(()=>g.pts[0]?g.pts[0].v[f]:null);return g._c.map(([x,y])=>idw(x,y,g.pts,f))}
+function stats(g,f){const v=cellVals(g,f).filter(x=>x!=null);if(!v.length)return null;const s=[...v].sort((a,b)=>a-b);return{mean:v.reduce((a,b)=>a+b,0)/v.length,min:s[0],max:s[s.length-1],p10:s[Math.floor(s.length*.1)],below:v.filter(x=>x<D.floor).length}}
+function side(g,x,y){const dx=x-g.cx,dy=y-g.cy;const along=dx*g._sin+dy*g._cos,across=dx*g._cos-dy*g._sin;const fb=along>2?'back':along<-2?'front':'middle',lr=across>2?'right':across<-2?'left':'';return (lr&&fb!=='middle'?fb+'-'+lr:lr||fb)}
+// world -> rotated (front of green at the bottom)
+const rot=(g,x,y)=>{const dx=x-g.cx,dy=y-g.cy;return[dx*g._cos-dy*g._sin,dx*g._sin+dy*g._cos]};
+function drawGreen(cv,g,f,opt={}){
+  prep(g);const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+  const pr=g.poly.map(p=>rot(g,p[0],p[1])),hr=g.heads.map(h=>rot(g,h.x,h.y));const all=opt.heads?pr.concat(hr):pr;
+  const ext=Math.max(...all.map(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))))+ (opt.heads?3:1);const sc=(Math.min(W,H)/2-(opt.pad||4))/ext;
+  const S=(p)=>[W/2+p[0]*sc,H/2-p[1]*sc];
+  // raster at ~0.5 m
+  const res=Math.max(40,Math.round(2*ext*2));const off=document.createElement('canvas');off.width=off.height=res;const oc=off.getContext('2d'),img=oc.createImageData(res,res);
+  for(let j=0;j<res;j++)for(let i=0;i<res;i++){const rx=(i+.5)/res*2*ext-ext,ry=ext-(j+.5)/res*2*ext;const wx=g.cx+rx*g._cos+ry*g._sin,wy=g.cy-rx*g._sin+ry*g._cos;
+    const v=g.qa==='turfrad'?idw(wx,wy,g.pts,f):(g.pts[0]?g.pts[0].v[f]:null);const c=g.qa==='turfrad'?rgb(v):[150,160,168];const k=(j*res+i)*4;img.data[k]=c[0];img.data[k+1]=c[1];img.data[k+2]=c[2];img.data[k+3]=255}
+  oc.putImageData(img,0,0);
+  ctx.save();ctx.beginPath();pr.forEach((p,i)=>{const[s1,s2]=S(p);i?ctx.lineTo(s1,s2):ctx.moveTo(s1,s2)});ctx.closePath();ctx.clip();
+  ctx.imageSmoothingEnabled=true;ctx.drawImage(off,W/2-ext*sc,H/2-ext*sc,2*ext*sc,2*ext*sc);
+  if(g.qa!=='turfrad'){ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=2;for(let k=-W;k<W*2;k+=10){ctx.beginPath();ctx.moveTo(k,0);ctx.lineTo(k-H,H);ctx.stroke()}}
+  ctx.restore();
+  ctx.beginPath();pr.forEach((p,i)=>{const[s1,s2]=S(p);i?ctx.lineTo(s1,s2):ctx.moveTo(s1,s2)});ctx.closePath();ctx.lineWidth=opt.heads?2.5:1.5;ctx.strokeStyle='rgba(255,255,255,.85)';ctx.stroke();
+  if(opt.heads){ctx.font='700 13px Barlow';ctx.textAlign='center';
+    g.heads.forEach((h,i)=>{const[s1,s2]=S(hr[i]);ctx.beginPath();ctx.arc(s1,s2,6,0,7);ctx.fillStyle='#0573a8';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
+      ctx.fillStyle=getComputedStyle(document.body).color;ctx.fillText(h.n.replace(/^\d+/,''),s1,s2-10)});
+    if(g.sensor){const[s1,s2]=S(rot(g,g.sensor.x,g.sensor.y));ctx.beginPath();ctx.rect(s1-6,s2-6,12,12);ctx.fillStyle='#ffe08a';ctx.fill();ctx.strokeStyle='#0b2231';ctx.lineWidth=2;ctx.stroke()}
+    const w=D.weather[f];if(w&&w.wind!=null){const to=((w.dir+180)-(g.play||0))*Math.PI/180;const ax=W-46,ay=40,L=22;ctx.save();ctx.translate(ax,ay);ctx.rotate(to);
+      ctx.strokeStyle=getComputedStyle(document.body).color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,L);ctx.lineTo(0,-L);ctx.lineTo(-7,-L+9);ctx.moveTo(0,-L);ctx.lineTo(7,-L+9);ctx.stroke();ctx.restore();
+      ctx.font='700 12px Barlow';ctx.fillStyle=getComputedStyle(document.body).color;ctx.fillText(sect(w.dir)+' '+Math.round(w.wind)+' km/h',ax,ay+L+16)}
+    ctx.font='600 12px Barlow';ctx.fillStyle='rgba(120,140,150,1)';ctx.fillText('BACK',W/2,14);ctx.fillText('FRONT',W/2,H-4)}
+  cv._map={S,sc,ext,g};
+}
+function setF(f){fi=Math.max(0,Math.min(D.frames.length-1,f));$('rng').value=fi;render()}
+function render(){
+  const t=D.frames[fi],fut=fi>D.i_now;
+  $('when').innerHTML=fmtT(t)+'<small>'+(fi===D.i_now?'now':fut?'forecast · no irrigation':fi===0?'scan':'earlier today')+'</small>';
+  [...$('jump').children].forEach(b=>b.classList.toggle('on',+b.dataset.f===fi));
+  // tiles
+  const T=$('tiles');T.innerHTML='';
+  G.forEach(h=>{const g=D.greens[h];const s=stats(g,fi);const d=document.createElement('div');d.className='tile'+(s&&g.qa==='turfrad'&&s.min<D.floor?' flag':'');
+    d.innerHTML=`<span class="h">${h}</span><canvas width="120" height="120"></canvas><div class="v">${g.qa==='turfrad'&&s?s.mean.toFixed(1)+'%':'–'}</div><div class="m">${g.qa==='turfrad'&&s?'low '+s.min.toFixed(1)+'%':'no reliable read'}</div>`;
+    T.appendChild(d);drawGreen(d.querySelector('canvas'),g,fi,{pad:6});d.onclick=()=>openGreen(h)});
+  // spots
+  const sp=[];G.forEach(h=>{const g=D.greens[h];if(g.qa!=='turfrad')return;const v=cellVals(g,fi);let mi=1e9,mc=null,mo=null,n=0;v.forEach((x,i)=>{if(x<D.floor)n++;if(x<mi){mi=x;mc=g._c[i];mo=g._own[i]}});sp.push({h,mi,n,where:side(g,mc[0],mc[1]),head:mo})});
+  sp.sort((a,b)=>a.mi-b.mi);const below=sp.filter(s=>s.mi<D.floor);
+  $('spotsTitle').textContent=below.length?`Hand water ${fut?'by '+fmtT(t):'now'}`:'Driest spots';
+  $('spots').innerHTML=(below.length?'':`<div class="empty">Nothing below ${D.floor}% ${fut?'by '+fmtT(t):'right now'}. Driest three:</div>`)+
+    (below.length?below:sp.slice(0,3)).slice(0,8).map(s=>`<div class="spot" data-h="${s.h}"><div class="sw" style="background:${col(s.mi)};color:${ink(s.mi)}">${s.h}</div><div><div class="t">${ord(s.h)} green · ${s.where}</div><div class="d">${s.mi.toFixed(1)}%${s.n?' · '+s.n+' m² under '+D.floor+'%':''} · nearest head ${s.head||'–'}</div></div></div>`).join('');
+  [...$('spots').querySelectorAll('.spot')].forEach(e=>e.onclick=()=>openGreen(e.dataset.h));
+  drawMap();if($('sheet').classList.contains('open'))drawDetail();
+}
+let GEO=null;
+function drawMap(){
+  if(!GEO)return;const svg=$('map');const L=GEO.layers;let xs=[],ys=[];for(const k in L)L[k].forEach(f=>f.p.forEach(p=>{xs.push(p[0]);ys.push(p[1])}));
+  const x0=Math.min(...xs)-10,x1=Math.max(...xs)+10,y0=Math.min(...ys)-10,y1=Math.max(...ys)+10;svg.setAttribute('viewBox',`${x0} 0 ${x1-x0} ${y1-y0}`);
+  const P=pp=>pp.map(p=>p[0].toFixed(1)+','+(y1-p[1]).toFixed(1)).join(' ');
+  let s='';[['approach','--appr'],['fairway','--fair'],['tee','--tee'],['bunker','--bunker']].forEach(([k,v])=>(L[k]||[]).forEach(f=>s+=`<polygon points="${P(f.p)}" fill="var(${v})"/>`));
+  G.forEach(h=>{const g=D.greens[h];const st=stats(g,fi);const c=g.qa==='turfrad'&&st?col(st.mean):'#9aa6ad';
+    s+=`<g data-h="${h}" style="cursor:pointer"><circle cx="${g.cx}" cy="${y1-g.cy}" r="22" fill="transparent"/><polygon points="${P(g.poly)}" fill="${c}" stroke="#fff" stroke-width="1.5"/>`+
+       `<text x="${g.cx}" y="${y1-g.cy-16}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="20" fill="currentColor">${h}</text></g>`});
+  if(showFw){const byH={};D.fairways.forEach(f=>{const h=(f[0].match(/^\d+/)||[''])[0];(byH[h]=byH[h]||[]).push(f[3])});
+    D.fairways.forEach(f=>{const h=(f[0].match(/^\d+/)||[''])[0],a=byH[h],m=a.reduce((p,q)=>p+q,0)/a.length,dv=f[3]-m;const c=dv<-3?'#f46d43':dv<-1?'#fdae61':dv>3?'#2c7fb8':dv>1?'#74add1':'#cfd8dc';
+      s+=`<circle cx="${f[1]}" cy="${y1-f[2]}" r="4.5" fill="${c}" stroke="#fff" stroke-width="1"><title>${f[0]} ${f[3]}%</title></circle>`})}
+  svg.innerHTML=s;svg.style.color=getComputedStyle(document.body).color;
+  svg.querySelectorAll('g[data-h]').forEach(e=>e.onclick=()=>openGreen(e.dataset.h));
+}
+let cur=null;
+function openGreen(h){cur=h;$('sheet').classList.add('open');document.body.style.overflow='hidden';drawDetail()}
+function drawDetail(){
+  const h=cur,g=D.greens[h];prep(g);const st=stats(g,fi);
+  $('dTitle').textContent=ord(h)+' green';$('dSub').textContent=fmtT(D.frames[fi])+(fi>D.i_now?' · forecast':fi===D.i_now?' · now':'')+(g.anchor?' · scanned '+fmtT(D.scan_day+'T'+g.anchor):'');
+  $('dNote').textContent=g.qa!=='turfrad'?(g.why||'No reliable reading for this green.')+(g.approx?' Outline drawn from the head positions.':''):(g.events&&g.events.length?'Water picked up by the probes at '+g.events.map(e=>e.at).join(', ')+'.':'');
+  drawGreen($('big'),g,fi,{heads:true,pad:30});
+  $('dStats').innerHTML=st&&g.qa==='turfrad'?[['Average',st.mean],['Driest',st.min],['Wettest',st.max],['Under '+D.floor+'%',st.below,'m²']].map(([l,v,u])=>`<div class="stat"><div class="num" style="color:${u?'inherit':col(v)}">${u?v:v.toFixed(1)}${u?'':'%'}</div><div class="l">${l}${u?' (m²)':''}</div></div>`).join(''):'';
+  // per-head at the selected frame
+  const v=cellVals(g,fi),acc={};g._own.forEach((o,i)=>{(acc[o]=acc[o]||[]).push(v[i])});
+  $('thSel').textContent=fi===D.i_now?'Now':fmtT(D.frames[fi]);
+  $('dHeads').innerHTML=g.heads.map(hd=>{const a=acc[hd.n];const vv=a?a.reduce((p,q)=>p+q,0)/a.length:hd.now;const c=x=>x==null?'–':`<span class="pill" style="background:${col(x)};color:${ink(x)}">${(+x).toFixed(1)}</span>`;
+    return `<tr><td class="n">${hd.n}</td><td>${side(g,hd.x,hd.y)}</td><td>${g.qa==='turfrad'?c(vv):'–'}</td><td>${g.qa==='turfrad'?c(hd.h16):'–'}</td><td>${g.qa==='turfrad'?c(hd.h22):'–'}</td></tr>`}).join('');
+  // sparkline of average + driest across frames
+  const cv=$('spark'),W=cv.width=cv.clientWidth*devicePixelRatio,H=cv.height=70*devicePixelRatio,ctx=cv.getContext('2d');ctx.clearRect(0,0,W,H);
+  const ser=D.frames.map((_,f)=>stats(g,f)),vals=ser.flatMap(s=>s?[s.mean,s.min]:[]);if(!vals.length||g.qa!=='turfrad')return;
+  const lo=Math.min(...vals,D.floor)-1,hi=Math.max(...vals)+1,X=f=>f/(D.frames.length-1)*W,Y=v=>H-(v-lo)/(hi-lo)*H;
+  ctx.fillStyle='rgba(10,166,220,.08)';ctx.fillRect(X(D.i_now),0,W-X(D.i_now),H);
+  ctx.setLineDash([4*devicePixelRatio,4*devicePixelRatio]);ctx.strokeStyle='rgba(224,49,59,.7)';ctx.beginPath();ctx.moveTo(0,Y(D.floor));ctx.lineTo(W,Y(D.floor));ctx.stroke();ctx.setLineDash([]);
+  [['mean','#0aa6dc'],['min','#f46d43']].forEach(([k,c])=>{ctx.strokeStyle=c;ctx.lineWidth=2.5*devicePixelRatio;ctx.beginPath();ser.forEach((s,f)=>{if(!s)return;f?ctx.lineTo(X(f),Y(s[k])):ctx.moveTo(X(f),Y(s[k]))});ctx.stroke()});
+  ctx.fillStyle='#0b2231';ctx.beginPath();ctx.arc(X(fi),Y(ser[fi].mean),4*devicePixelRatio,0,7);ctx.fill();
+}
+$('close').onclick=()=>{$('sheet').classList.remove('open');document.body.style.overflow=''};
+$('sheet').onclick=e=>{if(e.target.id==='sheet')$('close').onclick()};
+$('big').addEventListener('pointerdown',e=>{const cv=$('big'),m=cv._map;if(!m)return;const r=cv.getBoundingClientRect(),sx=(e.clientX-r.left)*cv.width/r.width,sy=(e.clientY-r.top)*cv.height/r.height;
+  const rx=(sx-cv.width/2)/m.sc,ry=-(sy-cv.height/2)/m.sc,g=m.g,wx=g.cx+rx*g._cos+ry*g._sin,wy=g.cy-rx*g._sin+ry*g._cos;const tip=$('btip');
+  if(!pip(wx,wy,g.poly)||g.qa!=='turfrad'){tip.style.display='none';return}const v=idw(wx,wy,g.pts,fi);tip.textContent=v.toFixed(1)+'%';tip.style.display='block';tip.style.left=(e.clientX-r.left+10)+'px';tip.style.top=(e.clientY-r.top-30)+'px'});
+$('rng').oninput=e=>{stop();setF(+e.target.value)};
+function stop(){if(timer){clearInterval(timer);timer=null;$('play').textContent='▶'}}
+$('play').onclick=()=>{if(timer)return stop();$('play').textContent='❚❚';if(fi>=D.frames.length-1)fi=0;timer=setInterval(()=>{if(fi>=D.frames.length-1)return stop();setF(fi+1)},700)};
+$('fwBtn').onclick=()=>{showFw=!showFw;$('fwBtn').classList.toggle('on',showFw);$('fwNote').style.display=showFw?'block':'none';drawMap()};
+async function load(){
+  const q='?t='+Date.now();[D,GEO]=await Promise.all([fetch('data.json'+q).then(r=>r.json()),fetch('geo_lite.json').then(r=>r.json()).catch(()=>null)]);
+  G=Object.keys(D.greens).sort((a,b)=>(+a)-(+b));
+  $('rng').max=D.frames.length-1;
+  $('ramp').style.background='linear-gradient(90deg,'+[10,12,14,16,18,20,22,24,26,28,30,32,34].map(v=>col(v)).join(',')+')';
+  const J=[['Scan',0],['Now',D.i_now],['4pm',D.i_16],['10pm',D.i_22],['Tomorrow 6am',D.frames.findIndex(f=>f.slice(0,10)>D.frames[0].slice(0,10)&&f.slice(11,13)==='06')]].filter(([_,f])=>f!=null&&f>=0);
+  $('jump').innerHTML=J.map(([l,f])=>`<button class="btn" data-f="${f}">${l}</button>`).join('');[...$('jump').children].forEach(b=>b.onclick=()=>{stop();setF(+b.dataset.f)});
+  const gen=new Date(D.generated);$('upd').textContent='Updated '+day(D.generated)+' '+fmtT(D.generated)+(D.stale?' · no scan yet today':'');
+  const td=D.today;$('chips').innerHTML=[
+    `<span class="chip"><span class="dot" style="background:${col(D.course_now.mean)}"></span>Course avg <b>${D.course_now.mean??'–'}%</b></span>`,
+    `<span class="chip">Hand water below <b>${D.floor}%</b></span>`,
+    `<span class="chip">ET today <b>${td.et0_total} mm</b></span>`,
+    td.wind!=null?`<span class="chip">Wind <b>${td.dir_word} ${Math.round(td.wind)} km/h</b></span>`:'' ].join('');
+  $('probes').innerHTML='<table><thead><tr><th>Probe</th><th>Depth</th><th>Reading</th><th>Last in</th></tr></thead><tbody>'+D.sensors.map(s=>`<tr><td class="n">${/^\d+$/.test(s.green)?ord(s.green)+' green':s.green}</td><td>${s.depth} cm</td><td class="n">${s.now??'–'}%</td><td>${s.at?fmtT(s.at.replace(' ','T')):'–'}</td></tr>`).join('')+'</tbody></table><div class="note" style="margin-top:6px">Probes read deeper than the surface and in whole numbers, so they sit lower than the map. They tell the map when water has gone on.</div>';
+  $('sources').innerHTML=D.sources.map(s=>`<span class="dot" style="background:${s.state==='ok'?'var(--ok)':s.state==='off'?'var(--faint)':'var(--warn)'}"></span><span><b>${s.name}</b> <span class="sub">${s.note}</span></span><span class="w">${s.at?(s.at.length>10?fmtT(s.at.replace(' ','T'))+' '+(s.at.slice(0,10)!==D.generated.slice(0,10)?day(s.at.slice(0,10)):''):day(s.at)):''}</span>`).join('');
+  $('how').innerHTML=`<p>Every morning the TurfRad on the greens mower measures moisture right across each green. That scan is the starting point, adjusted so each green's average matches TurfRad's own green figure (the number that lines up with the TDR probe).</p>
+  <p>From then on the map dries each green hour by hour using the weather: how much water the air is pulling out (ET), and the wind. The side of a green facing into the wind dries a bit faster, more so when it's windy.</p>
+  <p>The in-ground probes on the 5th, 9th and 15th tell the map when water has gone on (rain, irrigation or a wash-in) so it can wet the greens back up. Rain comes from the hourly weather.</p>
+  <p>Times after now are a forecast and assume no irrigation. Hand-water line: ${D.floor}% today (it moves with the day's ET). Drying rate in use: ${D.C} points per mm of ET.</p>
+  <p>The 4th green's TurfRad outline is off, so it shows grey until that's fixed.</p>`;
+  setF(D.i_now);
+}
+load();setInterval(()=>{if(!timer&&!$('sheet').classList.contains('open'))load()},10*60*1000);
+</script>
+</body>
+</html>
