@@ -90,9 +90,9 @@ details summary:after{content:" +";color:var(--tank)}details[open] summary:after
     <div class="row">
       <button class="play" id="play" aria-label="Play">▶</button>
       <div class="when" id="when">–</div>
-      <input type="range" id="rng" min="0" max="0" value="0" aria-label="Time">
+      <div class="jump" id="jump" style="margin:0;flex:1;justify-content:flex-end"></div>
     </div>
-    <div class="jump" id="jump"></div>
+    <input type="range" id="rng" min="0" max="0" value="0" aria-label="Time" style="width:100%">
     <div class="legend"><span>Dry</span><div class="ramp" id="ramp"></div><span>Wet</span></div>
     <div class="ticks"><span>10%</span><span>14</span><span>18</span><span>22</span><span>26</span><span>30</span><span>34%</span></div>
   </div>
@@ -167,7 +167,8 @@ function side(g,x,y){const dx=x-g.cx,dy=y-g.cy;const along=dx*g._sin+dy*g._cos,a
 const rot=(g,x,y)=>{const dx=x-g.cx,dy=y-g.cy;return[dx*g._cos-dy*g._sin,dx*g._sin+dy*g._cos]};
 function drawGreen(cv,g,f,opt={}){
   prep(g);const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
-  const pr=g.poly.map(p=>rot(g,p[0],p[1])),hr=g.heads.map(h=>rot(g,h.x,h.y));const all=opt.heads?pr.concat(hr):pr;
+  const pr=g.poly.map(p=>rot(g,p[0],p[1])),hr=g.heads.map(h=>rot(g,h.x,h.y));const pe=Math.max(...pr.map(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))));
+  const all=opt.heads?pr.concat(hr.filter(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))<=pe+9)):pr;
   const ext=Math.max(...all.map(p=>Math.max(Math.abs(p[0]),Math.abs(p[1]))))+ (opt.heads?3:1);const sc=(Math.min(W,H)/2-(opt.pad||4))/ext;
   const S=(p)=>[W/2+p[0]*sc,H/2-p[1]*sc];
   // raster at ~0.5 m
@@ -181,8 +182,8 @@ function drawGreen(cv,g,f,opt={}){
   ctx.restore();
   ctx.beginPath();pr.forEach((p,i)=>{const[s1,s2]=S(p);i?ctx.lineTo(s1,s2):ctx.moveTo(s1,s2)});ctx.closePath();ctx.lineWidth=opt.heads?2.5:1.5;ctx.strokeStyle='rgba(255,255,255,.85)';ctx.stroke();
   if(opt.heads){ctx.font='700 13px Barlow';ctx.textAlign='center';
-    g.heads.forEach((h,i)=>{const[s1,s2]=S(hr[i]);ctx.beginPath();ctx.arc(s1,s2,6,0,7);ctx.fillStyle='#0573a8';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
-      ctx.fillStyle=getComputedStyle(document.body).color;ctx.fillText(h.n.replace(/^\d+/,''),s1,s2-10)});
+    g.heads.forEach((h,i)=>{let q=hr[i];const m=Math.max(Math.abs(q[0]),Math.abs(q[1])),far=m>ext-1;if(far)q=[q[0]*(ext-1.5)/m,q[1]*(ext-1.5)/m];const[s1,s2]=S(q);ctx.globalAlpha=far?.55:1;ctx.beginPath();ctx.arc(s1,s2,6,0,7);ctx.fillStyle='#0573a8';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
+      ctx.fillStyle=getComputedStyle(document.body).color;ctx.fillText(h.n.replace(/^\d+/,'')+(far?' ↗':''),s1,s2-10);ctx.globalAlpha=1});
     if(g.sensor){const[s1,s2]=S(rot(g,g.sensor.x,g.sensor.y));ctx.beginPath();ctx.rect(s1-6,s2-6,12,12);ctx.fillStyle='#ffe08a';ctx.fill();ctx.strokeStyle='#0b2231';ctx.lineWidth=2;ctx.stroke()}
     const w=D.weather[f];if(w&&w.wind!=null){const to=((w.dir+180)-(g.play||0))*Math.PI/180;const ax=W-46,ay=40,L=22;ctx.save();ctx.translate(ax,ay);ctx.rotate(to);
       ctx.strokeStyle=getComputedStyle(document.body).color;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,L);ctx.lineTo(0,-L);ctx.lineTo(-7,-L+9);ctx.moveTo(0,-L);ctx.lineTo(7,-L+9);ctx.stroke();ctx.restore();
@@ -216,7 +217,7 @@ function drawMap(){
   const P=pp=>pp.map(p=>p[0].toFixed(1)+','+(y1-p[1]).toFixed(1)).join(' ');
   let s='';[['approach','--appr'],['fairway','--fair'],['tee','--tee'],['bunker','--bunker']].forEach(([k,v])=>(L[k]||[]).forEach(f=>s+=`<polygon points="${P(f.p)}" fill="var(${v})"/>`));
   G.forEach(h=>{const g=D.greens[h];const st=stats(g,fi);const c=g.qa==='turfrad'&&st?col(st.mean):'#9aa6ad';
-    s+=`<g data-h="${h}" style="cursor:pointer"><circle cx="${g.cx}" cy="${y1-g.cy}" r="22" fill="transparent"/><polygon points="${P(g.poly)}" fill="${c}" stroke="#fff" stroke-width="1.5"/>`+
+    s+=`<g data-h="${h}" style="cursor:pointer"><circle cx="${g.cx}" cy="${y1-g.cy}" r="17" fill="${c}" opacity=".35"/><polygon points="${P(g.poly)}" fill="${c}" stroke="#fff" stroke-width="1.5"/>`+
        `<text x="${g.cx}" y="${y1-g.cy-16}" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="20" fill="currentColor">${h}</text></g>`});
   if(showFw){const byH={};D.fairways.forEach(f=>{const h=(f[0].match(/^\d+/)||[''])[0];(byH[h]=byH[h]||[]).push(f[3])});
     D.fairways.forEach(f=>{const h=(f[0].match(/^\d+/)||[''])[0],a=byH[h],m=a.reduce((p,q)=>p+q,0)/a.length,dv=f[3]-m;const c=dv<-3?'#f46d43':dv<-1?'#fdae61':dv>3?'#2c7fb8':dv>1?'#74add1':'#cfd8dc';
@@ -229,7 +230,7 @@ function openGreen(h){cur=h;$('sheet').classList.add('open');document.body.style
 function drawDetail(){
   const h=cur,g=D.greens[h];prep(g);const st=stats(g,fi);
   $('dTitle').textContent=ord(h)+' green';$('dSub').textContent=fmtT(D.frames[fi])+(fi>D.i_now?' · forecast':fi===D.i_now?' · now':'')+(g.anchor?' · scanned '+fmtT(D.scan_day+'T'+g.anchor):'');
-  $('dNote').textContent=g.qa!=='turfrad'?(g.why||'No reliable reading for this green.')+(g.approx?' Outline drawn from the head positions.':''):(g.events&&g.events.length?'Water picked up by the probes at '+g.events.map(e=>e.at).join(', ')+'.':'');
+  $('dNote').textContent=g.qa!=='turfrad'?(g.why||'No reliable reading for this green.')+(g.approx?' Outline drawn from the head positions.':''):(g.tdr?`TDR walk today: average ${(+g.tdr.mean).toFixed(1)}% (${g.tdr.min}–${g.tdr.max}). The map is set to it. `:'')+(g.events&&g.events.length?'Water picked up by the probes at '+g.events.map(e=>e.at).join(', ')+'.':'');
   drawGreen($('big'),g,fi,{heads:true,pad:30});
   $('dStats').innerHTML=st&&g.qa==='turfrad'?[['Average',st.mean],['Driest',st.min],['Wettest',st.max],['Under '+D.floor+'%',st.below,'m²']].map(([l,v,u])=>`<div class="stat"><div class="num" style="color:${u?'inherit':col(v)}">${u?v:v.toFixed(1)}${u?'':'%'}</div><div class="l">${l}${u?' (m²)':''}</div></div>`).join(''):'';
   // per-head at the selected frame
@@ -244,7 +245,9 @@ function drawDetail(){
   ctx.fillStyle='rgba(10,166,220,.08)';ctx.fillRect(X(D.i_now),0,W-X(D.i_now),H);
   ctx.setLineDash([4*devicePixelRatio,4*devicePixelRatio]);ctx.strokeStyle='rgba(224,49,59,.7)';ctx.beginPath();ctx.moveTo(0,Y(D.floor));ctx.lineTo(W,Y(D.floor));ctx.stroke();ctx.setLineDash([]);
   [['mean','#0aa6dc'],['min','#f46d43']].forEach(([k,c])=>{ctx.strokeStyle=c;ctx.lineWidth=2.5*devicePixelRatio;ctx.beginPath();ser.forEach((s,f)=>{if(!s)return;f?ctx.lineTo(X(f),Y(s[k])):ctx.moveTo(X(f),Y(s[k]))});ctx.stroke()});
-  ctx.fillStyle='#0b2231';ctx.beginPath();ctx.arc(X(fi),Y(ser[fi].mean),4*devicePixelRatio,0,7);ctx.fill();
+  ctx.fillStyle=getComputedStyle(document.body).color;ctx.beginPath();ctx.arc(X(fi),Y(ser[fi].mean),4*devicePixelRatio,0,7);ctx.fill();
+  ctx.font=`600 ${11*devicePixelRatio}px Barlow`;ctx.fillStyle='rgba(111,138,153,1)';ctx.textAlign='left';ctx.fillText(fmtT(D.frames[0]),2,H-4);ctx.textAlign='right';ctx.fillText(fmtT(D.frames[D.frames.length-1]),W-2,H-4);
+  ctx.textAlign='left';ctx.fillStyle='#0aa6dc';ctx.fillText('average',X(D.i_now)+6,12*devicePixelRatio);ctx.fillStyle='#f46d43';ctx.fillText('driest',X(D.i_now)+6+56*devicePixelRatio,12*devicePixelRatio);
 }
 $('close').onclick=()=>{$('sheet').classList.remove('open');document.body.style.overflow=''};
 $('sheet').onclick=e=>{if(e.target.id==='sheet')$('close').onclick()};
