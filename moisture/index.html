@@ -210,8 +210,8 @@ function windLoop(now){requestAnimationFrame(windLoop);const dt=Math.min(.05,(no
     if(p.a>3.5||nx<-10||ny<-10||nx>W+10||ny>H+10){p.x=Math.random()*W;p.y=Math.random()*H;p.a=0}}wctx.stroke()}
 /* ---------- map ---------- */
 function buildMap(){
-  fr=D.frame;map=L.map('map',{zoomControl:false,attributionControl:true,zoomSnap:1,zoomDelta:1,wheelPxPerZoomLevel:110,minZoom:15,maxZoom:21,maxBoundsViscosity:.8,inertiaDeceleration:2400});
-  L.tileLayer('tiles/{z}/{x}/{y}.jpg',{minZoom:15,maxNativeZoom:19,maxZoom:21,bounds:[[-38.12491773,145.23794403],[-38.11659685,145.25110513]],attribution:'Aerial: MetroMap 6 Jan 2026 · Moisture: TurfRad, Spiio, Open-Meteo',keepBuffer:4,className:'aer'}).addTo(map);
+  fr=D.frame;map=L.map('map',{zoomControl:false,attributionControl:true,zoomSnap:.25,zoomDelta:.5,wheelPxPerZoomLevel:90,minZoom:15,maxZoom:21.5,maxBoundsViscosity:.8,inertiaDeceleration:2400});
+  L.tileLayer('tiles/{z}/{x}/{y}.jpg',{minZoom:15,maxNativeZoom:19,maxZoom:21.5,errorTileUrl:'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',bounds:[[-38.12491773,145.23794403],[-38.11659685,145.25110513]],attribution:'Aerial: MetroMap 6 Jan 2026 · Moisture: TurfRad, Spiio, Open-Meteo',keepBuffer:4,className:'aer'}).addTo(map);
   map.setMaxBounds([[-38.1275,145.2345],[-38.1135,145.2545]]);
   map.createPane('heat').style.zIndex=410;map.createPane('lines').style.zIndex=420;
   // course layer from the scan
