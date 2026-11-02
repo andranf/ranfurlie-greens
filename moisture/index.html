@@ -42,7 +42,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0d1b22;font-family:va
 .sw:after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);transition:transform .35s var(--ease)}
 .sw.on{background:var(--green)}.sw.on:after{transform:translateX(18px)}
 /* legend */
-.legend{position:fixed;right:12px;top:50%;transform:translateY(-60%);z-index:900;border-radius:16px;padding:10px 7px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--sec)}
+.legend{position:fixed;right:12px;top:38%;transform:translateY(-50%);z-index:900;border-radius:16px;padding:10px 7px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--sec)}
 .legend .bar{width:8px;height:150px;border-radius:4px}
 .legend .tk{position:relative;height:150px;width:22px}
 .legend .tk span{position:absolute;left:0;transform:translateY(-50%)}
@@ -126,6 +126,7 @@ td.h{font-weight:700}
 .leaflet-tooltip.gl{background:var(--matsolid);backdrop-filter:var(--blur);border:0;border-radius:12px;box-shadow:var(--shadow);color:var(--label);font:600 13px var(--font);padding:6px 10px}
 .leaflet-tooltip.gl:before{display:none}
 #wind{position:absolute;inset:0;z-index:450;pointer-events:none}
+.leaflet-tile-container img.leaflet-tile{width:256.7px!important;height:256.7px!important;outline:none}
 .fade-in{animation:fi .6s var(--ease)}@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 </style>
 </head>
@@ -201,10 +202,10 @@ function windAt(t){const a=D.weather[Math.floor(t)],b=D.weather[Math.min(D.weath
 function sizeWind(){const r=devicePixelRatio||1,el=$('map');wc.width=el.clientWidth*r;wc.height=el.clientHeight*r;wctx=wc.getContext('2d');wctx.scale(r,r);parts=[]}
 let lastF=performance.now();
 function windLoop(now){requestAnimationFrame(windLoop);const dt=Math.min(.05,(now-lastF)/1000);lastF=now;if(!wctx||document.hidden)return;const el=$('map'),W=el.clientWidth,H=el.clientHeight;
-  wctx.globalCompositeOperation='destination-out';wctx.fillStyle='rgba(0,0,0,.09)';wctx.fillRect(0,0,W,H);wctx.globalCompositeOperation='source-over';
+  wctx.globalCompositeOperation='destination-out';wctx.fillStyle='rgba(0,0,0,.16)';wctx.fillRect(0,0,W,H);wctx.globalCompositeOperation='source-over';
   if(!show.wind||!D)return;const w=windAt(T);if(!w)return;const to=(w.dir+180)*Math.PI/180,sp=14+w.wind*3.2,vx=Math.sin(to)*sp,vy=-Math.cos(to)*sp;
   const N=Math.round(W*H/9000);while(parts.length<N)parts.push({x:Math.random()*W,y:Math.random()*H,a:Math.random()*3});
-  wctx.strokeStyle='rgba(255,255,255,.42)';wctx.lineWidth=1.2;wctx.lineCap='round';wctx.beginPath();
+  wctx.strokeStyle='rgba(255,255,255,.32)';wctx.lineWidth=1;wctx.lineCap='round';wctx.beginPath();
   for(const p of parts){const j=.75+.5*Math.sin(p.a*3+p.x*.01),nx=p.x+vx*dt*j,ny=p.y+vy*dt*j;wctx.moveTo(p.x,p.y);wctx.lineTo(nx,ny);p.x=nx;p.y=ny;p.a+=dt;
     if(p.a>3.5||nx<-10||ny<-10||nx>W+10||ny>H+10){p.x=Math.random()*W;p.y=Math.random()*H;p.a=0}}wctx.stroke()}
 /* ---------- map ---------- */
@@ -233,14 +234,14 @@ function buildMap(){
     m.addTo(layers.heads)});
   G.forEach(h=>D.greens[h].heads.forEach(hd=>{hd._lab=L.marker(ll(hd.x,hd.y),{icon:L.divIcon({className:'',html:'<div class="hlab"></div>',iconSize:null}),interactive:false}).addTo(layers.hlabs)}));
   // probes
-  layers.probes=L.layerGroup();D.sensors.forEach(s=>L.marker(ll(s.x,s.y),{icon:L.divIcon({className:'',html:`<div class="probe glass"><i></i>${s.now??'–'}%</div>`,iconSize:null})}).bindTooltip(`<b>${/^\d+$/.test(s.green)?ord(s.green)+' green':s.green} probe</b><br>${s.depth} cm · ${s.now??'–'}% · last in ${s.at?fmtT(s.at.replace(' ','T')):'–'}`,{className:'gl',direction:'top',offset:[0,-10]}).addTo(layers.probes));
+  layers.probes=L.layerGroup();D.sensors.forEach(s=>L.marker(ll(s.x,s.y),{icon:L.divIcon({className:'',html:`<div class="probe glass"><i></i>probe ${s.now??'–'}% <span style="opacity:.6;font-weight:600">${s.depth} cm</span></div>`,iconSize:null})}).bindTooltip(`<b>${/^\d+$/.test(s.green)?ord(s.green)+' green':s.green} probe</b><br>${s.depth} cm · ${s.now??'–'}% · last in ${s.at?fmtT(s.at.replace(' ','T')):'–'}`,{className:'gl',direction:'top',offset:[0,-10]}).addTo(layers.probes));
   layers.probes.addTo(map);layers.spots=L.layerGroup().addTo(map);
   $('map').appendChild(wc);sizeWind();map.on('resize',sizeWind);
   map.on('zoomend',zoomDeco);home(false);zoomDeco();requestAnimationFrame(windLoop);
 }
 function zoomDeco(){const z=map.getZoom();
   toggle(layers.heads,show.heads&&z>=17.5);toggle(layers.hlabs,show.heads&&z>=19.75);toggle(layers.probes,show.probes&&z>=16);
-  document.querySelectorAll('.gbadge').forEach(e=>e.classList.toggle('small',z<17.25));}
+  document.querySelectorAll('.gbadge').forEach(e=>e.classList.toggle('small',z<17.25));lastSheet='';render()}
 function toggle(l,on){if(!l)return;on?map.hasLayer(l)||l.addTo(map):map.hasLayer(l)&&map.removeLayer(l)}
 function headVal(h,n){const g=D.greens[h];if(!g||g.qa!=='turfrad')return null;const v=cellVals(g,T);let s=0,c=0;g._own.forEach((o,i)=>{if(o===n){s+=v[i];c++}});return c?s/c:null}
 function home(anim=true){const b=L.latLngBounds(G.map(h=>ll(D.greens[h].cx,D.greens[h].cy)));map.flyToBounds(b,{paddingTopLeft:pad()[0],paddingBottomRight:pad()[1],duration:anim?1.1:0,animate:anim});}
@@ -299,7 +300,7 @@ function spark(h){const cv=$('spk');if(!cv)return;const r=devicePixelRatio||1,W=
   [['mean','#0a84ff'],['min','#ff9500']].forEach(([k,c])=>{ctx.strokeStyle=c;ctx.lineWidth=2.4*r;ctx.lineJoin='round';ctx.beginPath();ser.forEach((s,i)=>i?ctx.lineTo(X(i),Y(s[k])):ctx.moveTo(X(i),Y(s[k])));ctx.stroke()});
   const s=gstats(g,T);ctx.fillStyle=css.color;ctx.beginPath();ctx.arc(T/(n-1)*W,Y(s.mean),4*r,0,7);ctx.fill();
   ctx.font=`600 ${10.5*r}px -apple-system,Inter,sans-serif`;ctx.fillStyle=css.getPropertyValue('--sec');ctx.textAlign='left';ctx.fillText(fmtT(D.frames[0]),0,H-2*r);ctx.textAlign='right';ctx.fillText(fmtT(D.frames[n-1]),W,H-2*r);
-  ctx.textAlign='left';ctx.fillStyle='#0a84ff';ctx.fillText('average',4*r,11*r);ctx.fillStyle='#ff9500';ctx.fillText('driest',60*r,11*r)}
+  ctx.textAlign='center';ctx.fillStyle='#0a84ff';ctx.fillText('average',W/2-30*r,H-2*r);ctx.fillStyle='#ff9500';ctx.fillText('driest',W/2+30*r,H-2*r)}
 function select(h){sel=h;lastSheet='';if(h){const g=D.greens[h],P=g._px;map.flyToBounds([ll(P.x0-8,P.y0-8),ll(P.x1+8,P.y1+8)],{paddingTopLeft:pad()[0],paddingBottomRight:pad()[1],duration:1.2,maxZoom:21});if(innerWidth<900)snap(1)}else home();$('sc').scrollTop=0;draw()}
 /* ---------- sheet drag (peek / half / full) ---------- */
 const sh=$('sheet');let det=0;const dets=()=>[214,Math.round(innerHeight*.52),Math.round(innerHeight*.9)];
