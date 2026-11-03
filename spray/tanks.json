@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-04-greens-remediator-flush",
+   "title": "Remediator Flush + Chino, Greens",
+   "sprayer": "JD HD200",
+   "date_iso": "2026-11-04",
+   "date": "Wed 4 Nov",
+   "applicator": "Nathan Ferguson",
+   "method": "boom"
+  },
+  {
    "slug": "2026-10-28-greens-iron-sulphate",
    "title": "Iron Sulphate + Regulate, Greens",
    "sprayer": "JD HD200",
