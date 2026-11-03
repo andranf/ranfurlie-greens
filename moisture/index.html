@@ -49,10 +49,10 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0d1b22;font-family:va
 /* sheet */
 .sheet{position:fixed;left:0;right:0;bottom:0;height:92dvh;z-index:1000;border-radius:28px 28px 0 0;transform:translateY(calc(92dvh - var(--peek,214px)));transition:transform .55s var(--ease);display:flex;flex-direction:column;will-change:transform}
 .sheet.drag{transition:none}
-.grab{padding:8px 0 2px;cursor:grab;touch-action:none}
+.grab{padding:10px 0 8px;cursor:grab;touch-action:none}
 .grab i{display:block;width:38px;height:5px;border-radius:3px;background:var(--ter);margin:0 auto}
-.head{padding:4px 18px 0;touch-action:none}
-.scroll{overflow:auto;padding:0 16px calc(28px + env(safe-area-inset-bottom));flex:1;overscroll-behavior:contain}
+.head{padding:0 18px 0;touch-action:none;cursor:grab}
+.scroll{overflow:hidden;-webkit-overflow-scrolling:touch;padding:0 16px calc(28px + env(safe-area-inset-bottom));flex:1;overscroll-behavior:contain}
 @media (min-width:900px){.sheet{left:16px;right:auto;top:calc(max(10px,env(safe-area-inset-top)) + 70px);bottom:16px;width:400px;height:auto;border-radius:28px;transform:none!important}.grab{display:none}.legend{right:16px}}
 /* timeline */
 .tl{display:flex;align-items:center;gap:12px;padding:6px 0 4px}
@@ -302,15 +302,30 @@ function spark(h){const cv=$('spk');if(!cv)return;const r=devicePixelRatio||1,W=
   ctx.font=`600 ${10.5*r}px -apple-system,Inter,sans-serif`;ctx.fillStyle=css.getPropertyValue('--sec');ctx.textAlign='left';ctx.fillText(fmtT(D.frames[0]),0,H-2*r);ctx.textAlign='right';ctx.fillText(fmtT(D.frames[n-1]),W,H-2*r);
   ctx.textAlign='center';ctx.fillStyle='#0a84ff';ctx.fillText('average',W/2-30*r,H-2*r);ctx.fillStyle='#ff9500';ctx.fillText('driest',W/2+30*r,H-2*r)}
 function select(h){sel=h;lastSheet='';if(h){if(innerWidth<900)snap(1);const g=D.greens[h],P=g._px;map.flyToBounds([ll(P.x0-8,P.y0-8),ll(P.x1+8,P.y1+8)],{paddingTopLeft:pad()[0],paddingBottomRight:pad()[1],duration:1.2,maxZoom:21})}else home();$('sc').scrollTop=0;draw()}
-/* ---------- sheet drag (peek / half / full) ---------- */
-const sh=$('sheet');let det=0;const dets=()=>[214,Math.round(innerHeight*.52),Math.round(innerHeight*.9)];
-function sheetH(){return innerWidth>=900?0:dets()[det]}
-function snap(i){det=i;sh.style.setProperty('--peek',dets()[i]+'px')}
-(()=>{let y0=null,h0=0,lastY=0,lastT=0,v=0;const start=e=>{if(innerWidth>=900)return;y0=e.clientY;h0=dets()[det];sh.classList.add('drag');lastY=y0;lastT=performance.now();e.target.setPointerCapture&&e.target.setPointerCapture(e.pointerId)};
-  const move=e=>{if(y0==null)return;const h=Math.max(120,Math.min(innerHeight*.92,h0+(y0-e.clientY)));sh.style.setProperty('--peek',h+'px');const now=performance.now();v=(lastY-e.clientY)/Math.max(1,now-lastT);lastY=e.clientY;lastT=now};
-  const end=e=>{if(y0==null)return;sh.classList.remove('drag');const h=h0+(y0-e.clientY)+v*180,d=dets();let b=0;d.forEach((x,i)=>{if(Math.abs(x-h)<Math.abs(d[b]-h))b=i});y0=null;snap(b)};
-  [$('grab')].forEach(el=>{el.addEventListener('pointerdown',start);el.addEventListener('pointermove',move);el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end)});
-  $('grab').addEventListener('click',()=>{if(Math.abs(v)<.05)snap((det+1)%3)})})();
+/* ---------- sheet: peek / half / full, drag from anywhere on it (Apple Maps style) ---------- */
+const sh=$('sheet'),scr=$('sc');let det=0;
+const dets=()=>[214,Math.round(innerHeight*.52),Math.round(innerHeight*.9)];
+const wide=()=>innerWidth>=900;
+function sheetH(){return wide()?0:dets()[det]}
+function setH(h,anim){sh.classList.toggle('drag',!anim);sh.style.setProperty('--peek',Math.round(h)+'px')}
+function snap(i){det=Math.max(0,Math.min(2,i));setH(dets()[det],true);scr.style.overflowY=(det===2||wide())?'auto':'hidden';if(det<2)scr.scrollTop=0}
+function settle(g){const d=dets();let i;if(Math.abs(g.v)>.35)i=det+(g.v>0?1:-1);else{i=0;d.forEach((x,k)=>{if(Math.abs(x-g.h)<Math.abs(d[i]-g.h))i=k})}
+  if(g.h<d[0]-60)i=0;snap(i)}
+const tapToggle=t=>t.closest('.grab,.head')&&!t.closest('.rng,.play,.ticks span,button,input');
+let gs=null;
+sh.addEventListener('touchstart',e=>{if(wide()||e.touches.length>1)return;const t=e.touches[0];if(e.target.closest('.rng,.play,input'))return;
+  gs={y0:t.clientY,ly:t.clientY,lt:performance.now(),h0:dets()[det],h:dets()[det],v:0,mode:null,tgt:e.target}},{passive:true});
+sh.addEventListener('touchmove',e=>{if(!gs)return;const t=e.touches[0],dy=t.clientY-gs.y0;
+  if(!gs.mode){if(Math.abs(dy)<6)return;const inList=gs.tgt.closest('#sc');gs.mode=(!inList||det<2||(scr.scrollTop<=0&&dy>0))?'sheet':'scroll'}
+  if(gs.mode!=='sheet')return;e.preventDefault();gs.h=Math.max(120,Math.min(innerHeight*.94,gs.h0-dy));setH(gs.h,false);
+  const now=performance.now();gs.v=(gs.ly-t.clientY)/Math.max(1,now-gs.lt);gs.ly=t.clientY;gs.lt=now},{passive:false});
+sh.addEventListener('touchend',e=>{if(!gs)return;const g=gs;gs=null;if(g.mode==='sheet')return settle(g);if(!g.mode&&tapToggle(g.tgt))snap(det<2?det+1:0)});
+sh.addEventListener('touchcancel',()=>{if(gs&&gs.mode==='sheet')settle(gs);gs=null});
+// mouse (desktop browsers at phone width)
+let gm=null;
+sh.addEventListener('mousedown',e=>{if(wide()||!e.target.closest('.grab,.head')||e.target.closest('.rng,.play,input'))return;gm={y0:e.clientY,ly:e.clientY,lt:performance.now(),h0:dets()[det],h:dets()[det],v:0,moved:false,tgt:e.target}});
+addEventListener('mousemove',e=>{if(!gm)return;const dy=e.clientY-gm.y0;if(Math.abs(dy)>4)gm.moved=true;if(!gm.moved)return;gm.h=Math.max(120,Math.min(innerHeight*.94,gm.h0-dy));setH(gm.h,false);const now=performance.now();gm.v=(gm.ly-e.clientY)/Math.max(1,now-gm.lt);gm.ly=e.clientY;gm.lt=now});
+addEventListener('mouseup',()=>{if(!gm)return;const g=gm;gm=null;if(g.moved)settle(g);else if(tapToggle(g.tgt))snap(det<2?det+1:0)});
 /* ---------- timeline ---------- */
 function ticks(){const n=D.frames.length-1,mk=[[0,'Scan'],[D.i_now,'Now'],[D.i_16,'4 pm'],[D.i_22,'10 pm']].filter(x=>x[0]!=null);
   $('ticks').innerHTML=mk.map(([i,l])=>`<span data-i="${i}" style="left:${i/n*100}%;cursor:pointer;padding:2px 4px;${l==='Now'?'color:var(--blue)':''}">${l}</span>`).join('');
