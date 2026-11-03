@@ -570,5 +570,52 @@
   ],
   "why": "A suspension: goes in last, into the mixed tank, so it stays spread through it. You're at {before} L.",
   "src": "Label APVMA 88674/121954 · <a href=\"https://www.nuturf.com.au/images/product-tech-sds/ProForce_Regulate_PGR_2.5L_Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://www.nuturf.com.au/images/product-tech-sds/ProForce_Regulate_PGR_200SC_Technical_Sheet.pdf\" target=\"_blank\" rel=\"noopener\">tech sheet</a>"
+ },
+ "remediator": {
+  "name": "Remediator",
+  "gk_name": "Remediator",
+  "sig": "No label on file",
+  "sigc": "",
+  "form": "Liquid soil flush",
+  "what": "Soil flush / profile reset product. No ingredient record in GreenKeeper",
+  "haz": "No label or SDS on file: treat it as hazardous.",
+  "soft": true,
+  "hazFull": "No label or SDS in Turf Data and none found online. Read the drum label for rate, mixing and PPE before use. Until then: goggles, elbow-length gloves and apron when pouring, eyewash on the rig.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles",
+   "apron"
+  ],
+  "how": [
+   "Read the drum label first",
+   "Shake or agitate the drums",
+   "Pour {amt}, agitator on",
+   "Rinse the drums into the tank"
+  ],
+  "why": "Big volume, goes in second as on the sheet, after the Companion. You're at {before} L.",
+  "src": "Turf Data shed products (unverified) · no label or SDS found"
+ },
+ "chino": {
+  "name": "Chino 400 SC",
+  "gk_name": "Chino 400 SC",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Suspension concentrate (SC)",
+  "what": "Cyazofamid 400 g/L, Group 21 fungicide for Pythium (Campbell)",
+  "haz": "Avoid skin contact. Wash after use.",
+  "hazFull": "Cyazofamid 400 SC labels: CAUTION. Cotton overalls buttoned to neck and wrist, elbow-length chemical-resistant gloves. Turf: 1.0 L/ha (10 mL/100 m²) in 400–500 L/ha, spray before disease shows, consecutive sprays about 21 days apart; lightly water in for Pythium root rot and root dysfunction. Medium droplets or coarser, wind 3–20 km/h, no spraying in an inversion. Group 21.",
+  "ppe": [
+   "overalls",
+   "gloves"
+  ],
+  "how": [
+   "Shake the drum well",
+   "Measure {amt}",
+   "Pour in with the agitator running",
+   "Rinse the jug into the tank"
+  ],
+  "why": "A suspension: label says add it to a tank at least half full with the agitator running. Goes in last. You're at {before} L.",
+  "src": "APVMA 94408 · <a href=\"https://fernland.com.au/chino-400sc-turf-fungicide\" target=\"_blank\" rel=\"noopener\">product page</a> · <a href=\"https://nuturf.com.au/images/product-tech-sds/ISK-Segway-LABEL.pdf\" target=\"_blank\" rel=\"noopener\">cyazofamid 400 SC label (Segway)</a>"
  }
 }
