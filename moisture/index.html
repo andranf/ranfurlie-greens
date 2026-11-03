@@ -312,18 +312,18 @@ function snap(i){det=Math.max(0,Math.min(2,i));setH(dets()[det],true);scr.style.
 function settle(g){const d=dets();let i;if(Math.abs(g.v)>.35)i=det+(g.v>0?1:-1);else{i=0;d.forEach((x,k)=>{if(Math.abs(x-g.h)<Math.abs(d[i]-g.h))i=k})}
   if(g.h<d[0]-60)i=0;snap(i)}
 const tapToggle=t=>t.closest('.grab,.head')&&!t.closest('.rng,.play,.ticks span,button,input');
-let gs=null;
-sh.addEventListener('touchstart',e=>{if(wide()||e.touches.length>1)return;const t=e.touches[0];if(e.target.closest('.rng,.play,input'))return;
+let gs=null,lastTouch=0;
+sh.addEventListener('touchstart',e=>{lastTouch=Date.now();if(wide()||e.touches.length>1)return;const t=e.touches[0];if(e.target.closest('.rng,.play,input'))return;
   gs={y0:t.clientY,ly:t.clientY,lt:performance.now(),h0:dets()[det],h:dets()[det],v:0,mode:null,tgt:e.target}},{passive:true});
 sh.addEventListener('touchmove',e=>{if(!gs)return;const t=e.touches[0],dy=t.clientY-gs.y0;
   if(!gs.mode){if(Math.abs(dy)<6)return;const inList=gs.tgt.closest('#sc');gs.mode=(!inList||det<2||(scr.scrollTop<=0&&dy>0))?'sheet':'scroll'}
   if(gs.mode!=='sheet')return;e.preventDefault();gs.h=Math.max(120,Math.min(innerHeight*.94,gs.h0-dy));setH(gs.h,false);
   const now=performance.now();gs.v=(gs.ly-t.clientY)/Math.max(1,now-gs.lt);gs.ly=t.clientY;gs.lt=now},{passive:false});
-sh.addEventListener('touchend',e=>{if(!gs)return;const g=gs;gs=null;if(g.mode==='sheet')return settle(g);if(!g.mode&&tapToggle(g.tgt))snap(det<2?det+1:0)});
+sh.addEventListener('touchend',e=>{lastTouch=Date.now();if(!gs)return;const g=gs;gs=null;if(g.mode==='sheet')return settle(g);if(!g.mode&&tapToggle(g.tgt))snap(det<2?det+1:0)});
 sh.addEventListener('touchcancel',()=>{if(gs&&gs.mode==='sheet')settle(gs);gs=null});
 // mouse (desktop browsers at phone width)
 let gm=null;
-sh.addEventListener('mousedown',e=>{if(wide()||!e.target.closest('.grab,.head')||e.target.closest('.rng,.play,input'))return;gm={y0:e.clientY,ly:e.clientY,lt:performance.now(),h0:dets()[det],h:dets()[det],v:0,moved:false,tgt:e.target}});
+sh.addEventListener('mousedown',e=>{if(Date.now()-lastTouch<900||wide()||!e.target.closest('.grab,.head')||e.target.closest('.rng,.play,input'))return;gm={y0:e.clientY,ly:e.clientY,lt:performance.now(),h0:dets()[det],h:dets()[det],v:0,moved:false,tgt:e.target}});
 addEventListener('mousemove',e=>{if(!gm)return;const dy=e.clientY-gm.y0;if(Math.abs(dy)>4)gm.moved=true;if(!gm.moved)return;gm.h=Math.max(120,Math.min(innerHeight*.94,gm.h0-dy));setH(gm.h,false);const now=performance.now();gm.v=(gm.ly-e.clientY)/Math.max(1,now-gm.lt);gm.ly=e.clientY;gm.lt=now});
 addEventListener('mouseup',()=>{if(!gm)return;const g=gm;gm=null;if(g.moved)settle(g);else if(tapToggle(g.tgt))snap(det<2?det+1:0)});
 /* ---------- timeline ---------- */
