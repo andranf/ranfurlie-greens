@@ -188,14 +188,40 @@ function prepGreen(h){const g=D.greens[h];if(g._px)return;const xs=g.poly.map(p=
   g._cw=g._c.map(([x,y])=>{let s=0;const ws=g.pts.map(p=>{const q=Math.max((x-p.x)**2+(y-p.y)**2,.01);s+=1/q;return 1/q});return ws.map(v=>v/s)});
   g._own=g._c.map(([x,y])=>{let b=null,bd=1e9;for(const hd of g.heads){const d=(hd.x-x)**2+(hd.y-y)**2;if(d<bd){bd=d;b=hd.n}}return b});
   const r=(g.play||0)*Math.PI/180;g._cos=Math.cos(r);g._sin=Math.sin(r)}
-function paintGreen(h){const g=D.greens[h],P=g._px,img=g._img.data,ok=g.qa==='turfrad';const vals=g.pts.map(p=>pv(p,T));
+function paintGreen(h){const g=D.greens[h],P=g._px,img=g._img.data,ok=g.qa!=='none',est=g.qa!=='turfrad';const vals=g.pts.map(p=>pv(p,T));
   img.fill(0);for(let a=0;a<P.idx.length;a++){const o=P.idx[a]*4;let v=0;const b=a*P.n;for(let k=0;k<P.n;k++)v+=P.W[b+k]*vals[k];
-    if(ok){let li=Math.round((v-5)*20);li=li<0?0:li>800?800:li;img[o]=LUT[li*3];img[o+1]=LUT[li*3+1];img[o+2]=LUT[li*3+2];img[o+3]=235}
+    if(ok){let li=Math.round((v-5)*20);li=li<0?0:li>800?800:li;img[o]=LUT[li*3];img[o+1]=LUT[li*3+1];img[o+2]=LUT[li*3+2];img[o+3]=est?205:235}
     else{const s=((P.idx[a]%P.w)+Math.floor(P.idx[a]/P.w))%8<3;img[o]=s?200:150;img[o+1]=s?205:155;img[o+2]=s?210:160;img[o+3]=170}}
   g._ctx.putImageData(g._img,0,0)}
 const cellVals=(g,t)=>{const vals=g.pts.map(p=>pv(p,t));return g._cw.map(w=>w.reduce((s,wk,k)=>s+wk*vals[k],0))};
-function gstats(g,t){if(g.qa!=='turfrad')return null;const v=cellVals(g,t);let s=0,mi=1e9,ma=-1e9,mc=0,b=0;v.forEach((x,i)=>{s+=x;if(x<mi){mi=x;mc=i}if(x>ma)ma=x;if(x<D.floor)b++});return{mean:s/v.length,min:mi,max:ma,below:b,at:g._c[mc],own:g._own[mc]}}
+function gstats(g,t){if(g.qa==='none')return null;const v=cellVals(g,t);let s=0,mi=1e9,ma=-1e9,mc=0,b=0;v.forEach((x,i)=>{s+=x;if(x<mi){mi=x;mc=i}if(x>ma)ma=x;if(x<D.floor)b++});return{mean:s/v.length,min:mi,max:ma,below:b,at:g._c[mc],own:g._own[mc]}}
 function side(g,x,y){const dx=x-g.cx,dy=y-g.cy,al=dx*g._sin+dy*g._cos,ac=dx*g._cos-dy*g._sin;const fb=al>2?'back':al<-2?'front':'middle',lr=ac>2?'right':ac<-2?'left':'';return lr&&fb!=='middle'?fb+'-'+lr:lr||fb}
+/* ---------- fairways, surrounds, tees, practice surfaces: one predictive canvas ---------- */
+let CR=null;const RC=.8;
+function coursePolys(){const out=[];[['fairway','Fairway'],['approach','Surround'],['tee','Tee']].forEach(([k,l])=>(GEO.layers[k]||[]).forEach(f=>out.push({p:f.p,l,h:f.h})));
+  if(GEO.greens.Practice)out.push({p:GEO.greens.Practice,l:'Practice green'});Object.entries((D.fw||{}).extra_polys||{}).forEach(([l,p])=>out.push({p,l}));return out}
+function prepCourse(){const F=D.fpts||[];if(!F.length)return null;const polys=coursePolys();let xs=[],ys=[];polys.forEach(o=>o.p.forEach(q=>{xs.push(q[0]);ys.push(q[1])}));
+  const x0=Math.min(...xs)-2,x1=Math.max(...xs)+2,y0=Math.min(...ys)-2,y1=Math.max(...ys)+2,w=Math.ceil((x1-x0)/RC),h=Math.ceil((y1-y0)/RC);
+  const mc=document.createElement('canvas');mc.width=w;mc.height=h;const m=mc.getContext('2d');m.fillStyle='#fff';
+  polys.forEach(o=>{m.beginPath();o.p.forEach((q,i)=>{const X=(q[0]-x0)/RC,Y=(y1-q[1])/RC;i?m.lineTo(X,Y):m.moveTo(X,Y)});m.closePath();m.fill()});
+  const A=m.getImageData(0,0,w,h).data,idx=[],al=[];for(let i=0;i<w*h;i++)if(A[i*4+3]>0){idx.push(i);al.push(A[i*4+3])}
+  // bucket the control points (25 m) for nearest-neighbour lookups
+  const B=25,bk=new Map();F.forEach((f,k)=>{const key=Math.floor(f[1]/B)+','+Math.floor(f[2]/B);(bk.get(key)||bk.set(key,[]).get(key)).push(k)});
+  const K=5,NI=new Uint16Array(idx.length*K),NW=new Float32Array(idx.length*K);
+  for(let a=0;a<idx.length;a++){const px=x0+(idx[a]%w+.5)*RC,py=y1-(Math.floor(idx[a]/w)+.5)*RC,bx=Math.floor(px/B),by=Math.floor(py/B);let cand=[];
+    for(let r=1;r<=6&&cand.length<K;r++){cand=[];for(let i=-r;i<=r;i++)for(let j=-r;j<=r;j++){const l=bk.get((bx+i)+','+(by+j));if(l)cand.push(...l)}}
+    if(cand.length<1)cand=F.map((_,k)=>k);
+    const d=cand.map(k=>[k,(F[k][1]-px)**2+(F[k][2]-py)**2]).sort((u,v)=>u[1]-v[1]).slice(0,K);let s=0;
+    d.forEach(([k,q],j)=>{const wt=1/Math.max(q,1);NI[a*K+j]=k;NW[a*K+j]=wt;s+=wt});for(let j=0;j<K;j++)NW[a*K+j]/=s||1}
+  const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');
+  return{names:F.map(f=>f[0]).join(),x0,x1,y0,y1,w,h,idx:Int32Array.from(idx),al:Uint8Array.from(al),NI,NW,K,cv:c,ctx,img:ctx.createImageData(w,h),polys}}
+function courseVal(t){const F=D.fpts;return F.map(f=>{const v=f[3],i=Math.floor(t),j=Math.min(v.length-1,i+1);return v[i]*(1-(t-i))+v[j]*(t-i)})}
+function paintCourse(){if(!CR||!show.course)return;const V=courseVal(T),im=CR.img.data,{idx,al,NI,NW,K}=CR;
+  for(let a=0;a<idx.length;a++){let v=0;const b=a*K;for(let j=0;j<K;j++)v+=NW[b+j]*V[NI[b+j]];let li=Math.round((v-5)*20);li=li<0?0:li>800?800:li;const o=idx[a]*4;
+    im[o]=LUT[li*3];im[o+1]=LUT[li*3+1];im[o+2]=LUT[li*3+2];im[o+3]=al[a]*.84}
+  CR.ctx.putImageData(CR.img,0,0)}
+function courseAt(x,y){if(!CR)return null;const i=Math.floor((x-CR.x0)/RC),j=Math.floor((CR.y1-y)/RC);if(i<0||j<0||i>=CR.w||j>=CR.h)return null;const pix=j*CR.w+i;
+  let lo=0,hi=CR.idx.length-1;while(lo<=hi){const m=(lo+hi)>>1;if(CR.idx[m]===pix){const V=courseVal(T);let v=0;for(let k=0;k<CR.K;k++)v+=CR.NW[m*CR.K+k]*V[CR.NI[m*CR.K+k]];return v}if(CR.idx[m]<pix)lo=m+1;else hi=m-1}return null}
 /* ---------- wind particles ---------- */
 const wc=document.createElement('canvas');wc.id='wind';let wctx,parts=[];
 function windAt(t){const a=D.weather[Math.floor(t)],b=D.weather[Math.min(D.weather.length-1,Math.floor(t)+1)];if(!a||a.wind==null)return null;return{wind:a.wind+(b.wind-a.wind)*(t%1),dir:a.dir}}
@@ -215,7 +241,8 @@ function buildMap(){
   map.setMaxBounds([[-38.1275,145.2345],[-38.1135,145.2545]]);
   map.createPane('heat').style.zIndex=410;map.createPane('lines').style.zIndex=420;
   // course layer from the scan
-  if(D.course_heat)layers.course=L.imageOverlay(D.course_heat.url,D.course_heat.bounds,{pane:'heat',opacity:.62,interactive:false}).addTo(map);
+  CR=prepCourse();if(CR){paintCourse();layers.course=new CanvasOverlay(CR.cv,[ll(CR.x0,CR.y0),ll(CR.x1,CR.y1)],{pane:'heat',opacity:1,interactive:false}).addTo(map)}
+  Object.values((D.fw||{}).extra_polys||{}).forEach(p=>L.polygon(p.map(q=>ll(q[0],q[1])),{pane:'lines',color:'rgba(255,255,255,.7)',weight:1,fill:false,interactive:false}).addTo(map));
   // outlines
   const ol=L.layerGroup();const P=pp=>pp.map(p=>ll(p[0],p[1]));
   [['fairway','rgba(255,255,255,.45)',.8],['approach','rgba(255,255,255,.32)',.6],['tee','rgba(255,255,255,.45)',.8],['bunker','rgba(255,236,190,.85)',1]].forEach(([k,c,w])=>(GEO.layers[k]||[]).forEach(f=>L.polygon(P(f.p),{pane:'lines',color:c,weight:w,fill:false,interactive:false}).addTo(ol)));
@@ -224,7 +251,7 @@ function buildMap(){
   layers.greens=L.layerGroup().addTo(map);layers.glines=L.layerGroup().addTo(map);layers.badges=L.layerGroup().addTo(map);
   G.forEach(h=>{const g=D.greens[h];prepGreen(h);paintGreen(h);const P2=g._px;
     g._ov=new CanvasOverlay(g._cv,[ll(P2.x0,P2.y0),ll(P2.x1,P2.y1)],{pane:'heat',opacity:1,interactive:false}).addTo(layers.greens);
-    L.polygon(P(g.poly),{pane:'lines',color:'#fff',weight:1.6,opacity:.9,fill:true,fillOpacity:0}).on('click',()=>select(h)).addTo(layers.glines);
+    L.polygon(P(g.poly),{pane:'lines',color:'#fff',weight:1.6,opacity:.9,dashArray:g.qa!=='turfrad'?'5 5':null,fill:true,fillOpacity:0}).on('click',()=>select(h)).addTo(layers.glines);
     g._bd=L.marker(ll(g.cx,g.cy),{icon:L.divIcon({className:'',html:`<div class="gbadge glass" data-h="${h}"><i>${h}</i><span class="pc"></span></div>`,iconSize:null}),zIndexOffset:500}).on('click',()=>select(h)).addTo(layers.badges)});
   // sprinklers (canvas renderer) + green head labels
   const rend=L.canvas({padding:.5});layers.heads=L.layerGroup();layers.hlabs=L.layerGroup();
@@ -237,13 +264,17 @@ function buildMap(){
   layers.probes=L.layerGroup();D.sensors.forEach(s=>L.marker(ll(s.x,s.y),{icon:L.divIcon({className:'',html:`<div class="probe glass"><i></i>probe ${s.now??'–'}% <span style="opacity:.6;font-weight:600">${s.depth} cm</span></div>`,iconSize:null})}).bindTooltip(`<b>${/^\d+$/.test(s.green)?ord(s.green)+' green':s.green} probe</b><br>${s.depth} cm · ${s.now??'–'}% · last in ${s.at?fmtT(s.at.replace(' ','T')):'–'}`,{className:'gl',direction:'top',offset:[0,-10]}).addTo(layers.probes));
   layers.probes.addTo(map);layers.spots=L.layerGroup().addTo(map);
   $('map').appendChild(wc);sizeWind();map.on('resize',sizeWind);
+  map.on('click',e=>{const x=(e.latlng.lng-fr.lon0)*fr.kx,y=(e.latlng.lat-fr.lat0)*fr.ky;let txt=null;
+    for(const h of G){const g=D.greens[h];if(pip(x,y,g.poly)&&g.qa!=='none'){let n=0,d=0;g.pts.forEach(p=>{const q=Math.max((x-p.x)**2+(y-p.y)**2,.01);n+=pv(p,T)/q;d+=1/q});txt=`<b>${ord(h)} green</b> · ${(n/d).toFixed(1)}%${g.qa!=='turfrad'?' est.':''}`;break}}
+    if(!txt&&CR&&show.course){const v=courseAt(x,y);if(v!=null){const a=CR.polys.find(o=>pip(x,y,o.p));txt=`<b>${a?(a.h&&a.l!=='Fairway'?ord(a.h)+' ':'')+a.l:'Area'}</b> · ${v.toFixed(1)}%`}}
+    if(window._tt)map.removeLayer(window._tt);window._tt=null;if(txt)window._tt=L.tooltip({className:'gl',direction:'top',offset:[0,-6]}).setLatLng(e.latlng).setContent(txt).addTo(map)});
   map.on('zoomend',zoomDeco);home(false);zoomDeco();requestAnimationFrame(windLoop);
 }
 function zoomDeco(){const z=map.getZoom();
   toggle(layers.heads,show.heads&&z>=17.5);toggle(layers.hlabs,show.heads&&z>=19.75);toggle(layers.probes,show.probes&&z>=16);
   document.querySelectorAll('.gbadge').forEach(e=>e.classList.toggle('small',z<17.25));lastSheet='';render()}
 function toggle(l,on){if(!l)return;on?map.hasLayer(l)||l.addTo(map):map.hasLayer(l)&&map.removeLayer(l)}
-function headVal(h,n){const g=D.greens[h];if(!g||g.qa!=='turfrad')return null;const v=cellVals(g,T);let s=0,c=0;g._own.forEach((o,i)=>{if(o===n){s+=v[i];c++}});return c?s/c:null}
+function headVal(h,n){const g=D.greens[h];if(!g||g.qa==='none')return null;const v=cellVals(g,T);let s=0,c=0;g._own.forEach((o,i)=>{if(o===n){s+=v[i];c++}});return c?s/c:null}
 function home(anim=true){const b=L.latLngBounds(G.map(h=>ll(D.greens[h].cx,D.greens[h].cy)));map.flyToBounds(b,{paddingTopLeft:pad()[0],paddingBottomRight:pad()[1],duration:anim?1.1:0,animate:anim});}
 function pad(){const wide=innerWidth>=900;return wide?[[440,80],[70,30]]:[[20,90],[60,(sheetH()||220)+10]]}
 /* ---------- render ---------- */
@@ -253,7 +284,7 @@ function draw(){
   $('wt').textContent=fmtT(new Date(ms));const ws=$('ws');ws.className=fut?'fc':'';ws.textContent=Math.abs(t-D.i_now)<.05?'Now':fut?'Forecast · assumes no irrigation':t<.05?'At the scan':'Earlier today';
   const pc=t/(D.frames.length-1)*100;$('thumb').style.left=pc+'%';$('tpast').style.width=Math.min(pc,D.i_now/(D.frames.length-1)*100)+'%';$('tfut').style.left=D.i_now/(D.frames.length-1)*100+'%';
   if(document.activeElement!==$('rng'))$('rng').value=t;
-  G.forEach(h=>{paintGreen(h);const g=D.greens[h],s=gstats(g,t),e=g._bd&&g._bd.getElement();if(e){const b=e.querySelector('.gbadge');b.querySelector('.pc').textContent=s?s.mean.toFixed(1)+'%':'–';b.querySelector('i').style.background=s?col(s.mean):'rgba(0,0,0,.55)';b.querySelector('i').style.color=s?ink(s.mean):'#fff';b.classList.toggle('sel',sel===h)}
+  paintCourse();G.forEach(h=>{paintGreen(h);const g=D.greens[h],s=gstats(g,t),e=g._bd&&g._bd.getElement();if(e){const b=e.querySelector('.gbadge');b.querySelector('.pc').textContent=s?s.mean.toFixed(1)+'%':'–';b.querySelector('i').style.background=s?col(s.mean):'rgba(0,0,0,.55)';b.querySelector('i').style.color=s?ink(s.mean):'#fff';b.classList.toggle('sel',sel===h)}
     g.heads.forEach(hd=>{const el=hd._lab&&hd._lab.getElement();if(el){const v=headVal(h,hd.n);el.firstChild.textContent=hd.n.replace(/^\d+/,'')+(v!=null?' '+v.toFixed(1):'')}})});
   // dry spots
   layers.spots.clearLayers();G.forEach(h=>{const g=D.greens[h],s=gstats(g,t);if(s&&s.min<D.floor)L.marker(ll(s.at[0],s.at[1]),{icon:L.divIcon({className:'',html:'<div class="pulse"></div>',iconSize:null}),interactive:false}).addTo(layers.spots)});
@@ -270,20 +301,20 @@ function sheet(){const t=T,sc=$('sc');let html;
     html=`<button class="back" id="bk">${IC.back} All greens</button><div class="dt">${ord(h)} green</div>
     <div class="note" style="margin-top:2px">${g.anchor?'Scanned '+fmtT(D.scan_day+'T'+g.anchor):''}${g.tdr?` · TDR walk ${(+g.tdr.mean).toFixed(1)}%`:''}${g.events&&g.events.length?' · water picked up '+g.events.map(e=>e.at).join(', '):''}</div>
     ${s?`<div class="stats">${[['Average',s.mean],['Driest',s.min],['Wettest',s.max]].map(([l,v])=>`<div class="chip"><b><i style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:2px;background:${col(v)}"></i>${v.toFixed(1)}%</b><span>${l}</span></div>`).join('')}<div class="chip"><b>${s.below}</b><span>m² < ${D.floor}%</span></div></div>
-    ${s.below?`<div class="card insight">${IC.spark}<div>Driest spot is the <b>${side(g,s.at[0],s.at[1])}</b>, nearest head <b>${s.own}</b>.</div></div>`:''}`:`<div class="card insight">${IC.spark}<div>${g.why||'No reliable reading for this green yet.'}</div></div>`}
+    ${s.below?`<div class="card insight">${IC.spark}<div>Driest spot is the <b>${side(g,s.at[0],s.at[1])}</b>, nearest head <b>${s.own}</b>.</div></div>`:''}${g.qa!=='turfrad'?`<div class="card insight">${IC.spark}<div>Estimate from the in-ground probe only: ${g.why||'TurfRad has no reliable read of this green'}.</div></div>`:''}`:`<div class="card insight">${IC.spark}<div>${g.why||'No reliable reading for this green yet.'}</div></div>`}
     <canvas id="spk" style="width:100%;height:80px;display:block;margin:6px 0"></canvas>
     <h3>Sprinkler heads</h3><div class="list"><table><thead><tr><th>Head</th><th>Where</th><th>${Math.abs(t-D.i_now)<.05?'Now':fmtT(new Date(new Date(D.frames[0]).getTime()+t*3600e3))}</th><th>4 pm</th><th>10 pm</th></tr></thead><tbody>${heads}</tbody></table></div>
     <p class="note">A head's number is the average of the green surface closest to it.</p>`}
   else{const sp=[];G.forEach(h=>{const g=D.greens[h],s=gstats(g,t);if(s)sp.push({h,s,g})});sp.sort((a,b)=>a.s.min-b.s.min);const below=sp.filter(x=>x.s.min<D.floor);const avg=sp.length?sp.reduce((a,b)=>a+b.s.mean,0)/sp.length:null;const w=windAt(t);
     html=`<div class="card insight">${IC.spark}<div>${D.insight||''}</div></div>
     <div class="chips"><div class="chip"><b><i style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:2px;background:${col(avg)}"></i>${avg?avg.toFixed(1)+'%':'–'}</b><span>Greens</span></div><div class="chip"><b>${D.floor}%</b><span>Water below</span></div><div class="chip"><b>${D.today.et0_total}</b><span>ET mm</span></div><div class="chip"><b>${w?sect(w.dir)+' '+Math.round(w.wind):'–'}</b><span>Wind km/h</span></div></div>
-    <h3>${below.length?'Hand water':'Driest spots'}</h3><div class="list">${(below.length?below:sp.slice(0,3)).slice(0,8).map(x=>`<div class="li" data-h="${x.h}"><div class="bdg" style="background:${col(x.s.min)};color:${ink(x.s.min)}">${x.h}</div><div class="m"><b>${ord(x.h)} green · ${side(x.g,x.s.at[0],x.s.at[1])}</b><span>${x.s.below?x.s.below+' m² under '+D.floor+'% · ':''}head ${x.s.own}</span></div><div class="v">${x.s.min.toFixed(1)}%</div>${IC.chev}</div>`).join('')}</div>
+    <h3>${below.length?'Hand water':'Driest spots'}</h3><div class="list">${(below.length?below:sp.slice(0,3)).slice(0,8).map(x=>`<div class="li" data-h="${x.h}"><div class="bdg" style="background:${col(x.s.min)};color:${ink(x.s.min)}">${x.h}</div><div class="m"><b>${ord(x.h)} green · ${side(x.g,x.s.at[0],x.s.at[1])}${x.g.qa!=='turfrad'?' <span style="color:var(--orange);font-weight:600">est.</span>':''}</b><span>${x.s.below?x.s.below+' m² under '+D.floor+'% · ':''}head ${x.s.own}</span></div><div class="v">${x.s.min.toFixed(1)}%</div>${IC.chev}</div>`).join('')}</div>
     ${below.length?'':`<p class="note">Nothing below ${D.floor}% at this time.</p>`}
-    <h3>Greens</h3><div class="grid" id="gg">${G.map(h=>{const g=D.greens[h],s=gstats(g,t);return`<div class="gc${s&&s.min<D.floor?' flag':''}" data-h="${h}"><span class="n">${h}</span><canvas width="110" height="110"></canvas><b>${s?s.mean.toFixed(1)+'%':'–'}</b><span>${s?'low '+s.min.toFixed(1)+'%':'no reliable read'}</span></div>`}).join('')}</div>
+    <h3>Greens</h3><div class="grid" id="gg">${G.map(h=>{const g=D.greens[h],s=gstats(g,t);return`<div class="gc${s&&s.min<D.floor?' flag':''}" data-h="${h}"><span class="n">${h}</span><canvas width="110" height="110"></canvas><b>${s?s.mean.toFixed(1)+'%':'–'}</b><span>${s?(g.qa!=='turfrad'?'est. ':'')+'low '+s.min.toFixed(1)+'%':'no reliable read'}</span></div>`}).join('')}</div>
     <h3>Probes</h3><div class="list">${D.sensors.map(s=>`<div class="li" style="cursor:default"><div class="bdg" style="background:var(--fill)"><i style="width:9px;height:9px;border-radius:2px;background:#ffd60a;display:block"></i></div><div class="m"><b>${/^\d+$/.test(s.green)?ord(s.green)+' green':s.green}</b><span>${s.depth} cm · last in ${s.at?fmtT(s.at.replace(' ','T')):'–'}</span></div><div class="v">${s.now??'–'}%</div></div>`).join('')}</div>
     <p class="note">Probes read deeper than the surface and in whole numbers, so they sit lower than the map. They tell the map when water has gone on.</p>
-    <h3>Data</h3><div class="list">${D.sources.map(s=>`<div class="src"><span class="dot" style="background:${s.state==='ok'?'var(--green)':s.state==='off'?'var(--ter)':'var(--orange)'}"></span><span><b style="font-weight:600">${s.name}</b> <span style="color:var(--sec);font-size:13px">${s.note}</span></span><span style="color:var(--sec);font-size:12px">${s.at&&s.at.length>10?fmtT(s.at.replace(' ','T')):s.at||''}</span></div>`).join('')}</div>
-    <details><summary>How this map works</summary><p>Each morning TurfRad on the greens mower measures moisture across every green. That scan is the starting point, set so each green's average matches TurfRad's own green figure.</p><p>From there each green dries hour by hour with the weather: how hard the air is pulling water out (ET) and the wind. The side facing into the wind dries faster, more so when it's blowing.</p><p>The in-ground probes on the 5th, 9th and 15th tell the map when water has gone on so it can wet the greens back up. A TDR walk sets a green's level for the day.</p><p>Fairways, surrounds and tees show this morning's scan. Times after now are a forecast and assume no irrigation. Hand-water line today: ${D.floor}%.</p></details>`}
+    <h3>Data</h3><div class="list">${D.fw&&D.fw.day?`<div class="src"><span class="dot" style="background:${D.fw.age_h>30?'var(--orange)':'var(--green)'}"></span><span><b style="font-weight:600">Fairways, tees & surrounds</b> <span style="color:var(--sec);font-size:13px">${D.fw.source} ${D.fw.day}, carried forward ${D.fw.age_h} h${D.fw.skim_day?' · SkimTurf last pass '+D.fw.skim_day:''}</span></span><span></span></div>`:''}${D.sources.map(s=>`<div class="src"><span class="dot" style="background:${s.state==='ok'?'var(--green)':s.state==='off'?'var(--ter)':'var(--orange)'}"></span><span><b style="font-weight:600">${s.name}</b> <span style="color:var(--sec);font-size:13px">${s.note}</span></span><span style="color:var(--sec);font-size:12px">${s.at&&s.at.length>10?fmtT(s.at.replace(' ','T')):s.at||''}</span></div>`).join('')}</div>
+    <details><summary>How this map works</summary><p>Each morning TurfRad on the greens mower measures moisture across every green. That scan is the starting point, set so each green's average matches TurfRad's own green figure.</p><p>From there each green dries hour by hour with the weather: how hard the air is pulling water out (ET) and the wind. The side facing into the wind dries faster, more so when it's blowing.</p><p>The in-ground probes on the 5th, 9th and 15th tell the map when water has gone on so it can wet the greens back up. A TDR walk sets a green's level for the day.</p><p>Fairways, tees, surrounds and the practice greens start from the newest TurfRad fairway scan (or a SkimTurf pass when one is newer) and dry the same way, at a couch rate on fairways and tees. Times after now are a forecast and assume no irrigation. Hand-water line today: ${D.floor}%.</p></details>`}
   const key=(sel||'')+'|'+t.toFixed(2);if(key===lastSheet)return;lastSheet=key;
   const st=sc.scrollTop;sc.innerHTML=html;sc.scrollTop=st;
   if(sel){$('bk').onclick=()=>select(null);spark(sel)}
@@ -337,17 +368,18 @@ let pl=0;function stopPlay(){playing=false;$('play').innerHTML='<svg viewBox="0 
 $('play').onclick=()=>{if(playing)return stopPlay();playing=true;$('play').innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg>';if(T>=D.frames.length-1.01)T=0;let last=performance.now();
   const step=n=>{if(!playing)return;T=Math.min(D.frames.length-1,T+(n-last)/1000*1.6);last=n;draw();if(T>=D.frames.length-1){stopPlay();return}requestAnimationFrame(step)};requestAnimationFrame(step)};
 /* ---------- layers popover ---------- */
-const LY=[['greens','Greens heat'],['course','Fairways, surrounds & tees (scan)'],['heads','Sprinklers'],['probes','Probes'],['wind','Wind']];
+const LY=[['greens','Greens heat'],['course','Fairways, surrounds & tees'],['heads','Sprinklers'],['probes','Probes'],['wind','Wind']];
 function pop(){$('pop').innerHTML=LY.map(([k,l])=>`<div class="row" data-k="${k}">${l}<span class="sw${show[k]?' on':''}"></span></div>`).join('');
   $('pop').querySelectorAll('.row').forEach(r=>r.onclick=()=>{const k=r.dataset.k;show[k]=!show[k];r.querySelector('.sw').classList.toggle('on',show[k]);
-    if(k==='greens'){toggle(layers.greens,show.greens)}if(k==='course')toggle(layers.course,show.course);if(k==='heads'||k==='probes')zoomDeco()})}
+    if(k==='greens'){toggle(layers.greens,show.greens)}if(k==='course'){toggle(layers.course,show.course);paintCourse()}if(k==='heads'||k==='probes')zoomDeco()})}
 $('lyr').onclick=e=>{e.stopPropagation();$('pop').classList.toggle('on')};document.addEventListener('click',e=>{if(!$('pop').contains(e.target))$('pop').classList.remove('on')});
 $('home').onclick=()=>{sel=null;lastSheet='';home();draw()};
 /* ---------- boot ---------- */
 async function load(first){const q='?t='+Date.now();const[d,geo]=await Promise.all([fetch('data.json'+q).then(r=>r.json()),first?fetch('geo_lite.json'+q).then(r=>r.json()):Promise.resolve(GEO)]);
   if(!first){const keepT=Math.abs(T-D.i_now)<.05;D.greens&&Object.values(D.greens).forEach(g=>{});const old=D;D=d;G.forEach(h=>{const g=D.greens[h],o=old.greens[h];if(!g||!o)return;Object.assign(g,{_px:o._px,_cv:o._cv,_ctx:o._ctx,_img:o._img,_c:o._c,_own:o._own,_ov:o._ov,_bd:o._bd,_cos:o._cos,_sin:o._sin});
     g._cw=g._c.map(([x,y])=>{let s=0;const ws=g.pts.map(p=>{const q=Math.max((x-p.x)**2+(y-p.y)**2,.01);s+=1/q;return 1/q});return ws.map(v=>v/s)});const P=g._px;if(P&&g.pts.length!==P.n){g._px=null;prepGreen(h)}
-    g.heads.forEach((hd,i)=>hd._lab=o.heads[i]&&o.heads[i]._lab)});if(keepT)T=D.i_now;T=Math.min(T,D.frames.length-1);ticks();lastSheet='';draw();upd();return}
+    g.heads.forEach((hd,i)=>hd._lab=o.heads[i]&&o.heads[i]._lab)});if(CR&&CR.names!==(D.fpts||[]).map(f=>f[0]).join()){if(layers.course)map.removeLayer(layers.course);CR=prepCourse();if(CR){layers.course=new CanvasOverlay(CR.cv,[ll(CR.x0,CR.y0),ll(CR.x1,CR.y1)],{pane:'heat',opacity:1,interactive:false});if(show.course)layers.course.addTo(map)}}
+  if(keepT)T=D.i_now;T=Math.min(T,D.frames.length-1);ticks();lastSheet='';draw();upd();return}
   D=d;GEO=geo;G=Object.keys(D.greens).sort((a,b)=>(+a)-(+b));T=D.i_now;$('rng').max=D.frames.length-1;
   const lb=$('lbar'),vals=[34,30,26,22,18,14,10];lb.style.background='linear-gradient(180deg,'+[34,32,30,28,26,24,22,20,18,16,14,12,10].map(v=>col(v)).join(',')+')';$('ltk').innerHTML=vals.map((v,i)=>`<span style="top:${i/(vals.length-1)*100}%">${v}</span>`).join('');
   buildMap();pop();ticks();snap(0);upd();draw()}
