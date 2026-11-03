@@ -1,14 +1,14 @@
 {
- "build_label": "week of 2 November 2026",
- "built": "2026-11-02T06:17+1100",
- "asof": "2026-11-01",
- "asof_label": "Sun 1 Nov",
- "asof_long": "Sunday 1 November 2026",
+ "build_label": "week of 4 November 2026",
+ "built": "2026-11-04T08:08+1100",
+ "asof": "2026-11-03",
+ "asof_label": "Tue 3 Nov",
+ "asof_long": "Tuesday 3 November 2026",
  "latest": {
-  "t": 16.4,
-  "cool": 0.807,
-  "warm": 0.1136,
-  "label": "Sun 1 Nov"
+  "t": 15.2,
+  "cool": 0.683,
+  "warm": 0.0783,
+  "label": "Tue 3 Nov"
  },
  "model": {
   "cool_opt": 20.0,
@@ -18,20 +18,6 @@
   "crossover": 24.84
  },
  "hist": [
-  {
-   "d": "2026-10-03",
-   "lab": "3 Oct",
-   "t": 13.2,
-   "c": 0.466,
-   "w": 0.0394
-  },
-  {
-   "d": "2026-10-04",
-   "lab": "4 Oct",
-   "t": 12.0,
-   "c": 0.347,
-   "w": 0.0251
-  },
   {
    "d": "2026-10-05",
    "lab": "5 Oct",
@@ -227,114 +213,128 @@
    "t": 16.4,
    "c": 0.807,
    "w": 0.1136
+  },
+  {
+   "d": "2026-11-02",
+   "lab": "2 Nov",
+   "t": 14.9,
+   "c": 0.651,
+   "w": 0.071
+  },
+  {
+   "d": "2026-11-03",
+   "lab": "3 Nov",
+   "t": 15.2,
+   "c": 0.683,
+   "w": 0.0783
   }
  ],
  "stats": {
-  "cool14": 0.727,
-  "cool14_prev": 0.672,
-  "warm14": 0.21015962246619813,
-  "warm14_prev": 0.1129098862633509,
-  "clip14": 11.26,
-  "gvx21": 29.9
+  "cool14": 0.689,
+  "cool14_prev": 0.751,
+  "warm14": 0.16166799756778913,
+  "warm14_prev": 0.16779909272697516,
+  "clip14": 6.18,
+  "gvx21": 26.2
  },
  "headline_hist": "Greens GP is <em>holding</em> steady",
  "forecast": {
   "source": "Open-Meteo",
   "days": [
    {
-    "d": "2026-11-02",
-    "dow": "Mon",
-    "lab": "2 Nov",
-    "tmax": 20.7,
-    "tmin": 9.8,
-    "t": 15.2,
-    "c": 0.6887,
-    "w": 0.0796,
-    "hot": false
-   },
-   {
-    "d": "2026-11-03",
-    "dow": "Tue",
-    "lab": "3 Nov",
-    "tmax": 18.0,
-    "tmin": 9.8,
-    "t": 13.9,
-    "c": 0.5406,
-    "w": 0.0506,
-    "hot": false
-   },
-   {
     "d": "2026-11-04",
     "dow": "Wed",
     "lab": "4 Nov",
-    "tmax": 20.1,
-    "tmin": 8.0,
-    "t": 14.1,
-    "c": 0.557,
-    "w": 0.0533,
+    "tmax": 21.8,
+    "tmin": 8.1,
+    "t": 14.9,
+    "c": 0.656,
+    "w": 0.0722,
     "hot": false
    },
    {
     "d": "2026-11-05",
     "dow": "Thu",
     "lab": "5 Nov",
-    "tmax": 16.2,
-    "tmin": 9.8,
-    "t": 13.0,
-    "c": 0.4449,
-    "w": 0.0367,
+    "tmax": 16.8,
+    "tmin": 10.7,
+    "t": 13.8,
+    "c": 0.5243,
+    "w": 0.048,
     "hot": false
    },
    {
     "d": "2026-11-06",
     "dow": "Fri",
     "lab": "6 Nov",
-    "tmax": 19.3,
-    "tmin": 9.3,
-    "t": 14.3,
-    "c": 0.5845,
-    "w": 0.0581,
+    "tmax": 19.6,
+    "tmin": 10.6,
+    "t": 15.1,
+    "c": 0.6724,
+    "w": 0.0758,
     "hot": false
    },
    {
     "d": "2026-11-07",
     "dow": "Sat",
     "lab": "7 Nov",
-    "tmax": 13.9,
-    "tmin": 7.5,
-    "t": 10.7,
-    "c": 0.2394,
-    "w": 0.0149,
+    "tmax": 14.1,
+    "tmin": 8.5,
+    "t": 11.3,
+    "c": 0.2862,
+    "w": 0.0191,
     "hot": false
    },
    {
     "d": "2026-11-08",
     "dow": "Sun",
     "lab": "8 Nov",
-    "tmax": 14.0,
-    "tmin": 4.5,
-    "t": 9.2,
-    "c": 0.1481,
-    "w": 0.008,
+    "tmax": 15.3,
+    "tmin": 7.7,
+    "t": 11.5,
+    "c": 0.3029,
+    "w": 0.0206,
+    "hot": false
+   },
+   {
+    "d": "2026-11-09",
+    "dow": "Mon",
+    "lab": "9 Nov",
+    "tmax": 17.6,
+    "tmin": 6.5,
+    "t": 12.1,
+    "c": 0.3518,
+    "w": 0.0256,
+    "hot": false
+   },
+   {
+    "d": "2026-11-10",
+    "dow": "Tue",
+    "lab": "10 Nov",
+    "tmax": 24.2,
+    "tmin": 6.2,
+    "t": 15.2,
+    "c": 0.6833,
+    "w": 0.0783,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  9.2,
+  11.3,
   15.2
  ],
- "headline_fc": "A <em>cold change</em> from Sat",
+ "headline_fc": "A <em>cool</em> week: slow growth on the greens",
  "takeaways": [
   {
    "tone": "cool",
-   "head": "Greens: fair to Fri, slow from Sat",
-   "detail": "Bent and Poa GP averages 56% Mon to Fri, then 19% once the cold change arrives Sat."
+   "head": "Greens: slow growth",
+   "detail": "Bent and Poa GP averages 50% this week. Recovery from wear and cultivation will be slow."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 4%, best on Mon at 8%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 5%, best on Tue at 8%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
