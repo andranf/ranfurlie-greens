@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-05-greens-pgr-poachek",
+   "title": "PGR + Poachek + Fe + Urea, Greens",
+   "sprayer": "JD HD200",
+   "date_iso": "2026-11-05",
+   "date": "Thu 5 Nov",
+   "applicator": "Mitch Mahoney",
+   "method": "boom"
+  },
+  {
    "slug": "2026-11-04-greens-remediator-flush",
    "title": "Remediator Flush + Chino, Greens",
    "sprayer": "JD HD200",
