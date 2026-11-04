@@ -617,5 +617,30 @@
   ],
   "why": "A suspension: label says add it to a tank at least half full with the agitator running. Goes in last. You're at {before} L.",
   "src": "APVMA 94408 · <a href=\"https://fernland.com.au/chino-400sc-turf-fungicide\" target=\"_blank\" rel=\"noopener\">product page</a> · <a href=\"https://nuturf.com.au/images/product-tech-sds/ISK-Segway-LABEL.pdf\" target=\"_blank\" rel=\"noopener\">cyazofamid 400 SC label (Segway)</a>"
+ },
+ "urea": {
+  "name": "GroMaxx 46 (urea)",
+  "gk_name": "Wil-Gro GroMaxx 46 (46-0-0)",
+  "sig": "Not hazardous",
+  "sigc": "",
+  "form": "Soluble granules",
+  "what": "Urea, 46% N",
+  "haz": "Dust irritates eyes.",
+  "soft": true,
+  "hazFull": "Urea: not classified as hazardous, dust irritates eyes. Very soluble (about 1 kg per litre) but dissolving it is strongly endothermic: the tank goes cold and it dissolves slowly. Add it early with the agitator running and let it all dissolve. No Wil-Gro SDS on file.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "l_per_kg": 0.73,
+  "how": [
+   "Agitator on",
+   "Add {amt} a bag at a time",
+   "Let each bag dissolve before the next. The tank will go cold",
+   "No granules left on the strainer"
+  ],
+  "why": "Big solid: goes in early so it's fully dissolved before the PGRs, and its higher pH meets the acid iron, not the ethephon. You're at {before} L.",
+  "src": "Urea 46-0-0 (Wil-Gro GroMaxx 46) · general urea data, no Wil-Gro SDS on file"
  }
 }
