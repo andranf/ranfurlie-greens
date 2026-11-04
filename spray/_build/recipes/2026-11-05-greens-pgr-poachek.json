@@ -1,0 +1,167 @@
+{
+  "slug": "2026-11-05-greens-pgr-poachek",
+  "title": "PGR + Poachek + Fe + Urea, Greens",
+  "sheet_name": "JD - 300L/Ha - PGR to Greens (TE + Ethephon + Poachek + Fe)",
+  "sprayer": "JD HD200",
+  "applicator": [
+    "Mitch Mahoney",
+    "U08K55E3QJU"
+  ],
+  "date": "Thu 5 Nov",
+  "date_long": "Thu 5 Nov 2026",
+  "date_iso": "2026-11-05",
+  "area_ha": 2.0,
+  "rate_lha": 300,
+  "mix_l": 600,
+  "tank_cap_l": 757,
+  "fill_l": 400,
+  "nozzles": "Grey",
+  "speed": "7.1 km/h",
+  "pressure": "3.4 bar",
+  "ph_max": 4.5,
+  "last_load": "Remediator Flush + Chino, Greens, Wed 4 Nov: rinse the boom first",
+  "site_check": "Spray signs out on every green. Greens mown and blown, debris and clippings off",
+  "weather": "Delta T 2–8 · check the sock: forecast gusts 31–37 km/h · under 25 °C · dry from now",
+  "extra_checks": [
+    [
+      "rinse",
+      "Clean water run through the boom first",
+      "Yesterday's tank had Remediator and Chino in it"
+    ],
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 3.4 bar",
+      "300 L/ha at 7.1 km/h needs about 2.7 L/min on 75 cm nozzle spacing (1.8 L/min on 50 cm). If it's out, call Andy before you fill"
+    ],
+    [
+      "wind",
+      "Wind sock checked before you start",
+      "Stop if it's blowing off target"
+    ],
+    [
+      "ph",
+      "pH strips on the rig",
+      "pH is checked before the Promote goes in"
+    ]
+  ],
+  "products": [
+    {
+      "id": "companion",
+      "rate": "300 mL/ha",
+      "rate_lha": 0.3,
+      "unit": "mL",
+      "sheet": 1,
+      "why": "The label says Companion goes in first, before anything else. It holds the tank pH down for the ethephon."
+    },
+    {
+      "id": "urea",
+      "rate": "50 kg/ha",
+      "rate_lha": 50,
+      "unit": "kg",
+      "sheet": 6,
+      "note": "Goes in 2nd (sheet has it last)."
+    },
+    {
+      "id": "shadow",
+      "rate": "0.5 L/ha",
+      "rate_lha": 0.5,
+      "unit": "L",
+      "sheet": 2
+    },
+    {
+      "id": "iron",
+      "rate": "20 L/ha",
+      "rate_lha": 20,
+      "unit": "L",
+      "sheet": 3,
+      "why": "Acidic (pH about 2). Brings the tank pH back down after the urea, ready for the Promote."
+    },
+    {
+      "id": "poachek",
+      "rate": "0.75 L/ha",
+      "rate_lha": 0.75,
+      "unit": "L",
+      "sheet": 4
+    },
+    {
+      "id": "promote",
+      "rate": "3.5 L/ha",
+      "rate_lha": 3.5,
+      "unit": "L",
+      "sheet": 5,
+      "note": "Goes in last, after a pH check (sheet has it 5th).",
+      "why": "Check the tank is under pH 4.5 first. If it's 4.5 or above, stop and call Andy. Goes in last so the ethephon never sits in a higher-pH tank. You're at {before} L."
+    }
+  ],
+  "ppe_note": "Poachek is a Schedule 6 poison and fatal if breathed in: mist mask, face shield and elbow gloves when you pour it, and the mist mask stays on while you spray. Promote Plus 900 is corrosive and the iron is a strong acid: goggles, face shield and apron. Eyewash on the rig.",
+  "spray_ppe": [
+    "overalls",
+    "gloves",
+    "mask"
+  ],
+  "spray_rules": [
+    "All greens. Greens mown and blown first: debris and clippings off, dry leaf",
+    "Check the sock before you start. Gusts are forecast 31–37 km/h from first light: stop if it's blowing off target",
+    "Medal is off the 1st and 10th from 7:00am with no clear nine. Get as much done before 7 as you can, then work between groups. Never spray a green with golfers on or near it",
+    "Foliar pass: do NOT water in. No irrigation or hand watering on the greens for 24 h",
+    "Keep people off each green until it's dry"
+  ],
+  "spray_more": "Poachek label: not above 25 °C, dry turf, keep dry for 24 h after, fine spray 500–1000 L/ha, not on kikuyu or red fescue. Promote Plus 900: no rain within 8 h, don't leave the mix standing in metal for more than 2 h. Shadow Ultra: no rain or irrigation within 1 h, no entry without protective clothing until dry.",
+  "post_checks": [
+    [
+      "irrig",
+      "Greens irrigation off for 24 h, including #38 tonight, and nobody hand watering",
+      "Poachek: keep the turf dry for 24 h"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "#38 Spatially Claude Greens runs at 7:30pm tonight",
+      "d": "It was ON (every day, 7:30pm) when last checked. Tonight's run lands inside Poachek's 24 h dry period from a morning spray. It needs to be off tonight, or set to zero.",
+      "s": "Cirrus Pro · Poachek label APVMA 47841"
+    },
+    {
+      "c": "red",
+      "t": "Wind: gusts 31–37 km/h from first light",
+      "d": "Open-Meteo at 5am: 19 km/h gusting 35 now, 36–41 from 8 to 10am, easing to 22–27 after 4pm. The 6th station read SSW 5 gusting 8 at 4:45am, so check the sock. Fallback is 5–8pm (9 km/h gusting 22), which still stays dry until about 9pm Friday.",
+      "s": "Open-Meteo 5 Nov 5am · #dailycoursesetup brief 5 Nov"
+    },
+    {
+      "c": "",
+      "t": "Urea 50 kg/ha: 23 kg N/ha foliar, no water-in",
+      "d": "Confirmed by Andy. With 20 L/ha iron (pH about 2) on the leaf and no water-in, there's some burn risk; the cool day (max about 17 °C) keeps it down. 100 kg of urea in about 400 L drops the tank temperature by roughly 10 °C and dissolves slowly, so it goes in 2nd and must be fully dissolved before the PGRs.",
+      "s": "Sheet · Andy 5 Nov"
+    },
+    {
+      "c": "",
+      "t": "Dew vs Poachek's dry turf",
+      "d": "Dew point 7.6 °C and heavy dew at dawn; Poachek's label wants dry turf. Mowing and blowing first gets most of it off.",
+      "s": "#dailycoursesetup brief 5 Nov · Poachek label"
+    },
+    {
+      "c": "info",
+      "t": "Order changed from the sheet",
+      "d": "Urea moves from last to 2nd so it dissolves early. Promote Plus moves from 5th to last, after a pH check under 4.5, so the ethephon never sits in a tank the urea has pushed up.",
+      "s": "Andy 5 Nov · reasoning on each product card"
+    },
+    {
+      "c": "info",
+      "t": "PGR clocks",
+      "d": "Trinexapac 210 of 200 GDD since 21 Oct (due). Ethephon day 22 of its 14–28 day window. Paclobutrazol (Regulate 28 Oct) at 95 of 350 GDD, still working: three PGRs plus endothal on the bentgrass.",
+      "s": "Greens dashboard PGR clocks"
+    },
+    {
+      "c": "info",
+      "t": "Poachek 2nd pass, all greens",
+      "d": "15 days after the 21 Oct pass (label 2–3 sprays 10–14 days apart). 0.75 L/ha is half the 1.5 L/ha label rate, and 300 L/ha is under its 500–1000 L/ha fine-spray volume. All greens this time, including the practice green, 1st and 10th.",
+      "s": "Poachek label APVMA 47841"
+    },
+    {
+      "c": "info",
+      "t": "Nozzles: grey at 3.4 bar is about 284 L/ha",
+      "d": "Grey is ISO size 06: about 2.5 L/min at 3.4 bar. At 7.1 km/h that's about 284 L/ha on 75 cm nozzle spacing. The bucket test on the rig checklist confirms it.",
+      "s": "ISO 10625 nozzle colour code"
+    }
+  ]
+}
