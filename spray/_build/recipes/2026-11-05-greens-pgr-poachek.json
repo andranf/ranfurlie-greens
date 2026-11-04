@@ -116,9 +116,9 @@
   ],
   "flags": [
     {
-      "c": "red",
-      "t": "#38 Spatially Claude Greens runs at 7:30pm tonight",
-      "d": "It was ON (every day, 7:30pm) when last checked. Tonight's run lands inside Poachek's 24 h dry period from a morning spray. It needs to be off tonight, or set to zero.",
+      "c": "",
+      "t": "Keep #38 Spatially Claude Greens off tonight",
+      "d": "At 5:20am #38 was disabled (holding a 497-minute set at 50%) and no program was enabled. If it's switched on for tonight's 7:30pm start, it lands inside Poachek's 24 h dry period. The afternoon Spatially Claude run will write a set, so leave the group off or zero it.",
       "s": "Cirrus Pro · Poachek label APVMA 47841"
     },
     {
