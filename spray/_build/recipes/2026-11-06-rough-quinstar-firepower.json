@@ -1,0 +1,145 @@
+{
+  "slug": "2026-11-06-rough-quinstar-firepower",
+  "title": "Quinstar + Firepower, Rough (Tank 1)",
+  "sheet_name": "JD 300L/Ha - Rough - Quinstar + Firepower - GPS",
+  "sprayer": "JD HD200",
+  "applicator": [
+    "Nathan Ferguson",
+    "U06H9J0LBEC"
+  ],
+  "date": "Fri 6 Nov",
+  "date_long": "Fri 6 Nov 2026",
+  "date_iso": "2026-11-06",
+  "area_ha": 2.5,
+  "rate_lha": 300,
+  "mix_l": 750,
+  "tank_cap_l": 757,
+  "fill_l": 375,
+  "nozzles": "Grey Wilger",
+  "speed": "7.1 km/h",
+  "pressure": "3.4 bar",
+  "last_load": "PGR + Poachek + Fe + Urea, Greens, Thu 5 Nov: rinse the boom first",
+  "site_check": "Section control ON with the rough boundaries loaded. No overlap onto fairways, tees, surrounds or greens",
+  "weather": "Delta T 2–8 · wind under 15 km/h · gusts under 30 · 6–9am only",
+  "extra_checks": [
+    [
+      "jar",
+      "Jar test done",
+      "Per 3 L: 1.5 L water, 41 mL Quinstar, 1 mL Firepower, 10 mL Hasten, top up to 3 L. No clumps or separation after 10 minutes"
+    ],
+    [
+      "rinse",
+      "Clean water run through the boom first",
+      "Yesterday's tank was the greens PGR mix"
+    ],
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 3.4 bar",
+      "300 L/ha at 7.1 km/h needs about 2.7 L/min on 75 cm nozzle spacing. If it's out, call Andy before you fill"
+    ],
+    [
+      "gps",
+      "Section control ON, rough boundaries loaded",
+      "Firepower kills couch and bent: nothing on fairways, tees, surrounds or greens"
+    ]
+  ],
+  "products": [
+    {
+      "id": "quinstar",
+      "rate": "4.1 L/ha",
+      "rate_lha": 4.1,
+      "unit": "L",
+      "sheet": 1,
+      "why": "The suspension goes in first, into the half-filled tank, so it disperses before the EC and the oil. You're at {before} L."
+    },
+    {
+      "id": "firepower",
+      "rate": "100 mL/ha",
+      "rate_lha": 0.1,
+      "unit": "mL",
+      "sheet": 2,
+      "why": "The EC goes in after the suspension. Small measure: it's 900 g/L. You're at {before} L."
+    },
+    {
+      "id": "hasten",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "unit": "L",
+      "sheet": 3
+    }
+  ],
+  "ppe_note": "Firepower 900 is a Schedule 6 poison: impervious elbow gloves and a face shield when you pour it. Quinstar irritates eyes and skin: goggles.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "Rough only. Section control ON: no overlap onto fairways, tees, surrounds or greens. Firepower kills couch and bent",
+    "6–9am only. Stop if it gusts over 30 km/h or it's blowing toward a fairway, tee or green. Gusts reach 28 by 9am",
+    "Front nine first, ahead of the 7:00am field off the 1st, then the back nine before groups turn. Never spray near golfers",
+    "No irrigation on the rough tonight. No mowing the sprayed rough for 2 days, and don't collect clippings from the first 3 mows",
+    "Log the area sprayed"
+  ],
+  "spray_more": "Quinstar guide: 4.1 L/ha in 400 L water, avoid rain within 48 h and irrigation within 8 h, don't mow 2 days before or after. Firepower 900: Schedule 6, impervious elbow gloves and eye or face protection. Hasten: add last and keep agitating until it's sprayed out.",
+  "post_checks": [
+    [
+      "decon",
+      "JD decontaminated before it goes near a green again",
+      "Tank cleaner, then triple rinse through tank, boom and filters. Firepower residue kills bent"
+    ],
+    [
+      "log",
+      "Area sprayed logged",
+      ""
+    ],
+    [
+      "irrig",
+      "No irrigation on the rough tonight",
+      ""
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "Rain inside Quinstar's 48 h",
+      "d": "Dry until about 9pm, then about 13 mm from Friday night to Sunday morning (0.7 mm by midnight, 2.4 mm in the hour to 6am Saturday). The Quinstar guide says avoid rain within 48 h; a 6–9am spray gets 12–15 h. Firepower with Hasten should be on by then, but the quinclorac may lose some activity.",
+      "s": "Open-Meteo 6 Nov 5am · ADAMA Quinstar guide"
+    },
+    {
+      "c": "red",
+      "t": "Decontaminate the JD before its next greens tank",
+      "d": "Firepower (haloxyfop) kills bent at very low doses. Tank cleaner and a triple rinse through tank, boom and filters before the JD goes back on greens. It's on the post-application checklist. If the greens PGR card on today's board is a second tank, it goes on the JD before this one.",
+      "s": "Firepower SDS · #dailycoursesetup brief 6 Nov"
+    },
+    {
+      "c": "",
+      "t": "Fairway edges are couch",
+      "d": "Firepower kills couch, so any overlap or drift onto fairway edges will show. Wind NW 11–15 km/h through the window pushes drift to the SE side of each rough: keep section control on the boundaries and the boom low.",
+      "s": "Firepower tech note · Open-Meteo 6 Nov"
+    },
+    {
+      "c": "",
+      "t": "Tank 2: the last 1.15 ha",
+      "d": "345 L: Quinstar 4.72 L, Firepower 115 mL, Hasten 1.15 L (same rates). With Tank 1 that's 14.97 L of Quinstar, all 15 L on the shelf.",
+      "s": "Sheet rates · 3.65 ha total"
+    },
+    {
+      "c": "info",
+      "t": "Off-label and turf safety",
+      "d": "Firepower 900 is registered for forestry and industrial grass control, not turf; 90 g/ha haloxyfop here is under its label rates, which Victoria allows off-label. Neither Firepower nor Quinstar lists fescue as tolerant; Quinstar only suppresses kikuyu (2 sprays 14–21 days apart).",
+      "s": "ADAMA Firepower tech note · Quinstar guide"
+    },
+    {
+      "c": "info",
+      "t": "Quinstar water volume",
+      "d": "The guide's rate is 4.1 L/ha in 400 L water; this tank is 300 L/ha.",
+      "s": "ADAMA Quinstar guide"
+    },
+    {
+      "c": "info",
+      "t": "Nozzles: grey at 3.4 bar is about 284 L/ha",
+      "d": "Grey is ISO size 06: about 2.5 L/min at 3.4 bar. At 7.1 km/h that's about 284 L/ha on 75 cm nozzle spacing. The bucket test confirms it.",
+      "s": "ISO 10625 nozzle colour code"
+    }
+  ]
+}
