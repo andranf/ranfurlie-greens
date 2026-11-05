@@ -1,14 +1,14 @@
 {
- "build_label": "week of 5 November 2026",
- "built": "2026-11-05T12:00+1100",
- "asof": "2026-11-04",
- "asof_label": "Wed 4 Nov",
- "asof_long": "Wednesday 4 November 2026",
+ "build_label": "week of 6 November 2026",
+ "built": "2026-11-06T06:22+1100",
+ "asof": "2026-11-05",
+ "asof_label": "Thu 5 Nov",
+ "asof_long": "Thursday 5 November 2026",
  "latest": {
-  "t": 13.3,
-  "cool": 0.476,
-  "warm": 0.0409,
-  "label": "Wed 4 Nov"
+  "t": 13.9,
+  "cool": 0.541,
+  "warm": 0.0506,
+  "label": "Thu 5 Nov"
  },
  "model": {
   "cool_opt": 20.0,
@@ -18,13 +18,6 @@
   "crossover": 24.84
  },
  "hist": [
-  {
-   "d": "2026-10-06",
-   "lab": "6 Oct",
-   "t": 12.4,
-   "c": 0.385,
-   "w": 0.0293
-  },
   {
    "d": "2026-10-07",
    "lab": "7 Oct",
@@ -227,114 +220,121 @@
    "t": 13.3,
    "c": 0.476,
    "w": 0.0409
+  },
+  {
+   "d": "2026-11-05",
+   "lab": "5 Nov",
+   "t": 13.9,
+   "c": 0.541,
+   "w": 0.0506
   }
  ],
  "stats": {
-  "cool14": 0.651,
-  "cool14_prev": 0.794,
-  "warm14": 0.1460621968510498,
-  "warm14_prev": 0.18415217754159707,
-  "clip14": 6.93,
-  "gvx21": 26.4
+  "cool14": 0.627,
+  "cool14_prev": 0.808,
+  "warm14": 0.1143110138363218,
+  "warm14_prev": 0.2139256698475432,
+  "clip14": 7.64,
+  "gvx21": 25.1
  },
  "headline_hist": "Cooler days have <em>pulled</em> GP back",
  "forecast": {
   "source": "Open-Meteo",
   "days": [
    {
-    "d": "2026-11-05",
-    "dow": "Thu",
-    "lab": "5 Nov",
-    "tmax": 16.9,
-    "tmin": 10.2,
-    "t": 13.5,
-    "c": 0.5028,
-    "w": 0.0447,
-    "hot": false
-   },
-   {
     "d": "2026-11-06",
     "dow": "Fri",
     "lab": "6 Nov",
     "tmax": 19.3,
-    "tmin": 9.7,
-    "t": 14.5,
-    "c": 0.6065,
-    "w": 0.0622,
+    "tmin": 10.0,
+    "t": 14.7,
+    "c": 0.6231,
+    "w": 0.0654,
     "hot": false
    },
    {
     "d": "2026-11-07",
     "dow": "Sat",
     "lab": "7 Nov",
-    "tmax": 13.5,
-    "tmin": 8.7,
+    "tmax": 13.7,
+    "tmin": 8.6,
     "t": 11.1,
-    "c": 0.27,
-    "w": 0.0176,
+    "c": 0.274,
+    "w": 0.0179,
     "hot": false
    },
    {
     "d": "2026-11-08",
     "dow": "Sun",
     "lab": "8 Nov",
-    "tmax": 14.9,
-    "tmin": 6.7,
-    "t": 10.8,
-    "c": 0.2468,
-    "w": 0.0156,
+    "tmax": 15.0,
+    "tmin": 7.4,
+    "t": 11.2,
+    "c": 0.278,
+    "w": 0.0183,
     "hot": false
    },
    {
     "d": "2026-11-09",
     "dow": "Mon",
     "lab": "9 Nov",
-    "tmax": 18.5,
-    "tmin": 6.1,
-    "t": 12.3,
-    "c": 0.3753,
-    "w": 0.0282,
+    "tmax": 20.3,
+    "tmin": 6.9,
+    "t": 13.6,
+    "c": 0.5081,
+    "w": 0.0455,
     "hot": false
    },
    {
     "d": "2026-11-10",
     "dow": "Tue",
     "lab": "10 Nov",
-    "tmax": 24.6,
-    "tmin": 5.9,
-    "t": 15.2,
-    "c": 0.6887,
-    "w": 0.0796,
+    "tmax": 25.2,
+    "tmin": 6.9,
+    "t": 16.1,
+    "c": 0.7727,
+    "w": 0.1022,
     "hot": false
    },
    {
     "d": "2026-11-11",
     "dow": "Wed",
     "lab": "11 Nov",
-    "tmax": 15.6,
-    "tmin": 12.5,
+    "tmax": 16.9,
+    "tmin": 11.4,
     "t": 14.1,
-    "c": 0.557,
-    "w": 0.0533,
+    "c": 0.568,
+    "w": 0.0552,
+    "hot": false
+   },
+   {
+    "d": "2026-11-12",
+    "dow": "Thu",
+    "lab": "12 Nov",
+    "tmax": 17.5,
+    "tmin": 8.6,
+    "t": 13.1,
+    "c": 0.4501,
+    "w": 0.0373,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  10.8,
-  15.2
+  11.1,
+  16.1
  ],
  "headline_fc": "A <em>cool</em> week: slow growth on the greens",
  "takeaways": [
   {
    "tone": "cool",
    "head": "Greens: slow growth",
-   "detail": "Bent and Poa GP averages 46% this week. Recovery from wear and cultivation will be slow."
+   "detail": "Bent and Poa GP averages 50% this week. Recovery from wear and cultivation will be slow."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 4%, best on Tue at 8%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 5%, best on Tue at 10%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
