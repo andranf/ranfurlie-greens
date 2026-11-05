@@ -642,5 +642,28 @@
   ],
   "why": "Big solid: goes in early so it's fully dissolved before the PGRs, and its higher pH meets the acid iron, not the ethephon. You're at {before} L.",
   "src": "Urea 46-0-0 (Wil-Gro GroMaxx 46) · general urea data, no Wil-Gro SDS on file"
+ },
+ "buffit": {
+  "name": "Buff-It",
+  "gk_name": "Buff-It",
+  "sig": "No label on file",
+  "sigc": "",
+  "form": "Liquid buffering agent",
+  "what": "Oasis Turf spray buffering / water conditioning agent",
+  "haz": "No label or SDS on file: treat as an acid.",
+  "soft": true,
+  "hazFull": "Oasis Turf buffering agent (20 L packs). No label or SDS in Turf Data and none found online. Read the drum label before use; until then handle as an acidifier: goggles and elbow gloves when pouring.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Read the drum label first",
+   "Measure {amt}",
+   "Pour in before anything else, agitator on"
+  ],
+  "why": "Buffering agents go in first so the water is conditioned before the herbicides go in. You're at {before} L.",
+  "src": "Oasis Turf (Turf Data stock records) · no label or SDS found"
  }
 }
