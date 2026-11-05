@@ -31,7 +31,8 @@ SPRAY = os.path.dirname(HERE)
 def shown(amt_l, unit):
     if unit == "mL":
         return f"{round(amt_l * 1000):d}", "mL"
-    return (f"{amt_l:.2f}" if amt_l < 10 else f"{amt_l:.1f}"), "L"
+    # 6 Nov 2026: 10 L and over shows to 2 decimals without trailing zeros (10.25 L, not 10.2 L)
+    return (f"{amt_l:.2f}" if amt_l < 10 else (f"{round(amt_l + 1e-9, 2):.2f}".rstrip("0").rstrip("."))), "L"
 
 
 def merge_checks(base, extra):
