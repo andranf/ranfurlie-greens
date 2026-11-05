@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-06-rough-quinstar-firepower",
+   "title": "Quinstar + Firepower, Rough (Tank 1)",
+   "sprayer": "JD HD200",
+   "date_iso": "2026-11-06",
+   "date": "Fri 6 Nov",
+   "applicator": "Nathan Ferguson",
+   "method": "boom"
+  },
+  {
    "slug": "2026-11-05-greens-pgr-poachek",
    "title": "PGR + Poachek + Fe + Urea, Greens",
    "sprayer": "JD HD200",
