@@ -1,14 +1,14 @@
 {
- "build_label": "week of 6 November 2026",
- "built": "2026-11-06T12:04+1100",
- "asof": "2026-11-05",
- "asof_label": "Thu 5 Nov",
- "asof_long": "Thursday 5 November 2026",
+ "build_label": "week of 7 November 2026",
+ "built": "2026-11-07T06:25+1100",
+ "asof": "2026-11-06",
+ "asof_label": "Fri 6 Nov",
+ "asof_long": "Friday 6 November 2026",
  "latest": {
-  "t": 13.9,
-  "cool": 0.541,
-  "warm": 0.0506,
-  "label": "Thu 5 Nov"
+  "t": 15.1,
+  "cool": 0.672,
+  "warm": 0.0758,
+  "label": "Fri 6 Nov"
  },
  "model": {
   "cool_opt": 20.0,
@@ -18,13 +18,6 @@
   "crossover": 24.84
  },
  "hist": [
-  {
-   "d": "2026-10-07",
-   "lab": "7 Oct",
-   "t": 12.5,
-   "c": 0.395,
-   "w": 0.0304
-  },
   {
    "d": "2026-10-08",
    "lab": "8 Oct",
@@ -227,59 +220,55 @@
    "t": 13.9,
    "c": 0.541,
    "w": 0.0506
+  },
+  {
+   "d": "2026-11-06",
+   "lab": "6 Nov",
+   "t": 15.1,
+   "c": 0.672,
+   "w": 0.0758
   }
  ],
  "stats": {
-  "cool14": 0.627,
-  "cool14_prev": 0.808,
-  "warm14": 0.1143110138363218,
-  "warm14_prev": 0.2139256698475432,
+  "cool14": 0.621,
+  "cool14_prev": 0.793,
+  "warm14": 0.07578261467906912,
+  "warm14_prev": 0.24336581239380856,
   "clip14": 7.64,
-  "gvx21": 25.1
+  "gvx21": 26.4
  },
  "headline_hist": "Cooler days have <em>pulled</em> GP back",
  "forecast": {
   "source": "Open-Meteo",
   "days": [
    {
-    "d": "2026-11-06",
-    "dow": "Fri",
-    "lab": "6 Nov",
-    "tmax": 19.3,
-    "tmin": 10.0,
-    "t": 14.7,
-    "c": 0.6231,
-    "w": 0.0654,
-    "hot": false
-   },
-   {
     "d": "2026-11-07",
     "dow": "Sat",
     "lab": "7 Nov",
-    "tmax": 13.7,
-    "tmin": 8.6,
-    "t": 11.1,
-    "c": 0.274,
-    "w": 0.0179,
+    "tmax": 13.8,
+    "tmin": 8.8,
+    "t": 11.3,
+    "c": 0.2862,
+    "w": 0.0191,
     "hot": false
    },
    {
     "d": "2026-11-08",
     "dow": "Sun",
     "lab": "8 Nov",
-    "tmax": 15.1,
-    "tmin": 8.0,
-    "t": 11.6,
-    "c": 0.3072,
-    "w": 0.0211,
+    "tmax": 15.4,
+    "tmin": 7.6,
+    "t": 11.5,
+    "c": 0.3029,
+    "w": 0.0206,
     "hot": false
    },
    {
     "d": "2026-11-09",
     "dow": "Mon",
     "lab": "9 Nov",
-    "tmax": 19.9,
-    "tmin": 6.7,
+    "tmax": 19.7,
+    "tmin": 6.9,
     "t": 13.3,
     "c": 0.4762,
     "w": 0.0409,
@@ -289,40 +278,51 @@
     "d": "2026-11-10",
     "dow": "Tue",
     "lab": "10 Nov",
-    "tmax": 25.5,
+    "tmax": 24.2,
     "tmin": 6.9,
-    "t": 16.2,
-    "c": 0.7877,
-    "w": 0.107,
+    "t": 15.6,
+    "c": 0.7209,
+    "w": 0.0875,
     "hot": false
    },
    {
     "d": "2026-11-11",
     "dow": "Wed",
     "lab": "11 Nov",
-    "tmax": 16.4,
-    "tmin": 12.3,
-    "t": 14.3,
-    "c": 0.59,
-    "w": 0.0591,
+    "tmax": 16.2,
+    "tmin": 11.2,
+    "t": 13.7,
+    "c": 0.5189,
+    "w": 0.0472,
     "hot": false
    },
    {
     "d": "2026-11-12",
     "dow": "Thu",
     "lab": "12 Nov",
-    "tmax": 17.5,
-    "tmin": 8.6,
-    "t": 13.1,
-    "c": 0.4501,
-    "w": 0.0373,
+    "tmax": 16.6,
+    "tmin": 10.3,
+    "t": 13.5,
+    "c": 0.4921,
+    "w": 0.0432,
+    "hot": false
+   },
+   {
+    "d": "2026-11-13",
+    "dow": "Fri",
+    "lab": "13 Nov",
+    "tmax": 21.2,
+    "tmin": 10.0,
+    "t": 15.6,
+    "c": 0.7261,
+    "w": 0.0889,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  11.1,
-  16.2
+  11.3,
+  15.6
  ],
  "headline_fc": "A <em>solid</em> growing week for the greens",
  "takeaways": [
@@ -334,7 +334,7 @@
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 5%, best on Tue at 11%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 5%, best on Fri at 9%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
