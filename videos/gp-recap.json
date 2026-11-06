@@ -1,6 +1,6 @@
 {
  "build_label": "week of 6 November 2026",
- "built": "2026-11-06T06:22+1100",
+ "built": "2026-11-06T12:04+1100",
  "asof": "2026-11-05",
  "asof_label": "Thu 5 Nov",
  "asof_long": "Thursday 5 November 2026",
@@ -267,44 +267,44 @@
     "d": "2026-11-08",
     "dow": "Sun",
     "lab": "8 Nov",
-    "tmax": 15.0,
-    "tmin": 7.4,
-    "t": 11.2,
-    "c": 0.278,
-    "w": 0.0183,
+    "tmax": 15.1,
+    "tmin": 8.0,
+    "t": 11.6,
+    "c": 0.3072,
+    "w": 0.0211,
     "hot": false
    },
    {
     "d": "2026-11-09",
     "dow": "Mon",
     "lab": "9 Nov",
-    "tmax": 20.3,
-    "tmin": 6.9,
-    "t": 13.6,
-    "c": 0.5081,
-    "w": 0.0455,
+    "tmax": 19.9,
+    "tmin": 6.7,
+    "t": 13.3,
+    "c": 0.4762,
+    "w": 0.0409,
     "hot": false
    },
    {
     "d": "2026-11-10",
     "dow": "Tue",
     "lab": "10 Nov",
-    "tmax": 25.2,
+    "tmax": 25.5,
     "tmin": 6.9,
-    "t": 16.1,
-    "c": 0.7727,
-    "w": 0.1022,
+    "t": 16.2,
+    "c": 0.7877,
+    "w": 0.107,
     "hot": false
    },
    {
     "d": "2026-11-11",
     "dow": "Wed",
     "lab": "11 Nov",
-    "tmax": 16.9,
-    "tmin": 11.4,
-    "t": 14.1,
-    "c": 0.568,
-    "w": 0.0552,
+    "tmax": 16.4,
+    "tmin": 12.3,
+    "t": 14.3,
+    "c": 0.59,
+    "w": 0.0591,
     "hot": false
    },
    {
@@ -322,19 +322,19 @@
  },
  "fc_band": [
   11.1,
-  16.1
+  16.2
  ],
- "headline_fc": "A <em>cool</em> week: slow growth on the greens",
+ "headline_fc": "A <em>solid</em> growing week for the greens",
  "takeaways": [
   {
    "tone": "cool",
-   "head": "Greens: slow growth",
-   "detail": "Bent and Poa GP averages 50% this week. Recovery from wear and cultivation will be slow."
+   "head": "Greens: growing well",
+   "detail": "Bent and Poa GP averages 50% this week, cooler than the 20 °C optimum."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 5%, best on Tue at 10%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 5%, best on Tue at 11%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
