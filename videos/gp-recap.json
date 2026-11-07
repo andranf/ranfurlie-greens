@@ -1,6 +1,6 @@
 {
- "build_label": "week of 7 November 2026",
- "built": "2026-11-07T06:25+1100",
+ "build_label": "week of 8 November 2026",
+ "built": "2026-11-08T10:51+1100",
  "asof": "2026-11-06",
  "asof_label": "Fri 6 Nov",
  "asof_long": "Friday 6 November 2026",
@@ -242,99 +242,99 @@
   "source": "Open-Meteo",
   "days": [
    {
-    "d": "2026-11-07",
-    "dow": "Sat",
-    "lab": "7 Nov",
-    "tmax": 13.8,
-    "tmin": 8.8,
-    "t": 11.3,
-    "c": 0.2862,
-    "w": 0.0191,
-    "hot": false
-   },
-   {
     "d": "2026-11-08",
     "dow": "Sun",
     "lab": "8 Nov",
-    "tmax": 15.4,
-    "tmin": 7.6,
-    "t": 11.5,
-    "c": 0.3029,
-    "w": 0.0206,
+    "tmax": 16.0,
+    "tmin": 7.2,
+    "t": 11.6,
+    "c": 0.3115,
+    "w": 0.0215,
     "hot": false
    },
    {
     "d": "2026-11-09",
     "dow": "Mon",
     "lab": "9 Nov",
-    "tmax": 19.7,
-    "tmin": 6.9,
+    "tmax": 20.0,
+    "tmin": 6.7,
     "t": 13.3,
-    "c": 0.4762,
-    "w": 0.0409,
+    "c": 0.4815,
+    "w": 0.0416,
     "hot": false
    },
    {
     "d": "2026-11-10",
     "dow": "Tue",
     "lab": "10 Nov",
-    "tmax": 24.2,
-    "tmin": 6.9,
-    "t": 15.6,
-    "c": 0.7209,
-    "w": 0.0875,
+    "tmax": 24.3,
+    "tmin": 6.6,
+    "t": 15.4,
+    "c": 0.7102,
+    "w": 0.0848,
     "hot": false
    },
    {
     "d": "2026-11-11",
     "dow": "Wed",
     "lab": "11 Nov",
-    "tmax": 16.2,
-    "tmin": 11.2,
-    "t": 13.7,
-    "c": 0.5189,
-    "w": 0.0472,
+    "tmax": 17.0,
+    "tmin": 11.4,
+    "t": 14.2,
+    "c": 0.5735,
+    "w": 0.0561,
     "hot": false
    },
    {
     "d": "2026-11-12",
     "dow": "Thu",
     "lab": "12 Nov",
-    "tmax": 16.6,
-    "tmin": 10.3,
-    "t": 13.5,
-    "c": 0.4921,
-    "w": 0.0432,
+    "tmax": 18.5,
+    "tmin": 10.7,
+    "t": 14.6,
+    "c": 0.6176,
+    "w": 0.0643,
     "hot": false
    },
    {
     "d": "2026-11-13",
     "dow": "Fri",
     "lab": "13 Nov",
-    "tmax": 21.2,
-    "tmin": 10.0,
-    "t": 15.6,
-    "c": 0.7261,
-    "w": 0.0889,
+    "tmax": 21.5,
+    "tmin": 9.3,
+    "t": 15.4,
+    "c": 0.7049,
+    "w": 0.0835,
+    "hot": false
+   },
+   {
+    "d": "2026-11-14",
+    "dow": "Sat",
+    "lab": "14 Nov",
+    "tmax": 17.0,
+    "tmin": 11.7,
+    "t": 14.3,
+    "c": 0.59,
+    "w": 0.0591,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  11.3,
-  15.6
+  11.6,
+  15.4
  ],
  "headline_fc": "A <em>solid</em> growing week for the greens",
  "takeaways": [
   {
    "tone": "cool",
    "head": "Greens: growing well",
-   "detail": "Bent and Poa GP averages 50% this week, cooler than the 20 °C optimum."
+   "detail": "Bent and Poa GP averages 57% this week, cooler than the 20 °C optimum."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 5%, best on Fri at 9%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 6%, best on Tue at 8%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
