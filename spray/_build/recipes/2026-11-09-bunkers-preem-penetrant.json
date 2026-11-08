@@ -118,7 +118,8 @@
   ],
   "ppe_note": "Barricade label: cotton overalls buttoned to the neck and wrist, elbow-length chemical-resistant gloves and a washable hat for hand-wand work. Goggles when you pour the Pervade.",
   "spray_rules": [
-    "All bunker faces, right up under the lip, spraying down into the start of the bunker base. Not where we rake, unless there are weeds in the base",
+    "Faces only: from up under the lip down to where the raked base starts. No bases, unless it's a bad fairway bunker with lots of weeds in the base",
+    "Bunker map with the mix for each bunker and ticks as you go: andranf.github.io/ranfurlie-greens/spray/bunker-map/",
     "Keep it off greens and collars. Barricade's label says not on putting greens",
     "Nozzle no higher than 50 cm, coarse spray, 4 bar. Wind 3–20 km/h: stop if it's blowing toward a green",
     "Don't start until Delta T is over 2, likely about 8:30 with the heavy dew",
@@ -157,7 +158,7 @@
     [
       "areas",
       "Bunkers sprayed",
-      "e.g. all front nine, 10–14 greenside",
+      "Paste the list from the bunker map (Copy list for the checklist)",
       "text"
     ],
     [

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bunker Spray Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+/* Ranfurlie bunker spray map: tick off bunker faces as you go (9 Nov 2026). Reads ../../bunkers/data.json. */
+:root{
+  color-scheme:light;
+  --bg:#eef4f1; --card:#ffffff; --fg:#10241b; --muted:#4c6358; --faint:#7d9188; --line:rgba(16,36,27,.12);
+  --go:#13a356; --go-ink:#fff; --todo:#e0901b; --base:#8a4fd6; --sand:#f3e6c4; --sand-done:#d9f0df;
+  --fair:#cfe6bf; --green:#9fd38a; --tee:#b9dca6; --appr:#c3e1b0; --acc:#0573a8;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark; --bg:#0b1511; --card:#14221c; --fg:#eaf5ef; --muted:#a3bbb0; --faint:#77908a; --line:rgba(255,255,255,.1);
+  --go:#2fd27a; --go-ink:#03210f; --todo:#f0a73a; --base:#b083ff; --sand:#5b5138; --sand-done:#1f4a30;
+  --fair:#22402c; --green:#2f6a3e; --tee:#2a5236; --appr:#27492f; --acc:#38c6ff;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark; --bg:#0b1511; --card:#14221c; --fg:#eaf5ef; --muted:#a3bbb0; --faint:#77908a; --line:rgba(255,255,255,.1);
+  --go:#2fd27a; --go-ink:#03210f; --todo:#f0a73a; --base:#b083ff; --sand:#5b5138; --sand-done:#1f4a30;
+  --fair:#22402c; --green:#2f6a3e; --tee:#2a5236; --appr:#27492f; --acc:#38c6ff;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4;
+  padding:calc(12px + env(safe-area-inset-top,0px)) 16px calc(90px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:760px;margin:0 auto}
+.when{font-weight:600;color:var(--muted);font-size:14px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,8vw,44px);line-height:1;margin:2px 0 8px}
+.rule{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--todo);border-radius:14px;padding:12px 14px;margin:0 0 12px}
+.rule .t{display:block;font-size:17px;font-weight:700;margin-bottom:2px}
+.rule p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.stat .k{font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.stat .v{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.1}
+.gun{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:0 0 12px;font-size:15px;flex-wrap:wrap}
+.gun input{width:72px;font:inherit;font-size:18px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+.holes{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;margin:0 0 4px;scrollbar-width:none}
+.holes button{flex:0 0 auto;min-width:44px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;font-weight:700}
+.holes button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.holes button.full{background:var(--sand-done)}
+.mapbox{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:0 0 6px}
+svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:0 0 12px}
+.legend i{display:inline-block;width:18px;height:8px;border-radius:3px;margin-right:5px;vertical-align:middle}
+h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
+.bk{display:grid;grid-template-columns:auto 1fr auto;gap:4px 12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 8px}
+.bk.sel{outline:3px solid var(--acc)}
+.bk .num{font-family:var(--display);font-weight:800;font-size:26px;min-width:40px;text-align:center}
+.bk .d{font-weight:600}
+.bk .m{color:var(--muted);font-size:14px}
+.bk .weed{color:var(--base);font-weight:700;font-size:13px}
+.bk .act{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.tick{min-width:96px;height:44px;border-radius:999px;border:2px solid var(--go);background:transparent;color:var(--go);font:inherit;font-weight:700;font-size:16px}
+.bk.done .tick{background:var(--go);color:var(--go-ink)}
+.bk.done{opacity:.78}
+.basebtn{height:32px;border-radius:999px;border:1px dashed var(--base);background:transparent;color:var(--base);font:inherit;font-size:13px;font-weight:700}
+.basebtn.on{background:var(--base);color:#fff;border-style:solid}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;justify-content:center}
+.bar button{flex:1;max-width:360px;height:48px;border-radius:999px;border:0;background:var(--go);color:var(--go-ink);font:inherit;font-weight:700;font-size:16px}
+.bar button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);flex:0 0 auto;padding:0 16px}
+.note{color:var(--faint);font-size:13px;margin:10px 0 0}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+<div class="wrap">
+  <div class="when" id="when">Ranfurlie · Bunker faces</div>
+  <h1 id="title">Bunker spray map</h1>
+  <div class="rule">
+    <span class="t">Faces only: from up under the lip down to where the raked base starts.</span>
+    <p>Don't spray the bases. Only a bad fairway bunker with lots of weeds in the base gets its base done: tap <b>Base too</b> on that bunker.</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="k">Bunkers done</div><div class="v" id="sDone">0 / 0</div></div>
+    <div class="stat"><div class="k">Mix used</div><div class="v" id="sUsed">0 L</div></div>
+    <div class="stat"><div class="k">Left in tank</div><div class="v" id="sLeft">0 L</div></div>
+  </div>
+  <div class="gun"><span>Gun output from your bucket test:</span><input id="lpm" type="number" inputmode="decimal" min="1" max="60" step="0.5" value="10"><span>L/min</span></div>
+  <div class="holes" id="holes"></div>
+  <div class="mapbox"><svg id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of bunkers"></svg></div>
+  <div class="legend"><span><i style="background:var(--todo)"></i>Face to spray</span><span><i style="background:var(--go)"></i>Done</span><span><i style="background:var(--base)"></i>Base too</span><span><i style="background:var(--sand)"></i>Raked base, leave it</span></div>
+  <div id="list"></div>
+  <p class="note" id="basis"></p>
+</div>
+<div class="bar"><button class="ghost" id="undo" type="button">Undo</button><button id="copy" type="button">Copy list for the checklist</button></div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+  var Q=new URLSearchParams(location.search);
+  var CFG={
+    date:Q.get("date")||"2026-11-09", label:Q.get("label")||"Mon 9 Nov",
+    tank:+(Q.get("mix")||1300), lha:+(Q.get("lha")||1000),
+    prods:[["Barricade",+(Q.get("p1")||4.0)],["Pervade",+(Q.get("p2")||5.0)]], // mL per L of mix = (L/ha) / (mix L/ha) x 1000
+    data:"../../bunkers/data.json", recipe:"../2026-11-09-bunkers-preem-penetrant/"
+  };
+  var KEY="ranfurlie-bunkermap-"+CFG.date, st={done:{},base:{},hist:[],lpm:10};
+  try{var s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s){st=Object.assign(st,s)}}catch(e){}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+  var $=function(id){return document.getElementById(id)};
+  $("when").textContent="Ranfurlie · "+CFG.label+" · Pre-Emergent + Penetrant";
+  $("lpm").value=st.lpm||10;
+  var B=[],MAP=[],BOUNDS=[0,0,1000,700],FACE=0,PERL=0,hole="all",sel=null;
+  function per(p){var s=0;p.forEach(function(r){for(var i=0;i<r.length-1;i++){s+=Math.hypot(r[i+1][0]-r[i][0],r[i+1][1]-r[i][1])}});return s}
+  function path(p){return p.map(function(r){return "M"+r.map(function(q){return q[0].toFixed(1)+" "+q[1].toFixed(1)}).join("L")+"Z"}).join("")}
+  function r1(x){return x>=10?Math.round(x):Math.round(x*2)/2}
+  function fmtL(x){return (x>=10?Math.round(x):(Math.round(x*2)/2).toFixed(1).replace(/\.0$/,""))+" L"}
+  function secs(L){var m=+$("lpm").value||10, s=L/m*60; return s<90?Math.round(s/5)*5+" s":(Math.round(s/30)/2).toFixed(1).replace(/\.0$/,"")+" min"}
+  function mlOf(L){return CFG.prods.map(function(p){return p[0]+" "+Math.round(L*p[1])+" mL"}).join(" · ")}
+  function isFair(b){return /fairway|approach/i.test(b.d||"")}
+  function weedy(b){return /weed/i.test(b.com||"")}
+  function mixFor(b){var face=b.per*PERL, base=st.base[b.n]?Math.max((b.area||0)-b.per*1.5,0)*CFG.lha/10000:0; return {face:face,base:base,tot:face+base}}
+  fetch(CFG.data+"?t="+Date.now()).then(function(r){return r.json()}).then(function(d){
+    BOUNDS=d.bounds||BOUNDS; MAP=d.map||[];
+    B=(d.bunkers||[]).filter(function(b){return b.p&&b.p.length}).map(function(b){b.per=per(b.p);return b});
+    B.sort(function(a,b){return (a.h-b.h)||(a.n-b.n)});
+    var totPer=B.reduce(function(s,b){return s+b.per},0);
+    PERL=CFG.tank/totPer; FACE=PERL/(CFG.lha/10000);
+    $("basis").textContent="Amounts share the "+CFG.tank+" L tank across all "+B.length+" bunkers by the length of each bunker's edge: about "+(PERL*10).toFixed(1)+" L per 10 m of edge, a band about "+FACE.toFixed(1)+" m wide from the lip down at "+CFG.lha+" L/ha. Base too adds the raked base at "+CFG.lha+" L/ha. Ticks are saved on this phone.";
+    holesBar(); draw(); list(); stats();
+  }).catch(function(){ $("list").innerHTML='<div class="rule"><b>Couldn\'t load the bunker list.</b><p>Check you have signal and reload.</p></div>' });
+  function holesBar(){
+    var hs=[]; B.forEach(function(b){if(hs.indexOf(b.h)<0)hs.push(b.h)});
+    var h='<button type="button" data-h="all" class="'+(hole==="all"?"on":"")+'">All</button>';
+    hs.forEach(function(x){var all=B.filter(function(b){return b.h===x}), dn=all.every(function(b){return st.done[b.n]});
+      h+='<button type="button" data-h="'+x+'" class="'+(String(hole)===String(x)?"on ":"")+(dn?"full":"")+'">'+(x===0?"Practice":x)+'</button>'});
+    $("holes").innerHTML=h;
+  }
+  function vb(){
+    if(hole==="all") return [BOUNDS[0]-5,BOUNDS[1]-5,BOUNDS[2]-BOUNDS[0]+10,BOUNDS[3]-BOUNDS[1]+10];
+    var xs=[],ys=[]; B.forEach(function(b){if(b.h==hole)b.p.forEach(function(r){r.forEach(function(q){xs.push(q[0]);ys.push(q[1])})})});
+    if(!xs.length){ hole="all"; return vb(); }
+    var x0=Math.min.apply(0,xs),x1=Math.max.apply(0,xs),y0=Math.min.apply(0,ys),y1=Math.max.apply(0,ys),pad=25;
+    var w=Math.max(x1-x0+2*pad,120),h=Math.max(y1-y0+2*pad,90),cx=(x0+x1)/2,cy=(y0+y1)/2;
+    if(w/h<1.4) w=h*1.4; else h=w/1.4;
+    return [cx-w/2,cy-h/2,w,h];
+  }
+  function draw(){
+    var v=vb(), z=v[2]/1000, svg=$("map"), out="";
+    svg.setAttribute("viewBox",v.join(" "));
+    var fills={fairway:"var(--fair)",approach:"var(--appr)",tee:"var(--tee)",green:"var(--green)"};
+    MAP.forEach(function(m){out+='<path d="'+path([m.p])+'" fill="'+(fills[m.l]||"var(--fair)")+'" stroke="none"/>'});
+    B.forEach(function(b){
+      var dn=st.done[b.n], bs=st.base[b.n], band=Math.max(FACE,1.5);
+      var col=dn?"var(--go)":(bs?"var(--base)":"var(--todo)");
+      out+='<g data-n="'+b.n+'" style="cursor:pointer">';
+      out+='<path d="'+path(b.p)+'" fill="'+(bs?(dn?"var(--go)":"var(--base)"):(dn?"var(--sand-done)":"var(--sand)"))+'" fill-opacity="'+(bs?.45:1)+'" stroke="'+col+'" stroke-width="'+band.toFixed(1)+'" stroke-linejoin="round"'+(sel===b.n?' stroke-dasharray="none"':'')+'/>';
+      if(sel===b.n) out+='<circle cx="'+b.c[0].toFixed(1)+'" cy="'+b.c[1].toFixed(1)+'" r="'+(Math.sqrt(b.area||200)*0.9+12).toFixed(1)+'" fill="none" stroke="var(--acc)" stroke-width="'+(3*Math.max(z,0.3)).toFixed(1)+'"/>';
+      var fs=Math.max(7, 13*z);
+      out+='<text x="'+b.c[0].toFixed(1)+'" y="'+(b.c[1]+fs*0.35).toFixed(1)+'" text-anchor="middle" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="800" font-size="'+fs.toFixed(1)+'" fill="var(--fg)" stroke="var(--card)" stroke-width="'+(fs*0.18).toFixed(1)+'" paint-order="stroke">'+b.n+'</text>';
+      out+='</g>';
+    });
+    svg.innerHTML=out;
+  }
+  function row(b){
+    var m=mixFor(b), dn=st.done[b.n];
+    var h='<div class="bk'+(dn?" done":"")+(sel===b.n?" sel":"")+'" id="bk'+b.n+'" data-n="'+b.n+'">';
+    h+='<div class="num">'+b.n+'</div><div><div class="d">'+(b.h===0?"Practice":"Hole "+b.h)+' · '+(b.d||"")+'</div>';
+    h+='<div class="m">About <b>'+fmtL(m.face)+'</b> on the face, '+secs(m.face)+' · '+Math.round(b.per)+' m of edge</div>';
+    h+='<div class="m">'+mlOf(m.face)+'</div>';
+    if(st.base[b.n]) h+='<div class="m" style="color:var(--base)">Base too: about <b>'+fmtL(m.base)+'</b> more, '+secs(m.base)+'</div>';
+    if(weedy(b)&&isFair(b)) h+='<div class="weed">Weeds noted in the last bunker audit</div>';
+    h+='</div><div class="act"><button class="tick" type="button" data-act="tick">'+(dn?"Done ✓":"Tick")+'</button>';
+    if(isFair(b)) h+='<button class="basebtn'+(st.base[b.n]?" on":"")+'" type="button" data-act="base">Base too</button>';
+    h+='</div></div>';
+    return h;
+  }
+  function list(){
+    var hs=[],out=""; B.forEach(function(b){if(hs.indexOf(b.h)<0)hs.push(b.h)});
+    hs.forEach(function(x){
+      if(hole!=="all"&&String(hole)!==String(x))return;
+      var all=B.filter(function(b){return b.h===x}), dn=all.filter(function(b){return st.done[b.n]}).length;
+      var L=all.reduce(function(s,b){return s+mixFor(b).tot},0);
+      out+='<h2>'+(x===0?"Practice area":"Hole "+x)+' <span style="font-family:var(--body);font-size:15px;color:var(--muted);font-weight:600">· '+dn+' of '+all.length+' done · about '+fmtL(L)+'</span></h2>';
+      all.forEach(function(b){out+=row(b)});
+    });
+    $("list").innerHTML=out;
+  }
+  function stats(){
+    var dn=B.filter(function(b){return st.done[b.n]}), used=dn.reduce(function(s,b){return s+mixFor(b).tot},0);
+    var extra=B.filter(function(b){return st.base[b.n]}).reduce(function(s,b){return s+mixFor(b).base},0);
+    $("sDone").textContent=dn.length+" / "+B.length;
+    $("sUsed").textContent=fmtL(used);
+    var left=CFG.tank-used; $("sLeft").textContent=fmtL(Math.max(left,0));
+    $("sLeft").style.color=(CFG.tank-extra-B.reduce(function(s,b){return s+mixFor(b).face},0))<-1?"var(--base)":"";
+  }
+  function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on")},1800)}
+  function refresh(){holesBar();draw();list();stats();save()}
+  function select(n,scroll){sel=n;draw();list();if(scroll){var e=$("bk"+n);if(e)e.scrollIntoView({behavior:"smooth",block:"center"})}}
+  $("holes").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;hole=b.dataset.h==="all"?"all":+b.dataset.h;sel=null;refresh()});
+  $("map").addEventListener("click",function(e){var g=e.target.closest("g[data-n]");if(!g)return;var n=+g.dataset.n,b=B.filter(function(x){return x.n===n})[0];if(hole==="all"&&b){hole=b.h;holesBar()}select(n,true)});
+  $("list").addEventListener("click",function(e){
+    var btn=e.target.closest("button"), card=e.target.closest(".bk"); if(!card)return; var n=+card.dataset.n;
+    if(!btn){select(n,false);return}
+    if(btn.dataset.act==="tick"){ if(st.done[n]){delete st.done[n]} else {st.done[n]=new Date().toISOString(); st.hist.push(n); toast("Bunker "+n+" done")} }
+    if(btn.dataset.act==="base"){ if(st.base[n]) delete st.base[n]; else st.base[n]=1 }
+    sel=n; refresh();
+  });
+  $("lpm").addEventListener("input",function(){st.lpm=+this.value||10;list();save()});
+  $("undo").addEventListener("click",function(){var n=st.hist.pop();if(n&&st.done[n]){delete st.done[n];toast("Bunker "+n+" un-ticked");refresh()}else toast("Nothing to undo")});
+  $("copy").addEventListener("click",function(){
+    var dn=B.filter(function(b){return st.done[b.n]}), hs=[], txt=[];
+    B.forEach(function(b){if(hs.indexOf(b.h)<0)hs.push(b.h)});
+    hs.forEach(function(x){var all=B.filter(function(b){return b.h===x}), d=all.filter(function(b){return st.done[b.n]});
+      if(!d.length)return; txt.push(d.length===all.length?("Hole "+x+": all "+all.length):("Hole "+x+": "+d.map(function(b){return b.n}).join(", ")))});
+    var bases=B.filter(function(b){return st.base[b.n]&&st.done[b.n]}).map(function(b){return b.n});
+    var used=dn.reduce(function(s,b){return s+mixFor(b).tot},0);
+    var s="Bunker faces done: "+dn.length+" of "+B.length+" ("+txt.join("; ")+")."+(bases.length?" Bases too: "+bases.join(", ")+".":"")+" About "+Math.round(used)+" L used.";
+    var done=function(){toast("Copied. Paste it into Bunkers sprayed on the checklist")};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).then(done,function(){prompt("Copy this:",s)})} else {prompt("Copy this:",s)}
+  });
+})();
+</script>
+</html>
