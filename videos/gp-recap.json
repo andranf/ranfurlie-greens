@@ -1,14 +1,14 @@
 {
- "build_label": "week of 8 November 2026",
- "built": "2026-11-08T15:26+1100",
- "asof": "2026-11-07",
- "asof_label": "Sat 7 Nov",
- "asof_long": "Saturday 7 November 2026",
+ "build_label": "week of 9 November 2026",
+ "built": "2026-11-09T06:21+1100",
+ "asof": "2026-11-08",
+ "asof_label": "Sun 8 Nov",
+ "asof_long": "Sunday 8 November 2026",
  "latest": {
-  "t": 11.2,
-  "cool": 0.278,
-  "warm": 0.0183,
-  "label": "Sat 7 Nov"
+  "t": 12.7,
+  "cool": 0.414,
+  "warm": 0.0328,
+  "label": "Sun 8 Nov"
  },
  "model": {
   "cool_opt": 20.0,
@@ -18,13 +18,6 @@
   "crossover": 24.84
  },
  "hist": [
-  {
-   "d": "2026-10-09",
-   "lab": "9 Oct",
-   "t": 18.5,
-   "c": 0.963,
-   "w": 0.203
-  },
   {
    "d": "2026-10-10",
    "lab": "10 Oct",
@@ -227,114 +220,121 @@
    "t": 11.2,
    "c": 0.278,
    "w": 0.0183
+  },
+  {
+   "d": "2026-11-08",
+   "lab": "8 Nov",
+   "t": 12.7,
+   "c": 0.414,
+   "w": 0.0328
   }
  ],
  "stats": {
-  "cool14": 0.576,
-  "cool14_prev": 0.79,
-  "warm14": 0.06565792218291337,
-  "warm14_prev": 0.2410228690922485,
-  "clip14": 6.68,
-  "gvx21": 25.1
+  "cool14": 0.569,
+  "cool14_prev": 0.755,
+  "warm14": 0.06474884104211455,
+  "warm14_prev": 0.22486596250650506,
+  "clip14": 7.16,
+  "gvx21": 27.2
  },
  "headline_hist": "Cooler days have <em>pulled</em> GP back",
  "forecast": {
   "source": "Open-Meteo",
   "days": [
    {
-    "d": "2026-11-08",
-    "dow": "Sun",
-    "lab": "8 Nov",
-    "tmax": 15.8,
-    "tmin": 6.2,
-    "t": 11.0,
-    "c": 0.2621,
-    "w": 0.0169,
-    "hot": false
-   },
-   {
     "d": "2026-11-09",
     "dow": "Mon",
     "lab": "9 Nov",
-    "tmax": 20.0,
-    "tmin": 6.5,
-    "t": 13.2,
-    "c": 0.4709,
-    "w": 0.0402,
+    "tmax": 19.6,
+    "tmin": 7.1,
+    "t": 13.4,
+    "c": 0.4815,
+    "w": 0.0416,
     "hot": false
    },
    {
     "d": "2026-11-10",
     "dow": "Tue",
     "lab": "10 Nov",
-    "tmax": 24.5,
-    "tmin": 7.3,
-    "t": 15.9,
-    "c": 0.7574,
-    "w": 0.0976,
+    "tmax": 25.2,
+    "tmin": 7.7,
+    "t": 16.4,
+    "c": 0.812,
+    "w": 0.1153,
     "hot": false
    },
    {
     "d": "2026-11-11",
     "dow": "Wed",
     "lab": "11 Nov",
-    "tmax": 17.2,
-    "tmin": 11.6,
-    "t": 14.4,
-    "c": 0.5955,
-    "w": 0.0601,
+    "tmax": 17.9,
+    "tmin": 11.5,
+    "t": 14.7,
+    "c": 0.6286,
+    "w": 0.0665,
     "hot": false
    },
    {
     "d": "2026-11-12",
     "dow": "Thu",
     "lab": "12 Nov",
-    "tmax": 17.0,
-    "tmin": 11.2,
-    "t": 14.1,
-    "c": 0.5625,
-    "w": 0.0542,
+    "tmax": 19.2,
+    "tmin": 10.7,
+    "t": 14.9,
+    "c": 0.656,
+    "w": 0.0722,
     "hot": false
    },
    {
     "d": "2026-11-13",
     "dow": "Fri",
     "lab": "13 Nov",
-    "tmax": 20.4,
-    "tmin": 12.4,
-    "t": 16.4,
-    "c": 0.8072,
-    "w": 0.1136,
+    "tmax": 21.1,
+    "tmin": 12.3,
+    "t": 16.7,
+    "c": 0.8353,
+    "w": 0.1241,
     "hot": false
    },
    {
     "d": "2026-11-14",
     "dow": "Sat",
     "lab": "14 Nov",
-    "tmax": 17.0,
-    "tmin": 11.7,
-    "t": 14.3,
-    "c": 0.59,
-    "w": 0.0591,
+    "tmax": 18.5,
+    "tmin": 12.0,
+    "t": 15.2,
+    "c": 0.6887,
+    "w": 0.0796,
+    "hot": false
+   },
+   {
+    "d": "2026-11-15",
+    "dow": "Sun",
+    "lab": "15 Nov",
+    "tmax": 17.4,
+    "tmin": 9.3,
+    "t": 13.3,
+    "c": 0.4815,
+    "w": 0.0416,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  11.0,
-  16.4
+  13.3,
+  16.7
  ],
  "headline_fc": "A <em>solid</em> growing week for the greens",
  "takeaways": [
   {
    "tone": "cool",
    "head": "Greens: growing well",
-   "detail": "Bent and Poa GP averages 58% this week, cooler than the 20 °C optimum."
+   "detail": "Bent and Poa GP averages 65% this week, cooler than the 20 °C optimum."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 6%, best on Fri at 11%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 8%, best on Fri at 12%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
