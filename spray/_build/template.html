@@ -1025,7 +1025,7 @@ function signMix(){
   var who=readWho("mix");if(!who.name||!padHas("mix")||!mixReady())return;
   saveMe(who);var sig=padPath("mix");
   st.mixSig={at:Date.now(),name:who.name,slack:who.slack,sig:sig,sent:false};save();
-  send({kind:"mix",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,ph:st.ph||"",record:recordText(who.name),sig:sig});
+  send({kind:"mix",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,ph:st.ph||"",n:st.tank||1,record:recordText(who.name),sig:sig});
   buzz();toast(PREVIEW?"Signed (preview copy, not sent)":"Mix signed. Sent to #spraying");
   setTimeout(function(){setView("dash",true)},350);
 }
@@ -1047,7 +1047,7 @@ function signPost(){
   saveMe(who);var sig=padPath("post");
   st.postSig={at:Date.now(),name:who.name,slack:who.slack,sig:sig,sent:false};save();
   var checks=POSTC.map(function(r){return "✓ "+r[1]}).join("\n");
-  send({kind:"post",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,checks:checks,finish:finishText(),issues:(st.pd&&st.pd.issues)||"",extra:extraText(),sig:sig});
+  send({kind:"post",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:who.name,slack:who.slack,checks:checks,finish:finishText(),issues:(st.pd&&st.pd.issues)||"",extra:extraText(),n:st.tank||1,sig:sig});
   buzz();closePost();renderDash();toast(PREVIEW?"Checklist done (preview copy, not sent)":"Checklist done. Sent to #spraying");
 }
 
