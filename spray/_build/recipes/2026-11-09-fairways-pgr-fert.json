@@ -1,0 +1,129 @@
+{
+  "slug": "2026-11-09-fairways-pgr-fert",
+  "title": "PGR + Fert, Fairways",
+  "sheet_name": "5800 500L/Ha - Fairways - PGR + Fert (9 Nov)",
+  "sprayer": "Toro 5800",
+  "applicator": [
+    "Brodie Macdonald",
+    "U0839HLQA8G"
+  ],
+  "date": "Mon 9 Nov",
+  "date_long": "Mon 9 Nov 2026",
+  "date_iso": "2026-11-09",
+  "area_ha": 2.4,
+  "rate_lha": 500,
+  "mix_l": 1200,
+  "tank_cap_l": 1200,
+  "fill_l": 800,
+  "nozzles": "Blue",
+  "speed": "10 km/h",
+  "pressure": "3.5 bar",
+  "last_load": "Check what was last in the 5800 and run clean water through first",
+  "site_check": "Spray signs out at the fairways you're on",
+  "weather": "Delta T 2–8 · wind under 15 km/h · gusts under 30",
+  "facts": [
+    "Toro 5800 · Blue · 10 km/h · 3.5 bar",
+    "500 L/ha",
+    "2.4 ha a tank",
+    "As many tanks as all fairways need"
+  ],
+  "extra_checks": [
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 3.5 bar",
+      "500 L/ha at 10 km/h on 50 cm spacing needs about 4.2 L/min. Blue gives about 4.3. If it's well under (red nozzles give about 1.7), stop and call Andy"
+    ],
+    [
+      "notjd",
+      "This mix goes in the 5800, not the JD",
+      "The JD has Firepower in it today. Firepower kills couch"
+    ],
+    [
+      "stock",
+      "Enough for the tanks you need",
+      "Each tank: 3.12 L Shadow, 2.4 L Ambient Plus, 48 L GreenMaxx, 60 kg iron sulphate"
+    ]
+  ],
+  "products": [
+    {
+      "id": "shadow",
+      "rate": "1.3 L/ha",
+      "rate_lha": 1.3,
+      "unit": "L",
+      "sheet": 1
+    },
+    {
+      "id": "ambient",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "unit": "L",
+      "sheet": 2
+    },
+    {
+      "id": "greenmaxx",
+      "rate": "20 L/ha",
+      "rate_lha": 20.0,
+      "unit": "L",
+      "sheet": 3
+    },
+    {
+      "id": "ironsulphate",
+      "rate": "25 kg/ha",
+      "rate_lha": 25.0,
+      "unit": "kg",
+      "sheet": 4
+    }
+  ],
+  "ppe_note": "Iron sulphate and GreenMaxx are acidic and stain: goggles, elbow gloves and apron, dust mask when you tip the bags. Ambient Plus can cause serious eye damage: goggles.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "All fairways, 2.4 ha a tank. Mix another tank on the page each time you refill",
+    "Avoid spraying near golf. 10th tee start all day: do the front nine first while it's clear, then the back nine in the gaps behind groups",
+    "Start once Delta T is over 2 (likely about 8:30 with the heavy dew). Stop if it gusts over 30 or blows off target. Light easterly today, gusts 20–24",
+    "Keep the speed steady at 10 km/h. Turn the boom off on tees, greens, surrounds and bunkers",
+    "Keep people off each fairway until it's dry. Hose any iron sulphate splashes off paths and concrete straight away: it stains"
+  ],
+  "spray_more": "Shadow Ultra label: common couch fairways 0.8–1.6 L/ha in 100–500 L/ha water, no rain or irrigation within 1 h, no entry without protective clothing until dry. Ambient Plus label: shake before use, at least 420 L/ha water. Iron sulphate stains concrete, paths and paintwork.",
+  "post_checks": [
+    [
+      "tanks",
+      "Number of tanks and fairways done written in GreenKeeper",
+      ""
+    ]
+  ],
+  "flags": [
+    {
+      "c": "",
+      "t": "Nozzles: Blue at 3.5 bar, as you confirmed",
+      "d": "The sheet notes say Red AIC11004, but red (0.4 gpm) at 3.5 bar is about 1.7 L/min a nozzle: about 205 L/ha at 10 km/h on 50 cm spacing. Blue (Toro 1.0 gpm) is about 4.3 L/min at 3.5 bar, about 510 L/ha, which matches the sheet's 500 L/ha and its footer (Blue floodjets). Built on Blue (Andy, 9 Nov). The bucket test catches the wrong nozzles.",
+      "s": "Toro Multi Pro Spray Nozzle Selection Guide · TeeJet AIC11004"
+    },
+    {
+      "c": "",
+      "t": "Keep this mix out of the JD",
+      "d": "The JD has today's Firepower rough tank in it. Firepower (haloxyfop) kills couch, so the fairway tank must not go through the JD until it's been decontaminated.",
+      "s": "Firepower SDS"
+    },
+    {
+      "c": "info",
+      "t": "Shadow Ultra 1.3 L/ha on couch",
+      "d": "Label for golf fairways: common couch 0.8–1.6 L/ha, couch varieties such as Santa Ana and Wintergreen 0.6–1.2 L/ha, kikuyu 1.6–4 L/ha. 1.3 L/ha is inside the common couch range and just over the top of the hybrid couch range. 500 L/ha is the top of its 100–500 L/ha water volume.",
+      "s": "Shadow Ultra label APVMA 88267"
+    },
+    {
+      "c": "info",
+      "t": "Iron load: about 6 kg Fe/ha",
+      "d": "Iron sulphate at 25 kg/ha is about 5 kg Fe/ha (20% Fe), plus about 1.2 kg Fe/ha from the GreenMaxx (6% Fe). Today's max is 22 °C, which keeps the blackening risk down. 60 kg in about 850 L is about 70 g/L, well under its 360 g/L solubility: add it slowly with the agitator running.",
+      "s": "Iron sulphate SDS · GreenMaxx SDS · AccuWeather 9 Nov"
+    },
+    {
+      "c": "info",
+      "t": "Ambient Plus in an acidic tank",
+      "d": "Its label says it can be tank mixed with any spray; its SDS lists strong acids as incompatible for the concentrate. It goes in before the iron and GreenMaxx, as the sheet has it. 1.0 L/ha is just under its 1.2 L/ha label rate.",
+      "s": "Simplot label + SDS"
+    }
+  ]
+}
