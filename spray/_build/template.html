@@ -550,7 +550,7 @@ var TK=TESTMODE?"-test":"";
 var KEY="ranfurlie-tankmix-"+R.slug+TK, MEKEY="ranfurlie-spray-me"+TK, OUTKEY="ranfurlie-spray-outbox"+TK;
 var st=load()||fresh();
 function rid(){var a="abcdefghjkmnpqrstuvwxyz23456789",o="";for(var i=0;i<5;i++)o+=a[Math.floor(Math.random()*a.length)];return o}
-function fresh(){return {i:0,checks:{},ppe:{},post:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixSig:null,postSig:null,postDue:false,pd:{},run:rid(),pz:{},paused:null}}
+function fresh(){return {i:0,checks:{},ppe:{},post:{},added:{},batch:{},fillAt:null,topAt:null,ph:"",mixSig:null,postSig:null,postDue:false,pd:{},run:rid(),pz:{},paused:null,tank:1}}
 function load(){try{var s=localStorage.getItem(KEY);if(!s)return null;var o=JSON.parse(s);var legacy=!("run" in o)&&!!o.mixSig;var f=fresh();for(var k in f)if(!(k in o))o[k]=f[k];if(legacy)o.run="";if(o.i>=S.length)o.i=S.length-1;return o}catch(e){return null}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
 function getMe(){try{return JSON.parse(localStorage.getItem(MEKEY)||"null")}catch(e){return null}}
@@ -773,9 +773,10 @@ function todayCard(){
   return '<section class="card dcard today span2">'+
     '<div class="dhead"><span class="small">'+rel+' · '+esc(R.sprayer)+'</span>'+(pend?'<span class="chip warn">'+pend+' sign-off waiting for signal</span>':'')+'</div>'+
     '<h2>'+esc(R.title)+'</h2>'+
-    '<div class="statusline">'+statusChips()+'</div>'+
+    '<div class="statusline">'+((st.tank||1)>1?'<span class="chip">Tank '+st.tank+'</span>':'')+statusChips()+'</div>'+
     '<div class="facts">'+FACTS.map(function(x){return '<span class="fact">'+esc(x)+'</span>'}).join("")+'</div>'+
     (st.postSig&&R.date_iso>=TODAY?'<button class="btn go md wide" type="button" data-act="another">Mix another tank</button>':'')+
+    (st.mixSig&&!st.postSig&&R.date_iso===TODAY?'<button class="btn go md wide" type="button" data-act="next-tank">Same recipe: mix another tank</button><p class="small" style="margin:6px 0 10px">Tank sprayed out and refilling? Start the next tank here. Do the post-application checklist after the last tank.</p>':'')+
     (showRules?'<ul class="rules">'+(R.spray_rules||[]).map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>':'')+
     (postBtn&&(st.mixSig||st.postDue)?'<button class="btn go md wide" type="button" data-act="open-post">Post-application checklist</button>':
       (R.date_iso===TODAY&&!st.mixSig?'<button class="btn go md wide" type="button" data-act="to-mix">Open mixing guide</button>':''))+
@@ -1088,6 +1089,14 @@ document.addEventListener("click",function(e){
   else if(a==="ask-reset"){$("resetBox").innerHTML='<span class="small">Clear this phone’s progress on this tank?</span><button class="btn stop sm" type="button" data-act="reset">Clear</button><button class="btn ghost sm" type="button" data-act="keep">Keep</button>'}
   else if(a==="reset"){st=fresh();save();PADS={};renderReset();setView("mix",true);toast("Started again")}
   else if(a==="another"){st=fresh();save();PADS={};renderReset();setView("mix",true);toast("New tank started")}
+  else if(a==="next-tank"){
+    // 9 Nov 2026 (Andy): mix the next tank of the same recipe without doing the post-application checklist first.
+    if(!window.__nextArm){window.__nextArm=true;b.textContent="Tap again to start tank "+((st.tank||1)+1);setTimeout(function(){window.__nextArm=false;if(VIEW==="dash")renderDash()},5000);return}
+    window.__nextArm=false;
+    var pm=st.mixSig||{};var n=(st.tank||1)+1;
+    send({kind:"next",slug:R.slug,run:st.run||"",title:R.title,date:R.date_iso,sprayer:R.sprayer,tank:tankText(),name:pm.name||"",slack:pm.slack||"",n:st.tank||1});
+    st=fresh();st.tank=n;save();PADS={};renderReset();setView("mix",true);toast("Tank "+n+" started: same recipe");
+  }
   else if(a==="keep"){renderReset()}
 });
 document.addEventListener("input",function(e){
