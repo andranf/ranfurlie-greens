@@ -688,5 +688,50 @@
     ],
     "why": "Sheet order: in after the Shadow, before the acidic fertilisers. You're at {before} L.",
     "src": "Simplot label + SDS · <a href=\"http://techsheets.simplot.com/Partners/Ambient_Plus.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"http://sds.simplot.com/datasheets/77947.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+  },
+  "barricade": {
+    "name": "Barricade",
+    "gk_name": "Barricade (AU)",
+    "sig": "",
+    "sigc": "",
+    "form": "Suspension concentrate (SC)",
+    "what": "Syngenta Barricade: prodiamine 480 g/L, Group 3 (D) pre-emergent herbicide",
+    "haz": "Exempt from poison scheduling. Avoid skin contact.",
+    "soft": true,
+    "hazFull": "Label: cotton overalls buttoned to the neck and wrist and elbow-length chemical-resistant gloves when opening, mixing and spraying; washable hat for hand-wand work. Keep people off until the spray has dried. Not on putting greens or bowling greens, not on stressed turf. Wind 3–20 km/h, no inversion, nozzle no higher than 50 cm, COARSE droplets or larger. At least 500 L/ha water. Water in with at least 6 mm within 7 days; don't irrigate to run-off within 3 days. No overseeding with cool-season grass for 6 months.",
+    "ppe": [
+      "overalls",
+      "gloves",
+      "hat"
+    ],
+    "how": [
+      "Shake the drum well",
+      "Measure {amt} in a jug",
+      "Pour into moving water and rinse the jug into the tank"
+    ],
+    "why": "Suspension concentrate: in first so it disperses before the wetting agent. You're at {before} L.",
+    "src": "Label APVMA 62982 · <a href=\"https://nuturf.com.au/media/catalog/product/file/Barricade_Turf_Herbicide_Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · <a href=\"https://nuturf.com.au/media/catalog/product/file/Barricade_Herbicide_SDS_Jan_2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a>"
+  },
+  "pervade": {
+    "name": "Pervade",
+    "gk_name": "Pervade",
+    "sig": "",
+    "sigc": "",
+    "form": "Liquid soil surfactant",
+    "what": "Floratine Pervade: soil penetrant, moves water and product down into the profile",
+    "haz": "Wetting agent: irritates eyes.",
+    "soft": true,
+    "hazFull": "Floratine: 2.5–5 L/ha, 600–800 L/ha water, water in well. Repeat every 3–5 weeks in the growing season. Gloves and eye protection when pouring.",
+    "ppe": [
+      "gloves",
+      "goggles"
+    ],
+    "how": [
+      "Measure {amt}",
+      "Pour slowly into moving water so it doesn't foam",
+      "Rinse the jug into the tank"
+    ],
+    "why": "Wetting agent after the herbicide, as the sheet has it. You're at {before} L.",
+    "src": "Floratine Pervade product sheet (TURF) · <a href=\"https://turf.eu/en/products/fertilisers/special-products/d/pervade\" target=\"_blank\" rel=\"noopener\">product page</a>"
   }
 }

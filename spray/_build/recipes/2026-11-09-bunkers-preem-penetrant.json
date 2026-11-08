@@ -1,0 +1,202 @@
+{
+  "slug": "2026-11-09-bunkers-preem-penetrant",
+  "title": "Pre-Emergent + Penetrant, Bunker Faces",
+  "sheet_name": "Bunkers - Pre-Emergent + Penetrant App (9 Nov)",
+  "sprayer": "Silvan 2000 L",
+  "method": "handgun",
+  "applicator": [
+    "Michael K",
+    "U07QSB7HVM1"
+  ],
+  "date": "Mon 9 Nov",
+  "date_long": "Mon 9 Nov 2026",
+  "date_iso": "2026-11-09",
+  "area_ha": 0.5,
+  "rate_lha": 1000,
+  "mix_l": 500,
+  "tank_cap_l": 2000,
+  "fill_l": 300,
+  "nozzles": "Fishmouth",
+  "speed": "10 L per 100 m²",
+  "pressure": "4 bar",
+  "facts": [
+    "Silvan 2000 L · fishmouth · 4 bar",
+    "1000 L/ha",
+    "0.5 ha in this 500 L",
+    "10 L per 10 × 10 m"
+  ],
+  "check_title": "Rig check",
+  "checks": [
+    [
+      "pre",
+      "Pre-start done in TurfDog",
+      ""
+    ],
+    [
+      "rinse",
+      "Tank, hose and gun rinsed since the last load",
+      "Residue in the hose can damage the next job"
+    ],
+    [
+      "filters",
+      "Suction and gun filters clean, lid seal good",
+      ""
+    ],
+    [
+      "hose",
+      "Hose and reel: no cracks, kinks or leaks",
+      ""
+    ],
+    [
+      "gun",
+      "Gun trigger, lock and fishmouth nozzle work, no drips",
+      ""
+    ],
+    [
+      "agit",
+      "Agitation running",
+      ""
+    ],
+    [
+      "output",
+      "Gun output: spray into a bucket for 30 s at 4 bar, double it for L/min",
+      "1000 L/ha is 10 L per 10 × 10 m. At 10 L/min that's 1 minute per 10 × 10 m of bunker face"
+    ],
+    [
+      "fill",
+      "Fill hose above the water line",
+      ""
+    ],
+    [
+      "kit",
+      "Spill kit, wash water and eyewash on the rig",
+      ""
+    ],
+    [
+      "sds",
+      "Labels and SDSs for Barricade and Pervade with you",
+      ""
+    ],
+    [
+      "site",
+      "Spray signs out where you're working",
+      ""
+    ],
+    [
+      "wx",
+      "Weather OK",
+      "Barricade label: wind 3–20 km/h and no inversion. Don't start until Delta T is over 2 (likely about 8:30)"
+    ]
+  ],
+  "extra_checks": [
+    [
+      "dye",
+      "A little blue dye in the tank",
+      "So you can see where you've sprayed"
+    ],
+    [
+      "nogreens",
+      "Staying off greens and collars",
+      "Barricade's label says not on putting greens"
+    ]
+  ],
+  "products": [
+    {
+      "id": "barricade",
+      "rate": "4.0 L/ha",
+      "rate_lha": 4.0,
+      "unit": "L",
+      "sheet": 1
+    },
+    {
+      "id": "pervade",
+      "rate": "5.0 L/ha",
+      "rate_lha": 5.0,
+      "unit": "L",
+      "sheet": 2
+    }
+  ],
+  "ppe_note": "Barricade label: cotton overalls buttoned to the neck and wrist, elbow-length chemical-resistant gloves and a washable hat for hand-wand work. Goggles when you pour the Pervade.",
+  "spray_rules": [
+    "All bunker faces, right up under the lip, spraying down into the start of the bunker base. Not where we rake, unless there are weeds in the base",
+    "Keep it off greens and collars. Barricade's label says not on putting greens",
+    "Nozzle no higher than 50 cm, coarse spray, 4 bar. Wind 3–20 km/h: stop if it's blowing toward a green",
+    "Don't start until Delta T is over 2, likely about 8:30 with the heavy dew",
+    "10th tee start all day: front nine bunkers first while it's clear, then the back nine behind groups. Never spray near golfers",
+    "Keep people off until it's dry. Write down which bunkers you did: they need 6 mm of water within 7 days"
+  ],
+  "spray_more": "Barricade label: at least 500 L/ha water, wind 3–20 km/h, no inversion, nozzle no higher than 50 cm, COARSE droplets or larger, not on greens or stressed turf, don't apply if heavy rain is forecast within 48 h. Water in with at least 6 mm within 7 days, no irrigation to run-off for 3 days. No overseeding with cool-season grass for 6 months. Pervade: water in well.",
+  "post_checks": [
+    [
+      "out",
+      "Tank sprayed out on the bunker faces",
+      "Anything left: write it below"
+    ],
+    [
+      "flush",
+      "Hose and gun flushed with clean water",
+      "Sprayed out on a bunker face you treated"
+    ],
+    [
+      "nozzles",
+      "Gun nozzle and filters cleaned",
+      ""
+    ],
+    [
+      "ppe",
+      "Overalls, hat and gloves washed",
+      ""
+    ],
+    [
+      "areas",
+      "Bunkers sprayed written below",
+      "They need 6 mm of water within 7 days"
+    ]
+  ],
+  "post_fields": [
+    [
+      "areas",
+      "Bunkers sprayed",
+      "e.g. all front nine, 10–14 greenside",
+      "text"
+    ],
+    [
+      "left",
+      "Litres left in the tank",
+      "e.g. 0",
+      "num"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "",
+      "t": "Barricade 4 L/ha is above its spring summer-grass rate",
+      "d": "Label: most established turf (couch, kikuyu, buffalo) 1–3 L/ha in early spring for summer grass and crowsfoot. 4 L/ha sits in the label only for paspalum (2–4 L/ha) and for winter grass in high-risk areas such as greens surrounds (4 L/ha, late summer to early autumn). Built as the sheet stands.",
+      "s": "Barricade label APVMA 62982"
+    },
+    {
+      "c": "",
+      "t": "Needs 6 mm of water within 7 days",
+      "d": "Barricade's label: at least 6 mm of rain or irrigation within 7 days, and no irrigation to run-off for 3 days. Pervade also wants watering in. Only about 0.7 mm of showers is forecast for Wednesday, so it needs irrigation on the bunker faces. The rough tank asks for no irrigation on the rough tonight. Michael logs which bunkers he did on the checklist.",
+      "s": "Barricade label · AccuWeather 9 Nov"
+    },
+    {
+      "c": "info",
+      "t": "No overseeding the bunker faces for 6 months",
+      "d": "Barricade label: don't overseed with cool-season grass for 6 months after application.",
+      "s": "Barricade label"
+    },
+    {
+      "c": "info",
+      "t": "Pervade 5 L/ha at 1000 L/ha water",
+      "d": "Floratine's rate is 2.5–5 L/ha in 600–800 L/ha water, watered in well. 5 L/ha is the top of the range; 1000 L/ha is more water than it asks for, which suits a soil pass.",
+      "s": "Floratine Pervade product sheet"
+    },
+    {
+      "c": "info",
+      "t": "Sign-off will record the rig as 'Other'",
+      "d": "The sign-off workflow knows Silvan 1000 L and 600 L but not the 2000 L, so the Notion record shows the sprayer as Other. Everything else records normally.",
+      "s": "Spray sign-offs workflow"
+    }
+  ]
+}
