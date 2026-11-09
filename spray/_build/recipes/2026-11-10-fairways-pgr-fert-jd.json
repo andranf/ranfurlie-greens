@@ -1,0 +1,136 @@
+{
+  "slug": "2026-11-10-fairways-pgr-fert-jd",
+  "title": "PGR + Fert, Fairways (remainder, JD)",
+  "sheet_name": "JD 500L/Ha - Fairways - PGR + Fert (10 Nov)",
+  "sprayer": "JD HD200",
+  "applicator": [
+    "Mitch Mahoney",
+    "U08K55E3QJU"
+  ],
+  "date": "Tue 10 Nov",
+  "date_long": "Tue 10 Nov 2026",
+  "date_iso": "2026-11-10",
+  "area_ha": 1.5,
+  "rate_lha": 500,
+  "mix_l": 750,
+  "tank_cap_l": 757,
+  "fill_l": 500,
+  "nozzles": "Tan Wilger",
+  "speed": "9.8 km/h",
+  "pressure": "3.8 bar",
+  "last_load": "Quinstar + Firepower, Rough, Mon 9 Nov. The JD must be decontaminated before this mix goes in",
+  "site_check": "Spray signs out at the fairways you're on",
+  "weather": "Delta T 2–8 · wind under 15 km/h · gusts under 30",
+  "facts": [
+    "JD HD200 · Tan Wilger (SR110-20) · 9.8 km/h · 3.8 bar",
+    "500 L/ha",
+    "1.5 ha a tank",
+    "Remainder of fairways"
+  ],
+  "extra_checks": [
+    [
+      "decon",
+      "JD decontaminated after Monday's Firepower tank",
+      "Tank cleaner, then triple rinse through tank, boom, filters and nozzles. Firepower kills couch: if it hasn't been done, don't fill. Call Andy"
+    ],
+    [
+      "gps",
+      "Section control on, fairway boundaries loaded",
+      "Boom off on tees, greens, surrounds and bunkers"
+    ],
+    [
+      "stock",
+      "Enough for the tanks you need",
+      "Each tank: 1.95 L Shadow, 1.5 L Ambient Plus, 30 L GreenMaxx, 37.5 kg iron sulphate"
+    ]
+  ],
+  "products": [
+    {
+      "id": "shadow",
+      "rate": "1.3 L/ha",
+      "rate_lha": 1.3,
+      "unit": "L",
+      "sheet": 1
+    },
+    {
+      "id": "ambient",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "unit": "L",
+      "sheet": 2
+    },
+    {
+      "id": "greenmaxx",
+      "rate": "20 L/ha",
+      "rate_lha": 20.0,
+      "unit": "L",
+      "sheet": 3
+    },
+    {
+      "id": "ironsulphate",
+      "rate": "25 kg/ha",
+      "rate_lha": 25.0,
+      "unit": "kg",
+      "sheet": 4
+    }
+  ],
+  "ppe_note": "Iron sulphate and GreenMaxx are acidic and stain: goggles, elbow gloves and apron, dust mask when you tip the bags. Ambient Plus can cause serious eye damage: goggles.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "Remainder of fairways (not the ones done Monday), 1.5 ha a tank. Mix another tank on the page each time you refill",
+    "The 5800 is on fairways too: agree who does which holes before you start",
+    "Keep the speed steady at 9.8 km/h. Turn the boom off on tees, greens, surrounds and bunkers",
+    "Avoid spraying near golf. Work in the gaps behind groups",
+    "Start once Delta T is over 2. Stop if it gusts over 30 or blows off target",
+    "Keep people off each fairway until it's dry. Hose any iron sulphate splashes off paths and concrete straight away: it stains"
+  ],
+  "spray_more": "Shadow Ultra label: common couch fairways 0.8–1.6 L/ha in 100–500 L/ha water, no rain or irrigation within 1 h, no entry without protective clothing until dry. Ambient Plus label: shake before use, at least 420 L/ha water. Iron sulphate stains concrete, paths and paintwork.",
+  "post_checks": [
+    [
+      "tanks",
+      "Number of tanks and fairways done written in GreenKeeper",
+      ""
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "Decontaminate the JD before this mix goes in",
+      "d": "Monday's JD tank was Quinstar + Firepower on the rough. Firepower (haloxyfop) kills couch at very low doses, so a plain water rinse isn't enough before a couch fairway tank: tank cleaner, then a triple rinse through tank, boom, filters and nozzles. It's the first check on the rig list.",
+      "s": "Firepower SDS · 9 Nov rough recipe"
+    },
+    {
+      "c": "red",
+      "t": "Ambient Plus: check the shelf before you fill",
+      "d": "GreenKeeper had 7.0 L on hand before Monday's fairway tanks were entered. Each 5800 tank takes 2.4 L and each JD tank 1.5 L, so Monday's tanks may have used most of it. If there isn't enough for the tank, call Andy before you fill.",
+      "s": "GreenKeeper inventory · stock.json"
+    },
+    {
+      "c": "",
+      "t": "Two rigs on fairways",
+      "d": "The 5800 and the JD are both on fairways with the same mix. Agree who does which holes before you start, so nothing gets missed or double-sprayed.",
+      "s": "Andy, 9 Nov"
+    },
+    {
+      "c": "info",
+      "t": "Shadow Ultra 1.3 L/ha on couch",
+      "d": "Label for golf fairways: common couch 0.8–1.6 L/ha, couch varieties such as Santa Ana and Wintergreen 0.6–1.2 L/ha, kikuyu 1.6–4 L/ha. 1.3 L/ha is inside the common couch range and just over the top of the hybrid couch range. 500 L/ha is the top of its 100–500 L/ha water volume.",
+      "s": "Shadow Ultra label APVMA 88267"
+    },
+    {
+      "c": "info",
+      "t": "Iron load: about 6 kg Fe/ha",
+      "d": "Iron sulphate at 25 kg/ha is about 5 kg Fe/ha (20% Fe), plus about 1.2 kg Fe/ha from the GreenMaxx (6% Fe). Tuesday's forecast max is 25 °C, warmer than Monday's 22 °C: an early finish keeps the blackening risk down. Add the iron slowly with the agitator running.",
+      "s": "Iron sulphate SDS · GreenMaxx SDS · GreenKeeper forecast 10 Nov"
+    },
+    {
+      "c": "info",
+      "t": "Ambient Plus in an acidic tank",
+      "d": "Its label says it can be tank mixed with any spray; its SDS lists strong acids as incompatible for the concentrate. It goes in before the iron and GreenMaxx, as the sheet has it. 1.0 L/ha is just under its 1.2 L/ha label rate.",
+      "s": "Simplot label + SDS"
+    }
+  ]
+}

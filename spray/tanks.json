@@ -1,6 +1,24 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-10-fairways-pgr-fert-jd",
+   "title": "PGR + Fert, Fairways (remainder, JD)",
+   "sprayer": "JD HD200",
+   "date_iso": "2026-11-10",
+   "date": "Tue 10 Nov",
+   "applicator": "Mitch Mahoney",
+   "method": "boom"
+  },
+  {
+   "slug": "2026-11-10-fairways-pgr-fert",
+   "title": "PGR + Fert, Fairways (remainder)",
+   "sprayer": "Toro 5800",
+   "date_iso": "2026-11-10",
+   "date": "Tue 10 Nov",
+   "applicator": "Brodie Macdonald",
+   "method": "boom"
+  },
+  {
    "slug": "2026-11-10-bunkers-preem-penetrant",
    "title": "Pre-Emergent + Penetrant, Bunker Faces",
    "sprayer": "Silvan 2000 L",
