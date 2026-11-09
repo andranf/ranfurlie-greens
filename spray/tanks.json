@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-10-bunkers-preem-penetrant",
+   "title": "Pre-Emergent + Penetrant, Bunker Faces",
+   "sprayer": "Silvan 2000 L",
+   "date_iso": "2026-11-10",
+   "date": "Tue 10 Nov",
+   "applicator": "Michael K",
+   "method": "handgun"
+  },
+  {
    "slug": "2026-11-09-rough-quinstar-firepower",
    "title": "Quinstar + Firepower, Rough",
    "sprayer": "JD HD200",
