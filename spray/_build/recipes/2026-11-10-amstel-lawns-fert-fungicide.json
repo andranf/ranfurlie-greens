@@ -1,0 +1,125 @@
+{
+  "slug": "2026-11-10-amstel-lawns-fert-fungicide",
+  "title": "Fert + Fungicide, Amstel Lawns",
+  "sheet_name": "Fertiliser to Amstel Lawns (10 Nov)",
+  "sprayer": "Bertolini 75 L",
+  "method": "boom",
+  "applicator": [
+    "Tremayne Gallagher",
+    "U09V6AVPUDP"
+  ],
+  "date": "Tue 10 Nov",
+  "date_long": "Tue 10 Nov 2026",
+  "date_iso": "2026-11-10",
+  "area_ha": 0.0875,
+  "rate_lha": 400,
+  "mix_l": 35,
+  "tank_cap_l": 75,
+  "fill_l": 25,
+  "nozzles": "Yellow",
+  "speed": "4–4.5 km/h walking",
+  "pressure": "about 20 psi (1.4 bar)",
+  "last_load": "Check what was last in the Bertolini and run clean water through first",
+  "site_check": "Spray signs out at the Amstel lawns",
+  "weather": "Wind 3–20 km/h · no heavy rain coming",
+  "facts": [
+    "Bertolini · Yellow · 4–4.5 km/h walking · about 20 psi",
+    "400 L/ha",
+    "875 m² in this 35 L",
+    "Half tank, one fill"
+  ],
+  "extra_checks": [
+    [
+      "stock",
+      "Enough Medallion on the shelf",
+      "This fill needs 263 mL"
+    ]
+  ],
+  "products": [
+    {
+      "id": "shadow",
+      "rate": "0.75 L/ha",
+      "rate_lha": 0.75,
+      "unit": "mL",
+      "sheet": 1
+    },
+    {
+      "id": "250gt",
+      "rate": "18 L/ha",
+      "rate_lha": 18.0,
+      "unit": "mL",
+      "sheet": 2
+    },
+    {
+      "id": "medallion",
+      "rate": "3.0 L/ha",
+      "rate_lha": 3.006,
+      "unit": "mL",
+      "sheet": 3
+    },
+    {
+      "id": "greenmaxx",
+      "rate": "40 L/ha",
+      "rate_lha": 40.0,
+      "unit": "L",
+      "sheet": 4
+    },
+    {
+      "id": "highk",
+      "rate": "20 L/ha",
+      "rate_lha": 20.0,
+      "unit": "L",
+      "sheet": 5
+    }
+  ],
+  "ppe_note": "GreenMaxx and High K irritate eyes: goggles, PVC gloves and apron when you pour them. Medallion label: cotton overalls buttoned to the neck and wrist.",
+  "spray_rules": [
+    "Amstel lawns, 875 m², one 35 L fill",
+    "Walk a steady 4–4.5 km/h at about 20 psi with the yellow nozzles. Keep the overlap even so there are no stripes",
+    "Don't leave any product to dry on concrete or paths: hose it off straight away",
+    "Wind 3–20 km/h, coarse spray. Don't spray if heavy rain is coming",
+    "Keep people off until it's dry. Don't mow or water until it's thoroughly dry, ideally 24 h (Medallion label)"
+  ],
+  "spray_more": "250GT label: agitate thoroughly, check water pH (unstable at pH 7 or above), no surfactants or spray oils, don't mix with fertilisers (urea may cause foliar damage). Medallion label: 3 L/ha in 300–500 L/ha, coarse droplets, wind 3–20 km/h, don't mow or water until dry. High K SDS: pH 12.4–12.8, keep away from strong acids. Shadow Ultra label: add to a tank at least two-thirds full.",
+  "post_checks": [
+    [
+      "areas",
+      "Lawns sprayed written below",
+      ""
+    ]
+  ],
+  "post_fields": [
+    [
+      "areas",
+      "Areas sprayed",
+      "e.g. front lawn, café lawn",
+      "text"
+    ],
+    [
+      "left",
+      "Litres left in the tank",
+      "e.g. 0",
+      "num"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "",
+      "t": "250GT label: don't mix with fertilisers",
+      "d": "The 250GT label says not to mix with fertilisers (urea mixtures may cause foliar damage), and iprodione is unstable at pH 7 or above. High K (potassium carbonate, pH 12.4–12.8) lists strong acids as incompatible, and GreenMaxx is pH 2–3 with iron and magnesium sulphate. Built as the sheet (Andy, 10 Nov).",
+      "s": "250GT label APVMA 62284 · High K SDS 2025 · GreenMaxx SDS"
+    },
+    {
+      "c": "info",
+      "t": "Medallion 3 L/ha at 400 L/ha water",
+      "d": "Label rate is 3 L/ha in 300–500 L/ha for leaf and crown disease. 263 mL is the sheet amount for 875 m².",
+      "s": "Medallion label"
+    },
+    {
+      "c": "info",
+      "t": "250GT 18 L/ha",
+      "d": "Top of the label's 90–180 mL per 100 m² turf range.",
+      "s": "250GT label APVMA 62284"
+    }
+  ]
+}
