@@ -205,6 +205,7 @@ def print_slack_post(R, prods, cfg):
              ('**Setup:** ' + ' · '.join(R["facts"]) if R.get("facts") else
               f'**Setup:** {R["area_ha"]:g} ha · {R["rate_lha"]} L/ha · {R["mix_l"]} L mix · '
               f'{R["nozzles"]} · {R["speed"]} · {R["pressure"]}'), '',
+             ':rotating_light: **FILTER OUT? O-RING BACK IN.** Check the O-ring on every filter before it goes back in. No O-ring = leaks like crazy.', '',
              '**Mixing order' + (' (changed from the sheet):**' if changed else ':**'),
              f'1. Water to {R["fill_l"]} L, agitator on']
     for i, p in enumerate(prods, 2):
