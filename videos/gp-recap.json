@@ -1,6 +1,6 @@
 {
  "build_label": "week of 10 November 2026",
- "built": "2026-11-10T06:24+1100",
+ "built": "2026-11-10T13:52+1100",
  "asof": "2026-11-09",
  "asof_label": "Mon 9 Nov",
  "asof_long": "Monday 9 November 2026",
@@ -245,22 +245,22 @@
     "d": "2026-11-10",
     "dow": "Tue",
     "lab": "10 Nov",
-    "tmax": 26.2,
-    "tmin": 7.7,
+    "tmax": 26.1,
+    "tmin": 7.6,
     "t": 16.9,
-    "c": 0.8575,
-    "w": 0.1334,
+    "c": 0.8487,
+    "w": 0.1296,
     "hot": false
    },
    {
     "d": "2026-11-11",
     "dow": "Wed",
     "lab": "11 Nov",
-    "tmax": 18.6,
+    "tmax": 17.6,
     "tmin": 11.7,
-    "t": 15.2,
-    "c": 0.6779,
-    "w": 0.077,
+    "t": 14.7,
+    "c": 0.6231,
+    "w": 0.0654,
     "hot": false
    },
    {
@@ -268,43 +268,43 @@
     "dow": "Thu",
     "lab": "12 Nov",
     "tmax": 20.0,
-    "tmin": 10.3,
-    "t": 15.2,
-    "c": 0.6779,
-    "w": 0.077,
+    "tmin": 10.7,
+    "t": 15.3,
+    "c": 0.6995,
+    "w": 0.0821,
     "hot": false
    },
    {
     "d": "2026-11-13",
     "dow": "Fri",
     "lab": "13 Nov",
-    "tmax": 21.2,
-    "tmin": 9.9,
-    "t": 15.6,
-    "c": 0.7209,
-    "w": 0.0875,
+    "tmax": 19.9,
+    "tmin": 10.0,
+    "t": 14.9,
+    "c": 0.656,
+    "w": 0.0722,
     "hot": false
    },
    {
     "d": "2026-11-14",
     "dow": "Sat",
     "lab": "14 Nov",
-    "tmax": 19.7,
-    "tmin": 11.9,
-    "t": 15.8,
-    "c": 0.7471,
-    "w": 0.0947,
+    "tmax": 18.6,
+    "tmin": 11.1,
+    "t": 14.9,
+    "c": 0.6451,
+    "w": 0.0698,
     "hot": false
    },
    {
     "d": "2026-11-15",
     "dow": "Sun",
     "lab": "15 Nov",
-    "tmax": 17.1,
-    "tmin": 8.6,
-    "t": 12.9,
-    "c": 0.4296,
-    "w": 0.0347,
+    "tmax": 16.0,
+    "tmin": 9.6,
+    "t": 12.8,
+    "c": 0.4245,
+    "w": 0.034,
     "hot": false
    },
    {
@@ -324,12 +324,12 @@
   10.7,
   16.9
  ],
- "headline_fc": "Strong growth to Sat, then a <em>cold change</em>",
+ "headline_fc": "A <em>cold change</em> from Sun",
  "takeaways": [
   {
    "tone": "cool",
-   "head": "Greens: strong to Sat, slow from Sun",
-   "detail": "Bent and Poa GP averages 74% Tue to Sat, then 33% once the cold change arrives Sun."
+   "head": "Greens: fair to Sat, slow from Sun",
+   "detail": "Bent and Poa GP averages 69% Tue to Sat, then 33% once the cold change arrives Sun."
   },
   {
    "tone": "warm",
