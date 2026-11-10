@@ -4,7 +4,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
-/* Ranfurlie Tank Mix template v1.6 (19 Oct 2026). Built by spray/_build/build.py from a recipe + products.json + config.json.
+/* Ranfurlie Tank Mix template v1.6 (19 Oct 2026).
+   v1.9 (11 Nov): O-ring callout (yellow, bold) on the rig check and post-application checklist, plus an O-ring tick on both, on every page. Built by spray/_build/build.py from a recipe + products.json + config.json.
    v1.8 (20 Oct): the post-application checklist asks Finished or Not finished first; Not finished saves what's left in
    the tank (no ticking jobs that weren't done) and the tank stays open, with a Not finished strip on other tank pages.
    v1.7 (19 Oct): the pre-start and PPE steps stand alone (no recipe, tank gauge or setup chips until they're done).
@@ -159,6 +160,9 @@ button,select,textarea,input{font:inherit;color:inherit}
 @keyframes plus{0%{opacity:0;transform:translate(-50%,10px)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-46px)}}
 
 .haz{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:var(--r2);background:var(--poison-bg);font-weight:600;font-size:16.5px;line-height:1.3;box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2)}
+.oring{margin:0 0 12px;padding:14px 16px;border-radius:var(--r2);background:#ffe600;color:#161616;border:3px solid #e0313b;box-shadow:0 6px 18px -8px #e0313b}
+.oring b{display:block;font-family:var(--display);font-weight:800;font-size:27px;line-height:1.05;letter-spacing:.02em;text-transform:uppercase}
+.oring span{display:block;margin-top:6px;font-weight:700;font-size:16.5px;line-height:1.3}
 .haz svg{flex:none;width:22px;height:22px;stroke:var(--poison);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .haz.hot svg{animation:throb 1.6s ease-in-out infinite}
 @keyframes throb{50%{transform:scale(1.15)}}
@@ -541,6 +545,11 @@ var POSTC=(R.post_checks||[]);
 var TANK_PPE=PPE_ORDER.filter(function(k){return P.some(function(p){return p.ppe.indexOf(k)>=0})});
 if(TANK_PPE.indexOf("suit")>=0)TANK_PPE=TANK_PPE.filter(function(k){return k!=="overalls"});
 var FLAGS=R.flags||[];
+/* O-rings (Andy, 11 Nov 2026): the JD HD200 has been losing filter O-rings. Every page, every rig, no recipe can drop it. */
+var ORING='<div class="oring" role="alert"><b>Filter out? O-ring back in.</b><span>Every filter you pull: check its O-ring is there before it goes back in. No O-ring and it leaks like crazy. Missing or damaged? Don\'t refit it without one.</span></div>';
+function addOring(list,row){if(list.some(function(r){return r[0]==="oring"}))return;var i=-1;list.forEach(function(r,j){if(typeof r!=="string"&&/filter/i.test(r[0]+" "+r[1]))i=j});if(i>=0)list.splice(i+1,0,row);else list.push(row)}
+addOring(CHECKS,["oring","O-ring on every filter that came out","Check each one before it goes back in"]);
+addOring(POSTC,["oring","O-rings back in every filter that was pulled","No O-ring = leaks"]);
 
 var S=[{k:"check",n:CHECK_T},{k:"ppe",n:"PPE on"},{k:"fill",n:"Fill"}];
 P.forEach(function(p,i){S.push({k:"prod",n:p.name,p:p,i:i})});
@@ -650,7 +659,7 @@ var lastI=null, shownL=0;
 function render(){
   var s=S[st.i], h="";
   if(s.k==="check"){
-    h=gateHead("check")+'<h2 class="pname">'+esc(CHECK_T)+'</h2>'+gateCount("checks",CHECKS)+
+    h=gateHead("check")+'<h2 class="pname">'+esc(CHECK_T)+'</h2>'+ORING+gateCount("checks",CHECKS)+
       '<div class="checks">'+CHECKS.map(function(r){return checkBtn("checks",r[0],r[1],r[2])}).join("")+'</div>'+
       '<div id="stopMsg" hidden class="stopmsg"><b>Stop.</b> No chemical. Post the fault in #machinery and tell Ben or Andy.</div>'+
       '<div class="actions"><button class="btn stop" type="button" data-act="problem">Problem</button>'+gateBtn("checks",CHECKS,"All checked · PPE next")+'</div>';
@@ -943,7 +952,7 @@ function openPost(){
     '</div></div>';
   var body="";
   if(m==="done"){
-    body='<div class="checks">'+POSTC.map(function(r){return checkBtn("post",r[0],r[1],r[2])}).join("")+'</div>'+
+    body=ORING+'<div class="checks">'+POSTC.map(function(r){return checkBtn("post",r[0],r[1],r[2])}).join("")+'</div>'+
     '<div class="fields">'+
       '<div class="field"><label for="pdFinish">Finish time</label><input id="pdFinish" type="time" value="'+esc(pd.finish)+'"></div>'+
       '<div class="field"><label for="pdWind">Wind (km/h)</label><input id="pdWind" inputmode="decimal" value="'+esc(pd.wind||"")+'" placeholder="e.g. 8"></div>'+
