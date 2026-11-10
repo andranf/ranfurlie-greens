@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-11-bunkers-preem-penetrant",
+   "title": "Pre-Emergent + Penetrant, Bunker Faces",
+   "sprayer": "Silvan 2000 L",
+   "date_iso": "2026-11-11",
+   "date": "Wed 11 Nov",
+   "applicator": "Brodie Macdonald",
+   "method": "handgun"
+  },
+  {
    "slug": "2026-11-10-fairways-pgr-fert-jd",
    "title": "PGR + Fert, Fairways (remainder, JD)",
    "sprayer": "JD HD200",

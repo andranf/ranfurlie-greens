@@ -1,0 +1,222 @@
+{
+  "slug": "2026-11-11-bunkers-preem-penetrant",
+  "title": "Pre-Emergent + Penetrant, Bunker Faces",
+  "sheet_name": "Bunkers - Pre-Emergent + Penetrant App 2 (11 Nov), 3000 L/ha",
+  "sprayer": "Silvan 2000 L",
+  "method": "handgun",
+  "applicator": [
+    "Brodie Macdonald",
+    "U0839HLQA8G"
+  ],
+  "date": "Wed 11 Nov",
+  "date_long": "Wed 11 Nov 2026",
+  "date_iso": "2026-11-11",
+  "area_ha": 0.3333333333333333,
+  "rate_lha": 3000,
+  "mix_l": 1000,
+  "tank_cap_l": 2000,
+  "fill_l": 650,
+  "nozzles": "Fishmouth",
+  "speed": "30 L per 100 m²",
+  "pressure": "4 bar",
+  "facts": [
+    "Silvan 2000 L · fishmouth · 4 bar",
+    "3000 L/ha (new calibration)",
+    "0.33 ha in this 1000 L",
+    "30 L per 10 × 10 m"
+  ],
+  "check_title": "Rig check",
+  "checks": [
+    [
+      "pre",
+      "Pre-start done in TurfDog",
+      ""
+    ],
+    [
+      "oldmix",
+      "Monday's mix sprayed out first, with water added",
+      "It's 3 times today's strength. Read the gauge and add twice that much water (450 L in the tank: add 900 L), agitate 5 minutes, then spray it out on the bunkers with the map. Tank empty before today's fill"
+    ],
+    [
+      "filters",
+      "Suction and gun filters clean, lid seal good",
+      ""
+    ],
+    [
+      "hose",
+      "Hose and reel: no cracks, kinks or leaks",
+      ""
+    ],
+    [
+      "gun",
+      "Gun trigger, lock and fishmouth nozzle work, no drips",
+      ""
+    ],
+    [
+      "agit",
+      "Agitation running",
+      ""
+    ],
+    [
+      "output",
+      "Gun output: spray into a bucket for 30 s at 4 bar, double it for L/min",
+      "3000 L/ha is 30 L per 10 × 10 m. Put your L/min in the bunker map and it shows the time for each bunker"
+    ],
+    [
+      "fill",
+      "Fill hose above the water line",
+      ""
+    ],
+    [
+      "kit",
+      "Spill kit, wash water and eyewash on the rig",
+      ""
+    ],
+    [
+      "sds",
+      "Labels and SDSs for Barricade and Pervade with you",
+      ""
+    ],
+    [
+      "site",
+      "Spray signs out where you're working",
+      ""
+    ],
+    [
+      "wx",
+      "Weather OK",
+      "Barricade label: wind 3–20 km/h and no inversion. Delta T over 2 from about 8:00. Southerly 15 km/h at 9, 20 by 10, 22 gusting 35 from 11: stop once it's over 20"
+    ]
+  ],
+  "extra_checks": [
+    [
+      "dye",
+      "A little blue dye in the tank",
+      "So you can see where you've sprayed"
+    ],
+    [
+      "nogreens",
+      "Staying off greens and collars",
+      "Barricade's label says not on putting greens"
+    ]
+  ],
+  "products": [
+    {
+      "id": "barricade",
+      "rate": "4.0 L/ha",
+      "rate_lha": 4.0,
+      "unit": "L",
+      "sheet": 1
+    },
+    {
+      "id": "pervade",
+      "rate": "5.0 L/ha",
+      "rate_lha": 5.0,
+      "unit": "L",
+      "sheet": 2
+    }
+  ],
+  "ppe_note": "Barricade label: cotton overalls buttoned to the neck and wrist, elbow-length chemical-resistant gloves and a washable hat for hand-wand work. Goggles when you pour the Pervade.",
+  "spray_rules": [
+    "First: spray out Monday's mix. It's 3 times today's strength, so add twice the gauge reading in water first (450 L in the tank: add 900 L), agitate 5 minutes, then spray it like today's mix",
+    "Faces only: from up under the lip down to where the raked base starts. No bases, unless it's a bad fairway bunker with lots of weeds in the base",
+    "Bunker map: green bunkers are done (Monday's too). Tick each one as you finish it: andranf.github.io/ranfurlie-greens/spray/bunker-map/",
+    "Keep it off greens and collars. Barricade's label says not on putting greens",
+    "Nozzle no higher than 50 cm, coarse spray, 4 bar, 30 L per 10 × 10 m",
+    "Window about 8:00 to 10:30: Delta T over 2 from 8, southerly 20 km/h by 10 and 22 gusting 35 from 11. Stop when it's over 20 km/h or blowing toward a green",
+    "Never spray near golfers: work in the gaps behind groups",
+    "Keep people off until it's dry. Bunkers sprayed need 6 mm of water within 7 days"
+  ],
+  "spray_more": "Barricade label: at least 500 L/ha water, wind 3–20 km/h, no inversion, nozzle no higher than 50 cm, COARSE droplets or larger, not on greens or stressed turf, don't apply if heavy rain is forecast within 48 h. Water in with at least 6 mm within 7 days, no irrigation to run-off for 3 days. No overseeding with cool-season grass for 6 months. Pervade: water in well.",
+  "post_checks": [
+    [
+      "out",
+      "Tank sprayed out on the bunker faces",
+      "Anything left: write it below"
+    ],
+    [
+      "flush",
+      "Hose and gun flushed with clean water",
+      "Sprayed out on a bunker face you treated"
+    ],
+    [
+      "nozzles",
+      "Gun nozzle and filters cleaned",
+      ""
+    ],
+    [
+      "ppe",
+      "Overalls, hat and gloves washed",
+      ""
+    ],
+    [
+      "areas",
+      "Bunkers sprayed written below",
+      "They need 6 mm of water within 7 days"
+    ]
+  ],
+  "post_fields": [
+    [
+      "areas",
+      "Bunkers sprayed",
+      "Paste the list from the bunker map (Copy list for the checklist)",
+      "text"
+    ],
+    [
+      "left",
+      "Litres left in the tank",
+      "e.g. 0",
+      "num"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "",
+      "t": "Monday's leftover is 3 times today's strength",
+      "d": "Monday's tank was mixed for 1000 L/ha (Barricade 5.2 L and Pervade 6.5 L in 1300 L). At the new 3000 L/ha calibration it would put out Barricade 12 L/ha and Pervade 15 L/ha. Adding twice its volume in water brings it to today's sheet strength (Barricade 1.33 mL and Pervade 1.67 mL per litre), so about 450 L becomes about 1350 L and covers about 0.45 ha.",
+      "s": "9 Nov mix record · sheet 11 Nov"
+    },
+    {
+      "c": "",
+      "t": "Monday's bunkers may have had 3 times the rate",
+      "d": "If the gun was already putting out 3000 L/ha on Monday, the bunkers Michael sprayed got about Barricade 12 L/ha and Pervade 15 L/ha. The label's top Barricade rate is 4 L/ha. Don't respray those bunkers.",
+      "s": "Barricade label APVMA 62982"
+    },
+    {
+      "c": "",
+      "t": "Wind closes the window by about 10:30",
+      "d": "Barricade label: wind 3–20 km/h. AccuWeather: S 13 km/h at 8, 15 at 9, 20 at 10, then 22 gusting 35 from 11 to 6 pm. Delta T 2.0 at 8, 2.6 at 9, 3.2 at 10. About 2350 L to spray today (Monday's watered-down mix plus this tank) may not all go out before it gets too windy.",
+      "s": "AccuWeather Cranbourne West 11 Nov · Barricade label"
+    },
+    {
+      "c": "",
+      "t": "Barricade 4 L/ha is above its spring summer-grass rate",
+      "d": "Label: most established turf (couch, kikuyu, buffalo) 1–3 L/ha in early spring for summer grass and crowsfoot. 4 L/ha sits in the label only for paspalum (2–4 L/ha) and for winter grass in high-risk areas such as greens surrounds (4 L/ha, late summer to early autumn). Built at the sheet rate.",
+      "s": "Barricade label APVMA 62982"
+    },
+    {
+      "c": "",
+      "t": "Needs 6 mm of water within 7 days",
+      "d": "Barricade's label: at least 6 mm of rain or irrigation within 7 days, and no irrigation to run-off for 3 days. Pervade also wants watering in. Today is dry, so the bunker faces need irrigation, Monday's and today's.",
+      "s": "Barricade label · AccuWeather 11 Nov"
+    },
+    {
+      "c": "info",
+      "t": "Pervade 5 L/ha at 3000 L/ha water",
+      "d": "Floratine's rate is 2.5–5 L/ha in 600–800 L/ha water, watered in well. 3000 L/ha is far more water than it asks for, which suits soaking it into the sand.",
+      "s": "Floratine Pervade product sheet"
+    },
+    {
+      "c": "info",
+      "t": "No overseeding the bunker faces for 6 months",
+      "d": "Barricade label: don't overseed with cool-season grass for 6 months after application.",
+      "s": "Barricade label"
+    },
+    {
+      "c": "info",
+      "t": "Sign-off will record the rig as 'Other'",
+      "d": "The sign-off workflow knows Silvan 1000 L and 600 L but not the 2000 L, so the Notion record shows the sprayer as Other.",
+      "s": "Spray sign-offs workflow"
+    }
+  ]
+}

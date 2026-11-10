@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
 <style>
-/* Ranfurlie bunker spray map: tick off bunker faces as you go (9 Nov 2026). Reads ../../bunkers/data.json. */
+/* Ranfurlie bunker spray map: tick off bunker faces as you go (9 Nov 2026; 11 Nov: 3000 L/ha calibration, amounts per bunker face, ticks kept for the whole job, earlier days shown as done). Reads ../../bunkers/data.json. */
 :root{
   color-scheme:light;
   --bg:#eef4f1; --card:#ffffff; --fg:#10241b; --muted:#4c6358; --faint:#7d9188; --line:rgba(16,36,27,.12);
@@ -79,13 +79,13 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
   </div>
   <div class="stats">
     <div class="stat"><div class="k">Bunkers done</div><div class="v" id="sDone">0 / 0</div></div>
-    <div class="stat"><div class="k">Mix used</div><div class="v" id="sUsed">0 L</div></div>
-    <div class="stat"><div class="k">Left in tank</div><div class="v" id="sLeft">0 L</div></div>
+    <div class="stat"><div class="k">Sprayed today</div><div class="v" id="sUsed">0 L</div></div>
+    <div class="stat"><div class="k">Still to do</div><div class="v" id="sLeft">0 L</div></div>
   </div>
   <div class="gun"><span>Gun output from your bucket test:</span><input id="lpm" type="number" inputmode="decimal" min="1" max="60" step="0.5" value="10"><span>L/min</span></div>
   <div class="holes" id="holes"></div>
   <div class="mapbox"><svg id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of bunkers"></svg></div>
-  <div class="legend"><span><i style="background:var(--todo)"></i>Face to spray</span><span><i style="background:var(--go)"></i>Done</span><span><i style="background:var(--base)"></i>Base too</span><span><i style="background:var(--sand)"></i>Raked base, leave it</span></div>
+  <div class="legend"><span><i style="background:var(--todo)"></i>Face to spray</span><span><i style="background:var(--go)"></i>Done (any day)</span><span><i style="background:var(--base)"></i>Base too</span><span><i style="background:var(--sand)"></i>Raked base, leave it</span></div>
   <div id="list"></div>
   <p class="note" id="basis"></p>
 </div>
@@ -94,17 +94,34 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
 <script>
 (function(){
   var Q=new URLSearchParams(location.search);
+  function pad(x){return (x<10?"0":"")+x}
+  function dayOf(iso){var d=new Date(iso); if(isNaN(d))return String(iso).slice(0,10); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+  var TODAY=dayOf(new Date().toISOString());
+  // Bunkers sprayed on earlier days of this job, as {"bunker number":"YYYY-MM-DD"} (from the crew's lists).
+  var DONE_BEFORE={};
   var CFG={
-    date:Q.get("date")||"2026-11-09", label:Q.get("label")||"Mon 9 Nov",
-    tank:+(Q.get("mix")||1300), lha:+(Q.get("lha")||1000),
-    prods:[["Barricade",+(Q.get("p1")||4.0)],["Pervade",+(Q.get("p2")||5.0)]], // mL per L of mix = (L/ha) / (mix L/ha) x 1000
-    data:"../../bunkers/data.json", recipe:"../2026-11-09-bunkers-preem-penetrant/"
+    job:"bunkers-preem-nov26", start:"2026-11-09",
+    date:Q.get("date")||TODAY, label:Q.get("label")||"",
+    lha:+(Q.get("lha")||3000), faceHa:+(Q.get("ha")||1.3),
+    prods:[["Barricade",4.0/3000*1000],["Pervade",5.0/3000*1000]], // mL per L of mix at 3000 L/ha
+    data:"../../bunkers/data.json", recipe:"../2026-11-11-bunkers-preem-penetrant/"
   };
-  var KEY="ranfurlie-bunkermap-"+CFG.date, st={done:{},base:{},hist:[],lpm:10};
+  var KEY="ranfurlie-bunkermap-"+CFG.job, st={done:{},base:{},hist:[],lpm:10};
   try{var s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s){st=Object.assign(st,s)}}catch(e){}
+  // Ticks saved on this phone by the earlier map (one list per day): earlier days show as done, today's carry over.
+  var LEGACY={};
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);
+    if(!/^ranfurlie-bunkermap-\d{4}-\d{2}-\d{2}$/.test(k)||k.slice(-10)<CFG.start)continue;
+    var o=JSON.parse(localStorage.getItem(k)||"{}");
+    Object.keys(o.done||{}).forEach(function(n){var d=dayOf(o.done[n]); if(d===CFG.date){if(!st.done[n])st.done[n]=o.done[n]} else if(d<CFG.date) LEGACY[n]=d})}}catch(e){}
+  function before(n){if(st.done[n]){var d=dayOf(st.done[n]);return d<CFG.date?d:""} return DONE_BEFORE[n]||LEGACY[n]||""}
+  function isToday(n){return !!st.done[n]&&dayOf(st.done[n])===CFG.date}
+  function isDone(n){return !!(st.done[n]||before(n))}
+  function dayName(d){try{return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][new Date(d+"T12:00:00").getDay()]}catch(e){return d}}
+  if(!CFG.label){var _d=new Date(CFG.date+"T12:00:00");CFG.label=dayName(CFG.date)+" "+_d.getDate()+" "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][_d.getMonth()]}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
   var $=function(id){return document.getElementById(id)};
-  $("when").textContent="Ranfurlie · "+CFG.label+" · Pre-Emergent + Penetrant";
+  $("when").textContent="Ranfurlie · "+CFG.label+" · Pre-Emergent + Penetrant · "+CFG.lha+" L/ha";
   $("lpm").value=st.lpm||10;
   var B=[],MAP=[],BOUNDS=[0,0,1000,700],FACE=0,PERL=0,hole="all",sel=null;
   function per(p){var s=0;p.forEach(function(r){for(var i=0;i<r.length-1;i++){s+=Math.hypot(r[i+1][0]-r[i][0],r[i+1][1]-r[i][1])}});return s}
@@ -121,14 +138,15 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
     B=(d.bunkers||[]).filter(function(b){return b.p&&b.p.length}).map(function(b){b.per=per(b.p);return b});
     B.sort(function(a,b){return (a.h-b.h)||(a.n-b.n)});
     var totPer=B.reduce(function(s,b){return s+b.per},0);
-    PERL=CFG.tank/totPer; FACE=PERL/(CFG.lha/10000);
-    $("basis").textContent="Amounts share the "+CFG.tank+" L tank across all "+B.length+" bunkers by the length of each bunker's edge: about "+(PERL*10).toFixed(1)+" L per 10 m of edge, a band about "+FACE.toFixed(1)+" m wide from the lip down at "+CFG.lha+" L/ha. Base too adds the raked base at "+CFG.lha+" L/ha. Ticks are saved on this phone.";
+    FACE=CFG.faceHa*10000/totPer; PERL=FACE*CFG.lha/10000;
+    $("basis").textContent="Each bunker's amount is its face, about "+FACE.toFixed(1)+" m down from the lip all the way round, at "+CFG.lha+" L/ha: about "+Math.round(PERL*10)+" L per 10 m of edge, or "+Math.round(CFG.lha/100)+" L per 10 × 10 m. Base too adds the raked base at "+CFG.lha+" L/ha. Green bunkers are done. Ticks are saved on this phone.";
+    legacyCard();
     holesBar(); draw(); list(); stats();
   }).catch(function(){ $("list").innerHTML='<div class="rule"><b>Couldn\'t load the bunker list.</b><p>Check you have signal and reload.</p></div>' });
   function holesBar(){
     var hs=[]; B.forEach(function(b){if(hs.indexOf(b.h)<0)hs.push(b.h)});
     var h='<button type="button" data-h="all" class="'+(hole==="all"?"on":"")+'">All</button>';
-    hs.forEach(function(x){var all=B.filter(function(b){return b.h===x}), dn=all.every(function(b){return st.done[b.n]});
+    hs.forEach(function(x){var all=B.filter(function(b){return b.h===x}), dn=all.every(function(b){return isDone(b.n)});
       h+='<button type="button" data-h="'+x+'" class="'+(String(hole)===String(x)?"on ":"")+(dn?"full":"")+'">'+(x===0?"Practice":x)+'</button>'});
     $("holes").innerHTML=h;
   }
@@ -147,7 +165,7 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
     var fills={fairway:"var(--fair)",approach:"var(--appr)",tee:"var(--tee)",green:"var(--green)"};
     MAP.forEach(function(m){out+='<path d="'+path([m.p])+'" fill="'+(fills[m.l]||"var(--fair)")+'" stroke="none"/>'});
     B.forEach(function(b){
-      var dn=st.done[b.n], bs=st.base[b.n], band=Math.max(FACE,1.5);
+      var dn=isDone(b.n), bs=st.base[b.n], band=Math.max(FACE,1.5);
       var col=dn?"var(--go)":(bs?"var(--base)":"var(--todo)");
       out+='<g data-n="'+b.n+'" style="cursor:pointer">';
       out+='<path d="'+path(b.p)+'" fill="'+(bs?(dn?"var(--go)":"var(--base)"):(dn?"var(--sand-done)":"var(--sand)"))+'" fill-opacity="'+(bs?.45:1)+'" stroke="'+col+'" stroke-width="'+band.toFixed(1)+'" stroke-linejoin="round"'+(sel===b.n?' stroke-dasharray="none"':'')+'/>';
@@ -159,15 +177,16 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
     svg.innerHTML=out;
   }
   function row(b){
-    var m=mixFor(b), dn=st.done[b.n];
+    var m=mixFor(b), dn=isDone(b.n), bf=before(b.n);
     var h='<div class="bk'+(dn?" done":"")+(sel===b.n?" sel":"")+'" id="bk'+b.n+'" data-n="'+b.n+'">';
     h+='<div class="num">'+b.n+'</div><div><div class="d">'+(b.h===0?"Practice":"Hole "+b.h)+' · '+(b.d||"")+'</div>';
     h+='<div class="m">About <b>'+fmtL(m.face)+'</b> on the face, '+secs(m.face)+' · '+Math.round(b.per)+' m of edge</div>';
     h+='<div class="m">'+mlOf(m.face)+'</div>';
     if(st.base[b.n]) h+='<div class="m" style="color:var(--base)">Base too: about <b>'+fmtL(m.base)+'</b> more, '+secs(m.base)+'</div>';
     if(weedy(b)&&isFair(b)) h+='<div class="weed">Weeds noted in the last bunker audit</div>';
-    h+='</div><div class="act"><button class="tick" type="button" data-act="tick">'+(dn?"Done ✓":"Tick")+'</button>';
-    if(isFair(b)) h+='<button class="basebtn'+(st.base[b.n]?" on":"")+'" type="button" data-act="base">Base too</button>';
+    if(bf) h+='<div class="m" style="color:var(--go);font-weight:700">Sprayed '+dayName(bf)+'. Leave it</div>';
+    h+='</div><div class="act">'+(bf?'<button class="tick" type="button" disabled>Done '+dayName(bf)+'</button>':'<button class="tick" type="button" data-act="tick">'+(dn?"Done ✓":"Tick")+'</button>');
+    if(isFair(b)&&!bf) h+='<button class="basebtn'+(st.base[b.n]?" on":"")+'" type="button" data-act="base">Base too</button>';
     h+='</div></div>';
     return h;
   }
@@ -175,20 +194,39 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
     var hs=[],out=""; B.forEach(function(b){if(hs.indexOf(b.h)<0)hs.push(b.h)});
     hs.forEach(function(x){
       if(hole!=="all"&&String(hole)!==String(x))return;
-      var all=B.filter(function(b){return b.h===x}), dn=all.filter(function(b){return st.done[b.n]}).length;
-      var L=all.reduce(function(s,b){return s+mixFor(b).tot},0);
-      out+='<h2>'+(x===0?"Practice area":"Hole "+x)+' <span style="font-family:var(--body);font-size:15px;color:var(--muted);font-weight:600">· '+dn+' of '+all.length+' done · about '+fmtL(L)+'</span></h2>';
+      var all=B.filter(function(b){return b.h===x}), dn=all.filter(function(b){return isDone(b.n)}).length;
+      var L=all.filter(function(b){return !isDone(b.n)}).reduce(function(s,b){return s+mixFor(b).tot},0);
+      out+='<h2>'+(x===0?"Practice area":"Hole "+x)+' <span style="font-family:var(--body);font-size:15px;color:var(--muted);font-weight:600">· '+dn+' of '+all.length+' done'+(L>0.5?' · about '+fmtL(L)+' to go':'')+'</span></h2>';
       all.forEach(function(b){out+=row(b)});
     });
     $("list").innerHTML=out;
   }
   function stats(){
-    var dn=B.filter(function(b){return st.done[b.n]}), used=dn.reduce(function(s,b){return s+mixFor(b).tot},0);
-    var extra=B.filter(function(b){return st.base[b.n]}).reduce(function(s,b){return s+mixFor(b).base},0);
+    var dn=B.filter(function(b){return isDone(b.n)});
+    var today=B.filter(function(b){return isToday(b.n)}).reduce(function(s,b){return s+mixFor(b).tot},0);
+    var togo=B.filter(function(b){return !isDone(b.n)}).reduce(function(s,b){return s+mixFor(b).tot},0);
     $("sDone").textContent=dn.length+" / "+B.length;
-    $("sUsed").textContent=fmtL(used);
-    var left=CFG.tank-used; $("sLeft").textContent=fmtL(Math.max(left,0));
-    $("sLeft").style.color=(CFG.tank-extra-B.reduce(function(s,b){return s+mixFor(b).face},0))<-1?"var(--base)":"";
+    $("sUsed").textContent=fmtL(today);
+    $("sLeft").textContent=fmtL(togo);
+  }
+  function holeList(pick){
+    var hs=[],txt=[]; B.forEach(function(b){if(hs.indexOf(b.h)<0)hs.push(b.h)});
+    hs.forEach(function(x){var all=B.filter(function(b){return b.h===x}), d=all.filter(pick);
+      if(!d.length)return; txt.push(d.length===all.length?((x===0?"Practice":"Hole "+x)+": all "+all.length):((x===0?"Practice":"Hole "+x)+": "+d.map(function(b){return b.n}).join(", ")))});
+    return txt;
+  }
+  function copyText(s,msg){var done=function(){toast(msg)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).then(done,function(){prompt("Copy this:",s)})} else {prompt("Copy this:",s)}}
+  function legacyCard(){
+    var ns=Object.keys(LEGACY).filter(function(n){return !DONE_BEFORE[n]}); if(!ns.length)return;
+    var days=[]; ns.forEach(function(n){if(days.indexOf(LEGACY[n])<0)days.push(LEGACY[n])});
+    var el=document.createElement("div"); el.className="rule";
+    el.innerHTML='<span class="t">This phone has '+ns.length+' bunkers ticked on '+days.map(dayName).join(" and ")+'.</span><p>Send the list in the #spraying thread so they show on everyone\'s map.</p><p><button type="button" id="legacyCopy" style="margin-top:6px">Copy that list</button></p>';
+    var w=document.querySelector(".stats"); w.parentNode.insertBefore(el,w);
+    document.getElementById("legacyCopy").addEventListener("click",function(){
+      var s="Bunkers sprayed "+days.map(function(d){return dayName(d)+" "+d.slice(8)+"/"+d.slice(5,7)}).join(" and ")+" ("+ns.length+"): "+holeList(function(b){return !!LEGACY[b.n]&&!DONE_BEFORE[b.n]}).join("; ")+".";
+      copyText(s,"Copied. Paste it in the #spraying thread");
+    });
   }
   function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on")},1800)}
   function refresh(){holesBar();draw();list();stats();save()}
@@ -198,22 +236,18 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
   $("list").addEventListener("click",function(e){
     var btn=e.target.closest("button"), card=e.target.closest(".bk"); if(!card)return; var n=+card.dataset.n;
     if(!btn){select(n,false);return}
-    if(btn.dataset.act==="tick"){ if(st.done[n]){delete st.done[n]} else {st.done[n]=new Date().toISOString(); st.hist.push(n); toast("Bunker "+n+" done")} }
+    if(btn.dataset.act==="tick"){ if(before(n))return; if(st.done[n]){delete st.done[n]} else {st.done[n]=new Date().toISOString(); st.hist.push(n); toast("Bunker "+n+" done")} }
     if(btn.dataset.act==="base"){ if(st.base[n]) delete st.base[n]; else st.base[n]=1 }
     sel=n; refresh();
   });
   $("lpm").addEventListener("input",function(){st.lpm=+this.value||10;list();save()});
-  $("undo").addEventListener("click",function(){var n=st.hist.pop();if(n&&st.done[n]){delete st.done[n];toast("Bunker "+n+" un-ticked");refresh()}else toast("Nothing to undo")});
+  $("undo").addEventListener("click",function(){var n=st.hist.pop();if(n&&isToday(n)){delete st.done[n];toast("Bunker "+n+" un-ticked");refresh()}else toast("Nothing to undo")});
   $("copy").addEventListener("click",function(){
-    var dn=B.filter(function(b){return st.done[b.n]}), hs=[], txt=[];
-    B.forEach(function(b){if(hs.indexOf(b.h)<0)hs.push(b.h)});
-    hs.forEach(function(x){var all=B.filter(function(b){return b.h===x}), d=all.filter(function(b){return st.done[b.n]});
-      if(!d.length)return; txt.push(d.length===all.length?("Hole "+x+": all "+all.length):("Hole "+x+": "+d.map(function(b){return b.n}).join(", ")))});
-    var bases=B.filter(function(b){return st.base[b.n]&&st.done[b.n]}).map(function(b){return b.n});
+    var dn=B.filter(function(b){return isToday(b.n)});
+    var bases=B.filter(function(b){return st.base[b.n]&&isToday(b.n)}).map(function(b){return b.n});
     var used=dn.reduce(function(s,b){return s+mixFor(b).tot},0);
-    var s="Bunker faces done: "+dn.length+" of "+B.length+" ("+txt.join("; ")+")."+(bases.length?" Bases too: "+bases.join(", ")+".":"")+" About "+Math.round(used)+" L used.";
-    var done=function(){toast("Copied. Paste it into Bunkers sprayed on the checklist")};
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).then(done,function(){prompt("Copy this:",s)})} else {prompt("Copy this:",s)}
+    var s="Bunker faces done today: "+dn.length+" ("+holeList(function(b){return isToday(b.n)}).join("; ")+")."+(bases.length?" Bases too: "+bases.join(", ")+".":"")+" About "+Math.round(used)+" L at "+CFG.lha+" L/ha. All done so far: "+B.filter(function(b){return isDone(b.n)}).length+" of "+B.length+".";
+    copyText(s,"Copied. Paste it into Bunkers sprayed on the checklist");
   });
 })();
 </script>
