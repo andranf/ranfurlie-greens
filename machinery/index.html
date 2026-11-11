@@ -826,6 +826,211 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   #dash-root .mx{--ios-label2:var(--ios-label)}
 }
 
+/* POLISH v2 (12 Nov 2026) "instrument panel". Sits on top of the Apple skin and keeps its feel, but adds depth,
+   richer colour and clearer hierarchy: a softly tinted canvas, layered card shadows, the KPI row as a dark
+   instrument cluster (tell-tale lamps + hour-meter numerals), solid Overdue / Due capsules, tinted worklist
+   tiles and a red alert bar for "Do first". Motion for it is the POLISH v2 block at the end of apple-skin.js.
+   Delete this block and that one to go back to the flat Apple skin. */
+#dash-root .mx{
+  --pv-cl-a:#28302c;--pv-cl-b:#151a18;--pv-cl-line:rgba(255,255,255,.085);
+  --pv-cl-t:#f4f7f5;--pv-cl-t2:rgba(236,243,239,.70);--pv-cl-t3:rgba(236,243,239,.58);
+  --pv-l-blue:#63b3ff;--pv-l-red:#ff6259;--pv-l-amber:#ffb62e;--pv-l-rose:#ff7fa0;--pv-l-green:#45d47e;--pv-l-violet:#a898ff;
+  --ios-label:#16201b;--ios-label2:#5f6964;--ios-label3:#a4aca8;
+  --pv-shadow:0 0 0 .5px rgba(18,32,25,.09),0 1px 1px rgba(18,32,25,.04),0 10px 22px -12px rgba(18,32,25,.15),0 28px 50px -32px rgba(18,32,25,.26);
+  --pv-shadow-up:0 0 0 .5px rgba(18,32,25,.12),0 2px 3px rgba(18,32,25,.05),0 16px 28px -12px rgba(18,32,25,.22),0 36px 58px -30px rgba(18,32,25,.32);
+  --ios-card-shadow:var(--pv-shadow);--pv-card-bg:var(--ios-card);
+  --pv-tile:#ffffff;--pv-tile-ring:rgba(18,32,25,.10);--pv-tile-shadow:0 1px 2px rgba(18,32,25,.05),0 10px 18px -14px rgba(18,32,25,.22);
+  --pv-wash1:rgba(52,199,89,.17);--pv-wash2:rgba(0,122,255,.14);
+  --pv-cl-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 0 0 1px rgba(255,255,255,.05),0 1px 1px rgba(10,20,15,.25),0 16px 30px -14px rgba(10,20,15,.5),0 38px 64px -36px rgba(10,20,15,.65);
+  --pv-red1:#e9392e;--pv-red2:#d0271c;--pv-amb1:#ffc53d;--pv-amb2:#ffab0a;--pv-amb-ink:#3a2500;
+}
+@media (prefers-color-scheme:dark){#dash-root .mx{
+  --ios-label:#f4f7f5;--ios-label2:#9aa29e;--ios-label3:#636a66;
+  --pv-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 0 0 .5px rgba(255,255,255,.10),0 20px 38px -24px rgba(0,0,0,.9);
+  --pv-shadow-up:inset 0 1px 0 rgba(255,255,255,.10),0 0 0 .5px rgba(255,255,255,.18),0 24px 44px -22px #000;
+  --ios-card-shadow:var(--pv-shadow);--pv-card-bg:linear-gradient(180deg,#212123,#1a1a1c);
+  --pv-tile:#262628;--pv-tile-ring:rgba(255,255,255,.09);--pv-tile-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 12px 20px -14px rgba(0,0,0,.8);
+  --pv-wash1:rgba(48,209,88,.14);--pv-wash2:rgba(10,132,255,.16);
+  --pv-cl-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.08),0 24px 50px -30px #000;
+  --pv-red1:#ff5247;--pv-red2:#e8362b;--pv-amb1:#ffc53d;--pv-amb2:#ffab0a;--pv-amb-ink:#3a2500;
+}}
+:where([data-mode=light]) #dash-root .mx{
+  --ios-label:#16201b;--ios-label2:#5f6964;--ios-label3:#a4aca8;
+  --pv-shadow:0 0 0 .5px rgba(18,32,25,.09),0 1px 1px rgba(18,32,25,.04),0 10px 22px -12px rgba(18,32,25,.15),0 28px 50px -32px rgba(18,32,25,.26);
+  --pv-shadow-up:0 0 0 .5px rgba(18,32,25,.12),0 2px 3px rgba(18,32,25,.05),0 16px 28px -12px rgba(18,32,25,.22),0 36px 58px -30px rgba(18,32,25,.32);
+  --ios-card-shadow:var(--pv-shadow);--pv-card-bg:var(--ios-card);
+  --pv-tile:#ffffff;--pv-tile-ring:rgba(18,32,25,.10);--pv-tile-shadow:0 1px 2px rgba(18,32,25,.05),0 10px 18px -14px rgba(18,32,25,.22);
+  --pv-wash1:rgba(52,199,89,.17);--pv-wash2:rgba(0,122,255,.14);
+  --pv-cl-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 0 0 1px rgba(255,255,255,.05),0 1px 1px rgba(10,20,15,.25),0 16px 30px -14px rgba(10,20,15,.5),0 38px 64px -36px rgba(10,20,15,.65);
+  --pv-red1:#e9392e;--pv-red2:#d0271c;--pv-amb1:#ffc53d;--pv-amb2:#ffab0a;--pv-amb-ink:#3a2500;
+}
+:where([data-mode=dark]) #dash-root .mx{
+  --ios-label:#f4f7f5;--ios-label2:#9aa29e;--ios-label3:#636a66;
+  --pv-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 0 0 .5px rgba(255,255,255,.10),0 20px 38px -24px rgba(0,0,0,.9);
+  --pv-shadow-up:inset 0 1px 0 rgba(255,255,255,.10),0 0 0 .5px rgba(255,255,255,.18),0 24px 44px -22px #000;
+  --ios-card-shadow:var(--pv-shadow);--pv-card-bg:linear-gradient(180deg,#212123,#1a1a1c);
+  --pv-tile:#262628;--pv-tile-ring:rgba(255,255,255,.09);--pv-tile-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 12px 20px -14px rgba(0,0,0,.8);
+  --pv-wash1:rgba(48,209,88,.14);--pv-wash2:rgba(10,132,255,.16);
+  --pv-cl-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.08),0 24px 50px -30px #000;
+  --pv-red1:#ff5247;--pv-red2:#e8362b;--pv-amb1:#ffc53d;--pv-amb2:#ffab0a;--pv-amb-ink:#3a2500;
+}
+
+/* ---- canvas: morning light over turf (green from the left, sky from the right), fading into the system grey */
+#dash-root .mx::before{display:block;background:
+  radial-gradient(980px 560px at 6% -150px,var(--pv-wash1),transparent 72%),
+  radial-gradient(980px 600px at 97% -170px,var(--pv-wash2),transparent 72%),
+  var(--ios-bg);background-repeat:no-repeat}
+
+/* ---- header */
+#dash-root .mx .mx-title{font-weight:800;letter-spacing:-.03em}
+#dash-root .mx .mx-take{font-size:18px;line-height:1.45}
+#dash-root .mx .mx-take b{font-weight:700}
+#dash-root .mx .mx-live{background:color-mix(in srgb,var(--ios-green) 17%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ios-green) 30%,transparent)}
+#dash-root .mx .mx-live i{animation:pvPing 2.2s cubic-bezier(.2,.6,.3,1) infinite}
+@keyframes pvPing{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ios-green) 60%,transparent)}70%,100%{box-shadow:0 0 0 7px transparent}}
+
+/* ---- segmented control: a recessed track and a raised thumb */
+#dash-root .mx .mx-tabs{box-shadow:inset 0 1px 2px rgba(18,32,25,.09),inset 0 0 0 .5px rgba(18,32,25,.05)}
+#dash-root .mx .mx-tabs .mx-ind,#dash-root .mx .mx-tabs:not(.ind) .mx-tab[aria-selected="true"]{box-shadow:0 0 0 .5px rgba(18,32,25,.07),0 1px 1px rgba(18,32,25,.09),0 6px 14px -4px rgba(18,32,25,.26)}
+
+/* ---- surfaces: layered shadow so cards sit above the canvas */
+#dash-root .mx .mx-card,#dash-root .mx .x3-view,#dash-root .mx .x3-panel,#dash-root .mx .x3-listbox{background:var(--pv-card-bg);box-shadow:var(--pv-shadow)}
+#dash-root .mx .mx-card h3{font-weight:700;letter-spacing:-.018em}
+
+/* ---- KPI row = instrument cluster: one graphite panel, a cell per reading */
+#dash-root .mx .mx-kpis{position:relative;isolation:isolate;overflow:hidden;gap:1px;padding:0;border-radius:26px;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  background:radial-gradient(760px 260px at 0% 0%,rgba(69,212,126,.13),transparent 70%),radial-gradient(700px 260px at 100% 0%,rgba(99,179,255,.12),transparent 70%),linear-gradient(180deg,var(--pv-cl-a),var(--pv-cl-b));
+  box-shadow:var(--pv-cl-shadow)}
+#dash-root .mx #costs .mx-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+#dash-root .mx .mx-kpis::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;
+  background:linear-gradient(104deg,transparent 38%,rgba(255,255,255,.10) 50%,transparent 62%);transform:translateX(-100%)}
+#dash-root .mx .mx-kpi{--kl:var(--pv-cl-t2);--pv-g:.26;position:relative;overflow:hidden;background:transparent;border:0;border-radius:0;
+  padding:18px 20px 20px;gap:3px;box-shadow:-1px 0 0 var(--pv-cl-line),0 -1px 0 var(--pv-cl-line),-1px -1px 0 var(--pv-cl-line);
+  transition:background-color .3s}
+#dash-root .mx .mx-kpi:hover{transform:none;background:rgba(255,255,255,.035);box-shadow:-1px 0 0 var(--pv-cl-line),0 -1px 0 var(--pv-cl-line),-1px -1px 0 var(--pv-cl-line)}
+#dash-root .mx #k1{--kl:var(--pv-l-blue)} #dash-root .mx #k2{--kl:var(--pv-l-red)} #dash-root .mx #k3{--kl:var(--pv-l-amber)}
+#dash-root .mx #k4{--kl:var(--pv-l-rose)} #dash-root .mx #k5{--kl:var(--pv-l-green)} #dash-root .mx #k6{--kl:var(--pv-l-violet)}
+#dash-root .mx .mx-kpi-l,#dash-root .mx #k3 .mx-kpi-l{color:var(--pv-cl-t2);font-weight:500;gap:8px;align-items:flex-start;min-height:2.5em;letter-spacing:0}
+#dash-root .mx .mx-kpi-l::before{width:18px;height:18px;background:var(--kl);margin-top:-1px}
+/* the lamp behind each tell-tale symbol */
+#dash-root .mx .mx-kpi::before{content:"";display:none;position:absolute;inset:auto;left:-1px;top:-3px;width:60px;height:60px;border-radius:50%;
+  background:radial-gradient(closest-side,var(--kl),transparent);opacity:var(--pv-g);transform:none;animation:none;pointer-events:none;filter:blur(5px)}
+#dash-root .mx :is(#k1,#k2,#k3,#k4,#k5,#k6)::before{display:block}
+/* pointer light on the glass */
+#dash-root .mx .mx-kpi::after{content:"";display:block;position:absolute;inset:0;border-radius:0;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.10),transparent 70%)}
+#dash-root .mx .mx-kpi:hover::after{opacity:1}
+/* hour-meter numerals */
+#dash-root .mx .mx-kpi-v,#dash-root .mx .pv-odo{font-family:var(--ios-rounded);font-weight:700;font-size:40px;line-height:1.14;letter-spacing:-.01em;
+  margin-top:6px;color:var(--pv-cl-t);font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+#dash-root .mx .mx-kpi.pv-on .mx-kpi-v{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#dash-root .mx .pv-odo{display:flex;align-items:flex-start;height:1.14em;overflow:hidden;white-space:nowrap}
+#dash-root .mx .pv-w{flex:none;display:block;width:.64em;height:1.14em;overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 13%,#000 87%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 13%,#000 87%,transparent 100%)}
+#dash-root .mx .pv-s{display:flex;flex-direction:column;will-change:transform}
+#dash-root .mx .pv-s span{flex:none;display:block;height:1.14em;line-height:1.14em;text-align:center}
+#dash-root .mx .pv-c{flex:none;display:block;height:1.14em;line-height:1.14em}
+#dash-root .mx .pv-c.pv-u{color:var(--pv-cl-t2);font-weight:600;margin-right:.04em}
+#dash-root .mx .mx-kpi.bad .mx-kpi-v,#dash-root .mx .mx-kpi.bad .pv-odo{color:var(--pv-l-red);text-shadow:0 0 18px color-mix(in srgb,var(--pv-l-red) 34%,transparent)}
+#dash-root .mx .mx-kpi.warn .mx-kpi-v,#dash-root .mx .mx-kpi.warn .pv-odo{color:var(--pv-l-amber);text-shadow:0 0 18px color-mix(in srgb,var(--pv-l-amber) 30%,transparent)}
+#dash-root .mx .mx-kpi-s{color:var(--pv-cl-t3);font-size:12.5px;line-height:1.35;margin-top:2px}
+/* warning lamps stay lit and breathe; a zero reading puts the lamp out */
+#dash-root .mx .mx-kpi.bad,#dash-root .mx .mx-kpi.warn,#dash-root .mx #k4{--pv-g:.5}
+#dash-root .mx .mx-kpi.bad::before{animation:pvBreath 3.4s ease-in-out infinite}
+#dash-root .mx .mx-kpi.pv-off{--pv-g:0;--kl:rgba(236,243,239,.34)}
+#dash-root .mx .mx-kpi.pv-off::before{animation:none}
+#dash-root .mx .mx-kpi.pv-off .mx-kpi-v,#dash-root .mx .mx-kpi.pv-off .pv-odo{color:var(--pv-cl-t);text-shadow:none}
+@keyframes pvBreath{0%,100%{opacity:.5}50%{opacity:.24}}
+/* ignition: every lamp lights in turn (bulb check), a glint crosses the glass, then the lamps settle */
+#dash-root .mx .mx-kpis.pv-ign .mx-kpi::before{animation:pvLamp 1.7s ease-out both;animation-delay:calc(var(--i,0) * 95ms)}
+#dash-root .mx .mx-kpis.pv-ign .mx-kpi-l::before{animation:pvSym 1.7s ease-out both;animation-delay:calc(var(--i,0) * 95ms)}
+#dash-root .mx .mx-kpis.pv-ign::after{animation:pvGlint 1.5s .2s cubic-bezier(.3,.5,.2,1) both}
+@keyframes pvLamp{0%{opacity:0}14%{opacity:.95}46%{opacity:.95}100%{opacity:var(--pv-g)}}
+@keyframes pvSym{0%{opacity:.16}14%{opacity:1}46%{opacity:1;filter:brightness(1.5)}100%{opacity:1;filter:none}}
+@keyframes pvGlint{0%{opacity:1;transform:translateX(-100%)}99%{opacity:1;transform:translateX(100%)}100%{opacity:0;transform:translateX(100%)}}
+
+/* ---- "Do first": master warning bar */
+#dash-root .mx .mx-do{overflow:hidden;background:linear-gradient(98deg,color-mix(in srgb,var(--ios-red) 11%,var(--ios-card)) 0,var(--ios-card) 56%);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--ios-red) 26%,transparent),0 1px 1px rgba(18,32,25,.04),0 16px 30px -20px color-mix(in srgb,var(--ios-red) 60%,transparent)}
+#dash-root .mx .mx-do::before{box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -10px 12px -8px rgba(130,0,0,.38),0 6px 14px -4px color-mix(in srgb,var(--ios-red) 72%,transparent)}
+#dash-root .mx .mx-do::after{content:"";display:block;position:absolute;left:20px;top:18px;width:38px;height:38px;border-radius:10px;pointer-events:none;
+  animation:pvRing 2.6s cubic-bezier(.2,.6,.3,1) infinite}
+@keyframes pvRing{0%{box-shadow:0 0 0 0 rgba(255,59,48,.5)}70%,100%{box-shadow:0 0 0 13px rgba(255,59,48,0)}}
+#dash-root .mx .mx-do .mx-sec{font-weight:700}
+#dash-root .mx .mx-do-t{font-size:19px;font-weight:700;letter-spacing:-.018em}
+/* nothing urgent: the bar goes calm and green */
+#dash-root .mx .mx-do.pv-clear{background:linear-gradient(98deg,color-mix(in srgb,var(--ios-green) 11%,var(--ios-card)) 0,var(--ios-card) 56%);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--ios-green) 26%,transparent),var(--pv-shadow)}
+#dash-root .mx .mx-do.pv-clear::before{background-color:var(--ios-green);background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222.6%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M6 12.5l4 4 8-9%22/%3E%3C/svg%3E");box-shadow:inset 0 1px 0 rgba(255,255,255,.42),0 6px 14px -4px color-mix(in srgb,var(--ios-green) 70%,transparent)}
+#dash-root .mx .mx-do.pv-clear::after{display:none}
+#dash-root .mx .mx-do.pv-clear .mx-sec{color:var(--ios-green-t)}
+
+/* ---- mechanic worklist: raised tiles tinted by what they are */
+#dash-root .mx .mx-wc{--sev:var(--ios-gray);background:var(--pv-tile);box-shadow:0 0 0 1px var(--pv-tile-ring),var(--pv-tile-shadow);
+  transition:transform .34s var(--ios-spring),box-shadow .3s}
+#dash-root .mx .mx-wc.fault{--sev:var(--ios-red);background:color-mix(in srgb,var(--ios-red) 2.2%,var(--pv-tile));
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--ios-red) 17%,var(--pv-tile-ring)),var(--pv-tile-shadow)}
+#dash-root .mx .mx-wc.service{--sev:var(--ios-orange);background:color-mix(in srgb,var(--ios-orange) 4%,var(--pv-tile));
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--ios-orange) 26%,var(--pv-tile-ring)),var(--pv-tile-shadow)}
+#dash-root .mx .mx-wc.safety{--sev:var(--ios-red);background:color-mix(in srgb,var(--ios-red) 9%,var(--pv-tile));
+  box-shadow:0 0 0 1.5px color-mix(in srgb,var(--ios-red) 52%,transparent),0 14px 26px -16px color-mix(in srgb,var(--ios-red) 62%,transparent)}
+#dash-root .mx .mx-wc::after{display:block;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--sev) 7%,transparent),transparent 70%)}
+#dash-root .mx .mx-wc-n,#dash-root .mx .mx-wc.fault .mx-wc-n,#dash-root .mx .mx-wc.service .mx-wc-n{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--sev) 78%,#fff),var(--sev));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 8px -3px color-mix(in srgb,var(--sev) 75%,transparent)}
+#dash-root .mx .mx-wc-m{font-weight:700;letter-spacing:-.018em}
+#dash-root .mx .mx-wc .mx-ubtn,#dash-root .mx .mx-ubtn.sm{box-shadow:none;transition:background-color .2s,color .2s,transform .25s var(--ios-spring)}
+@media (hover:hover){
+  #dash-root .mx .mx-wc:hover{transform:translateY(-2px);box-shadow:0 0 0 1px color-mix(in srgb,var(--sev) 34%,var(--pv-tile-ring)),0 2px 3px rgba(18,32,25,.05),0 18px 28px -16px color-mix(in srgb,var(--sev) 38%,rgba(18,32,25,.5))}
+  #dash-root .mx .mx-wc:hover::after{opacity:1}
+  #dash-root .mx .mx-wc .mx-ubtn:hover,#dash-root .mx .mx-ubtn.sm:hover{background:var(--ios-blue);color:#fff;filter:none}
+}
+
+/* ---- status capsules: the worse it is, the more solid it gets */
+#dash-root .mx .mx-pill{padding:2.5px 9px;font-weight:650}
+#dash-root .mx .mx-pill.overdue,#dash-root .mx .mx-pill.Overdue,#dash-root .mx .mx-pill.Fault{background:linear-gradient(180deg,var(--pv-red1),var(--pv-red2));color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 3px 7px -3px color-mix(in srgb,var(--pv-red2) 80%,transparent)}
+#dash-root .mx .mx-pill.overdue i,#dash-root .mx .mx-pill.Overdue i,#dash-root .mx .mx-pill.Fault i{background:#fff}
+#dash-root .mx .mx-pill.due,#dash-root .mx .mx-pill.Due{background:linear-gradient(180deg,var(--pv-amb1),var(--pv-amb2));color:var(--pv-amb-ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 3px 7px -3px color-mix(in srgb,var(--pv-amb2) 80%,transparent)}
+#dash-root .mx .mx-pill.due i,#dash-root .mx .mx-pill.Due i{background:var(--pv-amb-ink)}
+#dash-root .mx .mx-pill.soon,#dash-root .mx .mx-pill.Soon{background:color-mix(in srgb,var(--ios-orange) 17%,transparent);color:var(--ios-orange-t)}
+#dash-root .mx .mx-pill.ok,#dash-root .mx .mx-pill.OK{background:color-mix(in srgb,var(--ios-green) 17%,transparent)}
+
+/* ---- tables: the machine leads each row, overdue hours read red */
+#dash-root .mx .mx-table tbody td:first-child{font-weight:600}
+#dash-root .mx .mx-table tbody tr td{transition:background-color .16s}
+#dash-root .mx .mx-table tbody tr:hover td{background:color-mix(in srgb,var(--ios-blue) 6%,transparent)}
+#dash-root .mx .mx-table td.pv-neg{color:var(--ios-red-t);font-weight:650}
+
+/* ---- buttons: the main action glows */
+#dash-root .mx .mx-ubtn,#dash-root .mx .mx-dlg .acts .go,#dash-root .mx .x3-btn.pri{
+  background-image:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,0) 60%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 8px 16px -8px color-mix(in srgb,var(--ios-blue) 85%,transparent);
+  transition:transform .28s var(--ios-spring),box-shadow .25s,filter .2s}
+#dash-root .mx .mx-wc .mx-ubtn,#dash-root .mx .mx-ubtn.sm{background-image:none;box-shadow:none}
+@media (hover:hover){
+  #dash-root .mx .mx-ubtn:hover{transform:translateY(-1px);filter:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 12px 20px -8px color-mix(in srgb,var(--ios-blue) 95%,transparent)}
+  #dash-root .mx .mx-wc .mx-ubtn:hover,#dash-root .mx .mx-ubtn.sm:hover{transform:none;box-shadow:none}
+}
+
+/* ---- narrower screens */
+@media (max-width:1080px){
+  #dash-root .mx .mx-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #dash-root .mx #costs .mx-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  #dash-root .mx .mx-kpis,#dash-root .mx #costs .mx-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;border-radius:22px}
+  #dash-root .mx .mx-kpi{padding:14px 15px 16px;border-radius:0}
+  #dash-root .mx .mx-kpi-l,#dash-root .mx #k3 .mx-kpi-l{font-size:12.5px;gap:7px}
+  #dash-root .mx .mx-kpi-v,#dash-root .mx .pv-odo{font-size:32px;margin-top:4px}
+  #dash-root .mx .mx-kpi-s{font-size:12px}
+  #dash-root .mx .mx-take{font-size:16.5px}
+  #dash-root .mx .mx-do-t{font-size:17.5px}
+  #dash-root .mx .mx-do::after{left:16px;top:16px;width:36px;height:36px}
+}
+
 html,body{background:#f2f2f7}@media (prefers-color-scheme:dark){html,body{background:#000}}</style>
 
 
@@ -3400,6 +3605,120 @@ try { if (window.MXH && MXH.redraw) MXH.redraw(); } catch (e) {}
   nav.addEventListener('click', function (e) { if (stuck && e.target.closest && e.target.closest('.mx-tab')) requestAnimationFrame(top); });
   if (window.MutationObserver) new MutationObserver(sync).observe(nav, { attributes: true, subtree: true, attributeFilter: ['aria-selected'] });
   sync(); setTimeout(function () { centre(false); }, 400);
+})();
+
+/* POLISH v2 (12 Nov 2026): motion for the instrument-panel look. The KPI numbers become hour-meter wheels that roll
+   to the reading (and tick over when a reading changes), the cluster runs a lamp check when it comes on, cards catch
+   the pointer light, overdue hours in tables are marked red. Honours Reduce Motion. Delete with the POLISH v2 CSS. */
+(function () {
+  var root = document.querySelector('.mx'); if (!root || root.__pv2) return; root.__pv2 = true;
+  var RM = false; try { RM = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var H = 1.14;   // one wheel step in em (matches .pv-w in the CSS)
+  var raf = window.requestAnimationFrame ? function (f) { return window.requestAnimationFrame(f); } : function (f) { return setTimeout(function () { f(Date.now()); }, 16); };
+  function now() { return window.performance && performance.now ? performance.now() : Date.now(); }
+  function mk(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function each(list, fn) { Array.prototype.forEach.call(list, fn); }
+  function parse(txt) {   // "$1,928" -> { pre: "$", body: "1,928", suf: "", units: 1928 }
+    var m = /^([^\d]*?)(\d[\d,]*)(?:\.(\d+))?([^\d]*)$/.exec(txt); if (!m) return null;
+    var dec = (m[3] || '').length, u = Math.round(parseFloat(m[2].replace(/,/g, '') + (dec ? '.' + m[3] : '')) * Math.pow(10, dec));
+    return isFinite(u) ? { pre: m[1], body: m[2] + (dec ? '.' + m[3] : ''), suf: m[4], units: u } : null;
+  }
+  function digits(u, n) { var a = []; for (var k = 0; k < n; k++) { a.push(u % 10); u = Math.floor(u / 10); } return a; }   // [0] = last digit
+
+  function build(st, p) {
+    var o = st.odo; o.textContent = ''; st.wheels = [];
+    if (p.pre) o.appendChild(mk('span', 'pv-c pv-u', p.pre));
+    for (var i = 0; i < p.body.length; i++) {
+      var ch = p.body.charAt(i);
+      if (ch >= '0' && ch <= '9') {
+        var w = mk('span', 'pv-w'), s = mk('span', 'pv-s'); for (var d = 0; d <= 10; d++) s.appendChild(mk('span', null, String(d % 10)));
+        w.appendChild(s); o.appendChild(w); st.wheels.push(s);
+      } else o.appendChild(mk('span', 'pv-c', ch));
+    }
+    if (p.suf) o.appendChild(mk('span', 'pv-c pv-u', p.suf));
+    st.wheels.reverse(); st.shape = p.pre + '|' + p.body.replace(/\d/g, '0') + '|' + p.suf;
+  }
+  function put(st, k, pos) { pos = ((pos % 10) + 10) % 10; st.wheels[k].style.transform = 'translateY(' + (-pos * H).toFixed(3) + 'em)'; }
+  function rest(st, u) { var d = digits(u, st.wheels.length); for (var k = 0; k < d.length; k++) put(st, k, d[k]); }
+  // like a real hour meter: a wheel only moves while the one to its right goes 9 -> 0
+  function tick(st, v) { var prev = 0; for (var k = 0; k < st.wheels.length; k++) { var pos = k === 0 ? v % 10 : Math.floor(v / Math.pow(10, k)) % 10 + Math.max(0, prev - 9); put(st, k, pos); prev = pos; } }
+  function run(st, dur, delay, frame, end) {
+    var tok = (st.tok = (st.tok || 0) + 1), t0 = null;
+    if (RM || !dur) { end(); return; }
+    frame(0);
+    raf(function step(ts) {
+      if (st.tok !== tok) return; if (t0 === null) t0 = ts + (delay || 0);
+      var p = (ts - t0) / dur; if (p >= 1) { st.tok++; end(); return; }
+      if (p > 0) frame(p); raf(step);
+    });
+    setTimeout(function () { if (st.tok === tok) { st.tok++; end(); } }, (delay || 0) + dur + 600);   // a hidden tab never gets its frames
+  }
+  function spin(st, fromU, toU, dur, delay) {   // every wheel rolls forward to its digit; the last digit turns most and settles last
+    var n = st.wheels.length, a = digits(fromU, n), b = digits(toU, n);
+    run(st, dur, delay, function (p) {
+      for (var k = 0; k < n; k++) {
+        var j = n - 1 - k, f = .6 + .4 * (n > 1 ? j / (n - 1) : 1), q = Math.min(1, p / f), e = 1 - Math.pow(1 - q, 4);
+        var travel = ((b[k] - a[k]) % 10 + 10) % 10 + 10 * Math.min(2, Math.max(n > 1 ? j : 1, 0));
+        put(st, k, a[k] + travel * e);
+      }
+    }, function () { rest(st, toU); });
+  }
+  function lamp(st, units) { st.kpi.classList.toggle('pv-off', units === 0 && (st.kpi.classList.contains('bad') || st.kpi.classList.contains('warn') || st.kpi.id === 'k4')); }
+  function ignite(group) {
+    if (!group || RM) return; var t = now(); if (group.__pvT && t - group.__pvT < 900) return; group.__pvT = t;
+    group.classList.remove('pv-ign'); void group.offsetWidth; group.classList.add('pv-ign');
+    clearTimeout(group.__pvC); group.__pvC = setTimeout(function () { group.classList.remove('pv-ign'); }, 2600);
+  }
+  function index(st) { var i = 0, n = st.kpi; while ((n = n.previousElementSibling)) i++; return i; }
+  function replay(st) { st.t = now(); if (!st.wheels.length) return; spin(st, 0, st.val, 1300, 140 + index(st) * 80); ignite(st.kpi.parentNode); }
+
+  function sync(st) {
+    var e = st.el, txt = (e.textContent || '').replace(/\s+/g, ' ').trim(), ct = e._ct || 0, bumped = ct !== st.ct, p = parse(txt);
+    if (bumped) {   // the page began its own count-up on this number: stop it, the wheels do the counting
+      e._ct = st.ct = ct + 1;
+      if (p && p.units === 0 && st.val) { e.textContent = st.txt; txt = st.txt; p = parse(txt); }   // its first frame always writes zero: put the reading back
+    }
+    if (!p) { st.tok = (st.tok || 0) + 1; st.odo.textContent = txt; st.wheels = []; st.shape = null; st.val = null; st.txt = txt; lamp(st, null); return; }
+    var first = st.val == null, same = !first && p.units === st.val && txt === st.txt;
+    if (same && !bumped) return;
+    var old = st.val, keep = st.shape === p.pre + '|' + p.body.replace(/\d/g, '0') + '|' + p.suf;
+    if (!keep) build(st, p);
+    st.val = p.units; st.txt = txt; lamp(st, p.units);
+    if (first || same) { replay(st); return; }
+    if (keep && Math.abs(p.units - old) <= 30) {   // a small change ticks over the way the meter on the machine does
+      var d = p.units - old; run(st, 900, 0, function (q) { var x = q < .5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2; tick(st, old + d * x); }, function () { rest(st, p.units); });
+    } else spin(st, keep ? old : 0, p.units, 1100, 0);
+  }
+  function attach(v) {
+    if (v.__pv) return; var kpi = v.closest ? v.closest('.mx-kpi') : null; if (!kpi || !window.MutationObserver) return;
+    var st = v.__pv = { el: v, kpi: kpi, odo: mk('span', 'pv-odo'), ct: v._ct || 0, val: null, txt: null, wheels: [], shape: null, t: 0 };
+    st.odo.setAttribute('aria-hidden', 'true'); v.parentNode.insertBefore(st.odo, v.nextSibling); kpi.classList.add('pv-on'); all.push(st);
+    new MutationObserver(function () { sync(st); }).observe(v, { childList: true, characterData: true, subtree: true });
+    sync(st);
+  }
+  var all = [], timer = null;
+  function scan() {
+    timer = null;
+    each(root.querySelectorAll('.mx-kpi-v'), attach);
+    each(root.querySelectorAll('.mx-table td'), function (td) { var neg = /^[−-]\s?\d/.test((td.textContent || '').trim()); if (neg !== td.classList.contains('pv-neg')) td.classList.toggle('pv-neg', neg); });
+    var df = root.querySelector('#dofirst'), card = df && df.closest ? df.closest('.mx-do') : null;
+    if (card) { var clear = /^nothing urgent/i.test((df.textContent || '').trim()); if (clear !== card.classList.contains('pv-clear')) card.classList.toggle('pv-clear', clear); }
+  }
+  if (window.MutationObserver) new MutationObserver(function () { if (!timer) timer = setTimeout(scan, 180); }).observe(root, { childList: true, subtree: true, characterData: true });
+  scan();
+
+  // coming back to a page: its meters roll again
+  document.addEventListener('click', function (e) {
+    if (!(e.target && e.target.closest && e.target.closest('.mx .mx-tab'))) return;
+    setTimeout(function () { var t = now(); all.forEach(function (st) { var sec = st.kpi.closest('.mx-page'); if (sec && !sec.hidden && st.val != null && t - st.t > 700) replay(st); }); }, 90);
+  }, true);
+
+  // pointer light on the cluster, the worklist tiles and the warning bar
+  document.addEventListener('pointermove', function (e) {
+    var c = e.target && e.target.closest && e.target.closest('.mx .mx-kpi, .mx .mx-wc'); if (!c) return;
+    var r = c.getBoundingClientRect(); if (!r.width || !r.height) return;
+    c.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%'); c.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+  }, true);
 })();
 </script>
 
