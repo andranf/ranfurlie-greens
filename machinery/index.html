@@ -71,7 +71,7 @@ body{font-size:16px}
 #dash-root .mx-chart{min-height:200px}
 #dash-root .mx-chart.tall{min-height:300px}
 #dash-root .mx-legend{font-size:12.5px}
-#dash-root .mx-src li{grid-template-columns:auto 1fr;font-size:13px}
+#dash-root .mx-src li{grid-template-columns:auto minmax(0,1fr) auto;font-size:13px}
 #dash-root .mx-dlg .acts button{padding:.7rem 1.2rem;font-size:15px}
 .pub-foot{font-size:13px}
 }
@@ -212,10 +212,15 @@ body{font-size:16px}
 [data-dash-source-state=empty]{color:transparent;}
 .mx-how p{margin:.2rem 0 .5rem;font-size:var(--cds-font-size-body);line-height:1.5;max-width:75ch;}
 .mx-src{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45rem;}
-.mx-src li{display:grid;grid-template-columns:auto 1fr auto;gap:.6rem;align-items:baseline;font-size:var(--cds-font-size-caption);}
+.mx-src li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.6rem;align-items:baseline;font-size:var(--cds-font-size-caption);}
 .mx-dot{width:.5rem;height:.5rem;border-radius:50%;display:inline-block;background:var(--color-fg-muted);}
 .mx-dot.live{background:var(--color-ok);} .mx-dot.waiting{background:var(--color-warn);}
 .mx-ufoot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.25rem;}
+.mx-wc>.mx-ufoot{margin-top:auto;padding-top:.25rem;}
+.mx-xlink{appearance:none;border:0;background:none;font:inherit;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);text-decoration:underline;text-underline-offset:2px;cursor:pointer;padding:0;text-align:left;align-self:flex-start;}
+.mx-xlink:hover{color:var(--color-fg);}
+#t-stock td:nth-child(4){min-width:13rem;}
+#t-catalog tbody tr{cursor:pointer;}
 .mx-upd{font-size:var(--cds-font-size-caption);line-height:1.4;border-radius:8px;padding:.3rem .55rem;background:color-mix(in srgb,var(--color-fg) 5%,transparent);min-width:0;flex:1 1 12rem;}
 .mx-upd b{font-weight:600;} .mx-upd .mx-upd-n{color:var(--color-fg-muted);overflow-wrap:anywhere;}
 .mx-upd.done{background:color-mix(in srgb,var(--color-ok) 14%,transparent);} .mx-upd.done b{color:var(--color-ok);}
@@ -471,6 +476,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
 <!-- END TANK MIX SKIN -->
 
 
+
 <div class="mx">
 <header class="mx-head" id="top">
   <div class="mx-head-text">
@@ -652,7 +658,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   </div>
   <div class="mx-card" id="card-catalog">
     <div class="mx-row"><h3>Parts catalogue</h3><span class="mx-note" id="cat-count"></span></div>
-    <p class="mx-note">Every service and wear part in the machinery bible, with OEM numbers checked against the parts books. "Checked: no" means the number could not be confirmed in a parts book: confirm it with the dealer before ordering.</p>
+    <p class="mx-note">Every service and wear part in the machinery bible, with OEM numbers checked against the parts books. "Checked: no" means the number could not be confirmed in a parts book: confirm it with the dealer before ordering. Click a row to see where the part sits on the machine.</p>
     <div class="mx-ctl">
       <select class="mx-sel" id="cat-model" aria-label="Model"><option value="">All models</option></select>
       <select class="mx-sel" id="cat-kind" aria-label="Kind"><option value="">Service + wear parts</option><option value="service">Service parts</option><option value="wear">Wear parts</option></select>
@@ -664,88 +670,190 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   </div>
 </section>
 
-<!-- 3D EXPLORER --><!-- parts explorer (photo) -->
+<!-- 3D EXPLORER --><!-- parts explorer v2 (11 Nov 2026): photo blow-apart with depth, callouts, live service status and machine detail -->
 <section class="mx-page" id="explore" role="tabpanel" aria-labelledby="tab-explore" hidden>
   <style>
-  .x3 [hidden]{display:none!important;}
-  .x3{display:grid;grid-template-columns:minmax(0,1fr) 22rem;gap:var(--cds-gap-md);align-items:start;}
-  @media (max-width:60rem){.x3{grid-template-columns:minmax(0,1fr);}}
+  .x3 [hidden],.x3-head [hidden]{display:none!important;}
+  .x3,.x3-head{--x3-accent:var(--ios-blue,var(--tm-tank-deep,#0573a8));--x3-bad:var(--color-bad,#c2332b);--x3-warn:var(--color-warn,#b86e00);--x3-ok:var(--color-ok,#1f8a3b);}
+  .x3{display:grid;grid-template-columns:minmax(0,1fr) minmax(20rem,27rem);gap:var(--cds-gap-md);align-items:start;}
+  @media (max-width:64rem){.x3{grid-template-columns:minmax(0,1fr);}}
+  /* header: machine picker, search, fleet machines, live strip */
+  .x3-models{display:flex;flex-wrap:wrap;gap:.5rem .7rem;margin:.55rem 0 .2rem;align-items:center;}
+  .x3-pick{font-size:var(--cds-font-size-body);padding:.45rem .7rem;max-width:100%;min-width:min(100%,20rem);}
+  .x3-search{position:relative;flex:1 1 16rem;min-width:min(100%,14rem);}
+  .x3-search .mx-in{width:100%;max-width:none;box-sizing:border-box;}
+  .x3-results{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:90;max-height:22rem;overflow:auto;background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:12px;box-shadow:var(--cds-shadow-popover);padding:.3rem;}
+  .x3-res{display:block;width:100%;text-align:left;appearance:none;border:0;background:none;font:inherit;color:var(--color-fg);padding:.4rem .55rem;border-radius:8px;cursor:pointer;}
+  .x3-res:hover,.x3-res.on{background:rgba(10,120,190,.12);background:color-mix(in srgb,var(--x3-accent) 12%,transparent);}
+  .x3-res b{font-weight:600;} .x3-res span{display:block;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-res i{font-style:normal;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--color-fg-muted);margin-right:.4rem;}
+  .x3-units{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0 .1rem;}
+  .x3-unit{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);text-align:left;padding:.4rem .7rem;border-radius:12px;border:1px solid var(--color-border-line);background:none;color:var(--color-fg);cursor:pointer;display:flex;flex-direction:column;gap:.05rem;min-width:8.5rem;}
+  .x3-unit b{font-size:var(--cds-font-size-body);font-weight:600;display:flex;align-items:center;gap:.4rem;}
+  .x3-unit span{color:var(--color-fg-muted);}
+  .x3-unit[aria-pressed="true"]{border-color:var(--x3-accent);box-shadow:inset 0 0 0 1px var(--x3-accent);background:rgba(10,120,190,.08);background:color-mix(in srgb,var(--x3-accent) 8%,transparent);}
+  .x3-unit.off{opacity:.6;}
+  .x3-dot{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;background:var(--x3-ok);flex:none;}
+  .x3-dot.overdue,.x3-dot.fault{background:var(--x3-bad);} .x3-dot.due{background:var(--x3-warn);} .x3-dot.soon{background:#c9a56a;background:color-mix(in srgb,var(--x3-warn) 55%,#d9d9d9);} .x3-dot.none{background:rgba(120,130,140,.45);background:color-mix(in srgb,var(--color-fg-muted) 45%,transparent);}
+  .x3-strip{display:flex;flex-wrap:wrap;gap:.35rem .5rem;margin-top:.45rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);align-items:center;}
+  .x3-chip{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .55rem;border-radius:999px;background:rgba(120,130,140,.12);background:color-mix(in srgb,var(--color-fg) 6%,transparent);color:var(--color-fg);white-space:nowrap;}
+  .x3-chip.bad{background:rgba(224,49,59,.14);background:color-mix(in srgb,var(--x3-bad) 14%,transparent);color:var(--x3-bad);font-weight:600;} .x3-chip.warn{background:rgba(184,110,0,.16);background:color-mix(in srgb,var(--x3-warn) 16%,transparent);color:var(--x3-warn);font-weight:600;}
+  .x3-chip.ok{background:rgba(31,138,59,.14);background:color-mix(in srgb,var(--x3-ok) 14%,transparent);color:var(--x3-ok);font-weight:600;}
+  /* stage */
   .x3-view{position:relative;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);overflow:hidden;background:var(--color-panel);}
-  .x3-stage{position:relative;overflow:hidden;height:clamp(22rem,62vh,44rem);}
-  .x3-stage canvas{display:block;width:100%;height:100%;cursor:grab;}
-  .x3-stage canvas:active{cursor:grabbing;}
-  .x3-status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;color:var(--color-fg-muted);font-size:var(--cds-font-size-body);}
-  .x3-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);box-shadow:var(--cds-shadow-popover);border-radius:8px;padding:.3rem .55rem;font-size:var(--cds-font-size-caption);white-space:nowrap;z-index:3;}
-  .x3-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-  .x3-lbl{position:absolute;left:0;top:0;pointer-events:auto;appearance:none;font:inherit;font-size:.7rem;line-height:1.2;padding:.18rem .45rem;border-radius:999px;border:1px solid var(--cds-border);background:color-mix(in srgb,var(--cds-surface-popover) 88%,transparent);color:var(--color-fg);cursor:pointer;white-space:nowrap;backdrop-filter:blur(4px);}
-  .x3-lbl:hover{border-color:var(--color-fg);}
-  .x3-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .9rem;padding:.6rem .8rem;border-top:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
-  .x3-bar label{display:flex;align-items:center;gap:.5rem;flex:1 1 14rem;}
-  .x3-ex{flex:1;accent-color:var(--color-fg);}
-  .x3-tg{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);padding:.3rem .65rem;border:1px solid var(--color-border-line);border-radius:999px;background:none;color:var(--color-fg);cursor:pointer;}
-  .x3-tg[aria-pressed="true"]{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);}
-  .x3-hint{width:100%;}
+  @media (min-width:64.01rem){.x3-view{position:sticky;top:var(--x3-top,.75rem);}}
+  .x3-stage{position:relative;overflow:hidden;height:clamp(24rem,68vh,48rem);background:radial-gradient(ellipse at 50% 45%,#ffffff 0%,#eef0ec 68%,#e1e4de 100%);touch-action:pan-y;outline:none;user-select:none;-webkit-user-select:none;}
+  @media (max-width:64rem){.x3-stage{height:min(92vw,70vh);min-height:19rem;}}
+  .x3-stage.zoomed{touch-action:none;cursor:grab;} .x3-stage.zoomed.drag{cursor:grabbing;}
+  .x3-status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem;color:#55605a;font-size:var(--cds-font-size-body);z-index:5;}
+  .x3-pan{position:absolute;left:50%;top:50%;width:0;height:0;will-change:transform;}
+  .x3-persp{position:absolute;left:0;top:0;width:0;height:0;perspective:1200px;}
+  .x3-scene{position:absolute;transform-style:preserve-3d;will-change:transform;}
+  .x3-ph-base{position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat;}
+  .x3-ph-layer{position:absolute;inset:0;pointer-events:none;will-change:transform;}
+  .x3-ph-img{position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat;pointer-events:auto;cursor:pointer;transition:opacity .25s ease,filter .25s ease;}
+  .x3-ph-ol{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+  .x3-ph-ol polygon{fill:transparent;stroke:transparent;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .2s ease,stroke .2s ease;}
+  .x3-scene.svc .x3-ph-layer.overdue polygon,.x3-scene.svc .x3-ph-layer.fault polygon{fill:rgba(224,49,59,.36);fill:color-mix(in srgb,var(--x3-bad) 36%,transparent);stroke:var(--x3-bad);}
+  .x3-scene.svc .x3-ph-layer.due polygon{fill:rgba(200,120,0,.36);fill:color-mix(in srgb,var(--x3-warn) 36%,transparent);stroke:var(--x3-warn);}
+  .x3-scene.svc .x3-ph-layer.soon polygon{fill:rgba(200,120,0,.16);stroke:rgba(200,120,0,.7);fill:color-mix(in srgb,var(--x3-warn) 16%,transparent);stroke:color-mix(in srgb,var(--x3-warn) 70%,transparent);}
+  .x3-scene.svc .x3-ph-layer.ok polygon{fill:rgba(31,138,59,.12);stroke:rgba(31,138,59,.55);fill:color-mix(in srgb,var(--x3-ok) 12%,transparent);stroke:color-mix(in srgb,var(--x3-ok) 55%,transparent);}
+  .x3-ph-layer.hov polygon{stroke:var(--x3-accent)!important;fill:rgba(10,120,190,.1);fill:color-mix(in srgb,var(--x3-accent) 10%,transparent);}
+  .x3-ph-layer.sel polygon{stroke:var(--x3-accent)!important;stroke-width:3;fill:rgba(10,120,190,.16);fill:color-mix(in srgb,var(--x3-accent) 16%,transparent);}
+  .x3-scene.has-sel .x3-ph-layer:not(.sel) .x3-ph-img{opacity:.42;filter:grayscale(.75);}
+  .x3-scene.has-sel .x3-ph-base{opacity:.25!important;}
+  .x3-a{position:absolute;width:0;height:0;pointer-events:none;}
+  .x3-ph-credit{position:absolute;left:0;right:0;bottom:.25rem;text-align:center;font-size:.62rem;color:#8a8b85;z-index:3;pointer-events:none;}
+  .x3-over{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6;overflow:visible;}
+  .x3-over .g{stroke:rgba(40,60,70,.34);stroke-width:1;stroke-dasharray:3 4;fill:none;}
+  .x3-over .l{stroke:rgba(40,60,70,.5);stroke-width:1;fill:none;}
+  .x3-over .l.on{stroke:var(--x3-accent);stroke-width:1.6;}
+  .x3-labels{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:7;}
+  .x3-lbl{position:absolute;left:0;top:0;pointer-events:auto;appearance:none;font:inherit;font-size:.72rem;line-height:1.2;padding:.2rem .5rem .2rem .25rem;border-radius:999px;border:1px solid var(--cds-border);background:var(--cds-surface-popover);background:color-mix(in srgb,var(--cds-surface-popover) 90%,transparent);color:var(--color-fg);cursor:pointer;white-space:nowrap;max-width:15rem;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;gap:.35rem;will-change:transform;}
+  .x3-lbl:hover,.x3-lbl.on{border-color:var(--x3-accent);box-shadow:0 0 0 1px var(--x3-accent);}
+  .x3-lbl span{overflow:hidden;text-overflow:ellipsis;}
+  .x3-num{position:absolute;left:0;top:0;pointer-events:auto;appearance:none;font:inherit;font-size:.66rem;font-weight:700;line-height:1;width:1.3rem;height:1.3rem;padding:0;border-radius:50%;border:1.5px solid #fff;background:#31434c;color:#fff;cursor:pointer;display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.3);will-change:transform;font-variant-numeric:tabular-nums;}
+  .x3-num.overdue,.x3-num.fault,.x3-nb.overdue,.x3-nb.fault{background:var(--x3-bad);} .x3-num.due,.x3-nb.due{background:var(--x3-warn);} .x3-num.on{background:var(--x3-accent);transform-origin:center;}
+  .x3-nb{display:inline-grid;place-items:center;flex:none;min-width:1.25rem;height:1.25rem;padding:0 .2rem;box-sizing:border-box;border-radius:999px;background:#31434c;color:#fff;font-size:.66rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;}
+  .x3-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);box-shadow:var(--cds-shadow-popover);border-radius:8px;padding:.35rem .6rem;font-size:var(--cds-font-size-caption);z-index:9;max-width:17rem;}
+  .x3-tip b{display:block;font-weight:600;} .x3-tip span{color:var(--color-fg-muted);}
+  .x3-zoom{position:absolute;right:.5rem;top:.5rem;z-index:8;display:flex;flex-direction:column;gap:.3rem;}
+  .x3-zb{appearance:none;width:2.1rem;height:2.1rem;border-radius:10px;border:1px solid var(--cds-border);background:var(--cds-surface-popover);background:color-mix(in srgb,var(--cds-surface-popover) 92%,transparent);color:var(--color-fg);font:inherit;font-size:1.05rem;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.12);}
+  .x3-zb:hover{border-color:var(--x3-accent);} .x3-zb svg{width:1.05rem;height:1.05rem;}
+  .x3-legend{position:absolute;left:.5rem;top:.5rem;z-index:8;display:flex;flex-wrap:wrap;gap:.3rem .6rem;font-size:.7rem;color:#31434c;background:rgba(255,255,255,.86);border-radius:999px;padding:.25rem .65rem;max-width:calc(100% - 4rem);}
+  .x3-legend span{display:inline-flex;align-items:center;gap:.3rem;white-space:nowrap;}
+  .x3-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem .6rem;padding:.6rem .8rem;border-top:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-bar label{display:flex;align-items:center;gap:.5rem;flex:1 1 13rem;white-space:nowrap;}
+  .x3-ex{flex:1;min-width:5rem;accent-color:var(--x3-accent);}
+  .x3-tg{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);padding:.32rem .7rem;border:1px solid var(--color-border-line);border-radius:999px;background:none;color:var(--color-fg);cursor:pointer;white-space:nowrap;}
+  .x3-tg[aria-pressed="true"]{background:var(--color-fg);color:var(--color-panel);border-color:var(--color-fg);}
+  #x3 .x3-tg.pri{background:var(--x3-accent);border-color:var(--x3-accent);color:#fff;font-weight:600;}
+  /* side: panel + component list */
   .x3-side{display:flex;flex-direction:column;gap:var(--cds-gap-md);min-width:0;}
-  .x3-panel,.x3-listbox{border:1px solid var(--color-border-line);border-radius:var(--cds-radius);background:var(--color-panel);padding:var(--cds-pad-md);}
+  .x3-panel,.x3-listbox{border:1px solid var(--color-border-line);border-radius:var(--cds-radius);background:var(--color-panel);padding:var(--cds-pad-md);min-width:0;}
   .x3-ph{display:flex;justify-content:space-between;gap:.5rem;align-items:flex-start;}
-  .x3-psys{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);text-transform:uppercase;letter-spacing:.05em;}
-  .x3-pt{margin:.15rem 0 0;font-family:var(--font-anthropic-serif);font-weight:400;font-size:1.3rem;line-height:1.2;}
-  .x3-x{appearance:none;border:0;background:none;font-size:1.4rem;line-height:1;color:var(--color-fg-muted);cursor:pointer;padding:0 .2rem;}
-  .x3-pd{font-size:var(--cds-font-size-body);line-height:1.45;margin:.6rem 0;}
-  .x3-pn{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
-  .x3-plist{display:flex;flex-direction:column;border-top:1px solid var(--color-border-line);}
-  .x3-pr{border-bottom:1px solid var(--color-border-line);}
-  .x3-pr summary{list-style:none;display:flex;justify-content:space-between;gap:.6rem;padding:.55rem 0;cursor:pointer;}
+  .x3-psys{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;}
+  .x3-pt{margin:.15rem 0 0;font-family:var(--font-anthropic-serif);font-weight:600;font-size:1.3rem;line-height:1.2;}
+  .x3-nav{display:flex;gap:.25rem;flex:none;}
+  .x3-x{appearance:none;border:0;background:none;font-size:1.3rem;line-height:1;color:var(--color-fg-muted);cursor:pointer;padding:.1rem .35rem;border-radius:8px;}
+  .x3-x:hover{background:rgba(120,130,140,.12);background:color-mix(in srgb,var(--color-fg) 8%,transparent);color:var(--color-fg);}
+  .x3-pd{font-size:var(--cds-font-size-body);line-height:1.5;margin:.6rem 0;}
+  .x3-pd b{font-weight:600;white-space:nowrap;}
+  .x3-pn{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin:.4rem 0;}
+  .x3-pills{display:flex;flex-wrap:wrap;gap:.3rem;margin:.5rem 0 0;}
+  .x3-sec{border-top:1px solid var(--color-border-line);}
+  .x3-sec>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.6rem 0;font-weight:600;font-size:var(--cds-font-size-body);}
+  .x3-sec>summary::-webkit-details-marker{display:none;}
+  .x3-sec>summary::after{content:'+';color:var(--color-fg-muted);font-weight:400;font-size:1.1rem;line-height:1;} .x3-sec[open]>summary::after{content:'\2212';}
+  .x3-sec>summary em{font-style:normal;font-weight:400;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);margin-left:auto;}
+  .x3-secb{padding:0 0 .7rem;font-size:var(--cds-font-size-body);line-height:1.45;min-width:0;}
+  .x3-ul{margin:0;padding:0 0 0 1.05rem;display:flex;flex-direction:column;gap:.3rem;} .x3-ul li{overflow-wrap:anywhere;}
+  .x3-ul.plain{list-style:none;padding:0;}
+  .x3-ivh{font-weight:600;margin:.55rem 0 .25rem;display:flex;justify-content:space-between;gap:.5rem;align-items:baseline;} .x3-ivh:first-child{margin-top:0;}
+  .x3-ivh em{font-style:normal;font-weight:400;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);white-space:nowrap;}
+  .x3-job{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.2rem .55rem;align-items:start;padding:.45rem 0;border-bottom:1px dashed var(--color-border-line);}
+  .x3-job:last-child{border-bottom:0;}
+  .x3-job .t{font-weight:500;cursor:pointer;} .x3-job .t:hover{text-decoration:underline;}
+  .x3-job .w{grid-column:2/-1;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-job .mx-ubtn{grid-row:1;grid-column:3;}
+  .x3-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.25rem .8rem;margin:0;font-size:var(--cds-font-size-body);}
+  .x3-dl dt{color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);padding-top:.1rem;} .x3-dl dd{margin:0;overflow-wrap:anywhere;}
+  .x3-plist{display:flex;flex-direction:column;}
+  .x3-pr{border-bottom:1px solid var(--color-border-line);} .x3-pr:last-child{border-bottom:0;}
+  .x3-pr summary{list-style:none;display:flex;justify-content:space-between;gap:.6rem;padding:.5rem 0;cursor:pointer;}
   .x3-pr summary::-webkit-details-marker{display:none;}
+  .x3-pr.hit summary{background:rgba(10,120,190,.1);background:color-mix(in srgb,var(--x3-accent) 10%,transparent);border-radius:8px;padding-left:.4rem;padding-right:.4rem;}
   .x3-prl{min-width:0;} .x3-prn{font-size:var(--cds-font-size-body);line-height:1.3;}
   .x3-prno{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
   .x3-prr{text-align:right;flex:none;font-variant-numeric:tabular-nums;}
   .x3-prp{font-size:var(--cds-font-size-body);font-weight:500;}
-  .x3-pro{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);} .x3-pro.ok{color:var(--color-ok);}
+  .x3-pro{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);} .x3-pro.ok{color:var(--x3-ok);font-weight:600;}
   .x3-prb{padding:0 0 .7rem;}
   .x3-prb dl{display:grid;grid-template-columns:auto 1fr;gap:.25rem .7rem;margin:0 0 .6rem;font-size:var(--cds-font-size-caption);}
   .x3-prb dt{color:var(--color-fg-muted);} .x3-prb dd{margin:0;overflow-wrap:anywhere;}
-  .x3-acts{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .x3-acts{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem;}
   .x3-btn{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);padding:.35rem .7rem;border-radius:8px;border:1px solid var(--color-border-line);background:none;color:var(--color-fg);text-decoration:none;cursor:pointer;}
-  .x3-btn.pri{background:var(--color-fg);color:var(--color-bg);border-color:var(--color-fg);}
-  .x3-pf{margin-top:.7rem;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);}
+  .x3-btn.pri{background:var(--color-fg);color:var(--color-panel);border-color:var(--color-fg);}
+  .x3-pf{margin-top:.2rem;padding-top:.7rem;border-top:1px solid var(--color-border-line);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.7;}
   .x3-pf a,.x3-link{color:var(--color-fg);} .x3-link{appearance:none;border:0;background:none;font:inherit;padding:0;text-decoration:underline;cursor:pointer;}
-  .x3-listbox h3{margin:0 0 .5rem;font-size:var(--cds-font-size-heading);font-weight:500;}
-  .x3-list{display:flex;flex-direction:column;gap:.6rem;max-height:24rem;overflow:auto;}
+  .x3-tbl{width:100%;border-collapse:collapse;font-size:var(--cds-font-size-caption);}
+  .x3-tbl th{text-align:left;font-weight:600;color:var(--color-fg-muted);padding:.25rem .4rem .25rem 0;border-bottom:1px solid var(--color-border-line);}
+  .x3-tbl td{padding:.3rem .4rem .3rem 0;border-bottom:1px dashed var(--color-border-line);vertical-align:top;overflow-wrap:anywhere;}
+  .x3-tbl td.n,.x3-tbl th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .x3-tbl tr.go{cursor:pointer;} .x3-tbl tr.go:hover td{background:rgba(10,120,190,.07);background:color-mix(in srgb,var(--x3-accent) 7%,transparent);}
+  .x3-lh{display:flex;justify-content:space-between;align-items:center;gap:.5rem;margin:0 0 .5rem;}
+  .x3-listbox h3{margin:0;font-size:var(--cds-font-size-heading);font-weight:600;}
+  .x3-lq{appearance:none;font:inherit;font-size:var(--cds-font-size-caption);padding:.3rem .6rem;border-radius:999px;border:1px solid var(--color-border-line);background:none;color:var(--color-fg);min-width:0;width:9.5rem;}
+  .x3-list{display:flex;flex-direction:column;gap:.6rem;max-height:26rem;overflow:auto;}
   .x3-lgh{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.15rem;}
-  .x3-li{display:block;width:100%;text-align:left;appearance:none;border:0;background:none;font:inherit;font-size:var(--cds-font-size-body);padding:.28rem .45rem;border-radius:6px;color:var(--color-fg);cursor:pointer;}
-  .x3-li:hover{background:color-mix(in srgb,var(--color-fg) 6%,transparent);} .x3-li.on{background:color-mix(in srgb,var(--color-warn) 16%,transparent);}
-  .x3-sep{width:1px;background:var(--color-border-line);margin:0 .2rem;}
-  .x3-photo{position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;}
-  .x3-stage:has(.x3-photo){background:radial-gradient(ellipse at 50% 45%,#ffffff 0%,#eceee9 70%,#e2e4de 100%);}
-  .x3-ph-base,.x3-ph-layer{position:absolute;inset:0;background-size:100% 100%;background-repeat:no-repeat;}
-  .x3-ph-layer{cursor:pointer;will-change:transform;}
-  .x3-ph-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:60;overflow:visible;}
-  .x3-ph-svg polygon{fill:none;stroke:transparent;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;}
-  .x3-ph-svg polygon.hov{stroke:rgba(230,120,0,.75);fill:rgba(255,150,30,.08);}
-  .x3-ph-svg polygon.sel{stroke:#e06a00;stroke-width:2.5;fill:rgba(255,140,20,.14);}
-  .x3-ph-credit{position:absolute;right:.4rem;bottom:.2rem;font-size:.65rem;color:#8a8b85;z-index:61;}
-  .x3-labels{z-index:70;}
-  .x3-models{display:flex;flex-wrap:wrap;gap:.5rem .7rem;margin:.55rem 0 .2rem;align-items:center;}
-  .x3-pick{font-size:var(--cds-font-size-body);padding:.45rem .7rem;max-width:100%;min-width:min(100%,22rem);}
+  .x3-li{display:flex;align-items:center;gap:.45rem;width:100%;text-align:left;appearance:none;border:0;background:none;font:inherit;font-size:var(--cds-font-size-body);padding:.3rem .45rem;border-radius:8px;color:var(--color-fg);cursor:pointer;}
+  .x3-li .nm{flex:1;min-width:0;} .x3-li .in{font-size:.68rem;color:var(--color-fg-muted);border:1px solid var(--color-border-line);border-radius:999px;padding:0 .4rem;white-space:nowrap;}
+  .x3-li:hover{background:rgba(120,130,140,.1);background:color-mix(in srgb,var(--color-fg) 6%,transparent);} .x3-li.on{background:rgba(10,120,190,.13);background:color-mix(in srgb,var(--x3-accent) 13%,transparent);}
   .x3-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.45;}
+  /* expanded (full screen) */
+  .x3.xl{position:fixed;inset:0;z-index:9990;background:var(--tm-sheet,var(--color-bg,#f3f5f2));padding:.6rem;grid-template-columns:minmax(0,1fr) minmax(19rem,25rem);grid-template-rows:minmax(0,1fr);overflow:hidden;}
+  .x3.xl .x3-view{position:relative;top:0;display:flex;flex-direction:column;height:100%;} .x3.xl .x3-stage{flex:1;height:auto;min-height:0;}
+  .x3.xl .x3-side{height:100%;overflow:auto;}
+  @media (max-width:64rem){.x3.xl{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,58%) minmax(0,42%);}}
+  @media (prefers-reduced-motion:reduce){.x3-ph-img,.x3-ph-ol polygon{transition:none;}}
   </style>
-  <div class="mx-card">
-    <div class="mx-row"><h3 class="x3-title">Greensmaster eTriFlex 3370</h3><span class="mx-note x3-sub">Toro Greens Mowers 1 and 2 · model 04591</span></div>
-    <div class="x3-models"><label class="x3-note" for="x3-pick">Machine</label><select class="mx-sel x3-pick" id="x3-pick" aria-label="Machine"><optgroup label="Greens and tees mowers"><option value="3370" selected>Greensmaster eTriFlex 3370 (Greens Mowers 1, 2)</option><option value="flex2120">Greensmaster Flex 2120 (Walk Behind 2)</option><option value="jd2550">JD 2550 PrecisionCut (JD Greens Mower 1)</option><option value="gm3150">Greensmaster 3150-Q (Tees Mower 1)</option></optgroup><optgroup label="Fairway, surrounds and rough mowers"><option value="5010h">Reelmaster 5010-H (Fairway Mowers 1-3)</option><option value="jd8000a">JD 8000A E-Cut Hybrid (Surrounds Mower 1)</option><option value="gm4300">Groundsmaster 4300-D</option><option value="jdz997r">JD Z997R ZTrak (Z-trac 1)</option><option value="victaztx">Victa ZTX (Amstel Zero Turn 1)</option><option value="hoverpro">Toro HoverPro 450 (Fly Mow 1)</option><option value="turfpro500">Toro Turf Pro 500 robot mower</option></optgroup><optgroup label="Bunkers, rollers and sprayers"><option value="sp3040">Sand Pro 3040 (Bunker Rake 1)</option><option value="sp5040">Sand Pro 5040</option><option value="re50">Tru-Turf RE50 greens rollers</option><option value="mp5800">Multi Pro 5800-D sprayer</option><option value="jdhd200">JD ProGator 2030A + HD200 sprayer</option><option value="gk75">BA GK75 greens sprayer</option></optgroup><optgroup label="Aeration, renovation and top dressing"><option value="pc648s">ProCore 648s</option><option value="vd7215">Redexim Verti-Drain 7215</option><option value="ua60">1st Products UA60 Aera-Vator (Seeder 1)</option><option value="terrarake">Wiedenmann Terra Rake 230</option><option value="ws1550">Turfco WideSpin 1550 top dresser</option><option value="sodcutter">Ryan Jr. sod cutter</option><option value="trench150">Trenchmaster 150 trencher</option></optgroup><optgroup label="Utility vehicles"><option value="mdx">Workman MDX</option><option value="gtx">Workman GTX Electric</option><option value="umx">Yamaha UMX</option><option value="triton">Mitsubishi Triton GLX (Ute 1)</option></optgroup><optgroup label="Tractors, loaders and excavator"><option value="jd3520">JD 3520 tractors (Tractor 1, 2)</option><option value="kubotal5740">Kubota L5740</option><option value="mf2850m">Massey Ferguson 2850M + loader</option><option value="nhc227">New Holland C227 track loader</option><option value="sk35sr">Kobelco SK35SR-7 excavator</option></optgroup><optgroup label="Blowers, robots and small equipment"><option value="proforce">Toro Pro Force blower</option><option value="rangepro">Toro Range Pro 100 ball collector</option><option value="fjdz42p">FJD Z42P mower and ball picker</option><option value="fs240">Stihl FS 240 brushcutter</option></optgroup><optgroup label="Trailers"><option value="trailer">Dean 3 t tipping trailer</option><option value="transpro80">Toro TransPro 80 trailer</option></optgroup></select><span class="x3-note">39 machines</span></div>
-    <p class="mx-note x3-help">Hover over the photo to find a part, click it for part numbers, price, what is on the shelf and where to order. Slide to blow the machine apart.</p>
+  <div class="mx-card x3-head">
+    <div class="mx-row"><h3 class="x3-title">Parts explorer</h3><span class="mx-note x3-sub"></span></div>
+    <div class="x3-models">
+      <label class="x3-note" for="x3-pick">Machine</label>
+      <select class="mx-sel x3-pick" id="x3-pick" aria-label="Machine"></select>
+      <div class="x3-search"><input class="mx-in" id="x3-q" type="search" placeholder="Find a part, part number or component on any machine" aria-label="Search parts and components" autocomplete="off"><div class="x3-results" hidden></div></div>
+    </div>
+    <div class="x3-units" role="group" aria-label="Fleet machine"></div>
+    <div class="x3-strip"></div>
   </div>
-  <div class="x3" id="x3">
+  <div class="x3" id="x3" data-source="m_explorer m_catalog m_items m_fleet m_faults m_models m_history m_stock">
     <div class="x3-view">
-      <div class="x3-stage"><div class="x3-status">Loading…</div><div class="x3-labels"></div><div class="x3-tip" hidden></div></div>
+      <div class="x3-stage" tabindex="0" aria-label="Machine photo: click a part">
+        <div class="x3-status">Loading…</div>
+        <svg class="x3-over" aria-hidden="true"></svg>
+        <div class="x3-labels"></div>
+        <div class="x3-tip" hidden></div>
+        <div class="x3-legend" hidden></div>
+        <div class="x3-zoom">
+          <button class="x3-zb x3-zin" type="button" aria-label="Zoom in" title="Zoom in">+</button>
+          <button class="x3-zb x3-zout" type="button" aria-label="Zoom out" title="Zoom out">&minus;</button>
+          <button class="x3-zb x3-zfit" type="button" aria-label="Fit to view" title="Fit to view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+          <button class="x3-zb x3-full" type="button" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        </div>
+      </div>
       <div class="x3-bar">
-        <label>Assembled <input class="x3-ex" type="range" min="0" max="100" value="0" aria-label="Exploded view"> Blown apart</label>
-        <button class="x3-tg x3-reset">Reset view</button>
+        <button class="x3-tg pri x3-play" type="button">Blow apart</button>
+        <label>Assembled <input class="x3-ex" type="range" min="0" max="100" value="0" aria-label="Blown-apart amount"> Apart</label>
+        <button class="x3-tg x3-tlab" type="button" aria-pressed="true">Labels</button>
+        <button class="x3-tg x3-tsvc" type="button" aria-pressed="false">Service view</button>
+        <button class="x3-tg x3-tour" type="button" aria-pressed="false">Walk-through</button>
+        <button class="x3-tg x3-reset" type="button">Reset</button>
       </div>
     </div>
     <div class="x3-side">
-      <div class="x3-panel" hidden></div>
-      <div class="x3-listbox"><h3>Components</h3><div class="x3-list"></div></div>
+      <div class="x3-panel"></div>
+      <div class="x3-listbox"><div class="x3-lh"><h3>Components</h3><input class="x3-lq" type="search" placeholder="Filter" aria-label="Filter components"></div><div class="x3-list"></div></div>
       <p class="x3-note"></p>
     </div>
   </div>
@@ -854,6 +962,14 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function noRef(t) { return String(t || '').replace(/\s*\(ref [\d.]+\)/g, '').replace(/\s{2,}/g, ' ').trim(); }   // Slack post references are for the log, not for the crew
+  function sentences(t) {   // split a paragraph into points; keeps 22 in., approx., e.g. and N.m together
+    var out = [], cur = '', P = String(t || '').split(/\. (?=[A-Z0-9(])/);
+    P.forEach(function (x, i) { cur += x; var last = (x.split(/\s+/).pop() || '').toLowerCase(); if (i < P.length - 1 && /^(in|approx|e\.g|i\.e|no|max|min|ft|lb|deg|dia|qty|incl|ref|fig|vs|std)$/.test(last)) { cur += '. '; return; } cur = cur.trim(); if (cur) out.push(cur + (i < P.length - 1 && !/[.:;!?]$/.test(cur) ? '.' : '')); cur = ''; });
+    return out;
+  }
+  function xHas(slug) { return !!(window.MX3D && MX3D.has && slug && MX3D.has(slug)); }
+  function xBtn(cls, text, q) { var b = el('button', cls, text); b.type = 'button'; b.addEventListener('click', function (e) { e.stopPropagation(); MX3D.openFor(q); }); return b; }
   function fmtN(v, f) { return v == null || v === '' || isNaN(+v) ? '' : (f || f1)(+v); }
   function fmtD(s) { if (!s) return ''; var d = new Date(String(s).slice(0, 10) + 'T00:00:00'); return isNaN(d) ? String(s) : d3.timeFormat('%-d %b %Y')(d); }
   function fmtDs(s) { if (!s) return ''; var d = new Date(String(s).slice(0, 10) + 'T00:00:00'); return isNaN(d) ? String(s) : d3.timeFormat('%-d %b')(d); }
@@ -1298,7 +1414,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     FX.counts();
   }
   function drawToday() {
-    var ol = $('#wl'); var wl = R('m_worklist');
+    var ol = $('#wl'); var wl = R('m_worklist'); var FBY = {}; R('m_fleet').forEach(function (r) { FBY[r.fleet] = r; });
     if (!failed(ol, 'm_worklist')) {
       ol.replaceChildren();
       wl.forEach(function (c) {
@@ -1309,12 +1425,14 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
         var j = el('p', 'mx-wc-j', c.job); li.appendChild(j);
         var w = el('div', 'mx-wc-w ' + (c.kind === 'fault' ? 'mx-bad' : (/overdue/.test(c.why) ? 'mx-bad' : 'mx-warn')), c.why + ((c.flags || []).indexOf('safety') >= 0 ? ' · safety' : ''));
         li.appendChild(w);
-        if (c.note) li.appendChild(el('div', 'mx-wc-p', c.note));
+        if (c.note) li.appendChild(el('div', 'mx-wc-p', noRef(c.note)));
         if (c.tasks && c.tasks.length) { var ul = el('ul'); c.tasks.slice(0, 4).forEach(function (t) { ul.appendChild(el('li', null, t)); }); li.appendChild(ul); }
         if (c.parts && c.parts.length) li.appendChild(el('div', 'mx-wc-p', 'Parts: ' + c.parts.join('; ')));
         if (c.stock && c.stock.length) { var sk = el('div', 'mx-wc-s'); sk.appendChild(el('b', null, 'In the workshop')); c.stock.forEach(function (x) { sk.appendChild(el('div', null, x)); }); li.appendChild(sk); }
         var meta = []; if (c.labour_h) meta.push('Labour ~' + c.labour_h + ' h'); if (c.hours_now) meta.push('hours ~' + f0(c.hours_now)); if (c.ref) meta.push(c.ref);
         if (meta.length) li.appendChild(el('div', 'mx-wc-p', meta.join(' · ')));
+        var xfl = (c.machines && c.machines[0]) || c.machine, xr = FBY[xfl];
+        if (xr && xHas(xr.slug)) li.appendChild(xBtn('mx-xlink', 'See it in the parts explorer', { slug: xr.slug, fleet: xr.fleet, item: (c.items && c.items[0] && c.items[0].id) || null }));
         var job = jobFromCard(c); var uf = updFoot(c.upd, job, 'wl:' + (c.ref || job.ref)); if (uf) li.appendChild(uf);
         ol.appendChild(li);
       });
@@ -1322,13 +1440,16 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     }
     table('t-faults', R('m_faults'), {
       fleet: function (r) { var a = el('span', 'mx-wc-m', r.fleet || r.machine); a.addEventListener('click', function (e) { e.stopPropagation(); openMachine(r.fleet); }); return a; },
-      job: function (r, td) { td.className = 'wrap'; var d = el('div', null, r.job); if (r.note) d.appendChild(el('div', 'mx-note', r.note));
+      job: function (r, td) { td.className = 'wrap'; var d = el('div', null, r.job); if (r.note) d.appendChild(el('div', 'mx-note', noRef(r.note)));
         if (r.stock && r.stock.length) d.appendChild(el('div', 'mx-note', 'In the workshop: ' + r.stock.join(' · ')));
         var uf = updFoot(r.upd, jobFromFault(r), 'f:' + r.id); if (uf) d.appendChild(uf); return d; },
       priority: function (r) { return pill(r.priority === 'High' ? 'overdue' : r.priority === 'Medium' ? 'due' : 'ok', r.priority + (r.safety ? ' · safety' : '')); },
       id: function (r) { return r.link ? link(r.link, r.id) : r.id; }
     }, { empty: 'No open faults.' });
-    if (!failed($('#t-updates'), 'm_updates')) table('t-updates', R('m_updates').filter(function (r) { return r.id !== 'none'; }), {
+    var UPD = R('m_updates').filter(function (r) { return r.id !== 'none'; }), UG = {}, uk = function (r) { return [r.when, r.machine, r.job, r.status, r.by].join('|'); };
+    UPD.forEach(function (r) { (UG[uk(r)] = UG[uk(r)] || []).push(r); });
+    UPD = UPD.filter(function (r) { var g = UG[uk(r)]; return g.length < 2 || r === (g.filter(function (x) { return x.note || x.time_h || x.hours || x.parts; })[0] || g[0]); });
+    if (!failed($('#t-updates'), 'm_updates')) table('t-updates', UPD, {
       when: function (r) { return r.when; },
       machine: function (r) { var a = el('span', 'mx-wc-m', r.machine); a.addEventListener('click', function (e) { e.stopPropagation(); openMachine(r.machine.split(',')[0].trim()); }); return a; },
       job: function (r, td) { td.className = 'wrap hn'; return r.job; },
@@ -1415,7 +1536,9 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     if (!r) { box.hidden = true; return; }
     box.hidden = false; box.replaceChildren(); if (box._last !== r.id) { box._last = r.id; FX.flash(box); }
     var hd = el('div', 'mx-row'); var h3 = el('h3', null, r.fleet + ': ' + r.label); hd.appendChild(h3);
-    var op = el('button', 'mx-chip', 'Open machine sheet'); op.addEventListener('click', function () { openMachine(r.fleet); }); hd.appendChild(op); box.appendChild(hd);
+    var op = el('button', 'mx-chip', 'Open machine sheet'); op.addEventListener('click', function () { openMachine(r.fleet); }); hd.appendChild(op);
+    var xf = R('m_fleet').filter(function (x) { return x.fleet === r.fleet; })[0]; if (xf && xHas(xf.slug)) hd.appendChild(xBtn('mx-chip', 'See it on the machine', { slug: xf.slug, fleet: xf.fleet, item: r.id }));
+    box.appendChild(hd);
     var uf = updFoot(r.upd, jobFromItem(r), 'i:' + r.id); if (uf) box.appendChild(uf);
     itemBlock(r, box);
   }
@@ -1489,7 +1612,9 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
     var box = $('#machine'); var r = R('m_fleet').filter(function (x) { return x.fleet === state.machine; })[0];
     if (!r) { box.hidden = true; return; }
     box.hidden = false; box.replaceChildren();
-    var hd = el('div', 'mx-row'); hd.appendChild(el('h3', null, r.fleet)); hd.appendChild(pill(r.state, r.state)); box.appendChild(hd);
+    var hd = el('div', 'mx-row'); hd.appendChild(el('h3', null, r.fleet)); hd.appendChild(pill(r.state, r.state));
+    if (xHas(r.slug)) hd.appendChild(xBtn('mx-chip', 'Open in the parts explorer', { slug: r.slug, fleet: r.fleet }));
+    box.appendChild(hd);
     box.appendChild(el('p', 'mx-note', r.make + ' ' + r.model + (r.engine ? ' · ' + r.engine : '')));
     var dl = el('dl', 'mx-dl'); var add = function (k, v) { if (v == null || v === '' || v === false) return; var d = el('div'); d.appendChild(el('dt', null, k)); d.appendChild(el('dd', null, String(v))); dl.appendChild(d); };
     add('Hours', r.km ? f0(r.km) + ' km (odometer)' : (r.hours != null ? (r.hours_est ? '~' : '') + f1(r.hours) : 'no reading'));
@@ -1618,7 +1743,7 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       grind: function (r) { var b = r.grind; if (!b) return ''; var s = el('span'); s.appendChild(pill(b.status, b.status)); s.appendChild(document.createTextNode(' last ' + (b.last ? fmtDs(b.last) : '–') + (b.due ? ' · due ' + fmtDs(b.due) : '') + (b.every_h ? ' · every ' + b.every_h + ' h' : ''))); return s; }
     }, { onClick: function (k) { openMachine(k); } });
     var g = $('#hoc-guides'); g.replaceChildren(); var seen = {};
-    R('m_hoc').forEach(function (r) { if (!r.guidance || seen[r.model]) return; seen[r.model] = 1; var c = el('div', 'mx-card'); c.appendChild(el('h3', null, r.model)); c.appendChild(el('p', 'mx-note', r.guidance)); g.appendChild(c); });
+    R('m_hoc').forEach(function (r) { if (!r.guidance || seen[r.model]) return; seen[r.model] = 1; var c = el('div', 'mx-card'); c.appendChild(el('h3', null, r.model)); var gl = el('ul', 'mx-list'); sentences(r.guidance).forEach(function (t) { gl.appendChild(el('li', null, t)); }); c.appendChild(gl); g.appendChild(c); });
   }
 
   // ---------- parts
@@ -1670,7 +1795,8 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
       aftermarket: function (r, td) { td.className = 'wrap hn'; var L = r.aftermarket || []; if (!L.length) return ''; var d = el('div'); L.forEach(function (o) { var ln = el('div'); ln.appendChild(document.createTextNode((o.brand ? o.brand + ' ' : '') + (o.part_no || '') + ' ' + o.shown + (o.fit === 'direct' ? '' : ' (check fit)') + ' ')); if (o.url) ln.appendChild(link(o.url, o.supplier || 'link')); else if (o.supplier) ln.appendChild(document.createTextNode(o.supplier)); if (o.note) ln.title = o.note; d.appendChild(ln); }); return d; },
       supplier: function (r, td) { td.className = 'wrap hn'; return r.link && /^https?:/.test(r.link) ? link(r.link, r.supplier || 'link') : (r.supplier || ''); },
       verified: function (r) { return r.verified === 'yes' ? 'yes' : (r.verified || ''); }, on_hand: function (r) { return r.on_hand ? String(r.on_hand) : ''; }
-    }, { numeric: ['price', 'g_price', 'am_price'], sortVal: { aftermarket: function (r) { return r.am_price; } } });
+    }, { numeric: ['price', 'g_price', 'am_price'], sortVal: { aftermarket: function (r) { return r.am_price; } },
+         onClick: function (k) { var r = R('m_catalog').filter(function (x) { return x.key === k; })[0]; if (r && xHas(r.slug)) MX3D.openFor({ slug: r.slug, part_no: r.part_no }); } });
   }
   $('#cat-model').addEventListener('change', function (e) { state.catModel = e.target.value; drawParts(); });
   $('#cat-kind').addEventListener('change', function (e) { state.catKind = e.target.value; drawParts(); });
@@ -1740,13 +1866,15 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   $$('#card-checks .mx-chip').forEach(function (b) { b.addEventListener('click', function () { state.sev = b.dataset.sev; $$('#card-checks .mx-chip').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); drawChecks(); }); });
 
   // ---------- draw loop
-  var DRAW = { today: drawToday, plan: drawPlan, fleet: drawFleet, usage: drawUsage, cutting: drawCutting, parts: drawParts, explore: function () { var r = document.getElementById("x3"); if (r && r.__mx3d && r.__mx3d.resize) r.__mx3d.resize(); }, costs: drawCosts, history: drawHistory, checks: drawChecks };
+  var DRAW = { today: drawToday, plan: drawPlan, fleet: drawFleet, usage: drawUsage, cutting: drawCutting, parts: drawParts, explore: function () {}, costs: drawCosts, history: drawHistory, checks: drawChecks };
   function draw() {
     try { drawHeader(); } catch (e) { console.error(e); }
     try { DRAW[state.page](); } catch (e) { console.error(e); }
     var pb = document.getElementById('pub-built'); var s = R('m_summary')[0]; if (pb && s) pb.textContent = 'updated ' + s.built_label + ', refreshed hourly';
   }
   var first = true;
+  // hooks the parts explorer uses (its script follows this one)
+  window.MXH = { show: show, openMachine: openMachine, openLJ: UPDURL ? openLJ : null, updButton: updButton, updChip: updChip, jobFromItem: jobFromItem, jobFromFault: jobFromFault, state: state, redraw: function () { draw(); } };
   FX.intro();
   dash.onData(function () {
     var go = first && R('m_summary').length > 0;
@@ -1757,410 +1885,698 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   });
 })();
 </script>
-<script>(function () { var gh = /github\.io$/.test(location.hostname); window.MX3D_PHOTO_SRC = { '3370': gh ? 'photo3370.json' : '/_blob/8edfff7ebbdcaa973a36649b9db59a50', '5010h': gh ? 'photo5010h.json' : '/_blob/fe02e64818e5bf74769105604e3e414f', 'flex2120': gh ? 'photoflex2120.json' : '/_blob/17d11da7fb05cdcaa194f05d7d19bec4', 'mdx': gh ? 'photomdx.json' : '/_blob/39193cd144726dd04d615e6c505094d7', 'gtx': gh ? 'photogtx.json' : '/_blob/7fede5609076305bbf377d7ed9566fda', 'jd2550': gh ? 'photojd2550.json' : '/_blob/ad7f04c5934d2c5525c8f9b02a898ec8', 'gm4300': gh ? 'photogm4300.json' : '/_blob/5988cca4e6ec0c0ac79fead011838aa2', 'mp5800': gh ? 'photomp5800.json' : '/_blob/6ad6a475a1ccad1f8e680f393faa1725', 'gm3150': gh ? 'photogm3150.json' : '/_blob/244e4c433a5a30df9caa85ea85670b74', 'sp3040': gh ? 'photosp3040.json' : '/_blob/f254af3a19e19dd5989ff882ccf5fb89', 'sp5040': gh ? 'photosp5040.json' : '/_blob/46724cfb55588ad94116eb4d1455c7bf', 'pc648s': gh ? 'photopc648s.json' : '/_blob/b233df2a0674f995417fe3cbe2136741', 'jd8000a': gh ? 'photojd8000a.json' : '/_blob/a78530e005e493e0f913f4df9ebe9dc9', 'jd3520': gh ? 'photojd3520.json' : '/_blob/5d25b7ef02354d0be70b84b2fa1c73e4', 'jdhd200': gh ? 'photojdhd200.json' : '/_blob/58e3e9ebb3bef77c1635ed8cc7b1be5c', 'jdz997r': gh ? 'photojdz997r.json' : '/_blob/c815ba3e73e1edf9754292d39c3c069f', 'kubotal5740': gh ? 'photokubotal5740.json' : '/_blob/c61e890a9c7d63ba5627d3a8eae823dc', 'mf2850m': gh ? 'photomf2850m.json' : '/_blob/4a1de4fad22cc7cc5ac4aa4e5e69c29c', 'umx': gh ? 'photoumx.json' : '/_blob/728f4c22524c07cc7f55b03276adc22c', 'nhc227': gh ? 'photonhc227.json' : '/_blob/b1416f8cdf690dee491470b2eac2e155', 'sk35sr': gh ? 'photosk35sr.json' : '/_blob/113d0dde91c22a0e2d2f405e94e556ac', 'triton': gh ? 'phototriton.json' : '/_blob/aa0a841b157b092deadfba1089d80a82', 'trailer': gh ? 'phototrailer.json' : '/_blob/593d68d213a7d454af1cd7abd2872aa8', 'transpro80': gh ? 'phototranspro80.json' : '/_blob/eb0ef7e54bf1d9c4a837417c4a0af11b', 'trench150': gh ? 'phototrench150.json' : '/_blob/302bfbe0fa8ac524804c025e7d32219e', 'vd7215': gh ? 'photovd7215.json' : '/_blob/b47d873c49210745ebeb30778eb0f75f', 'ua60': gh ? 'photoua60.json' : '/_blob/c4b0ea67ead9b01541d006f4d1ad76e5', 'terrarake': gh ? 'phototerrarake.json' : '/_blob/08fb952c88fe1a9d8a678442e7aa9f87', 'ws1550': gh ? 'photows1550.json' : '/_blob/ae0e280010d4737b9be1dc14ad6c9c3a', 'sodcutter': gh ? 'photosodcutter.json' : '/_blob/be203d6eb32e99eb94038136f8b2abb7', 'gk75': gh ? 'photogk75.json' : '/_blob/ea75c029312677dc4fc9763334c3e748', 're50': gh ? 'photore50.json' : '/_blob/17a255cbaa84b59d4deb797168e59ea5', 'proforce': gh ? 'photoproforce.json' : '/_blob/f146d21d41e59a03c63285d054b30143', 'hoverpro': gh ? 'photohoverpro.json' : '/_blob/d4f4c961f36cdc5c107df9554845523c', 'rangepro': gh ? 'photorangepro.json' : '/_blob/3e419d5d5dbf4bf9681c00e8bd59f888', 'turfpro500': gh ? 'phototurfpro500.json' : '/_blob/cbc4101f8ab99eb623c82a96e83d4300', 'fjdz42p': gh ? 'photofjdz42p.json' : '/_blob/e20b5f0176c66c69ae3133e541d56332', 'victaztx': gh ? 'photovictaztx.json' : '/_blob/721c28f0edfebc4f405847f42bc85d85', 'fs240': gh ? 'photofs240.json' : '/_blob/6ba2d3b1c87213f0591ffd9480b9df4a' }; })();</script>
+<script>(function () { var gh = /github\.io$/.test(location.hostname); window.MX3D_PHOTO_SRC = { '3370': gh ? 'photo3370.json' : '/_blob/c485f4dcd131910cbc41a221d0d48956', '5010h': gh ? 'photo5010h.json' : '/_blob/7e02fbf750166b4435ba9fb2bb108157', 'flex2120': gh ? 'photoflex2120.json' : '/_blob/17d11da7fb05cdcaa194f05d7d19bec4', 'mdx': gh ? 'photomdx.json' : '/_blob/39193cd144726dd04d615e6c505094d7', 'gtx': gh ? 'photogtx.json' : '/_blob/7fede5609076305bbf377d7ed9566fda', 'jd2550': gh ? 'photojd2550.json' : '/_blob/ad7f04c5934d2c5525c8f9b02a898ec8', 'gm4300': gh ? 'photogm4300.json' : '/_blob/5988cca4e6ec0c0ac79fead011838aa2', 'mp5800': gh ? 'photomp5800.json' : '/_blob/6ad6a475a1ccad1f8e680f393faa1725', 'gm3150': gh ? 'photogm3150.json' : '/_blob/244e4c433a5a30df9caa85ea85670b74', 'sp3040': gh ? 'photosp3040.json' : '/_blob/f254af3a19e19dd5989ff882ccf5fb89', 'sp5040': gh ? 'photosp5040.json' : '/_blob/46724cfb55588ad94116eb4d1455c7bf', 'pc648s': gh ? 'photopc648s.json' : '/_blob/b233df2a0674f995417fe3cbe2136741', 'jd8000a': gh ? 'photojd8000a.json' : '/_blob/a78530e005e493e0f913f4df9ebe9dc9', 'jd3520': gh ? 'photojd3520.json' : '/_blob/5d25b7ef02354d0be70b84b2fa1c73e4', 'jdhd200': gh ? 'photojdhd200.json' : '/_blob/58e3e9ebb3bef77c1635ed8cc7b1be5c', 'jdz997r': gh ? 'photojdz997r.json' : '/_blob/c815ba3e73e1edf9754292d39c3c069f', 'kubotal5740': gh ? 'photokubotal5740.json' : '/_blob/c61e890a9c7d63ba5627d3a8eae823dc', 'mf2850m': gh ? 'photomf2850m.json' : '/_blob/4a1de4fad22cc7cc5ac4aa4e5e69c29c', 'umx': gh ? 'photoumx.json' : '/_blob/728f4c22524c07cc7f55b03276adc22c', 'nhc227': gh ? 'photonhc227.json' : '/_blob/b1416f8cdf690dee491470b2eac2e155', 'sk35sr': gh ? 'photosk35sr.json' : '/_blob/113d0dde91c22a0e2d2f405e94e556ac', 'triton': gh ? 'phototriton.json' : '/_blob/aa0a841b157b092deadfba1089d80a82', 'trailer': gh ? 'phototrailer.json' : '/_blob/593d68d213a7d454af1cd7abd2872aa8', 'transpro80': gh ? 'phototranspro80.json' : '/_blob/eb0ef7e54bf1d9c4a837417c4a0af11b', 'trench150': gh ? 'phototrench150.json' : '/_blob/302bfbe0fa8ac524804c025e7d32219e', 'vd7215': gh ? 'photovd7215.json' : '/_blob/b47d873c49210745ebeb30778eb0f75f', 'ua60': gh ? 'photoua60.json' : '/_blob/c4b0ea67ead9b01541d006f4d1ad76e5', 'terrarake': gh ? 'phototerrarake.json' : '/_blob/08fb952c88fe1a9d8a678442e7aa9f87', 'ws1550': gh ? 'photows1550.json' : '/_blob/ae0e280010d4737b9be1dc14ad6c9c3a', 'sodcutter': gh ? 'photosodcutter.json' : '/_blob/be203d6eb32e99eb94038136f8b2abb7', 'gk75': gh ? 'photogk75.json' : '/_blob/ea75c029312677dc4fc9763334c3e748', 're50': gh ? 'photore50.json' : '/_blob/17a255cbaa84b59d4deb797168e59ea5', 'proforce': gh ? 'photoproforce.json' : '/_blob/f146d21d41e59a03c63285d054b30143', 'hoverpro': gh ? 'photohoverpro.json' : '/_blob/d4f4c961f36cdc5c107df9554845523c', 'rangepro': gh ? 'photorangepro.json' : '/_blob/3e419d5d5dbf4bf9681c00e8bd59f888', 'turfpro500': gh ? 'phototurfpro500.json' : '/_blob/cbc4101f8ab99eb623c82a96e83d4300', 'fjdz42p': gh ? 'photofjdz42p.json' : '/_blob/e20b5f0176c66c69ae3133e541d56332', 'victaztx': gh ? 'photovictaztx.json' : '/_blob/721c28f0edfebc4f405847f42bc85d85', 'fs240': gh ? 'photofs240.json' : '/_blob/6ba2d3b1c87213f0591ffd9480b9df4a' }; })();</script>
 <script>
-/* Ranfurlie machinery 3D parts explorer - Toro Reelmaster 5010-H (03950).
-14 Oct 2026: photo explorer for Flex 2120, Workman MDX, Workman GTX, JD 2550, Groundsmaster 4300-D, Multi Pro 5800-D.
-Those six are 'lazy': their parts data is inside machinery/photo<id>.json (key 'model'), masters in machinery/photos/.
-Procedural model built from Toro's published dimensions (spec sheet / product page 03950):
-length 2819 mm, wheelbase 1524 mm, transport width 2337 mm, width of cut 2540 mm, ROPS 2172 mm, seat 1600 mm,
-front tyres 26.5x14-12, rear 20x12-10, five 22 in (559 mm) 5 in DPA cutting units. Shapes are simplified.
-Part numbers: machinery bible (models/toro_reelmaster_5010h.json, parts catalogs 3471-213 / 3478-264, CU 3451-988).
-Live price / on-hand come from the dashboard's m_catalog dataset when present. */
+/* Ranfurlie machinery parts explorer v2 (11 Nov 2026).
+A studio photo of each machine, cut into parts that lift and slide apart in depth. Every machine's outlines and parts
+data live in machinery/photo<id>.json (key 'model'); the list of machines is REG below. Live detail comes from the
+dashboard datasets: m_explorer (which service items, faults, schedule lines, fluids and checks belong to which
+component: built hourly by automation/machinery_explorer.py), m_catalog (prices, shelf stock, aftermarket), m_items,
+m_faults, m_fleet, m_models, m_history and m_stock. To add a machine: build its photo file with
+automation/machinery_x3tool.py, add it to REG and to MX3D_PHOTO_SRC, and rebuild. */
 (function () {
 'use strict';
-// ------------------------------------------------------------------ parts data
-var CAT_PC1 = 'https://www.toro.com/getpub/253209';   // Parts catalog 3471-213 (Mowers 1 and 3)
-var CAT_PC2 = 'https://www.toro.com/getpub/270027';   // Parts catalog 3478-264 (Mower 2)
-var CAT_CU = 'https://www.toro.com/getpub/254361';    // Cutting unit parts catalog 3451-988
-var CAT_OM = 'https://www.toro.com/getpub/253206';    // Operator's manual 3471-210
-var LOOKUP = 'https://www.toro.com/en/parts/partdetails?id=57149';
-// Parts not in the machinery bible's service/wear lists (reference numbers from the catalogs)
-var EXTRA = {
-'138-6909': { name: 'Engine assembly, Kubota D1105 (s/n 418274365+, Mowers 1 and 3)', note: 'Major assembly. Dealer quote.' },
-'145-2806': { name: 'Engine assembly, Kubota D1105 (s/n 420000000+, Mower 2)', note: 'Major assembly. Dealer quote.' },
-'106-5277': { name: 'Air cleaner assembly', note: 'Complete housing. Service element is 108-3810.' },
-'136-3726': { name: '12 V AGM battery for the 48 V pack (x4)', note: 'Replace as a set of four.' },
-'139-8482': { name: 'Hybrid 48 V DC fuse kit', note: 'Keep one on the shelf: the 48 V cutting-unit fuses are separate from the 12 V block.' },
-'161-9001': { name: 'Telematics gateway (Intelli360)', note: 'Fitted by the dealer. Reports hours to Intelli360.' },
-'93-2242': { name: 'Hydraulic filter and head assembly', note: 'Club stocks one ($233.33). Only needed if the head is damaged: routine service is the 75-1310 element.' },
-'108-3841': { name: 'Engine oil filter (alternative number)', note: 'Shown at the oil-filter position in PC 3478-264. Club stocks it. Confirm interchangeable with 127-0511.' },
-'115-3299': { name: 'Reel bearing seal, flocked (x2 per reel)', note: '' },
-'112-5290': { name: 'Roller bearing', note: 'In roller rebuild kit 114-5430.' },
-'114-3717': { name: 'Roller oil seal', note: 'In roller rebuild kit 114-5430.' },
-'03623': { name: 'Cutting unit, 5 in DPA 11-blade forward swept', note: 'Check the plates: the club has not recorded whether 03621, 03623 or 03624 came on the leased units.' }
-};
-// Snapshot of m_catalog for the 5010-H (13 Oct 2026); live dashboard data overrides it.
-var SNAP = {
-'127-0511': ['Engine oil filter', 24.0, 'genuine', 0, 'Toro dealer', null, '50 h, 150 h'],
-'108-3810': ['Air filter (primary)', 27.58, 'genuine', 3, 'Toro dealer', null, '400 h'],
-'114-4057': ['Air cleaner safety element (optional)', 20.54, 'equivalent', 0, 'Toro dealer', 'https://www.amacrongolf.com.au/products/f223f428ee/5592000042652949', ''],
-'110-9049': ['Fuel/water separator filter (spin-on)', 45.0, 'genuine', 3, 'Toro dealer', null, '400 h'],
-'98-7612': ['In-line engine fuel filter', 8.57, 'equivalent', 0, 'Toro dealer', 'https://www.amacrongolf.com.au/products/e407e6a76e/5592000028782583', '400 h'],
-'75-1310': ['Hydraulic charge filter (element)', 89.7, 'equivalent', 0, 'Toro dealer', 'https://www.amacrongolf.com.au/products/e2dac8509d/5592000018986028', '1000 h'],
-'104-3494': ['Alternator belt', 41.32, 'equivalent', 0, 'Toro dealer', 'https://www.amacrongolf.com.au/products/h7d44a8c0c/5592000020562605', '8 h, 100 h'],
-'130-1411': ['Glow plug (x3)', 36.89, 'equivalent', 0, 'Toro / Kubota dealer', 'https://www.ebay.com.au/itm/286039723952', ''],
-'121-6395': ['Engine oil Toro Premium 15W-40 (5 gal)', 4.68, 'genuine', 0, 'Toro dealer / club bulk oil', null, '50 h, 150 h'],
-'133-8086': ['Toro PX Extended Life Hydraulic Fluid 5 gal', null, null, 0, 'Toro dealer', null, '2000 h'],
-'108-1190': ['Premium all-purpose grease 14 oz', null, null, 0, 'Toro dealer', null, '50 h, 800 h'],
-'132-8621': ['12 V starting battery', null, null, 0, 'Toro dealer', null, ''],
-'145-2576': ['MVP hydraulic hose kit', null, null, 0, 'Toro dealer', null, ''],
-'147-1257': ['Bedknife Tournament (5in DPA), HOC 3.8-9.5 mm', null, null, 0, 'Toro dealer', null, ''],
-'137-6093': ['Bedknife EdgeMax Low HOC (std on 03623)', null, null, 0, 'Toro dealer', null, ''],
-'147-1244': ['Bedknife Low HOC (std on 03624)', null, null, 0, 'Toro dealer', null, ''],
-'119-4151': ['Bedknife screw (8 per knife)', 0.6, 'genuine', 0, 'Toro dealer / Turftines', 'https://www.tines.com.au/product/bedknife-screw-toro/', ''],
-'140-5510': ['Reel bearing, sealed stainless (2 per reel)', null, null, 0, 'Toro dealer', null, ''],
-'114-5430': ['Roller rebuild kit (greasable rollers)', null, null, 0, 'Toro dealer', null, ''],
-'137-8427': ['Reel assy 5in 11-blade (22in)', null, null, 0, 'Toro dealer', null, '']
-};
-var STOCK_EXTRA = { '108-3841': [24.0, 1], '93-2242': [233.33, 1] };
-// Pickable components: id -> description + part numbers
-var COMP = {
-hood: { name: 'Hood and rear body panels', sys: 'Body', desc: 'Lift the hood for the engine, air cleaner and radiator. Blow debris off the rear screen and radiator daily.', parts: [], cat: CAT_PC1 },
-engine: { name: 'Engine: Kubota D1105 3-cyl diesel', sys: 'Engine', desc: '24.8 hp (18.5 kW) liquid-cooled diesel driving the generator. Oil 3.3 L 15W-40. First oil and filter change at 50 h, then every 150 h.', parts: ['127-0511', '108-3841', '121-6395', '130-1411', '138-6909', '145-2806'], cat: CAT_PC2 },
-oilfilter: { name: 'Engine oil filter', sys: 'Engine', desc: 'Spin-on. Oil the gasket, hand tight then a further 1/2 to 3/4 turn. Change at 50 h, then every 150 h.', parts: ['127-0511', '108-3841'], cat: CAT_PC2 },
-belt: { name: 'Alternator / fan belt', sys: 'Engine', desc: 'Check tension at 8 h and every 100 h: 11 mm deflection with 10 kg midway between the pulleys.', parts: ['104-3494'], cat: CAT_PC2 },
-generator: { name: 'Hybrid generator (PowerMatch)', sys: 'Hybrid drive', desc: 'Driven off the engine. Feeds the 48 V reel motors and tops up the battery pack; PowerMatch adds over 40 hp of peak power.', parts: ['139-8482'], cat: CAT_PC2 },
-aircleaner: { name: 'Air cleaner', sys: 'Engine', desc: 'Service only when the indicator shows red, or at 400 h. Early changes let dirt in.', parts: ['108-3810', '114-4057', '106-5277'], cat: CAT_PC2 },
-radiator: { name: 'Radiator and oil cooler', sys: 'Cooling', desc: 'Rear mounted, 6 fins per inch, 5.2 L coolant. Clean the screen and cores daily; change coolant and hoses every 2 years.', parts: [], cat: CAT_PC1 },
-fueltank: { name: 'Left front pod (fuel tank, 53 L diesel)', sys: 'Fuel', desc: '14 US gal (53 L). Tank position shown is approximate: check the filler location on the machine. Drain water from the fuel/water separator daily.', parts: [], cat: CAT_PC1 },
-fuelsep: { name: 'Fuel/water separator and in-line filter', sys: 'Fuel', desc: 'Spin-on separator and in-line engine filter, both every 400 h. Drain the bowl daily.', parts: ['110-9049', '98-7612'], cat: CAT_PC2 },
-hydtank: { name: 'Right front pod (hydraulic tank) and charge filter', sys: 'Hydraulics', desc: '41.6 L of Toro PX. Tank and filter positions shown are approximate. Charge filter every 1,000 h, fluid every 2,000 h (800 h for both if any non-PX fluid goes in). Hoses every 2 years.', parts: ['75-1310', '93-2242', '133-8086', '145-2576'], cat: CAT_PC2 },
-battery48: { name: '48 V battery pack (4 x 12 V AGM)', sys: 'Hybrid drive', desc: 'Sealed, maintenance free. Buffers power for the electric reel motors. 48 V fuses are separate from the 12 V fuse block.', parts: ['136-3726', '139-8482'], cat: CAT_PC2 },
-battery12: { name: '12 V starting battery', sys: 'Electrical', desc: '570 CCA. Clean terminals and check charge at 50 h.', parts: ['132-8621'], cat: CAT_PC2 },
-seat: { name: 'Operator seat', sys: 'Operator station', desc: 'Deluxe high-back suspension seat with fore/aft, height and weight adjustment. Seat switch is an interlock.', parts: [], cat: CAT_PC1 },
-rops: { name: 'ROPS (2-post) and seat belt', sys: 'Safety', desc: 'Check the ROPS mounts and seat belt daily. Do not drill, weld or modify the ROPS.', parts: [], cat: CAT_PC1 },
-console: { name: 'Control console and InfoCenter', sys: 'Operator station', desc: 'Right-hand pivoting console: InfoCenter LCD for gauges, faults, service reminders, reel and backlap speed. Telematics gateway reports hours to Intelli360.', parts: ['161-9001'], cat: CAT_PC1 },
-steering: { name: 'Steering wheel and tilt column', sys: 'Steering', desc: 'Rear-wheel power steering with its own hydraulic pump.', parts: [], cat: CAT_PC1 },
-tyreFL: { name: 'Front tyre and wheel, left', sys: 'Traction', desc: '26.5 x 14-12 turf tyre on a hydrostatic wheel motor with drum brake. 83-103 kPa (12-15 psi). Lug nuts 94-122 N.m, hub nut 407-542 N.m.', parts: [], cat: CAT_PC1 },
-tyreFR: { name: 'Front tyre and wheel, right', sys: 'Traction', desc: '26.5 x 14-12 turf tyre on a hydrostatic wheel motor with drum brake. 83-103 kPa (12-15 psi). Lug nuts 94-122 N.m, hub nut 407-542 N.m.', parts: [], cat: CAT_PC1 },
-tyreRL: { name: 'Rear tyre and wheel, left', sys: 'Steering', desc: '20 x 12-10 turf tyre on the steer axle. 83-103 kPa (12-15 psi).', parts: [], cat: CAT_PC1 },
-tyreRR: { name: 'Rear tyre and wheel, right', sys: 'Steering', desc: '20 x 12-10 turf tyre on the steer axle. 83-103 kPa (12-15 psi).', parts: [], cat: CAT_PC1 },
-frame: { name: 'Main frame and footplate', sys: 'Chassis', desc: 'Grease all fittings after every wash (No. 2 lithium).', parts: ['108-1190'], cat: CAT_PC1 },
-lights: { name: 'Front cowl and headlights', sys: 'Body', desc: 'Moulded front cowl with the two work lights and front indicators. Check lights before going out in low light.', parts: [], cat: CAT_PC1 },
-liftR: { name: 'Rear lift arms', sys: 'Hydraulics', desc: 'Carry the two rear (mid-mount) cutting units. Grease the pivots after washing.', parts: ['108-1190'], cat: CAT_PC1 },
-liftF: { name: 'Front lift arms and cylinders', sys: 'Hydraulics', desc: 'Raise and lower the three front cutting units. Check hoses for wear daily.', parts: ['145-2576', '108-1190'], cat: CAT_PC1 }
-};
-var CU_POS = { cu4: 'front left', cu1: 'front centre', cu5: 'front right', cu2: 'rear left', cu3: 'rear right' };
-Object.keys(CU_POS).forEach(function (k) {
-COMP[k] = { name: 'Cutting unit, ' + CU_POS[k], sys: 'Cutting units', desc: '22 in (559 mm) 5 in DPA cutting unit with its own 48 V electric reel motor. 5 grease fittings per unit at 50 h and after washing. HOC 5 mm on fairways, approaches and surrounds (from 21 Oct 2026).', parts: ['03623', '137-8427', '147-1257', '119-4151', '140-5510', '114-5430'], cat: CAT_CU };
-});
-var SUB = {
-reel: { name: 'Reel (5 in, 11 blades)', desc: 'Backlap and check reel-to-bedknife contact daily. Grind when the land is over 3 mm: 30 deg relief to 1.3 mm land, end-to-end diameter within 0.25 mm.', parts: ['137-8427', '140-5510', '115-3299'] },
-bedknife: { name: 'Bedknife and bedbar', desc: 'Tournament knife 147-1257 is the only listed knife that covers 5 mm. Bedknife screws 29.8 N.m (8 per knife); bedbar bolts 37-45 N.m. Replace at the lip limit (Tournament 3.4 mm).', parts: ['147-1257', '137-6093', '147-1244', '119-4151'] },
-froller: { name: 'Front roller (Wiehle, grooved)', desc: 'Greasable. Rebuild with the roller kit when the bearings have play.', parts: ['114-5430', '112-5290', '114-3717'] },
-rroller: { name: 'Rear roller', desc: 'Greasable. Same rebuild kit as the front roller.', parts: ['114-5430', '112-5290', '114-3717'] },
-motor: { name: 'Reel motor (48 V electric)', desc: 'Direct electric drive, nine reel speed settings plus onboard backlap. Fused on the 48 V circuit.', parts: ['139-8482'] },
-cuframe: { name: 'Cutting unit frame and side plates', desc: 'DPA (dual precision adjustment) at each end sets reel-to-bedknife contact.', parts: ['03623'] }
-};
-// ------------------------------------------------------------------ Greensmaster eTriFlex 3370 data
-var G_PC = 'https://www.toro.com/getpub/283322';   // Parts catalog 3471-256 (Mower 2, s/n 418200000+)
-var G_PC1 = 'https://www.toro.com/getpub/283333';  // Parts catalog 3461-607 (Mower 1 if 04591)
-var G_CU = 'https://www.toro.com/getpub/187748';   // Cutting unit parts catalog 3443-444
-var G_OM = 'https://www.toro.com/getpub/276738';   // Operator's manual 3481-521
-var G_COMP = {
-body: { name: 'Rear body (battery compartment cover)', sys: 'Body', desc: 'Covers the lithium pack and electronics. Park in shade on hot days: the InfoCenter high-temperature alert stops the reels and slows the machine. Never pressure wash.', parts: [], cat: G_PC },
-batteries: { name: 'Lithium battery pack (5 x HyperCell)', sys: 'Power', desc: '55.2 V nominal, 199.85 Ah, about 11 kWh (04591). Sealed, not user serviceable. Charge after each day; store at 40-60 % (54.3-57.3 V). Check cable connections every 50 h with the main connectors unplugged. Mower 1: read the model plate first (04590 has 8 batteries).', parts: ['145-5385', '147-3134', '144-3848', '139-8482'], cat: G_PC },
-dcdc: { name: 'DC/DC converter and controllers', sys: 'Power', desc: 'Runs the 12 V circuits off the 48 V pack: there is no 12 V battery on the 3370. 48 V fuses are specialty fuses and are not interchangeable with 12 V ones.', parts: ['139-8482'], cat: G_PC },
-frame: { name: 'Frame and footplate', sys: 'Chassis', desc: 'Tubular frame with the perforated footplate. Check for cracks at the A-arm mounts.', parts: [], cat: G_PC },
-seat: { name: 'Operator seat', sys: 'Operator station', desc: 'Adjustable seat with seat switch interlock.', parts: [], cat: G_PC },
-rops: { name: 'ROPS', sys: 'Safety', desc: 'Check mounts and the seat belt daily. Do not drill, weld or modify.', parts: [], cat: G_PC },
-console: { name: 'Control console and InfoCenter', sys: 'Operator station', desc: 'InfoCenter for battery state, faults, reel speed (clip rate) and backlap: SERVICE > BACKLAP = ON, set BACKLAP RPM in SETTINGS. Mower 2 has the Intelli360 telematics gateway.', parts: ['161-9001'], cat: G_PC },
-steering: { name: 'Steering arm and wheel', sys: 'Steering', desc: '48 V electric power steering on the steering arm.', parts: [], cat: G_PC },
-lift: { name: 'Lift arms (double A-arm) and lift actuators', sys: 'Cutting units', desc: 'Electric lift actuators, one per unit (#1 centre, #2, #3 each have their own part number). Never raise the suspension to transport with the reel motors sitting in the frame holders.', parts: ['137-7933'], cat: G_PC },
-tyreFL: { name: 'Front tyre and wheel motor, left', sys: 'Traction', desc: '19 x 10.5-8 smooth tyre on an electric wheel motor with an oil-filled gearbox. Wheel nuts 108-122 N.m. Gearbox oil (SAE 80W-90, about 384 ml) at 8 h then every 800 h, machine level; clean the magnetic drain plug and check for metal flakes.', parts: ['117-9030', '139-8565', '133-7659'], cat: G_PC },
-tyreFR: { name: 'Front tyre and wheel motor, right', sys: 'Traction', desc: '19 x 10.5-8 smooth tyre on an electric wheel motor with an oil-filled gearbox. Wheel nuts 108-122 N.m. Gearbox oil (SAE 80W-90, about 384 ml) at 8 h then every 800 h, machine level; clean the magnetic drain plug and check for metal flakes.', parts: ['117-9030', '139-8565', '133-7659'], cat: G_PC },
-tyreR: { name: 'Rear tyre and steering fork', sys: 'Steering', desc: '19 x 10.5-8 smooth tyre in the steered rear fork. 3WD kit optional.', parts: ['117-9030'], cat: G_PC }
-};
-var G_POS = { cu1: '#1 centre', cu2: '#2 front left', cu3: '#3 front right' };
-Object.keys(G_POS).forEach(function (k) {
-G_COMP[k] = { name: 'Cutting unit ' + G_POS[k], sys: 'Cutting units', desc: '21 in (533 mm) 5 in DPA cutting unit, 11-blade, with a 48 V brushless reel motor and grass basket. Greens HOC 2.4-2.7 mm: Microcut bedknife. Daily paper test for light contact; 1 click = 0.018 mm. Sealed reel bearings: no greasing. Keep contact light and edges sharp: it directly extends run time.', parts: ['137-8512', '115-1880', '93-4262', '119-4151', '140-5510', '140-5552', '121-2637', '138-8905'], cat: G_CU };
-});
-var G_SUB = {
-reel: { name: 'Reel (5 in, 11 blades, low drag)', desc: 'Backlap when the paper test shows dull edges (club practice about 10 h). Grind when land is over 3 mm: 30 deg relief to 0.8 mm land, spin to under 0.025 mm run-out. Scrap at 114.3 mm diameter or more than 0.25 mm taper.', parts: ['137-8512', '140-5510', '115-3299', '925100'] },
-bedknife: { name: 'Bedknife and bedbar', desc: 'Microcut family for greens (1.5-4.7 mm HOC). 13 new screws at every knife change. After a grind or new knife: 0.05 mm shim at each end, then 3 clicks closer, paper test.', parts: ['115-1880', '93-4262', '108-4303', '139-4320', '119-4151', 'TOR510880', '140-5531', '125-5610'] },
-froller: { name: 'Front roller (Wiehle)', desc: 'Rebuild with the roller kit when the bearings have play.', parts: ['140-5552'] },
-rroller: { name: 'Rear roller (2 in steel)', desc: 'Same roller rebuild kit as the front.', parts: ['140-5552'] },
-motor: { name: 'Reel motor (48 V brushless)', desc: 'Clip rate 200-520 rpm, set in the InfoCenter. Grease the spline with Toro synthetic grease at refit.', parts: ['138-8905', '136-8595'] },
-cuframe: { name: 'Cutting unit frame and DPA adjusters', desc: 'Dual precision adjustment at each end; counterbalance springs carry the unit weight.', parts: ['121-2637'] },
-basket: { name: 'Grass basket', desc: 'Empty before it overfills: a full basket throws clippings and loads the reel. Check the hanger lips for cracks.', parts: [] }
-};
-var G_EXTRA = {
-'161-9001': { name: 'Telematics gateway (Intelli360)', note: 'Mower 2 (s/n 418200000+) only. Fitted and activated by the dealer.' },
-'115-3299': { name: 'Reel bearing seal, flocked (x2 per reel)', note: '' },
-'144-3848': { name: 'Battery charger (Mower 1 if 04591)', note: 'If Mower 1 is a 04590 the charger is 04012. Read the plate.' }
-};
-var G_SNAP = {
-'139-8482': ['Hybrid 48VDC fuse kit (keep on hand)', null, null, 0, 'Toro Australia dealer', null, ''],
-'133-7659': ['Gearbox drain plug, magnetic', null, null, 0, 'Toro Australia dealer', null, '8 h, 800 h'],
-'147-3134': ['Battery charger 1200 W (Mower 2)', null, null, 0, 'Toro Australia dealer', null, ''],
-'145-5385': ['Lithium battery - 04591', null, null, 0, 'Toro Australia dealer (dangerous goods)', null, ''],
-'125-5610': ['Reel paper (10 pack)', null, null, 0, 'Toro Australia dealer', null, ''],
-'140-5531': ['Bedknife-to-reel shim 0.05 mm', null, null, 0, 'Toro Australia dealer', null, ''],
-'TOR510880': ['Bedknife screw tool', null, null, 0, 'Toro Australia dealer', null, ''],
-'925100': ['Lapping compound 100 grit', 20.56, 'genuine', 0, 'GA Power Equipment Spares', null, '10 h'],
-'136-8595': ['Toro synthetic grease', 62.1, 'genuine', 0, 'Toro dealer', null, ''],
-'115-1880': ['Bedknife EdgeMax Microcut (factory std)', 65.0, 'genuine', 0, 'Toro Australia dealer', null, ''],
-'93-4262': ['Bedknife Microcut, 1.5-4.7 mm HOC', 76.47, 'genuine', 0, 'Amacron (AM93-4262) / Turftines', 'https://www.tines.com.au/product/934262-micro-cut-13-hole-bedknife/', '75 h'],
-'108-4303': ['Bedknife Microcut Extended, 7 deg top', null, null, 0, 'Toro Australia dealer', null, ''],
-'139-4320': ['Bedknife EdgeMax Microcut Short', null, null, 0, 'Toro Australia dealer', null, ''],
-'119-4151': ['Bedknife screw (13 per bedknife)', 0.6, 'genuine', 0, 'Toro dealer / Turftines', 'https://www.tines.com.au/product/bedknife-screw-toro/', '75 h'],
-'140-5510': ['Reel bearing, sealed stainless (2 per reel)', null, null, 0, 'Toro Australia dealer', null, ''],
-'140-5552': ['Roller rebuild kit (one roller)', null, null, 0, 'Toro Australia dealer', null, ''],
-'121-2637': ['DPA adjuster rebuild kit', null, null, 0, 'Toro Australia dealer', null, ''],
-'137-8512': ['Reel assy 21 in 11-blade low drag', null, null, 0, 'Toro Australia dealer', null, ''],
-'117-9030': ['Wheel and tyre assy', null, null, 0, 'Toro Australia dealer', null, ''],
-'137-7933': ['Lift actuator (#1 centre / #2 / #3)', null, null, 0, 'Toro Australia dealer', null, ''],
-'138-8905': ['Reel motor, electric', null, null, 0, 'Toro Australia dealer', null, ''],
-'139-8565': ['Wheel motor assy RH / LH (with gearbox)', null, null, 0, 'Toro Australia dealer', null, '']
-};
-var MODELS = {
-'5010h': { id: '5010h', slug: 'toro_reelmaster_5010h', title: 'Reelmaster 5010-H', sub: 'Fairway Mowers 1, 2 and 3 · model 03950', COMP: COMP, SUB: SUB, EXTRA: EXTRA, SNAP: SNAP, STOCK: STOCK_EXTRA, LOOKUP: LOOKUP, OM: CAT_OM,
-LBL: ['engine', 'hood', 'rops', 'seat', 'aircleaner', 'radiator', 'battery48', 'hydtank', 'fueltank', 'generator', 'cu1', 'cu2', 'cu3', 'cu4', 'cu5', 'tyreFR', 'console', 'lights', 'steering'], UNDER: ['engine', 'oilfilter', 'belt', 'generator', 'aircleaner', 'radiator', 'fuelsep', 'battery12'], xray: 'hood', xrayLabel: 'See through hood', cam: { r: 6.2, th: 0.85, ph: 1.12, t: [0, 0.75, 0] },
-note: "Part outlines on the photo are drawn by hand and approximate; the engine, generator, batteries and filters sit under the hood and are in the parts list. Part numbers come from parts books 3471-213 (Mowers 1 and 3), 3478-264 (Mower 2) and cutting-unit book 3451-988." },
-'3370': { id: '3370', slug: 'toro_etriflex_3370', title: 'Greensmaster eTriFlex 3370', sub: 'Toro Greens Mowers 1 and 2 · model 04591', COMP: G_COMP, SUB: G_SUB, EXTRA: G_EXTRA, SNAP: G_SNAP, STOCK: {}, LOOKUP: 'https://www.toro.com/en/parts/partdetails?id=58293', OM: G_OM,
-LBL: ['body', 'batteries', 'rops', 'seat', 'steering', 'console', 'cu1', 'cu2', 'cu3', 'tyreFR', 'tyreR', 'lift', 'dcdc'], UNDER: ['batteries', 'dcdc'], xray: 'body', xrayLabel: 'See through body', cam: { r: 4.6, th: 0.85, ph: 1.12, t: [0, 0.6, 0] },
-note: "Part outlines on the photo are drawn by hand and approximate. Part numbers come from parts books 3471-256 (Mower 2) and 3461-607, and cutting-unit book 3443-444. Mower 1: check the model plate (04590 or 04591) before ordering battery or charger parts." },
-'flex2120': { id: 'flex2120', lazy: true, slug: 'toro_flex_2120', title: "Greensmaster Flex 2120", sub: "Greens Mower - Walk Behind 2 · model 04044", note: '' },
-'mdx': { id: 'mdx', lazy: true, slug: 'toro_workman_mdx', title: "Workman MDX", sub: "Workman MDX 1 to 5 · model 07235TC", note: '' },
-'gtx': { id: 'gtx', lazy: true, slug: 'toro_workman_gtx', title: "Workman GTX Electric", sub: "Workman GTX 1 and 2 (07043 lead-acid), 3 and 4 (07433TC lithium)", note: '' },
-'jd2550': { id: 'jd2550', lazy: true, slug: 'jd_2550_precisioncut', title: "John Deere 2550 PrecisionCut", sub: "JD Greens Mower 1", note: '' },
-'gm4300': { id: 'gm4300', lazy: true, slug: 'toro_groundsmaster_4300d', title: "Groundsmaster 4300-D", sub: "Groundsmaster 4300 1 · model 30864", note: '' },
-'mp5800': { id: 'mp5800', lazy: true, slug: 'toro_multipro_5800', title: "Multi Pro 5800-D", sub: "5800 1 · model 41393", note: '' },
-'gm3150': { id: 'gm3150', lazy: true, slug: 'toro_greensmaster_3150', title: "Greensmaster 3150-Q", sub: "Toro Tees Mower 1 · model 04358", note: '' },
-'sp3040': { id: 'sp3040', lazy: true, slug: 'toro_sandpro_3040', title: "Sand Pro 3040", sub: "Bunker Rake 1 · model 08703", note: '' },
-'sp5040': { id: 'sp5040', lazy: true, slug: 'toro_sandpro_5040', title: "Sand Pro 5040", sub: "SandPro 5040 1 · model 08705", note: '' },
-'pc648s': { id: 'pc648s', lazy: true, slug: 'toro_procore_648s', title: "ProCore 648s", sub: "ProCore 648s 1 · model 09960", note: '' },
-"jd8000a": { id: "jd8000a", lazy: true, slug: "jd_8000a", title: "John Deere 8000A E-Cut Hybrid", sub: "Surrounds Mower 1 \u00b7 5 x 18 in. QA5 reels, electric reel drive", note: '' },
-"jd3520": { id: "jd3520", lazy: true, slug: "jd_3520", title: "John Deere 3520 Compact Utility Tractor", sub: "Tractor 1 and Tractor 2 \u00b7 3520 4WD, Yanmar 3TNV84T turbo diesel", note: '' },
-"jdhd200": { id: "jdhd200", lazy: true, slug: "jd_hd200_sprayer", title: "John Deere HD200 SelectSpray on ProGator 2030A", sub: "JD Sprayer 1 \u00b7 757 L HD200 SelectSpray on a ProGator 2030A diesel, AgLeader InCommand rate control", note: '' },
-"jdz997r": { id: "jdz997r", lazy: true, slug: "jd_z997r", title: "John Deere Z997R ZTrak Diesel", sub: "Z-trac 1 \u00b7 Z997R Max-Frame diesel zero-turn, 7-Iron PRO deck (72 in. in the photo)", note: '' },
-"kubotal5740": { id: "kubotal5740", lazy: true, slug: "kubota_l5740", title: "Kubota L5740 HST", sub: "L5740 1 \u00b7 L40 series, Kubota V2403-M-T turbo diesel, HST (photo shows the cab model)", note: '' },
-"mf2850m": { id: "mf2850m", lazy: true, slug: "mf_2850m", title: "Massey Ferguson MF 2850 M with FL 2811 loader", sub: "Massey FL 2850 1 \u00b7 Iseki E4FH turbo diesel with DPF, Servo-HST, MF FL 2811 loader", note: '' },
-"umx": { id: "umx", lazy: true, slug: "yamaha_umx", title: "Yamaha UMX (petrol EFI)", sub: "UMX Heavy Duty 1 \u00b7 driving range utility vehicle, serial J0G-000552 (2022)", note: '' },
-"nhc227": { id: "nhc227", lazy: true, slug: "nh_c227", title: "New Holland C227 compact track loader", sub: "Track Loader 1 (PIN NJM448024, 2017) \u00b7 C227 200 Series Tier 4B, FPT F5H 3.4 L", note: '' },
-"sk35sr": { id: "sk35sr", lazy: true, slug: "kobelco_sk35sr", title: "Kobelco SK35SR-7 mini excavator", sub: "Excavator 1 (serial PX18020917, about 1124 h) \u00b7 SK35SR-7 (probable: check the plate), Yanmar 3TNV88F", note: '' },
-"triton": { id: "triton", lazy: true, slug: "mitsubishi_triton_glx", title: "Mitsubishi Triton GLX", sub: "Ute 1 (2023, about 8,349 km) \u00b7 Triton GLX 2.4 L diesel, MR 23MY or MV 24MY (check the VIN)", note: '' },
-"trailer": { id: "trailer", lazy: true, slug: "trailers", title: "Dean 3 t hydraulic tipping trailer", sub: "Trailers 1 to 3 (serials MK21814, MK21129; Trailer 3 plate unreadable) \u00b7 Dean 3 t hydraulic tipper", note: '' },
-"transpro80": { id: "transpro80", lazy: true, slug: "trailers", title: "Toro TransPro 80 greens mower trailer", sub: "Greensmower Trailers 1 and 2 (2022) \u00b7 TransPro 80 tow-behind trailer (model 04235 shown)", note: '' },
-"trench150": { id: "trench150", lazy: true, slug: "trenchmaster_150", title: "Trenchmaster 150 PTO trencher", sub: "Trenching Machine 1 \u00b7 Trenchmaster 150 (TM150) 3-point PTO auger trencher", note: '' },
-"vd7215": { id: "vd7215", lazy: true, slug: "redexim_verti_drain_7215", title: "Redexim Verti-Drain 7215", sub: "Verti Drain 1 (2018) and Verti Drain 2 (2023) \u00b7 3-point PTO deep-tine aerator, model 7215", note: '' },
-"ua60": { id: "ua60", lazy: true, slug: "firstproducts_ua60", title: "1st Products AERA-vator UA60", sub: "Seeder 1 (SN 3831) \u00b7 UA60 with SB60 seed box, 3-point PTO", note: '' },
-"terrarake": { id: "terrarake", lazy: true, slug: "wiedenmann_terra_rake", title: "Wiedenmann Terra Rake 230", sub: "Terra Rake 2.3m 1 \u00b7 3-point spring-tine verticut harrow, 2.3 m", note: '' },
-"ws1550": { id: "ws1550", lazy: true, slug: "turfco_widespin_1550", title: "Turfco WideSpin 1550", sub: "Top Dresser 1 (2022, s/n 129581) \u00b7 tow-behind broadcast topdresser, Vanguard engine", note: '' },
-"sodcutter": { id: "sodcutter", lazy: true, slug: "ryan_jr_sod_cutter", title: "Ryan Jr. Sod Cutter 18 in", sub: "Sod Cutter 1 (2022, s/n 544954C10123) \u00b7 model 544954C, Honda GX160", note: '' },
-"gk75": { id: "gk75", lazy: true, slug: "ba_gk75", title: "BA Greens Keeper GK75", sub: "Green Sprayer 1 (s/n D27058) \u00b7 75 L pedestrian turf sprayer, 12 V pump", note: '' },
-"re50": { id: "re50", lazy: true, slug: "truturf_re50", title: "Tru-Turf RE50 Electric Greens Roller", sub: "Greens Roller 1 and 2 \u00b7 RE50, 48 V electric drive, trailer transport", note: '' },
-"proforce": { id: "proforce", lazy: true, slug: "toro_proforce_44552", title: "Toro Pro Force Debris Blower", sub: "Blower 1 and 2 \u00b7 model 44552, tow-behind, Kohler V-twin", note: '' },
-"hoverpro": { id: "hoverpro", lazy: true, slug: "toro_hoverpro_450", title: "Toro HoverPro 450 Hover Mower", sub: "Fly Mow 1 \u00b7 HoverPro 450 (photo: model 02616, Honda GCVx170)", note: '' },
-"rangepro": { id: "rangepro", lazy: true, slug: "toro_range_pro_100", title: "Toro Range Pro 100 Robotic Ball Picker", sub: "Range Pro 100 Ball collector 1 \u00b7 model 30931ANZ, RTK GNSS, LiFePO4", note: '' },
-"turfpro500": { id: "turfpro500", lazy: true, slug: "toro_turf_pro_500", title: "Toro Turf Pro 500 Robotic Mower", sub: "Turf Pro Auto Mower 500 1 \u00b7 model 30921ANZ, RTK GNSS, 5 cutting heads", note: '' },
-"fjdz42p": { id: "fjdz42p", lazy: true, slug: "fjd_z42p", title: "FJD Z42P Autonomous Mower with Ball Picker", sub: "Autonomous picker 1 \u00b7 FJDynamics Z42P, 42 in. electric zero-turn with ball-picker attachment (driving range)", note: '' },
-"victaztx": { id: "victaztx", lazy: true, slug: "victa_ztx", title: "Victa ZTX Zero-Turn Mower", sub: "Amstel Zero Turn 1 \u00b7 ZTX2342F (42 in.) or ZTX2348F (48 in.), B&S 23 hp", note: '' },
-"fs240": { id: "fs240", lazy: true, slug: "small_power_equipment", title: "Stihl FS 240 Brushcutter", sub: "Whipper Snipper 1 to 6 \u00b7 STIHL FS 240, bike handle, 2-stroke", note: '' }
-};
-var CUR = MODELS['5010h'];
+var REG = [{"id":"3370","slug":"toro_etriflex_3370","title":"Greensmaster eTriFlex 3370","sub":"Toro Greens Mowers 1 and 2 · model 04591","g":"Greens and tees mowers","pick":"Greensmaster eTriFlex 3370 (Greens Mowers 1, 2)"},{"id":"flex2120","slug":"toro_flex_2120","title":"Greensmaster Flex 2120","sub":"Greens Mower - Walk Behind 2 · model 04044","g":"Greens and tees mowers","pick":"Greensmaster Flex 2120 (Walk Behind 2)"},{"id":"jd2550","slug":"jd_2550_precisioncut","title":"John Deere 2550 PrecisionCut","sub":"JD Greens Mower 1","g":"Greens and tees mowers","pick":"JD 2550 PrecisionCut (JD Greens Mower 1)"},{"id":"gm3150","slug":"toro_greensmaster_3150","title":"Greensmaster 3150-Q","sub":"Toro Tees Mower 1 · model 04358","g":"Greens and tees mowers","pick":"Greensmaster 3150-Q (Tees Mower 1)"},{"id":"5010h","slug":"toro_reelmaster_5010h","title":"Reelmaster 5010-H","sub":"Fairway Mowers 1, 2 and 3 · model 03950","g":"Fairway, surrounds and rough mowers","pick":"Reelmaster 5010-H (Fairway Mowers 1-3)"},{"id":"jd8000a","slug":"jd_8000a","title":"John Deere 8000A E-Cut Hybrid","sub":"Surrounds Mower 1 · 5 x 18 in. QA5 reels, electric reel drive","g":"Fairway, surrounds and rough mowers","pick":"JD 8000A E-Cut Hybrid (Surrounds Mower 1)"},{"id":"gm4300","slug":"toro_groundsmaster_4300d","title":"Groundsmaster 4300-D","sub":"Groundsmaster 4300 1 · model 30864","g":"Fairway, surrounds and rough mowers","pick":"Groundsmaster 4300-D"},{"id":"jdz997r","slug":"jd_z997r","title":"John Deere Z997R ZTrak Diesel","sub":"Z-trac 1 · Z997R Max-Frame diesel zero-turn, 7-Iron PRO deck (72 in. in the photo)","g":"Fairway, surrounds and rough mowers","pick":"JD Z997R ZTrak (Z-trac 1)"},{"id":"victaztx","slug":"victa_ztx","title":"Victa ZTX Zero-Turn Mower","sub":"Amstel Zero Turn 1 · ZTX2342F (42 in.) or ZTX2348F (48 in.), B&S 23 hp","g":"Fairway, surrounds and rough mowers","pick":"Victa ZTX (Amstel Zero Turn 1)"},{"id":"hoverpro","slug":"toro_hoverpro_450","title":"Toro HoverPro 450 Hover Mower","sub":"Fly Mow 1 · HoverPro 450 (photo: model 02616, Honda GCVx170)","g":"Fairway, surrounds and rough mowers","pick":"Toro HoverPro 450 (Fly Mow 1)"},{"id":"turfpro500","slug":"toro_turf_pro_500","title":"Toro Turf Pro 500 Robotic Mower","sub":"Turf Pro Auto Mower 500 1 · model 30921ANZ, RTK GNSS, 5 cutting heads","g":"Fairway, surrounds and rough mowers","pick":"Toro Turf Pro 500 robot mower"},{"id":"sp3040","slug":"toro_sandpro_3040","title":"Sand Pro 3040","sub":"Bunker Rake 1 · model 08703","g":"Bunkers, rollers and sprayers","pick":"Sand Pro 3040 (Bunker Rake 1)"},{"id":"sp5040","slug":"toro_sandpro_5040","title":"Sand Pro 5040","sub":"SandPro 5040 1 · model 08705","g":"Bunkers, rollers and sprayers","pick":"Sand Pro 5040"},{"id":"re50","slug":"truturf_re50","title":"Tru-Turf RE50 Electric Greens Roller","sub":"Greens Roller 1 and 2 · RE50, 48 V electric drive, trailer transport","g":"Bunkers, rollers and sprayers","pick":"Tru-Turf RE50 greens rollers"},{"id":"mp5800","slug":"toro_multipro_5800","title":"Multi Pro 5800-D","sub":"5800 1 · model 41393","g":"Bunkers, rollers and sprayers","pick":"Multi Pro 5800-D sprayer"},{"id":"jdhd200","slug":"jd_hd200_sprayer","title":"John Deere HD200 SelectSpray on ProGator 2030A","sub":"JD Sprayer 1 · 757 L HD200 SelectSpray on a ProGator 2030A diesel, AgLeader InCommand rate control","g":"Bunkers, rollers and sprayers","pick":"JD ProGator 2030A + HD200 sprayer"},{"id":"gk75","slug":"ba_gk75","title":"BA Greens Keeper GK75","sub":"Green Sprayer 1 (s/n D27058) · 75 L pedestrian turf sprayer, 12 V pump","g":"Bunkers, rollers and sprayers","pick":"BA GK75 greens sprayer"},{"id":"pc648s","slug":"toro_procore_648s","title":"ProCore 648s","sub":"ProCore 648s 1 · model 09960","g":"Aeration, renovation and top dressing","pick":"ProCore 648s"},{"id":"vd7215","slug":"redexim_verti_drain_7215","title":"Redexim Verti-Drain 7215","sub":"Verti Drain 1 (2018) and Verti Drain 2 (2023) · 3-point PTO deep-tine aerator, model 7215","g":"Aeration, renovation and top dressing","pick":"Redexim Verti-Drain 7215"},{"id":"ua60","slug":"firstproducts_ua60","title":"1st Products AERA-vator UA60","sub":"Seeder 1 (SN 3831) · UA60 with SB60 seed box, 3-point PTO","g":"Aeration, renovation and top dressing","pick":"1st Products UA60 Aera-Vator (Seeder 1)"},{"id":"terrarake","slug":"wiedenmann_terra_rake","title":"Wiedenmann Terra Rake 230","sub":"Terra Rake 2.3m 1 · 3-point spring-tine verticut harrow, 2.3 m","g":"Aeration, renovation and top dressing","pick":"Wiedenmann Terra Rake 230"},{"id":"ws1550","slug":"turfco_widespin_1550","title":"Turfco WideSpin 1550","sub":"Top Dresser 1 (2022, s/n 129581) · tow-behind broadcast topdresser, Vanguard engine","g":"Aeration, renovation and top dressing","pick":"Turfco WideSpin 1550 top dresser"},{"id":"sodcutter","slug":"ryan_jr_sod_cutter","title":"Ryan Jr. Sod Cutter 18 in","sub":"Sod Cutter 1 (2022, s/n 544954C10123) · model 544954C, Honda GX160","g":"Aeration, renovation and top dressing","pick":"Ryan Jr. sod cutter"},{"id":"trench150","slug":"trenchmaster_150","title":"Trenchmaster 150 PTO trencher","sub":"Trenching Machine 1 · Trenchmaster 150 (TM150) 3-point PTO auger trencher","g":"Aeration, renovation and top dressing","pick":"Trenchmaster 150 trencher"},{"id":"mdx","slug":"toro_workman_mdx","title":"Workman MDX","sub":"Workman MDX 1 to 5 · model 07235TC","g":"Utility vehicles","pick":"Workman MDX"},{"id":"gtx","slug":"toro_workman_gtx","title":"Workman GTX Electric","sub":"Workman GTX 1 and 2 (07043 lead-acid), 3 and 4 (07433TC lithium)","g":"Utility vehicles","pick":"Workman GTX Electric"},{"id":"umx","slug":"yamaha_umx","title":"Yamaha UMX (petrol EFI)","sub":"UMX Heavy Duty 1 · driving range utility vehicle, serial J0G-000552 (2022)","g":"Utility vehicles","pick":"Yamaha UMX"},{"id":"triton","slug":"mitsubishi_triton_glx","title":"Mitsubishi Triton GLX","sub":"Ute 1 (2023, about 8,349 km) · Triton GLX 2.4 L diesel, MR 23MY or MV 24MY (check the VIN)","g":"Utility vehicles","pick":"Mitsubishi Triton GLX (Ute 1)"},{"id":"jd3520","slug":"jd_3520","title":"John Deere 3520 Compact Utility Tractor","sub":"Tractor 1 and Tractor 2 · 3520 4WD, Yanmar 3TNV84T turbo diesel","g":"Tractors, loaders and excavator","pick":"JD 3520 tractors (Tractor 1, 2)"},{"id":"kubotal5740","slug":"kubota_l5740","title":"Kubota L5740 HST","sub":"L5740 1 · L40 series, Kubota V2403-M-T turbo diesel, HST (photo shows the cab model)","g":"Tractors, loaders and excavator","pick":"Kubota L5740"},{"id":"mf2850m","slug":"mf_2850m","title":"Massey Ferguson MF 2850 M with FL 2811 loader","sub":"Massey FL 2850 1 · Iseki E4FH turbo diesel with DPF, Servo-HST, MF FL 2811 loader","g":"Tractors, loaders and excavator","pick":"Massey Ferguson 2850M + loader"},{"id":"nhc227","slug":"nh_c227","title":"New Holland C227 compact track loader","sub":"Track Loader 1 (PIN NJM448024, 2017) · C227 200 Series Tier 4B, FPT F5H 3.4 L","g":"Tractors, loaders and excavator","pick":"New Holland C227 track loader"},{"id":"sk35sr","slug":"kobelco_sk35sr","title":"Kobelco SK35SR-7 mini excavator","sub":"Excavator 1 (serial PX18020917, about 1124 h) · SK35SR-7 (probable: check the plate), Yanmar 3TNV88F","g":"Tractors, loaders and excavator","pick":"Kobelco SK35SR-7 excavator"},{"id":"proforce","slug":"toro_proforce_44552","title":"Toro Pro Force Debris Blower","sub":"Blower 1 and 2 · model 44552, tow-behind, Kohler V-twin","g":"Blowers, robots and small equipment","pick":"Toro Pro Force blower"},{"id":"rangepro","slug":"toro_range_pro_100","title":"Toro Range Pro 100 Robotic Ball Picker","sub":"Range Pro 100 Ball collector 1 · model 30931ANZ, RTK GNSS, LiFePO4","g":"Blowers, robots and small equipment","pick":"Toro Range Pro 100 ball collector"},{"id":"fjdz42p","slug":"fjd_z42p","title":"FJD Z42P Autonomous Mower with Ball Picker","sub":"Autonomous picker 1 · FJDynamics Z42P, 42 in. electric zero-turn with ball-picker attachment (driving range)","g":"Blowers, robots and small equipment","pick":"FJD Z42P mower and ball picker"},{"id":"fs240","slug":"small_power_equipment","title":"Stihl FS 240 Brushcutter","sub":"Whipper Snipper 1 to 6 · STIHL FS 240, bike handle, 2-stroke","g":"Blowers, robots and small equipment","pick":"Stihl FS 240 brushcutter"},{"id":"trailer","slug":"trailers","title":"Dean 3 t hydraulic tipping trailer","sub":"Trailers 1 to 3 (serials MK21814, MK21129; Trailer 3 plate unreadable) · Dean 3 t hydraulic tipper","g":"Trailers","pick":"Dean 3 t tipping trailer"},{"id":"transpro80","slug":"trailers","title":"Toro TransPro 80 greens mower trailer","sub":"Greensmower Trailers 1 and 2 (2022) · TransPro 80 tow-behind trailer (model 04235 shown)","g":"Trailers","pick":"Toro TransPro 80 trailer"}];
+var MODELS = {}; REG.forEach(function (m) { MODELS[m.id] = m; });
+var PUBLIC_URL = 'https://andranf.github.io/ranfurlie-greens/machinery/';
+var RM = false, FINE = true;
+try { RM = matchMedia('(prefers-reduced-motion: reduce)').matches; FINE = matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) {}
+var SVGNS = 'http://www.w3.org/2000/svg';
+
+// ------------------------------------------------------------------ data
+var NORM = typeof WeakMap === 'function' ? new WeakMap() : null;
+function unj(v) { if (typeof v === 'string' && v.length > 1) { var c = v.charAt(0); if (c === '{' || c === '[') { try { return JSON.parse(v); } catch (e) { return v; } } } return v; }
+function R(id) {   // the dashboard runtime can hand nested fields over as JSON text: parse them back once per dataset
+  var d; try { d = window.dash && dash.data ? dash.data(id) : null; } catch (e) { d = null; }
+  if (!d || d.status !== 'ok' || !Array.isArray(d.data)) return [];
+  var x = d.data; if (!NORM) return x; var y = NORM.get(x); if (y) return y;
+  y = x.map(function (r) { if (!r || typeof r !== 'object') return r; var o = {}; Object.keys(r).forEach(function (k) { o[k] = unj(r[k]); }); return o; });
+  NORM.set(x, y); return y;
+}
+function by(rows, k) { var o = {}; rows.forEach(function (r) { if (r && r[k] != null) o[r[k]] = r; }); return o; }
+var DB = { fleet: {}, items: [], itemById: {}, faults: [], faultById: {}, models: {}, cat: {}, stock: [], hist: [], x: {} };
+function loadDB() {
+  DB.fleet = by(R('m_fleet'), 'fleet'); DB.items = R('m_items'); DB.itemById = by(DB.items, 'id');
+  DB.faults = R('m_faults'); DB.faultById = by(DB.faults, 'id'); DB.models = by(R('m_models'), 'slug');
+  DB.stock = R('m_stock'); DB.hist = R('m_history'); DB.x = by(R('m_explorer'), 'id');
+  var cat = {}; R('m_catalog').forEach(function (r) { if (!r || !r.slug) return; (cat[r.slug] = cat[r.slug] || {})[norm(r.part_no)] = r; }); DB.cat = cat;
+  DB.catRows = R('m_catalog'); SIDX = null;
+}
+
 // ------------------------------------------------------------------ helpers
 function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
-function money(v) { return v == null ? null : '$' + (v < 10 ? v.toFixed(2) : v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')); }
-function amList(L) { var d = el('div'); L.forEach(function (o) { var line = el('div', 'x3-am'); line.appendChild(document.createTextNode((o.brand ? o.brand + ' ' : '') + (o.part_no || '') + ' · ' + o.shown + (o.supplier ? ' · ' : ''))); if (o.supplier) { if (o.url) { var a = el('a', null, o.supplier); a.href = o.url; a.target = '_blank'; a.rel = 'noopener'; line.appendChild(a); } else line.appendChild(document.createTextNode(o.supplier)); } line.appendChild(document.createTextNode(o.fit === 'direct' ? ' · replaces this number' : ' · same spec, check fit')); if (o.note) line.title = o.note; d.appendChild(line); }); return d; }
-  function norm(p) { return String(p || '').replace(/^toro\s*/i, '').replace(/[\s-]/g, '').toUpperCase(); }
-function partInfo(no) {
-var live = null;
-try {
-if (window.dash && dash.data) {
-var d = dash.data('m_catalog');
-if (d && d.status === 'ok' && Array.isArray(d.data)) {
-for (var i = 0; i < d.data.length; i++) { var r = d.data[i]; if (r.slug === CUR.slug && norm(r.part_no) === norm(no)) { live = r; break; } }
+function sv(t, c) { var e = document.createElementNS(SVGNS, t); if (c) e.setAttribute('class', c); return e; }
+function norm(p) { return String(p || '').replace(/^toro\s*/i, '').replace(/[\s-]/g, '').toUpperCase(); }
+function money(v) { return v == null || isNaN(+v) ? null : '$' + (+v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function num(v, d) { if (v == null || v === '' || isNaN(+v)) return ''; var n = +v; return n.toLocaleString('en-AU', { maximumFractionDigits: d == null ? 1 : d, minimumFractionDigits: 0 }); }
+var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function fmtD(s) { if (!s) return ''; var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s)); if (!m) return String(s); var y = new Date().getFullYear(); return (+m[3]) + ' ' + MON[+m[2] - 1] + (+m[1] !== y ? ' ' + m[1] : ''); }
+function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+function easeIO(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+function easeO(t) { return 1 - Math.pow(1 - t, 3); }
+function first(t) { t = String(t || ''); var m = /[a-z0-9)]\. (?=[A-Z])/.exec(t); return m ? t.slice(0, m.index + 2) : t; }   // first sentence (no look-behind: older iPhones)
+function clean(s) { return String(s || '').replace(/\s*\(ref [\d.]+\)/g, '').replace(/\s+/g, ' ').trim(); }
+var QTY = /(\d[\d.,]*(?:\s?(?:-|to|x)\s?\d[\d.,]*)?\s?(?:N\.m|N·m|Nm|kPa|psi|mm|cm|ml|L|litres?|h|hours?|rpm|V|Ah|A|kW|hp|deg|°C|°|%|km\/h|bar|kg|in\.|US gal|CCA|micron|months?|years?|weeks?|clicks?)(?![A-Za-z]))/g;
+function rich(text, cls) {   // paragraph with the numbers a mechanic looks for in bold
+  var p = el('p', cls || 'x3-pd'), s = String(text || ''), i = 0, m; QTY.lastIndex = 0;
+  while ((m = QTY.exec(s))) { if (m.index > i) p.appendChild(document.createTextNode(s.slice(i, m.index))); p.appendChild(el('b', null, m[0])); i = m.index + m[0].length; }
+  if (i < s.length) p.appendChild(document.createTextNode(s.slice(i)));
+  return p;
 }
-}
-} catch (e) {}
-if (live) return { no: no, name: live.name, price: live.price, kind: live.price_kind, onHand: live.on_hand, supplier: live.supplier, url: live.equiv_url || live.link, every: (live.intervals || []).map(function (h) { return h + ' h'; }).join(', '), note: live.note, alt: live.alt, equiv: live.equiv, live: true, g: live.genuine || null, am: live.aftermarket || [], amPrice: live.am_price };
-var s = SNAP[no];
-if (s) return { no: no, name: s[0], price: s[1], kind: s[2], onHand: s[3], supplier: s[4], url: s[5], every: s[6] };
-var x = EXTRA[no] || { name: no, note: '' };
-var st = STOCK_EXTRA[no];
-return { no: no, name: x.name, price: st ? st[0] : null, kind: st ? 'genuine' : null, onHand: st ? st[1] : 0, supplier: 'Toro dealer', url: null, every: '', note: x.note };
-}
-// ------------------------------------------------------------------ canvas textures
-function canvasTex(THREE, w, h, draw, srgb, rep) {
-var c = document.createElement('canvas'); c.width = w; c.height = h; var g = c.getContext('2d'); draw(g, w, h);
-var t = new THREE.CanvasTexture(c); if (srgb) t.colorSpace = THREE.SRGBColorSpace;
-t.wrapS = t.wrapT = THREE.RepeatWrapping; if (rep) t.repeat.set(rep[0], rep[1]); t.anisotropy = 8; return t;
-}
-function noise(g, w, h, a, b, amt) {
-var id = g.getImageData(0, 0, w, h), d = id.data;
-for (var i = 0; i < d.length; i += 4) { var n = (Math.random() - 0.5) * amt; d[i] = Math.max(0, Math.min(255, d[i] + n)); d[i + 1] = Math.max(0, Math.min(255, d[i + 1] + n)); d[i + 2] = Math.max(0, Math.min(255, d[i + 2] + n)); }
-g.putImageData(id, 0, 0);
-}
-// ------------------------------------------------------------------ mount
-function mount(root, opts) {
-opts = opts || {};
-if (root.__mx3d) { root.__mx3d.resize(); return root.__mx3d; }
-var D = MODELS[root.dataset.model] || MODELS['3370']; CUR = D;
-// lazy models: parts data ships inside the photo file (keeps the page small)
-var PL = D.lazy && window.MX3D_PHOTOS && window.MX3D_PHOTOS[D.id];
-if (PL && PL.model) { for (var mk in PL.model) D[mk] = PL.model[mk]; D.lazy = false; }
-COMP = D.COMP || {}; SUB = D.SUB || {}; EXTRA = D.EXTRA || {}; SNAP = D.SNAP || {}; STOCK_EXTRA = D.STOCK || {}; LOOKUP = D.LOOKUP; CAT_OM = D.OM;
-(function () { var host = root.closest('section') || root; var t = host.querySelector('.x3-title'), s2 = host.querySelector('.x3-sub'), n = root.querySelector('.x3-note'), xb0 = root.querySelector('.x3-xray');
-if (t) t.textContent = D.title; if (s2) s2.textContent = D.sub; if (n) n.textContent = D.note + ' Prices are ex GST. Genuine: latest invoice, club stock cost or AU retail. Aftermarket: every credible equivalent found, cheapest first (hover a line for notes). Stock counts update hourly.'; var hp = host.querySelector('.x3-help'); if (hp) hp.textContent = 'Hover over the photo to find a part, click it for part numbers, price, what is on the shelf and where to order. Slide to blow the machine apart; click a cutting unit and choose Blow up this unit to pull just that one out.';
-var pk = host.querySelector('.x3-pick'); if (pk) { pk.value = D.id;
-if (!pk.__bound) { pk.__bound = true; pk.addEventListener('change', function () { var v = pk.value; if (!MODELS[v] || root.dataset.model === v || (!root.dataset.model && v === '3370')) return; root.dataset.model = v; if (root.__mx3d && root.__mx3d.destroy) root.__mx3d.destroy(); root.__mx3d = null; mount(root, opts); }); } } })();
-var api = { resize: function () {} }; root.__mx3d = api;
-var stage = root.querySelector('.x3-stage'), panel = root.querySelector('.x3-panel'), tip = root.querySelector('.x3-tip'), labels = root.querySelector('.x3-labels');
-var status = root.querySelector('.x3-status');
-status.hidden = false; status.textContent = 'Loading…'; panel.hidden = true; labels.replaceChildren();
-// ---- photo mode: a real photo cut into parts that lift and slide apart
-var PSRC = window.MX3D_PHOTO_SRC && window.MX3D_PHOTO_SRC[D.id];
-if (PSRC && !(window.MX3D_PHOTOS && window.MX3D_PHOTOS[D.id]) && !root['__ph' + D.id]) {
-root['__ph' + D.id] = true; status.hidden = false; status.textContent = 'Loading photo…'; buildList();
-fetch(PSRC).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) { (window.MX3D_PHOTOS = window.MX3D_PHOTOS || {})[D.id] = j; }).catch(function () {}).then(function () { if (root.__mx3d === api) { root.__mx3d = null; mount(root, opts); } });
-return api;
-}
-var PH = window.MX3D_PHOTOS && window.MX3D_PHOTOS[D.id];
-if (PH) { buildPhoto(PH); return api; }
-function buildPhoto(P) {
-status.hidden = true; buildList();
-var wrap = el('div', 'x3-photo'), base = el('div', 'x3-ph-base'), svgNS = 'http://www.w3.org/2000/svg';
-base.style.backgroundImage = 'url(' + P.img + ')'; wrap.appendChild(base);
-var svg = document.createElementNS(svgNS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + P.w + ' ' + P.h); svg.setAttribute('class', 'x3-ph-svg');
-var L = P.parts.map(function (p, i) {
-var d = el('div', 'x3-ph-layer'); d.style.backgroundImage = 'url(' + P.img + ')';
-d.style.clipPath = 'polygon(' + p.poly.map(function (q) { return (q[0] / P.w * 100).toFixed(2) + '% ' + (q[1] / P.h * 100).toFixed(2) + '%'; }).join(',') + ')';
-d.style.zIndex = 2 + i; wrap.appendChild(d);
-var pg = document.createElementNS(svgNS, 'polygon'); pg.setAttribute('points', p.poly.map(function (q) { return q.join(','); }).join(' ')); svg.appendChild(pg);
-var cx = 0, cy = 0; p.poly.forEach(function (q) { cx += q[0]; cy += q[1]; }); cx /= p.poly.length; cy /= p.poly.length;
-var lb = el('button', 'x3-lbl', p.label); lb.hidden = true; labels.appendChild(lb);
-var o = { p: p, d: d, pg: pg, lb: lb, cx: cx, cy: cy, key: p.pid + '|' + (p.sub || '') };
-function pick(e) { e.stopPropagation(); sel(o); }
-d.addEventListener('click', pick); lb.addEventListener('click', pick);
-d.addEventListener('pointerenter', function (e) { hov(o, e); }); d.addEventListener('pointermove', function (e) { hov(o, e); }); d.addEventListener('pointerleave', function () { hov(null); });
-return o;
-});
-wrap.appendChild(svg); stage.insertBefore(wrap, stage.firstChild);
-wrap.addEventListener('click', function () { sel(null); });
-var t = 0, goalT = 0, only = null, hovered = null, selected = null, raf = null;
-function hov(o, e) {
-hovered = o; L.forEach(function (x) { x.pg.classList.toggle('hov', !!o && x.p.pid === o.p.pid && (x.p.sub || '') === (o.p.sub || '')); });
-if (o) { var r = stage.getBoundingClientRect(); tip.hidden = false; tip.textContent = o.p.sub ? (SUB[o.p.sub] ? SUB[o.p.sub].name : o.p.label) + ', ' + COMP[o.p.pid].name.replace(/^Cutting unit /, 'unit ') : COMP[o.p.pid].name; tip.style.left = (e.clientX - r.left + 14) + 'px'; tip.style.top = (e.clientY - r.top + 12) + 'px'; } else tip.hidden = true;
-}
-function sel(o, pid) {
-selected = o ? o : null; var id = o ? o.p.pid : pid, sb = o ? (o.p.sub || null) : null;
-L.forEach(function (x) { x.pg.classList.toggle('sel', !!id && x.p.pid === id && (!sb || x.p.sub === sb) && (sb || !x.p.sub || true)); });
-if (!id) { panel.hidden = true; root.querySelectorAll('.x3-li').forEach(function (b) { b.classList.remove('on'); }); return; }
-showPanel(id, sb);
-}
-selectFn = function (pid, sub) { sel(null, pid); if (pid) showPanel(pid, sub || null); };
-var slider = root.querySelector('.x3-ex'), rb = root.querySelector('.x3-reset');
-function onSlide() { goalT = slider.value / 100; only = null; kick(); }
-if (slider) slider.addEventListener('input', onSlide);
-function onReset() { goalT = 0; only = null; if (slider) slider.value = 0; sel(null); kick(); }
-if (rb) rb.addEventListener('click', onReset);
-api.blowUnit = function (pid) { only = pid; goalT = 1; if (slider) slider.value = 100; kick(); };
-function frame() {
-t += (goalT - t) * 0.16; if (Math.abs(goalT - t) < 0.002) t = goalT;
-var e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, r = wrap.getBoundingClientRect(), sr = stage.getBoundingClientRect();
-wrap.style.transform = 'scale(' + (1 - 0.2 * (only ? 0 : e)).toFixed(3) + ')';
-base.style.opacity = (1 - 0.7 * e).toFixed(3); base.style.filter = 'grayscale(' + e.toFixed(2) + ') blur(' + (e * 1.5).toFixed(2) + 'px)';
-L.forEach(function (x) {
-var f = only ? (x.p.pid === only ? e : 0) : e;
-var dx = x.p.ex[0] / P.w * 100 * f * 1.15, dy = x.p.ex[1] / P.h * 100 * f * 1.15, s = 1 + 0.05 * f;
-var tr = 'translate(' + dx.toFixed(2) + '%,' + dy.toFixed(2) + '%) scale(' + s.toFixed(3) + ')';
-x.d.style.transform = tr; x.d.style.transformOrigin = (x.cx / P.w * 100) + '% ' + (x.cy / P.h * 100) + '%';
-x.d.style.filter = f > 0.02 ? 'drop-shadow(0 ' + (10 * f).toFixed(1) + 'px ' + (14 * f).toFixed(1) + 'px rgba(0,0,0,' + (0.35 * f).toFixed(2) + '))' : 'none';
-x.pg.setAttribute('transform', 'translate(' + (x.p.ex[0] * f * 1.15) + ',' + (x.p.ex[1] * f * 1.15) + ') translate(' + x.cx + ',' + x.cy + ') scale(' + s + ') translate(' + (-x.cx) + ',' + (-x.cy) + ')');
-var show = f > 0.35; x.lb.hidden = !show;
-if (show) { var px = r.left - sr.left + (x.cx + x.p.ex[0] * f * 1.15) / P.w * r.width, py = r.top - sr.top + (x.cy + x.p.ex[1] * f * 1.15) / P.h * r.height; x.lb.style.transform = 'translate(' + px.toFixed(0) + 'px,' + py.toFixed(0) + 'px) translate(-50%,-50%)'; x.lb.style.opacity = Math.min(1, (f - 0.35) * 3).toFixed(2); }
-});
-if (t !== goalT) raf = requestAnimationFrame(frame); else raf = null;
-}
-function kick() { if (!raf) raf = requestAnimationFrame(frame); }
-function fit() { var sz = Math.min(stage.clientWidth, stage.clientHeight) * 0.96; wrap.style.width = wrap.style.height = sz + 'px'; }
-api.resize = function () { fit(); kick(); }; fit(); window.addEventListener('resize', api.resize);
-api.destroy = function () { if (raf) cancelAnimationFrame(raf); window.removeEventListener('resize', api.resize); if (slider) slider.removeEventListener('input', onSlide); if (rb) rb.removeEventListener('click', onReset); wrap.remove(); labels.replaceChildren(); panel.hidden = true; tip.hidden = true; if (slider) slider.value = 0; };
-api.pause = function () {}; api.renderNow = function () { t = goalT; frame(); };
-api.select = function (pid, sub) { selectFn(pid, sub); }; api.explode = function (v) { goalT = v; if (slider) slider.value = v * 100; kick(); };
-var credit = el('div', 'x3-ph-credit', P.credit || ''); wrap.appendChild(credit);
-frame();
-}
-// no photo for this machine yet: keep the parts list and panels working
-status.hidden = false; status.textContent = 'Photo for this machine coming soon. The parts list on the right works now: click any component for part numbers, price and stock.';
-buildList();
-return api;
-var selectFn = null;
-function buildList() {
-var list = root.querySelector('.x3-list'); list.replaceChildren();
-var groups = {};
-Object.keys(COMP).forEach(function (k) { var c = COMP[k]; (groups[c.sys] = groups[c.sys] || []).push(k); });
-Object.keys(groups).forEach(function (sys) {
-var g = el('div', 'x3-lg'); g.appendChild(el('div', 'x3-lgh', sys));
-groups[sys].forEach(function (k) { var b = el('button', 'x3-li', COMP[k].name); b.dataset.pid = k; b.addEventListener('click', function () { if (selectFn) selectFn(k, null, true); else showPanel(k, null); }); g.appendChild(b); });
-list.appendChild(g);
-});
-}
-function showPanel(pid, sub) {
-var c = COMP[pid]; if (!c) { panel.hidden = true; return; }
-var s = sub ? SUB[sub] : null;
-panel.hidden = false; panel.replaceChildren();
-var head = el('div', 'x3-ph');
-var ht = el('div'); ht.appendChild(el('div', 'x3-psys', c.sys + (s ? ' · ' + c.name : '')));
-ht.appendChild(el('h3', 'x3-pt', s ? s.name : c.name)); head.appendChild(ht);
-var x = el('button', 'x3-x', '×'); x.setAttribute('aria-label', 'Close'); x.addEventListener('click', function () { if (selectFn) selectFn(null); else panel.hidden = true; }); head.appendChild(x);
-panel.appendChild(head);
-panel.appendChild(el('p', 'x3-pd', s ? s.desc : c.desc));
-var nos = s ? s.parts : c.parts;
-if (nos.length) {
-var tl = el('div', 'x3-plist');
-nos.forEach(function (no) {
-var p = partInfo(no); var row = el('details', 'x3-pr');
-var sm = el('summary');
-var l = el('div', 'x3-prl'); l.appendChild(el('div', 'x3-prn', p.name)); l.appendChild(el('code', 'x3-prno', no));
-sm.appendChild(l);
-var r = el('div', 'x3-prr');
-if (p.g !== undefined) { r.appendChild(el('div', 'x3-prp', p.g && p.g.price != null ? 'Genuine ' + money(p.g.price) : 'Genuine: quote')); if (p.amPrice != null) r.appendChild(el('div', 'x3-pro ok', 'Aftermarket from ' + money(p.amPrice))); } else r.appendChild(el('div', 'x3-prp', p.price != null ? money(p.price) + (p.kind === 'equivalent' ? ' equiv.' : '') : 'quote'));
-r.appendChild(el('div', 'x3-pro ' + (p.onHand > 0 ? 'ok' : ''), p.onHand > 0 ? p.onHand + ' on shelf' : 'none on shelf'));
-sm.appendChild(r); row.appendChild(sm);
-var body = el('div', 'x3-prb');
-var dl = el('dl');
-function add(k, v) { if (v == null || v === '') return; dl.appendChild(el('dt', null, k)); var dd = el('dd'); if (v.nodeType) dd.appendChild(v); else dd.textContent = v; dl.appendChild(dd); }
-if (p.g !== undefined) { add('Genuine', p.g ? (p.g.shown || money(p.g.price)) + (p.g.src ? ' (' + p.g.src + ')' : '') + (p.g.supplier ? ', ' + p.g.supplier : '') : 'No public price. Ask the dealer for a quote.'); add('Aftermarket', p.am && p.am.length ? amList(p.am) : 'None found yet.'); } else add('Price', p.price != null ? money(p.price) + ' ex GST' + (p.kind === 'equivalent' ? ' (aftermarket equivalent' + (p.equiv ? ': ' + p.equiv.replace(/\s*\$[\d.,]+$/, '') : '') + ')' : (p.kind === 'genuine' ? ' (genuine, club cost / AU retail)' : '')) : 'No public price. Ask the Toro dealer for a quote.');
-add('On the shelf', String(p.onHand || 0) + (STOCK_EXTRA[no] && !p.live ? ' (workshop stock)' : ''));
-add('Service', p.every);
-add('Where to order', p.supplier);
-add('Also', p.alt);
-add('Note', p.note);
-body.appendChild(dl);
-var acts = el('div', 'x3-acts');
-if (p.url) { var a = el('a', 'x3-btn pri', /amacron/.test(p.url) ? 'Order from Amacron' : (/tines/.test(p.url) ? 'Order from Turftines' : (/ebay/.test(p.url) ? 'View on eBay' : 'Order online'))); a.href = p.url; a.target = '_blank'; a.rel = 'noopener'; acts.appendChild(a); }
-var tl2 = el('a', 'x3-btn', CUR.lookupLabel || 'Toro parts lookup'); tl2.href = LOOKUP; tl2.target = '_blank'; tl2.rel = 'noopener'; acts.appendChild(tl2);
-var cp = el('button', 'x3-btn', 'Copy part no.'); cp.addEventListener('click', function () { try { navigator.clipboard.writeText(no); cp.textContent = 'Copied'; setTimeout(function () { cp.textContent = 'Copy part no.'; }, 1200); } catch (e) {} }); acts.appendChild(cp);
-body.appendChild(acts); row.appendChild(body); tl.appendChild(row);
-});
-panel.appendChild(tl);
-} else panel.appendChild(el('p', 'x3-pn', 'No service or wear parts listed for this component. Use the parts book for structural parts.'));
-var foot = el('div', 'x3-pf');
-var cl = el('a', null, CUR.catLabel || 'Parts book (PDF)'); cl.href = c.cat || CAT_PC1; cl.target = '_blank'; cl.rel = 'noopener'; foot.appendChild(cl);
-foot.appendChild(document.createTextNode(' · '));
-var om = el('a', null, "Operator's manual"); om.href = CAT_OM; om.target = '_blank'; om.rel = 'noopener'; foot.appendChild(om);
-if (/^cu/.test(pid) && !sub) { foot.appendChild(document.createTextNode(' · ')); var bx = el('button', 'x3-link', 'Blow up this unit'); bx.addEventListener('click', function () { if (api.blowUnit) api.blowUnit(pid); }); foot.appendChild(bx); }
-panel.appendChild(foot);
-root.querySelectorAll('.x3-li').forEach(function (b) { b.classList.toggle('on', b.dataset.pid === pid); });
-}
-api.showPanel = showPanel;
-return api;
-}
-window.MX3D = { mount: mount, MODELS: MODELS };
-})();
+var STL = { overdue: 'Overdue', due: 'Due', soon: 'Due soon', ok: 'Up to date', fault: 'Open fault' };
+function pill(st, label) { var p = el('span', 'mx-pill ' + st); p.appendChild(el('i')); p.appendChild(document.createTextNode(label || STL[st] || st)); return p; }
+function H() { return window.MXH || null; }
+function link(url, text, cls) { var a = el('a', cls || null, text); a.href = url; a.target = '_blank'; a.rel = 'noopener'; return a; }
+function copy(text, btn, done) { try { navigator.clipboard.writeText(text).then(function () { var o = btn.textContent; btn.textContent = done || 'Copied'; setTimeout(function () { btn.textContent = o; }, 1300); }); } catch (e) {} }
 
+// ------------------------------------------------------------------ state
+var root, sec, head, stage, panel, tip, labels, over, statusEl, listEl, slider, legend;
+var CUR = null, P = null, M = null, COMP = {}, SUB = {};
+var S = { id: null, unit: null, pid: null, sub: null, no: null, t: 0, goal: 0, only: null, zoom: 1, px: 0, py: 0, svc: false, lab: true, xl: false };
+var L = [], scene = null, pan = null, base = null, SZ = 400, raf = null, inited = false, pending = null, peeked = false;
+var tiltX = 0, tiltY = 0, goalTX = 0, goalTY = 0, hovO = null, tour = null, dragged = false, SIDX = null, loadTok = 0, loading = false;
+
+// ------------------------------------------------------------------ sub-parts (reel, bedknife, pump head ...): which component each belongs to
+var SOWN = {};
+function wtoks(t) { return String(t || '').toLowerCase().replace(/\([^)]*\)/g, ' ').split(/[^a-z0-9]+/).filter(function (w) { return w.length >= 4 && ['with', 'assembly', 'unit', 'front', 'rear', 'left', 'right', 'system', 'filter', 'valve', 'control'].indexOf(w) < 0; }).map(function (w) { return w.replace(/s$/, ''); }); }
+function subOwners(k) {
+  if (SOWN[k]) return SOWN[k];
+  var a = []; L.forEach(function (o) { if (o.p.sub === k && a.indexOf(o.p.pid) < 0) a.push(o.p.pid); });
+  if (!a.length) a = Object.keys(COMP).filter(function (p) { return /^(cu|deck|head)/i.test(p); });
+  if (!a.length) { var sp = (SUB[k].parts || []).map(norm); a = Object.keys(COMP).filter(function (p) { return (COMP[p].parts || []).some(function (n) { return sp.indexOf(norm(n)) >= 0; }); }); }
+  if (!a.length) { var st = wtoks(SUB[k].name); a = Object.keys(COMP).filter(function (p) { var ct = wtoks(COMP[p].name); return st.some(function (w) { return ct.indexOf(w) >= 0; }); }); }
+  SOWN[k] = a; return a;
+}
+function subsOf(pid) { return Object.keys(SUB).filter(function (k) { return subOwners(k).indexOf(pid) >= 0; }); }
+
+// ------------------------------------------------------------------ live lookups
+function X() { return DB.x[S.id] || null; }
+function unitsOf(id) {
+  var x = DB.x[id], names = x && x.units && x.units.length ? x.units : null;
+  if (!names) { var slug = MODELS[id].slug; names = Object.keys(DB.fleet).filter(function (f) { return DB.fleet[f].slug === slug && DB.fleet[f].status !== 'Gone'; }); if (REG.filter(function (m) { return m.slug === slug; }).length > 1) names = []; }
+  return names.map(function (n) { return DB.fleet[n]; }).filter(Boolean);
+}
+function live(pid) { var x = X(), lv = x && x.live && S.unit ? x.live[S.unit] : null; return (lv && lv[pid]) || null; }
+function itemsOf(pid) { var lv = live(pid); return lv ? (lv.it || []).map(function (i) { return DB.itemById[i]; }).filter(Boolean) : []; }
+function faultsOf(pid) { var lv = live(pid); return lv ? (lv.ft || []).map(function (i) { return DB.faultById[i]; }).filter(Boolean) : []; }
+var RANK = { overdue: 3, due: 2, soon: 1, ok: 0 };
+function stat(pid) {
+  if (faultsOf(pid).length) return 'fault';
+  var best = -1, bs = ''; itemsOf(pid).forEach(function (it) { var r = RANK[it.status]; if (r != null && r > best) { best = r; bs = it.status; } }); return bs;
+}
+function partInfo(no) {
+  var live = (DB.cat[CUR.slug] || {})[norm(no)];
+  if (live) return { no: no, name: live.name, price: live.price, kind: live.price_kind, onHand: live.on_hand, supplier: live.supplier, url: live.equiv_url || live.link,
+    every: (Array.isArray(live.intervals) ? live.intervals : []).map(function (h) { return h + ' h'; }).join(', '), note: live.note, alt: live.alt, equiv: live.equiv, live: true,
+    g: live.genuine && typeof live.genuine === 'object' ? live.genuine : null, am: Array.isArray(live.aftermarket) ? live.aftermarket : [], amPrice: live.am_price, verified: live.verified };
+  var s = (M.SNAP || {})[no];
+  if (s) return { no: no, name: s[0], price: s[1], kind: s[2], onHand: s[3], supplier: s[4], url: s[5], every: s[6] };
+  var x = (M.EXTRA || {})[no] || { name: no, note: '' }, st = (M.STOCK || {})[no];
+  return { no: no, name: x.name, price: st ? st[0] : null, kind: st ? 'genuine' : null, onHand: st ? st[1] : 0, supplier: null, url: null, every: '', note: x.note };
+}
+function dueText(it) {
+  var a = [];
+  if (it.to_go_h != null && it.to_go_h !== '') a.push(it.to_go_h < 0 ? num(-it.to_go_h) + ' h overdue' : num(it.to_go_h) + ' h to go');
+  if (it.due_date) a.push((it.status === 'overdue' ? 'was due ' : 'due ') + fmtD(it.due_date));
+  if (it.basis) a.push(it.basis);
+  if (it.labour_h) a.push('about ' + num(it.labour_h) + ' h labour');
+  if (it.kit_aud) a.push('parts ' + money(it.kit_aud));
+  return a.join(' · ');
+}
+
+// ------------------------------------------------------------------ init
+function init() {
+  sec = document.getElementById('explore'); root = document.getElementById('x3'); if (!sec || !root) return false;
+  head = sec.querySelector('.x3-head'); stage = root.querySelector('.x3-stage'); panel = root.querySelector('.x3-panel'); tip = root.querySelector('.x3-tip');
+  labels = root.querySelector('.x3-labels'); over = root.querySelector('.x3-over'); statusEl = root.querySelector('.x3-status'); listEl = root.querySelector('.x3-list');
+  slider = root.querySelector('.x3-ex'); legend = root.querySelector('.x3-legend');
+  // machine picker, grouped
+  var pk = head.querySelector('.x3-pick'), og = null, g = null;
+  REG.forEach(function (m) { if (m.g !== g) { g = m.g; og = document.createElement('optgroup'); og.label = g; pk.appendChild(og); } var o = new Option(m.pick || m.title, m.id); og.appendChild(o); });
+  pk.addEventListener('change', function () { stopTour(); open(pk.value); });
+  slider.addEventListener('input', function () { stopTour(); S.goal = slider.value / 100; S.only = null; syncPlay(); kick(); });
+  root.querySelector('.x3-play').addEventListener('click', function () { stopTour(); S.only = null; S.goal = S.goal > 0.5 ? 0 : 1; slider.value = S.goal * 100; syncPlay(); kick(); });
+  root.querySelector('.x3-reset').addEventListener('click', function () { stopTour(); S.goal = 0; S.only = null; slider.value = 0; zoomFit(); select(null); syncPlay(); kick(); });
+  tg('.x3-tlab', function (on) { S.lab = on; kick(); });
+  tg('.x3-tsvc', function (on) { S.svc = on; paintStatus(); });
+  root.querySelector('.x3-tour').addEventListener('click', function () { if (tour) stopTour(); else startTour(); });
+  root.querySelector('.x3-zin').addEventListener('click', function () { zoomTo(S.zoom * 1.5, 0, 0); });
+  root.querySelector('.x3-zout').addEventListener('click', function () { zoomTo(S.zoom / 1.5, 0, 0); });
+  root.querySelector('.x3-zfit').addEventListener('click', zoomFit);
+  root.querySelector('.x3-full').addEventListener('click', function () { setXL(!S.xl); });
+  root.querySelector('.x3-lq').addEventListener('input', function (e) { filterList(e.target.value); });
+  bindStage(); bindSearch();
+  window.addEventListener('resize', onResize);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && S.xl) setXL(false); });
+  inited = true; return true;
+}
+function tg(sel, fn) { var b = root.querySelector(sel); b.addEventListener('click', function () { var on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on ? 'true' : 'false'); fn(on); }); }
+function syncPlay() { var b = root.querySelector('.x3-play'); if (b) b.textContent = S.goal > 0.5 ? 'Put back together' : 'Blow apart'; }
+function onResize() { if (!inited || !scene) return; fit(); measure(); kick(); stickyTop(); }
+function stickyTop() {
+  var nav = document.querySelector('.mx-tabs'), top = 12, e = nav, i = 0;
+  while (e && i++ < 3) { var cs = getComputedStyle(e); if (cs.position === 'sticky' || cs.position === 'fixed') { top = Math.max(top, e.getBoundingClientRect().height + (parseFloat(cs.top) || 0) + 12); break; } e = e.parentElement; }
+  root.style.setProperty('--x3-top', top + 'px');
+}
+
+// ------------------------------------------------------------------ open / load a machine
+function open(id, sel) {
+  if (!MODELS[id]) return;
+  if (!inited && !init()) return;
+  pending = sel || null;
+  if (S.id === id && M && scene) { applyPending(); return; }
+  if (S.id === id && loading) return;
+  S.id = id; CUR = MODELS[id]; var tok = ++loadTok;
+  head.querySelector('.x3-pick').value = id; head.querySelector('.x3-title').textContent = CUR.title; head.querySelector('.x3-sub').textContent = CUR.sub || '';
+  teardown(); statusEl.hidden = false; statusEl.textContent = 'Loading ' + CUR.title + '…';
+  var cache = (window.MX3D_PHOTOS = window.MX3D_PHOTOS || {});
+  if (cache[id]) { build(cache[id]); return; }
+  var src = window.MX3D_PHOTO_SRC && window.MX3D_PHOTO_SRC[id];
+  if (!src) { statusEl.textContent = 'No photo for this machine yet.'; return; }
+  loading = true;
+  fetch(src).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) { cache[id] = j; if (tok === loadTok) build(j); })
+    .catch(function () { if (tok !== loadTok) return; loading = false; statusEl.replaceChildren(el('div', null, 'Could not load this machine. Check the connection, then '));
+      var b = el('button', 'x3-link', 'try again'); b.addEventListener('click', function () { S.id = null; open(id, pending); }); statusEl.firstChild.appendChild(b); });
+}
+function openFor(q) {   // {slug, fleet, part_no, item}: from the worklist, fleet sheet, service plan or parts catalogue
+  q = q || {}; var c = REG.filter(function (m) { return m.slug === q.slug; }); if (!c.length) return false;
+  if (!inited && !init()) return false;
+  loadDB();
+  var m = c[0];
+  if (q.fleet && c.length > 1) { var hit = c.filter(function (k) { var x = DB.x[k.id]; return x && (x.units || []).indexOf(q.fleet) >= 0; })[0]; if (hit) m = hit; }
+  var sel = { unit: q.fleet || null, no: q.part_no || null, item: q.item || null };
+  var h = H(); if (h && h.show) h.show('explore');
+  open(m.id, sel); return true;
+}
+function has(slug) { return REG.some(function (m) { return m.slug === slug; }); }
+function teardown() {
+  if (raf) { cancelAnimationFrame(raf); raf = null; }
+  stopTour(); if (pan) pan.remove(); pan = scene = base = null; L = []; hovO = null;
+  labels.replaceChildren(); over.replaceChildren(); tip.hidden = true; panel.replaceChildren(); listEl.replaceChildren();
+  S.pid = S.sub = S.no = null; S.t = S.goal = 0; S.only = null; S.zoom = 1; S.px = S.py = 0; slider.value = 0; stage.classList.remove('zoomed'); syncPlay();
+}
+
+// ------------------------------------------------------------------ build the scene
+function build(j) {
+  P = j; M = j.model || {}; COMP = M.COMP || {}; SUB = M.SUB || {}; SOWN = {};
+  statusEl.hidden = true; loading = false; loadDB(); lastSig = sig();
+  pan = el('div', 'x3-pan'); var persp = el('div', 'x3-persp'); scene = el('div', 'x3-scene'); base = el('div', 'x3-ph-base');
+  base.style.backgroundImage = 'url(' + P.img + ')'; scene.appendChild(base);
+  var N = P.parts.length, cxm = P.w / 2, cym = P.h / 2;
+  L = P.parts.map(function (p, i) {
+    var cx = 0, cy = 0; p.poly.forEach(function (q) { cx += q[0]; cy += q[1]; }); cx /= p.poly.length; cy /= p.poly.length;
+    var d = el('div', 'x3-ph-layer'), im = el('div', 'x3-ph-img'), ol = sv('svg', 'x3-ph-ol'), pg = sv('polygon');
+    im.style.backgroundImage = 'url(' + P.img + ')';
+    im.style.clipPath = im.style.webkitClipPath = 'polygon(' + p.poly.map(function (q) { return (q[0] / P.w * 100).toFixed(2) + '% ' + (q[1] / P.h * 100).toFixed(2) + '%'; }).join(',') + ')';
+    ol.setAttribute('viewBox', '0 0 ' + P.w + ' ' + P.h); ol.setAttribute('preserveAspectRatio', 'none'); pg.setAttribute('points', p.poly.map(function (q) { return q.join(','); }).join(' ')); ol.appendChild(pg);
+    d.style.transformOrigin = (cx / P.w * 100) + '% ' + (cy / P.h * 100) + '%'; d.appendChild(im); d.appendChild(ol); scene.appendChild(d);
+    var a = el('i', 'x3-a'), h = el('i', 'x3-a'); a.style.left = h.style.left = (cx / P.w * 100) + '%'; a.style.top = h.style.top = (cy / P.h * 100) + '%'; scene.appendChild(h); scene.appendChild(a);
+    var ang = Math.atan2(cx - cxm, -(cy - cym)); if (ang < 0) ang += Math.PI * 2;
+    var o = { p: p, i: i, d: d, im: im, a: a, h: h, cx: cx, cy: cy, ang: ang, dist: Math.hypot(cx - cxm, cy - cym), z0: i * 0.05, depth: 14 + 120 * (N > 1 ? i / (N - 1) : 0), f: 0, hv: 0, pl: 0, lw: 0, name: p.sub && SUB[p.sub] ? SUB[p.sub].name : (COMP[p.pid] || {}).name || p.label };
+    im.addEventListener('click', function (e) { e.stopPropagation(); if (dragged) return; stopTour(); select(o.p.pid, o.p.sub || null); });
+    im.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'touch') hover(o, e); }); im.addEventListener('pointermove', function (e) { if (e.pointerType !== 'touch') hover(o, e); });
+    im.addEventListener('pointerleave', function () { hover(null); });
+    return o;
+  });
+  // callout numbers run clockwise from the top, like a parts-book drawing
+  L.slice().sort(function (a, b) { return a.ang - b.ang; }).forEach(function (o, k) { o.n = k + 1; });
+  // outer parts leave first
+  var maxd = Math.max.apply(null, L.map(function (o) { return o.dist; }).concat([1]));
+  L.forEach(function (o) { o.delay = 1 - o.dist / maxd; });
+  L.forEach(function (o) {
+    o.gl = sv('line', 'g'); over.appendChild(o.gl);
+    o.ll = sv('polyline', 'l'); over.appendChild(o.ll);
+    o.nb = el('button', 'x3-num', String(o.n)); o.nb.type = 'button'; o.nb.setAttribute('aria-label', o.name); labels.appendChild(o.nb);
+    o.lb = el('button', 'x3-lbl'); o.lb.type = 'button'; o.lb.appendChild(el('span', 'x3-nb', String(o.n))); o.lb.appendChild(el('span', null, o.p.label || o.name)); labels.appendChild(o.lb);
+    [o.nb, o.lb].forEach(function (b) { b.style.opacity = 0; b.style.pointerEvents = 'none';
+      b.addEventListener('click', function (e) { e.stopPropagation(); stopTour(); select(o.p.pid, o.p.sub || null); });
+      b.addEventListener('pointerenter', function (e) { hover(o, e, true); }); b.addEventListener('pointerleave', function () { hover(null); }); });
+  });
+  var credit = el('div', 'x3-ph-credit', P.credit || ''); scene.appendChild(credit);
+  persp.appendChild(scene); pan.appendChild(persp); stage.insertBefore(pan, stage.firstChild);
+  root.querySelector('.x3-note').textContent = (M.note ? M.note + ' ' : '') + 'Prices are ex GST. Genuine: latest invoice, club stock cost or AU retail. Aftermarket: every credible equivalent found, cheapest first. What is due, faults, hours and shelf stock refresh every hour.';
+  fit(); stickyTop(); pickUnit(); drawHead(); buildList(); paintStatus(); measure();
+  if (pending) applyPending(); else drawPanel();
+  frame();
+  if (!peeked && !RM && !pending) { peeked = true; setTimeout(function () { if (S.goal !== 0 || S.pid || sec.hidden) return; S.goal = 0.62; kick(); setTimeout(function () { if (S.goal === 0.62 && +slider.value === 0) { S.goal = 0; kick(); } }, 1700); }, 650); }
+}
+function applyPending() {
+  var q = pending; pending = null; if (!q) { drawPanel(); return; }
+  if (q.unit && DB.fleet[q.unit] && unitsOf(S.id).some(function (u) { return u.fleet === q.unit; })) { S.unit = q.unit; drawHead(); buildList(); paintStatus(); }
+  var pid = q.pid || null, sub = q.sub || null, no = q.no || null;
+  if (!pid && q.item && !S.svc) { var sb = root.querySelector('.x3-tsvc'); sb.setAttribute('aria-pressed', 'true'); S.svc = true; paintStatus(); }
+  if (!pid && no) { var n = norm(no);
+    Object.keys(COMP).some(function (k) { if ((COMP[k].parts || []).some(function (x) { return norm(x) === n; })) { pid = k; return true; } return false; });
+    if (!pid) Object.keys(SUB).some(function (k) { if ((SUB[k].parts || []).some(function (x) { return norm(x) === n; })) { var ow = subOwners(k)[0]; if (ow) { pid = ow; sub = k; } return !!ow; } return false; }); }
+  if (pid && COMP[pid]) select(pid, sub, no); else { select(null); if (no) { S.no = no; drawPanel(); } }
+}
+function fit() { var sw = stage.clientWidth, sh = stage.clientHeight; SZ = Math.max(120, Math.min(sw, sh) * 0.94); scene.style.width = scene.style.height = SZ + 'px'; scene.style.left = scene.style.top = (-SZ / 2) + 'px'; clampPan(); }
+function measure() { L.forEach(function (o) { o.lw = o.lb.offsetWidth; }); }
+
+// ------------------------------------------------------------------ animation frame
+function kick() { if (!raf && scene) raf = requestAnimationFrame(frame); }
+function prog(o) {
+  if (S.only) return o.p.pid === S.only ? easeIO(S.t) : 0;
+  var D = 0.34, x = clamp((S.t - o.delay * D) / (1 - D), 0, 1); return easeO(x);
+}
+function frame() {
+  raf = null; if (!scene) return;
+  var moving = false;
+  if (S.t !== S.goal) { S.t += (S.goal - S.t) * (RM ? 1 : 0.11); if (Math.abs(S.goal - S.t) < 0.002) S.t = S.goal; else moving = true; }
+  var gx = RM ? 0 : goalTX, gy = RM ? 0 : goalTY;
+  if (tiltX !== gx || tiltY !== gy) { tiltX += (gx - tiltX) * 0.1; tiltY += (gy - tiltY) * 0.1; if (Math.abs(gx - tiltX) < 0.004 && Math.abs(gy - tiltY) < 0.004) { tiltX = gx; tiltY = gy; } else moving = true; }
+  var Eall = easeIO(S.t), E = S.only ? 0 : Eall, k = 1 - 0.17 * E, amp = 1.5 + 7.5 * Eall;
+  scene.style.transform = 'rotateX(' + (-tiltY * amp).toFixed(3) + 'deg) rotateY(' + (tiltX * amp).toFixed(3) + 'deg) scale(' + k.toFixed(4) + ')';
+  pan.style.transform = 'translate(' + S.px.toFixed(1) + 'px,' + S.py.toFixed(1) + 'px) scale(' + S.zoom.toFixed(4) + ')';
+  base.style.opacity = (1 - 0.74 * Eall).toFixed(3); base.style.filter = Eall > 0.01 ? 'grayscale(' + Eall.toFixed(2) + ') blur(' + (Eall * 1.4).toFixed(2) + 'px)' : 'none';
+  var assembled = S.t < 0.3;
+  L.forEach(function (o) {
+    var seld = S.pid && o.p.pid === S.pid && (!S.sub || o.p.sub === S.sub);
+    var hvT = hovO && hovO.p.pid === o.p.pid && (hovO.p.sub || '') === (o.p.sub || '') ? 1 : 0, plT = seld && assembled ? 1 : 0;
+    if (o.hv !== hvT) { o.hv += (hvT - o.hv) * (RM ? 1 : 0.22); if (Math.abs(hvT - o.hv) < 0.01) o.hv = hvT; else moving = true; }
+    if (o.pl !== plT) { o.pl += (plT - o.pl) * (RM ? 1 : 0.14); if (Math.abs(plT - o.pl) < 0.005) o.pl = plT; else moving = true; }
+    var f = prog(o), ff = Math.max(f, o.pl * 0.42);
+    var dx = o.p.ex[0] * 1.15 * ff, dy = o.p.ex[1] * 1.15 * ff, z = o.z0 + o.depth * ff + 22 * o.hv, s = 1 + 0.05 * ff + 0.025 * o.hv;
+    o.d.style.transform = 'translate3d(' + (dx / P.w * 100).toFixed(3) + '%,' + (dy / P.h * 100).toFixed(3) + '%,' + z.toFixed(2) + 'px) scale(' + s.toFixed(4) + ')';
+    var sh = Math.max(ff, o.hv * 0.6);
+    o.d.style.filter = sh > 0.03 ? 'drop-shadow(0 ' + (9 * sh).toFixed(1) + 'px ' + (13 * sh).toFixed(1) + 'px rgba(10,25,35,' + (0.34 * sh).toFixed(2) + '))' : 'none';
+    o.a.style.transform = 'translate3d(' + (dx / P.w * SZ).toFixed(2) + 'px,' + (dy / P.h * SZ).toFixed(2) + 'px,' + z.toFixed(2) + 'px)';
+    o.f = ff; o.fx = f;
+  });
+  var sr = stage.getBoundingClientRect();
+  L.forEach(function (o) { var r = o.a.getBoundingClientRect(), h = o.h.getBoundingClientRect(); o.ax = r.left - sr.left; o.ay = r.top - sr.top; o.hx = h.left - sr.left; o.hy = h.top - sr.top; });
+  place(sr.width, sr.height, k);
+  if (moving) raf = requestAnimationFrame(frame);
+}
+function spread(arr, gap, lo, hi) {
+  arr.sort(function (a, b) { return a.ay - b.ay; });
+  arr.forEach(function (o, i) { o.ly = Math.max(clamp(o.ay, lo, hi), i ? arr[i - 1].ly + gap : lo); });
+  for (var i = arr.length - 1; i >= 0; i--) { var cap = i === arr.length - 1 ? hi : arr[i + 1].ly - gap; if (arr[i].ly > cap) arr[i].ly = cap; }
+}
+function place(sw, sh, k) {
+  var room = (sw - SZ * k * S.zoom) / 2, call = S.lab && S.zoom <= 1.01 && room >= 104;
+  var maxw = Math.min(240, room + SZ * k * 0.12 - 18);
+  var shown = [];
+  L.forEach(function (o) {
+    var seld = S.pid && o.p.pid === S.pid && (!S.sub || o.p.sub === S.sub);
+    var v = S.lab ? clamp((o.f - 0.3) * 3.2, 0, 1) : 0; if (seld && S.lab) v = Math.max(v, clamp(o.pl * 2, 0, 1), o.f > 0.3 ? 1 : 0);
+    o.v = v; if (v > 0.01) shown.push(o);
+    var gf = clamp(o.f * 1.4, 0, 1);
+    if (gf > 0.02 && Math.hypot(o.ax - o.hx, o.ay - o.hy) > 6) { o.gl.setAttribute('x1', o.hx.toFixed(1)); o.gl.setAttribute('y1', o.hy.toFixed(1)); o.gl.setAttribute('x2', o.ax.toFixed(1)); o.gl.setAttribute('y2', o.ay.toFixed(1)); o.gl.style.opacity = (gf * 0.9).toFixed(2); }
+    else o.gl.style.opacity = 0;
+  });
+  // number balloons sit on the parts; nudge apart when they collide
+  shown.forEach(function (o) { o.bx = o.ax; o.by = o.ay; });
+  for (var it = 0; it < 3; it++) for (var i = 0; i < shown.length; i++) for (var j = i + 1; j < shown.length; j++) {
+    var a = shown[i], b = shown[j], dx = b.bx - a.bx, dy = b.by - a.by, d = Math.hypot(dx, dy);
+    if (d < 23) { if (d < 0.5) { dx = 1; dy = 0; d = 1; } var push = (23 - d) / 2; a.bx -= dx / d * push; a.by -= dy / d * push; b.bx += dx / d * push; b.by += dy / d * push; }
+  }
+  if (call) {
+    var left = shown.filter(function (o) { return o.ax < sw / 2; }), right = shown.filter(function (o) { return o.ax >= sw / 2; });
+    spread(left, 27, legend.hidden ? 16 : 46, sh - 16); spread(right, 27, 16, sh - 16);
+    left.forEach(function (o) { o.lx = 8; o.ex = 8 + Math.min(o.lw, maxw); }); right.forEach(function (o) { var pad = o.ly < 170 ? 52 : 8; o.lx = sw - pad - Math.min(o.lw, maxw); o.ex = o.lx; });
+  }
+  L.forEach(function (o) {
+    var on = S.pid && o.p.pid === S.pid && (!S.sub || o.p.sub === S.sub), hv = hovO === o;
+    if (o.v > 0.01) {
+      o.nb.style.opacity = o.v.toFixed(2); o.nb.style.pointerEvents = 'auto'; o.nb.style.transform = 'translate(' + (o.bx - 10.5).toFixed(1) + 'px,' + (o.by - 10.5).toFixed(1) + 'px)' + (on ? ' scale(1.25)' : '');
+      o.nb.classList.toggle('on', !!on);
+    } else { o.nb.style.opacity = 0; o.nb.style.pointerEvents = 'none'; }
+    if (o.v > 0.01 && call) {
+      o.lb.style.maxWidth = maxw + 'px'; o.lb.style.opacity = o.v.toFixed(2); o.lb.style.pointerEvents = 'auto';
+      o.lb.style.transform = 'translate(' + o.lx.toFixed(1) + 'px,' + (o.ly - 12).toFixed(1) + 'px)'; o.lb.classList.toggle('on', !!on || hv);
+      var el2 = o.ex + (o.ax < sw / 2 ? 10 : -10);
+      o.ll.setAttribute('points', o.ex.toFixed(1) + ',' + o.ly.toFixed(1) + ' ' + el2.toFixed(1) + ',' + o.ly.toFixed(1) + ' ' + o.bx.toFixed(1) + ',' + o.by.toFixed(1));
+      o.ll.style.opacity = (o.v * 0.9).toFixed(2); o.ll.setAttribute('class', on || hv ? 'l on' : 'l');
+    } else { o.lb.style.opacity = 0; o.lb.style.pointerEvents = 'none'; o.ll.style.opacity = 0; }
+  });
+}
+
+// ------------------------------------------------------------------ hover, select, status paint
+function partsLine(pid, sub) {
+  var nos = (sub && SUB[sub] ? SUB[sub].parts : (COMP[pid] || {}).parts) || [], on = 0; nos.forEach(function (n) { if ((partInfo(n).onHand || 0) > 0) on++; });
+  return nos.length ? nos.length + (nos.length === 1 ? ' part number' : ' part numbers') + (on ? ' · ' + on + ' on the shelf' : '') : '';
+}
+function hover(o, e, noTip) {
+  var ch = hovO !== o; hovO = o;
+  if (ch) { L.forEach(function (x) { x.d.classList.toggle('hov', !!o && x.p.pid === o.p.pid && (x.p.sub || '') === (o.p.sub || '')); }); kick(); }
+  if (o && e && !noTip) {
+    var r = stage.getBoundingClientRect();
+    if (ch || tip.hidden) { tip.replaceChildren(); tip.appendChild(el('b', null, o.n + '  ' + o.name));
+      var st = stat(o.p.pid), a = []; if (st === 'fault') a.push('Open fault on this machine'); else if (st && st !== 'ok') { var its = itemsOf(o.p.pid).filter(function (i) { return i.status === st; }); a.push(STL[st] + ': ' + (its[0] ? its[0].label : '') + (its.length > 1 ? ' +' + (its.length - 1) : '')); }
+      var pl = partsLine(o.p.pid, o.p.sub); if (pl) a.push(pl); if (a.length) tip.appendChild(el('span', null, a.join(' · '))); }
+    tip.hidden = false; var x = e.clientX - r.left + 14, y = e.clientY - r.top + 14; tip.style.left = clamp(x, 4, r.width - tip.offsetWidth - 4) + 'px'; tip.style.top = clamp(y, 4, r.height - tip.offsetHeight - 4) + 'px';
+  } else tip.hidden = true;
+}
+function select(pid, sub, no) {
+  if (pid && !COMP[pid]) pid = null;
+  S.pid = pid || null; S.sub = pid ? (sub || null) : null; S.no = no || null;
+  if (S.only && S.only !== pid) { S.only = null; }
+  var any = false;
+  L.forEach(function (o) { var on = !!pid && o.p.pid === pid && (!S.sub || o.p.sub === S.sub); o.d.classList.toggle('sel', on); if (on) any = true; });
+  if (scene) scene.classList.toggle('has-sel', any);
+  drawPanel(); markList(); kick();
+  if (pid && window.innerWidth <= 1024 && !tour) { var r = panel.getBoundingClientRect(); if (r.top > window.innerHeight * 0.82 || r.top < 0) panel.scrollIntoView({ block: 'nearest', behavior: RM ? 'auto' : 'smooth' }); }
+}
+function paintStatus() {
+  if (!scene) return;
+  scene.classList.toggle('svc', S.svc);
+  L.forEach(function (o) { var st = stat(o.p.pid); ['overdue', 'due', 'soon', 'ok', 'fault'].forEach(function (c) { o.d.classList.toggle(c, st === c); o.nb.classList.toggle(c, st === c); }); var nb = o.lb.firstChild; nb.className = 'x3-nb' + (st && st !== 'ok' && st !== 'soon' ? ' ' + st : ''); });
+  legend.hidden = !S.svc; legend.replaceChildren();
+  if (S.svc) {
+    if (!S.unit) legend.appendChild(el('span', null, 'No fleet machine is linked to this model, so there is no service status to show.'));
+    else [['overdue', 'Overdue or open fault'], ['due', 'Due'], ['soon', 'Due soon'], ['ok', 'Up to date']].forEach(function (x) { var s = el('span'); s.appendChild(el('i', 'x3-dot ' + x[0])); s.appendChild(document.createTextNode(x[1])); legend.appendChild(s); });
+  }
+}
+
+// ------------------------------------------------------------------ zoom, pan, tilt, full screen
+function clampPan() { var sw = stage.clientWidth, sh = stage.clientHeight, mx = Math.max(0, (SZ * S.zoom - sw) / 2 + sw * 0.25 * (S.zoom > 1 ? 1 : 0)), my = Math.max(0, (SZ * S.zoom - sh) / 2 + sh * 0.25 * (S.zoom > 1 ? 1 : 0)); S.px = clamp(S.px, -mx, mx); S.py = clamp(S.py, -my, my); }
+function zoomTo(z, cx, cy) { z = clamp(z, 1, 4.5); if (z < 1.04) z = 1; var r = z / S.zoom; S.px = cx - (cx - S.px) * r; S.py = cy - (cy - S.py) * r; S.zoom = z; if (z === 1) { S.px = S.py = 0; } clampPan(); stage.classList.toggle('zoomed', z > 1); kick(); }
+function zoomFit() { S.zoom = 1; S.px = S.py = 0; stage.classList.remove('zoomed'); kick(); }
+function setXL(on) { S.xl = on; root.classList.toggle('xl', on); try { document.documentElement.style.overflow = on ? 'hidden' : ''; } catch (e) {} setTimeout(onResize, 30); }
+function bindStage() {
+  var pts = {}, start = null, pinch = null;
+  stage.addEventListener('click', function (e) { if (dragged || (e.target.closest && e.target.closest('.x3-zoom,.x3-legend'))) return; stopTour(); if (S.pid) select(null); });
+  stage.addEventListener('dblclick', function (e) { var r = stage.getBoundingClientRect(), cx = e.clientX - r.left - r.width / 2, cy = e.clientY - r.top - r.height / 2; if (S.zoom < 1.6) zoomTo(2.3, cx, cy); else zoomFit(); });
+  stage.addEventListener('wheel', function (e) { if (!(e.ctrlKey || e.metaKey || S.xl)) return; e.preventDefault(); var r = stage.getBoundingClientRect(); zoomTo(S.zoom * Math.exp(-e.deltaY * 0.0016), e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2); }, { passive: false });
+  stage.addEventListener('pointerdown', function (e) { if (e.target.closest && e.target.closest('.x3-zoom')) return; pts[e.pointerId] = { x: e.clientX, y: e.clientY }; var ids = Object.keys(pts);
+    if (ids.length === 1) { start = { x: e.clientX, y: e.clientY, px: S.px, py: S.py }; dragged = false; }
+    if (ids.length === 2) { var a = pts[ids[0]], b = pts[ids[1]]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, z: S.zoom }; dragged = true; } });
+  window.addEventListener('pointermove', function (e) { if (!pts[e.pointerId]) return; pts[e.pointerId] = { x: e.clientX, y: e.clientY }; var ids = Object.keys(pts);
+    if (ids.length === 2 && pinch) { var a = pts[ids[0]], b = pts[ids[1]], r = stage.getBoundingClientRect(); zoomTo(pinch.z * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d, (a.x + b.x) / 2 - r.left - r.width / 2, (a.y + b.y) / 2 - r.top - r.height / 2); return; }
+    if (ids.length === 1 && start && S.zoom > 1) { var dx = e.clientX - start.x, dy = e.clientY - start.y; if (!dragged && Math.hypot(dx, dy) > 5) { dragged = true; stage.classList.add('drag'); } if (dragged) { S.px = start.px + dx; S.py = start.py + dy; clampPan(); kick(); } } });
+  var up = function (e) { if (!pts[e.pointerId]) return; delete pts[e.pointerId]; if (!Object.keys(pts).length) { start = null; pinch = null; stage.classList.remove('drag'); setTimeout(function () { dragged = false; }, 0); } };
+  window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+  if (FINE) {
+    stage.addEventListener('pointermove', function (e) { if (e.pointerType === 'touch' || S.zoom > 1) return; var r = stage.getBoundingClientRect(); goalTX = clamp((e.clientX - r.left) / r.width * 2 - 1, -1, 1); goalTY = clamp((e.clientY - r.top) / r.height * 2 - 1, -1, 1); kick(); });
+    stage.addEventListener('pointerleave', function () { goalTX = goalTY = 0; kick(); });
+  }
+  stage.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); step(1); } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); step(-1); }
+    else if (e.key === 'Escape') { if (S.pid) select(null); } else if (e.key === '+' || e.key === '=') zoomTo(S.zoom * 1.4, 0, 0); else if (e.key === '-') zoomTo(S.zoom / 1.4, 0, 0);
+    else if (e.key === ' ') { e.preventDefault(); root.querySelector('.x3-play').click(); } });
+}
+function order() { return L.slice().sort(function (a, b) { return a.n - b.n; }); }
+function step(dir) {
+  var O = order(); if (!O.length) return; var i = -1; O.some(function (o, k) { if (S.pid && o.p.pid === S.pid && (o.p.sub || null) === (S.sub || null)) { i = k; return true; } return false; });
+  if (i < 0 && S.pid) O.some(function (o, k) { if (o.p.pid === S.pid) { i = k; return true; } return false; });
+  var n = O[(i + dir + O.length) % O.length]; if (i < 0) n = dir > 0 ? O[0] : O[O.length - 1]; select(n.p.pid, n.p.sub || null);
+}
+function startTour() {
+  if (!L.length) return; var b = root.querySelector('.x3-tour'), O = order(), i = 0; b.setAttribute('aria-pressed', 'true');
+  S.only = null; S.goal = 1; slider.value = 100; syncPlay();
+  var go = function () { if (!tour) return; if (i >= O.length) { stopTour(); select(null); return; } var o = O[i++]; b.textContent = 'Walk-through ' + i + '/' + O.length; select(o.p.pid, o.p.sub || null); };
+  tour = { t: setInterval(go, 3400) }; setTimeout(go, RM ? 0 : 900);
+}
+function stopTour() { if (!tour) return; clearInterval(tour.t); tour = null; var b = root.querySelector('.x3-tour'); b.setAttribute('aria-pressed', 'false'); b.textContent = 'Walk-through'; }
+
+// ------------------------------------------------------------------ header: fleet machines + live strip
+function pickUnit() { var U = unitsOf(S.id); if (S.unit && U.some(function (u) { return u.fleet === S.unit; })) return; var a = U.filter(function (u) { return u.status === 'Active'; }); S.unit = (a[0] || U[0] || {}).fleet || null; }
+function stateCls(u) { var s = String(u.state || '').toLowerCase(); return s === 'fault' ? 'fault' : s === 'overdue' ? 'overdue' : s === 'due' ? 'due' : s === 'soon' ? 'soon' : (u.status !== 'Active' ? 'none' : ''); }
+function hoursTxt(u) { if (u.hours == null) return u.km ? num(u.km, 0) + ' km' : 'no hour meter'; return (u.hours_est ? '~' : '') + num(u.hours, 1) + ' h'; }
+function drawHead() {
+  var box = head.querySelector('.x3-units'), strip = head.querySelector('.x3-strip'), U = unitsOf(S.id); box.replaceChildren(); strip.replaceChildren();
+  box.hidden = U.length < 2;
+  U.forEach(function (u) { var b = el('button', 'x3-unit' + (u.status !== 'Active' ? ' off' : '')); b.type = 'button'; b.setAttribute('aria-pressed', u.fleet === S.unit ? 'true' : 'false');
+    var t = el('b'); t.appendChild(el('i', 'x3-dot ' + stateCls(u))); t.appendChild(document.createTextNode(u.fleet)); b.appendChild(t);
+    b.appendChild(el('span', null, hoursTxt(u) + ' · ' + (u.status !== 'Active' ? 'parked' : (u.state || 'OK'))));
+    b.addEventListener('click', function () { S.unit = u.fleet; drawHead(); buildList(); paintStatus(); drawPanel(); kick(); }); box.appendChild(b); });
+  var u = S.unit ? DB.fleet[S.unit] : null; if (!u) { strip.appendChild(el('span', null, DB.fleet && Object.keys(DB.fleet).length ? 'No machine in the fleet register is linked to this model.' : '')); return; }
+  var chip = function (t, c) { var s = el('span', 'x3-chip' + (c ? ' ' + c : ''), t); strip.appendChild(s); return s; };
+  chip(u.fleet); chip(hoursTxt(u)); if (u.rate_week) chip(num(u.rate_week, 1) + ' h a week');
+  if (u.n_overdue) chip(u.n_overdue + ' overdue', 'bad'); if (u.n_due) chip(u.n_due + ' due', 'warn');
+  var nf = (u.faults || []).length; if (nf) chip(nf + (nf === 1 ? ' open fault' : ' open faults'), 'bad');
+  if (!u.n_overdue && !u.n_due && !nf && u.status === 'Active') chip('Nothing overdue', 'ok');
+  if (u.next_label) chip('Next: ' + u.next_label + (u.next_to_go_h != null ? (u.next_to_go_h < 0 ? ', ' + num(-u.next_to_go_h) + ' h over' : ' in ' + num(u.next_to_go_h) + ' h') : '') + (u.next_date ? ' (' + fmtD(u.next_date) + ')' : ''));
+  if (u.hoc != null) chip('Height of cut ' + u.hoc + ' mm');
+  var h = H();
+  if (h && h.openMachine) { var b1 = el('button', 'x3-link', 'Full machine sheet'); b1.addEventListener('click', function () { h.openMachine(u.fleet); }); strip.appendChild(b1); }
+  if (h && h.openLJ) { var b2 = el('button', 'x3-link', 'Log a job on it'); b2.addEventListener('click', function () { h.openLJ(u.fleet); }); strip.appendChild(b2); }
+}
+
+// ------------------------------------------------------------------ component list
+function mainPiece(pid) { return L.filter(function (o) { return o.p.pid === pid && !o.p.sub; })[0] || L.filter(function (o) { return o.p.pid === pid; })[0] || null; }
+function buildList() {
+  listEl.replaceChildren(); var groups = {}, ord = [];
+  Object.keys(COMP).forEach(function (k) { var s = COMP[k].sys || 'Other'; if (!groups[s]) { groups[s] = []; ord.push(s); } groups[s].push(k); });
+  ord.forEach(function (sys) {
+    var g = el('div', 'x3-lg'); g.appendChild(el('div', 'x3-lgh', sys));
+    groups[sys].forEach(function (k) {
+      var b = el('button', 'x3-li'); b.type = 'button'; b.dataset.pid = k; b.dataset.q = (COMP[k].name + ' ' + sys + ' ' + (COMP[k].parts || []).join(' ')).toLowerCase();
+      var o = mainPiece(k), st = stat(k);
+      if (o) b.appendChild(el('span', 'x3-nb' + (st === 'overdue' || st === 'fault' || st === 'due' ? ' ' + st : ''), String(o.n))); else b.appendChild(el('i', 'x3-dot ' + (st && st !== 'ok' ? st : 'none')));
+      b.appendChild(el('span', 'nm', COMP[k].name)); if (!o) b.appendChild(el('span', 'in', 'inside'));
+      b.addEventListener('click', function () { stopTour(); select(k, null); });
+      if (o) { b.addEventListener('pointerenter', function () { hover(o, null); }); b.addEventListener('pointerleave', function () { hover(null); }); }
+      g.appendChild(b);
+    });
+    listEl.appendChild(g);
+  });
+  var q = root.querySelector('.x3-lq'); if (q && q.value) filterList(q.value); markList();
+}
+function filterList(q) { q = String(q || '').toLowerCase().trim(); Array.prototype.forEach.call(listEl.querySelectorAll('.x3-lg'), function (g) { var any = false; Array.prototype.forEach.call(g.querySelectorAll('.x3-li'), function (b) { var ok = !q || b.dataset.q.indexOf(q) >= 0; b.hidden = !ok; if (ok) any = true; }); g.hidden = !any; }); }
+function markList() { Array.prototype.forEach.call(listEl.querySelectorAll('.x3-li'), function (b) { var on = b.dataset.pid === S.pid; b.classList.toggle('on', on); if (on && b.scrollIntoView && listEl.scrollHeight > listEl.clientHeight) { var t = b.offsetTop - listEl.offsetTop; if (t < listEl.scrollTop || t > listEl.scrollTop + listEl.clientHeight - 30) listEl.scrollTop = Math.max(0, t - 60); } }); }
+
+// ------------------------------------------------------------------ panel pieces
+function sec2(title, count, open) { var d = el('details', 'x3-sec'); if (open) d.open = true; var s = el('summary'); s.appendChild(el('span', null, title)); if (count != null && count !== '') s.appendChild(el('em', null, String(count))); d.appendChild(s); var b = el('div', 'x3-secb'); d.appendChild(b); return { d: d, b: b }; }
+function ul(items, cls) { var u = el('ul', 'x3-ul' + (cls ? ' ' + cls : '')); items.forEach(function (t) { var li = el('li'); if (t && t.nodeType) li.appendChild(t); else li.textContent = t; u.appendChild(li); }); return u; }
+function openItem(id) { var h = H(); if (!h || !h.show) return; h.state.item = id; h.show('plan'); setTimeout(function () { var d = document.getElementById('item-detail'); if (d && !d.hidden) d.scrollIntoView({ block: 'start' }); }, 60); }
+function jobRow(it) {
+  var r = el('div', 'x3-job'); r.appendChild(pill(it.status)); var t = el('div', 't', it.label); t.title = 'Open in the service plan'; t.addEventListener('click', function () { openItem(it.id); }); r.appendChild(t);
+  var h = H(), b = h && h.updButton ? h.updButton(h.jobFromItem(it), it.id, true) : null; if (b) r.appendChild(b);
+  var w = dueText(it); if (w) r.appendChild(el('div', 'w', w));
+  if (it.upd && h && h.updChip) { var c = h.updChip(it.upd, it.id); if (c) { c.style.gridColumn = '1 / -1'; r.appendChild(c); } }
+  return r;
+}
+function faultRow(f) {
+  var r = el('div', 'x3-job'); r.appendChild(pill(f.safety ? 'overdue' : 'due', f.safety ? 'Safety' : (f.priority || 'Fault'))); var t = el('div', 't', f.job); if (f.link) { t.addEventListener('click', function () { window.open(f.link, '_blank', 'noopener'); }); t.title = 'Open the job in Notion'; } r.appendChild(t);
+  var h = H(), b = h && h.updButton ? h.updButton(h.jobFromFault(f), f.id, true) : null; if (b) r.appendChild(b);
+  r.appendChild(el('div', 'w', [f.id, f.days_open != null ? (f.days_open === 0 ? 'reported today' : 'open ' + f.days_open + (f.days_open === 1 ? ' day' : ' days')) : '', clean(f.note)].filter(Boolean).join(' · ')));
+  return r;
+}
+function amList(Lm) { var d = el('div'); Lm.forEach(function (o) { var line = el('div'); line.appendChild(document.createTextNode((o.brand ? o.brand + ' ' : '') + (o.part_no || '') + ' · ' + (o.shown || money(o.price) || '') + (o.supplier ? ' · ' : ''))); if (o.supplier) { if (o.url) line.appendChild(link(o.url, o.supplier)); else line.appendChild(document.createTextNode(o.supplier)); } line.appendChild(document.createTextNode(o.fit === 'direct' ? ' · replaces this number' : ' · same spec, check fit')); if (o.note) line.title = o.note; d.appendChild(line); }); return d; }
+function partRow(no, hit) {
+  var p = partInfo(no), row = el('details', 'x3-pr' + (hit ? ' hit' : '')); if (hit) row.open = true;
+  var sm = el('summary'), l = el('div', 'x3-prl'); l.appendChild(el('div', 'x3-prn', p.name)); l.appendChild(el('code', 'x3-prno', no)); sm.appendChild(l);
+  var r = el('div', 'x3-prr');
+  if (p.live) { r.appendChild(el('div', 'x3-prp', p.g && p.g.price != null ? 'Genuine ' + money(p.g.price) : (p.price != null && p.kind !== 'equivalent' ? money(p.price) : 'Genuine: quote'))); if (p.amPrice != null) r.appendChild(el('div', 'x3-pro ok', 'Aftermarket from ' + money(p.amPrice))); }
+  else r.appendChild(el('div', 'x3-prp', p.price != null ? money(p.price) + (p.kind === 'equivalent' ? ' equiv.' : '') : 'quote'));
+  r.appendChild(el('div', 'x3-pro ' + (p.onHand > 0 ? 'ok' : ''), p.onHand > 0 ? num(p.onHand, 1) + ' on the shelf' : 'none on the shelf'));
+  sm.appendChild(r); row.appendChild(sm);
+  var body = el('div', 'x3-prb'), dl = el('dl');
+  var add = function (k, v) { if (v == null || v === '') return; dl.appendChild(el('dt', null, k)); var dd = el('dd'); if (v.nodeType) dd.appendChild(v); else dd.textContent = v; dl.appendChild(dd); };
+  if (p.live) { add('Genuine', p.g ? (p.g.shown || money(p.g.price) || 'quote') + (p.g.src ? ' (' + p.g.src + ')' : '') + (p.g.supplier ? ', ' + p.g.supplier : '') : (p.price != null && p.kind !== 'equivalent' ? money(p.price) + ' ex GST' : 'No public price. Ask the dealer for a quote.')); add('Aftermarket', p.am && p.am.length ? amList(p.am) : 'None found yet.'); }
+  else add('Price', p.price != null ? money(p.price) + ' ex GST' + (p.kind === 'equivalent' ? ' (aftermarket equivalent)' : (p.kind === 'genuine' ? ' (genuine, club cost or AU retail)' : '')) : 'No public price. Ask the dealer for a quote.');
+  add('On the shelf', num(p.onHand || 0, 1)); add('Changed every', p.every); add('Where to order', p.supplier); add('Also', p.alt); add('Note', p.note);
+  if (p.verified === 'no') add('Check', 'This number could not be confirmed in a parts book. Confirm it with the dealer before ordering.');
+  body.appendChild(dl);
+  var acts = el('div', 'x3-acts');
+  if (p.url) acts.appendChild(link(p.url, /amacron/.test(p.url) ? 'Order from Amacron' : (/tines/.test(p.url) ? 'Order from Turftines' : (/ebay/.test(p.url) ? 'View on eBay' : 'Order online')), 'x3-btn pri'));
+  if (M.LOOKUP) acts.appendChild(link(M.LOOKUP, M.lookupLabel || 'Parts lookup', 'x3-btn'));
+  var cp = el('button', 'x3-btn', 'Copy part no.'); cp.type = 'button'; cp.addEventListener('click', function () { copy(no, cp); }); acts.appendChild(cp);
+  body.appendChild(acts); row.appendChild(body); return row;
+}
+function md() { return DB.models[CUR.slug] || null; }
+function keepIdx(key, n) { var x = X(); var k = x && x.keep && x.keep[key]; if (Array.isArray(k)) return k; var a = []; for (var i = 0; i < n; i++) a.push(i); return a; }
+function ivBlock(iv, taskIdx) {
+  var f = document.createDocumentFragment(), hd = el('div', 'x3-ivh'); hd.appendChild(el('span', null, iv.label));
+  var meta = []; if (iv.labour) meta.push('~' + num(iv.labour) + ' h'); if (iv.confidence) meta.push(iv.confidence); if (meta.length) hd.appendChild(el('em', null, meta.join(' · ')));
+  f.appendChild(hd);
+  var T = (iv.tasks || []); var show = taskIdx ? taskIdx.map(function (j) { return T[j]; }).filter(Boolean) : T;
+  if (show.length) f.appendChild(ul(show));
+  if (!taskIdx || !show.length) { var ps = (iv.parts || []).map(function (p) { return (p.qty ? p.qty + ' × ' : '') + p.name + ' ' + p.part_no; }); if (ps.length) f.appendChild(el('p', 'x3-pn', 'Parts: ' + ps.join('; '))); }
+  if (!taskIdx) { var fl = (iv.fluids || []).map(function (x) { return x.what + (x.qty_l ? ' ' + num(x.qty_l) + ' L' : '') + (x.spec ? ' (' + x.spec + ')' : ''); }); if (fl.length) f.appendChild(el('p', 'x3-pn', 'Fluids: ' + fl.join('; '))); if (iv.source) f.appendChild(el('p', 'x3-pn', 'Source: ' + iv.source)); }
+  return f;
+}
+function fluidTable(rows) {
+  var t = el('table', 'x3-tbl'), hr = el('tr'); ['System', 'Spec', 'Capacity'].forEach(function (h, i) { hr.appendChild(el('th', i === 2 ? 'n' : null, h)); }); t.appendChild(hr);
+  rows.forEach(function (f) { var tr = el('tr'); tr.appendChild(el('td', null, f.system || f.what || '')); tr.appendChild(el('td', null, f.spec || '')); tr.appendChild(el('td', 'n', f.capacity_l != null ? num(f.capacity_l, 2) + ' L' : (f.qty_l != null ? num(f.qty_l, 2) + ' L' : ''))); if (f.source) tr.title = f.source; t.appendChild(tr); });
+  return t;
+}
+function shareBtn(pid) { var b = el('button', 'x3-link', 'Copy a link to this'); b.type = 'button'; b.addEventListener('click', function () { copy(PUBLIC_URL + '#x/' + S.id + (pid ? '/' + pid : ''), b, 'Link copied'); }); return b; }
+
+// ------------------------------------------------------------------ panel: a component
+function drawPanel() { if (!M || !panel) return; if (S.pid) drawComp(S.pid, S.sub); else drawOverview(); }
+function drawComp(pid, sub) {
+  var c = COMP[pid], s = sub ? SUB[sub] : null, x = X(), mp = x && x.map ? x.map[pid] : null, m = md(), o = (sub ? L.filter(function (q) { return q.p.pid === pid && q.p.sub === sub; })[0] : null) || mainPiece(pid);
+  panel.replaceChildren();
+  var hd = el('div', 'x3-ph'), ht = el('div'), ps = el('div', 'x3-psys'); if (o) ps.appendChild(el('span', 'x3-nb', String(o.n))); ps.appendChild(document.createTextNode(c.sys + (s ? ' · ' + c.name : ''))); ht.appendChild(ps);
+  ht.appendChild(el('h3', 'x3-pt', s ? s.name : c.name)); hd.appendChild(ht);
+  var nav = el('div', 'x3-nav');
+  [['‹', 'Previous part', -1], ['›', 'Next part', 1]].forEach(function (a) { var b = el('button', 'x3-x', a[0]); b.type = 'button'; b.setAttribute('aria-label', a[1]); b.title = a[1]; b.addEventListener('click', function () { stopTour(); step(a[2]); }); nav.appendChild(b); });
+  var xb = el('button', 'x3-x', '×'); xb.type = 'button'; xb.setAttribute('aria-label', 'Close'); xb.addEventListener('click', function () { stopTour(); select(null); }); nav.appendChild(xb); hd.appendChild(nav); panel.appendChild(hd);
+  var its = itemsOf(pid), fts = faultsOf(pid), act = its.filter(function (i) { return i.status !== 'ok'; });
+  var pills = el('div', 'x3-pills');
+  if (fts.length) pills.appendChild(pill('overdue', fts.length + (fts.length === 1 ? ' open fault' : ' open faults')));
+  ['overdue', 'due', 'soon'].forEach(function (st) { var n = its.filter(function (i) { return i.status === st; }).length; if (n) pills.appendChild(pill(st, n + ' ' + STL[st].toLowerCase())); });
+  if (!o) pills.appendChild(pill('soon', 'Inside the machine: not visible in this photo'));
+  if (pills.firstChild) panel.appendChild(pills);
+  if (s) { var bk = el('button', 'x3-link', '‹ Back to ' + c.name); bk.type = 'button'; bk.style.fontSize = 'var(--cds-font-size-caption)'; bk.style.marginTop = '.45rem'; bk.addEventListener('click', function () { select(pid, null); }); panel.appendChild(bk); }
+  panel.appendChild(rich(s ? s.desc : c.desc));
+  var pieces = L.filter(function (q) { return q.p.pid === pid; });
+  if (!sub && pieces.length > 1) { var bu = el('button', 'x3-btn', S.only === pid ? 'Put this assembly back' : 'Blow up just this assembly'); bu.type = 'button'; bu.addEventListener('click', function () { if (S.only === pid) { S.only = null; S.goal = 0; slider.value = 0; } else { S.only = pid; S.t = 0; S.goal = 1; slider.value = 100; } syncPlay(); drawPanel(); kick(); }); var ac = el('div', 'x3-acts'); ac.style.margin = '0 0 .7rem'; ac.appendChild(bu); panel.appendChild(ac); }
+  // live: what is due, faults
+  if (S.unit && (its.length || fts.length)) {
+    var a = sec2('On ' + S.unit, act.length + fts.length ? (act.length + fts.length) + ' to do' : 'up to date', true);
+    fts.forEach(function (f) { a.b.appendChild(faultRow(f)); });
+    its.slice().sort(function (p, q) { return (RANK[q.status] || 0) - (RANK[p.status] || 0) || ((p.to_go_h == null ? 1e9 : p.to_go_h) - (q.to_go_h == null ? 1e9 : q.to_go_h)); }).forEach(function (it) { a.b.appendChild(jobRow(it)); });
+    panel.appendChild(a.d);
+  }
+  // parts
+  var nos = ((s ? s.parts : c.parts) || []).slice();
+  var pr = sec2('Parts', nos.length ? nos.length + (nos.length === 1 ? ' number' : ' numbers') : 'none listed', true);
+  if (nos.length) { var tl = el('div', 'x3-plist'), hn = S.no ? norm(S.no) : null, hitEl = null; nos.forEach(function (no) { var row = partRow(no, hn && norm(no) === hn); if (row.open) hitEl = row; tl.appendChild(row); }); pr.b.appendChild(tl);
+    var acts = el('div', 'x3-acts'), cp = el('button', 'x3-btn', 'Copy this parts list'); cp.type = 'button'; cp.addEventListener('click', function () { copy(CUR.title + ' - ' + (s ? s.name : c.name) + '\n' + nos.map(function (n) { var p = partInfo(n); return n + '  ' + p.name; }).join('\n'), cp); }); acts.appendChild(cp); pr.b.appendChild(acts);
+    if (hitEl) setTimeout(function () { if (hitEl.scrollIntoView) hitEl.scrollIntoView({ block: 'nearest' }); }, 80); }
+  else pr.b.appendChild(el('p', 'x3-pn', 'No service or wear parts are listed for this component. Use the parts book for structural parts.'));
+  panel.appendChild(pr.d);
+  var subs = s ? [] : subsOf(pid);
+  if (subs.length) { var ins = sec2('What is inside it', subs.length + (subs.length === 1 ? ' sub-part' : ' sub-parts'), true);
+    subs.forEach(function (k) { var r = el('div', 'x3-job'); r.style.gridTemplateColumns = 'minmax(0,1fr) auto'; var t = el('div', 't', SUB[k].name); t.addEventListener('click', function () { select(pid, k); }); r.appendChild(t);
+      r.appendChild(el('span', 'x3-pro', (SUB[k].parts || []).length ? (SUB[k].parts || []).length + ' part no.' : '')); var d1 = el('div', 'w', first(SUB[k].desc)); d1.style.gridColumn = '1 / -1'; r.appendChild(d1); ins.b.appendChild(r); });
+    panel.appendChild(ins.d); }
+  // the bible: schedule, fluids, checks, issues for this component
+  if (m && mp) {
+    if (mp.iv && mp.iv.length) { var sc = sec2('Service schedule for this part', mp.iv.length + (mp.iv.length === 1 ? ' service' : ' services'), false); mp.iv.forEach(function (e) { var iv = (m.intervals || [])[e[0]]; if (iv) sc.b.appendChild(ivBlock(iv, e[1] || [])); }); panel.appendChild(sc.d); }
+    if (mp.fl && mp.fl.length) { var fl = sec2('Fluids and capacities', '', false); fl.b.appendChild(fluidTable(mp.fl.map(function (i) { return (m.fluids || [])[i]; }).filter(Boolean))); panel.appendChild(fl.d); }
+    if (mp.dc && mp.dc.length) { var dc = sec2('Daily checks', mp.dc.length, false); dc.b.appendChild(ul(mp.dc.map(function (i) { return (m.daily_checks || [])[i]; }).filter(Boolean))); panel.appendChild(dc.d); }
+    if (mp.ki && mp.ki.length) { var ki = sec2('Known issues', mp.ki.length, false); ki.b.appendChild(ul(mp.ki.map(function (i) { return (m.known_issues || [])[i]; }).filter(Boolean))); panel.appendChild(ki.d); }
+  }
+  var lv = live(pid);
+  if (lv && lv.hs && lv.hs.length) { var hs = sec2('Recent work on ' + S.unit, lv.hs.length, false); hs.b.appendChild(ul(lv.hs.map(function (h) { return fmtD(h[0]) + ': ' + h[1] + (h[3] ? ' (' + num(h[3]) + ' h)' : ''); }), 'plain')); panel.appendChild(hs.d); }
+  var foot = el('div', 'x3-pf');
+  var cat = c.cat || M.CAT; if (cat) foot.appendChild(link(cat, M.catLabel || 'Parts book (PDF)')); if (M.OM) { if (foot.firstChild) foot.appendChild(document.createTextNode(' · ')); foot.appendChild(link(M.OM, "Operator's manual")); }
+  if (M.LOOKUP) { if (foot.firstChild) foot.appendChild(document.createTextNode(' · ')); foot.appendChild(link(M.LOOKUP, M.lookupLabel || 'Parts lookup')); }
+  if (foot.firstChild) foot.appendChild(document.createTextNode(' · ')); foot.appendChild(shareBtn(pid));
+  var h = H(); if (h && h.openLJ && S.unit) { foot.appendChild(document.createTextNode(' · ')); var lj = el('button', 'x3-link', 'Log a job on this machine'); lj.type = 'button'; lj.addEventListener('click', function () { h.openLJ(S.unit); }); foot.appendChild(lj); }
+  panel.appendChild(foot);
+}
+
+// ------------------------------------------------------------------ panel: the whole machine
+function drawOverview() {
+  var u = S.unit ? DB.fleet[S.unit] : null, m = md(), x = X(); panel.replaceChildren();
+  var hd = el('div', 'x3-ph'), ht = el('div'); ht.appendChild(el('div', 'x3-psys', u ? (u.cat || 'Machine') : 'Machine')); ht.appendChild(el('h3', 'x3-pt', u ? u.fleet : CUR.title)); hd.appendChild(ht); panel.appendChild(hd);
+  if (u) { var pl = el('div', 'x3-pills'); var sc = stateCls(u); pl.appendChild(pill(sc === 'fault' ? 'overdue' : (sc && sc !== 'none' ? sc : 'ok'), u.status !== 'Active' ? 'Parked' : (u.state || 'OK'))); if (u.tele) pl.appendChild(pill('ok', 'Hours live from Intelli360')); panel.appendChild(pl); }
+  panel.appendChild(el('p', 'x3-pn', 'Click any part on the photo, a number, or a line in the list below for its detail. ' + L.length + ' parts are outlined on the photo and ' + Object.keys(COMP).length + ' components are listed.'));
+  if (S.no && !S.pid) panel.appendChild(el('p', 'x3-pn', 'Part ' + S.no + ' is not tied to one component on this photo. It is in the parts list below.'));
+  if (u) {
+    var dl = el('dl', 'x3-dl'), add = function (k, v) { if (v == null || v === '' || v === false) return; dl.appendChild(el('dt', null, k)); var dd = el('dd'); if (v.nodeType) dd.appendChild(v); else dd.textContent = v; dl.appendChild(dd); };
+    add('Model', [u.make, u.model].filter(Boolean).join(' ')); add('Serial', u.serial); add('Year', u.year); add('Asset no.', u.asset_no);
+    add('Hours', u.hours != null ? hoursTxt(u) + (u.last_reading && u.last_reading.date ? ' (last read ' + fmtD(u.last_reading.date) + (u.last_reading.source ? ', ' + u.last_reading.source : '') + ')' : '') : null);
+    add('Odometer', u.km ? num(u.km, 0) + ' km' : null); add('Use', u.rate_week ? num(u.rate_week, 1) + ' h a week' + (u.hours_year ? ', about ' + num(u.hours_year, 0) + ' h a year' : '') : null);
+    add('Usually out', (u.likely_days || []).join(', ')); add('Main jobs', (u.top_tasks || []).slice(0, 4).map(function (t) { return t[0]; }).join(', '));
+    add('Area', u.area); add('Height of cut', u.hoc != null ? u.hoc + ' mm' : null); add('Owned / leased', u.own + (u.lease_end ? ', lease ends ' + fmtD(u.lease_end) : ''));
+    add('Next service', u.next_label ? u.next_label + (u.next_to_go_h != null ? (u.next_to_go_h < 0 ? ', ' + num(-u.next_to_go_h) + ' h overdue' : ', ' + num(u.next_to_go_h) + ' h to go') : '') + (u.next_date ? ' (' + fmtD(u.next_date) + ')' : '') : null);
+    add('Replacement', u.replacement && u.replacement.item ? u.replacement.item + (u.replacement.start ? ', ' + u.replacement.start : '') : null); add('Note', u.notes);
+    panel.appendChild(dl);
+    var acts = el('div', 'x3-acts'), h = H();
+    if (h && h.openMachine) { var b1 = el('button', 'x3-btn', 'Full machine sheet'); b1.type = 'button'; b1.addEventListener('click', function () { h.openMachine(u.fleet); }); acts.appendChild(b1); }
+    if (h && h.openLJ) { var b2 = el('button', 'x3-btn', 'Log a job'); b2.type = 'button'; b2.addEventListener('click', function () { h.openLJ(u.fleet); }); acts.appendChild(b2); }
+    if (acts.firstChild) { acts.style.marginBottom = '.7rem'; panel.appendChild(acts); }
+    var its = DB.items.filter(function (i) { return i.fleet === u.fleet; }), act = its.filter(function (i) { return i.status !== 'ok'; }), fts = DB.faults.filter(function (f) { return f.fleet === u.fleet; });
+    var a = sec2('To do on ' + u.fleet, (act.length + fts.length) || 'nothing', true);
+    fts.forEach(function (f) { a.b.appendChild(faultRow(f)); });
+    act.sort(function (p, q) { return (RANK[q.status] || 0) - (RANK[p.status] || 0) || ((p.to_go_h == null ? 1e9 : p.to_go_h) - (q.to_go_h == null ? 1e9 : q.to_go_h)); }).forEach(function (it) { a.b.appendChild(jobRow(it)); });
+    if (!act.length && !fts.length) a.b.appendChild(el('p', 'x3-pn', 'Nothing overdue or due soon, and no open faults.'));
+    panel.appendChild(a.d);
+    var later = its.filter(function (i) { return i.status === 'ok'; }).sort(function (p, q) { return String(p.due_date || '9').localeCompare(String(q.due_date || '9')); });
+    if (later.length) { var lt = sec2('Coming up later', later.length, false); later.forEach(function (it) { lt.b.appendChild(jobRow(it)); }); panel.appendChild(lt.d); }
+  }
+  if (m) {
+    var sp = sec2('Engine, power and model numbers', '', false), dl2 = el('dl', 'x3-dl');
+    [['Make and model', [m.make, m.model].filter(Boolean).join(' ')], ['Power', m.power], ['Engine / drive', m.engine], ['Model numbers', (m.model_numbers || []).join('; ')], ['Notes', m.notes]].forEach(function (r) { if (!r[1]) return; dl2.appendChild(el('dt', null, r[0])); dl2.appendChild(el('dd', null, r[1])); });
+    if (dl2.firstChild) { sp.b.appendChild(dl2); panel.appendChild(sp.d); }
+    var kf = keepIdx('fl', (m.fluids || []).length); if (kf.length) { var fl = sec2('Fluids and capacities', kf.length, false); fl.b.appendChild(fluidTable(kf.map(function (i) { return m.fluids[i]; }))); panel.appendChild(fl.d); }
+    var kiv = keepIdx('iv', (m.intervals || []).length); if (kiv.length) { var sv2 = sec2('Full service schedule', kiv.length + ' services', false); kiv.forEach(function (i) { sv2.b.appendChild(ivBlock(m.intervals[i], null)); }); panel.appendChild(sv2.d); }
+    var kd = keepIdx('dc', (m.daily_checks || []).length); if (kd.length) { var dc = sec2('Daily and pre-start checks', kd.length, false); dc.b.appendChild(ul(kd.map(function (i) { return m.daily_checks[i]; }))); panel.appendChild(dc.d); }
+    var kk = keepIdx('ki', (m.known_issues || []).length); if (kk.length) { var ki = sec2('Known issues', kk.length, false); ki.b.appendChild(ul(kk.map(function (i) { return m.known_issues[i]; }))); panel.appendChild(ki.d); }
+    var rg = m.reel && m.reel.guidance && !/^(n\/a|not applicable)\.?$/i.test(String(m.reel.guidance).trim()) ? m.reel.guidance : '';
+    if (m.reel && ((m.reel.bedknives || []).length || rg)) { var rl = sec2((m.reel.bedknives || []).length ? 'Reels and bedknives' : 'Working gear: set-up and wear', '', false);
+      if ((m.reel.bedknives || []).length) { var t = el('table', 'x3-tbl'), hr = el('tr'); ['Bedknife', 'Part no.', 'Height of cut'].forEach(function (h) { hr.appendChild(el('th', null, h)); }); t.appendChild(hr); m.reel.bedknives.forEach(function (b) { var tr = el('tr'); tr.appendChild(el('td', null, b.name || '')); tr.appendChild(el('td', null, b.part_no || '')); tr.appendChild(el('td', null, b.hoc_range_mm ? b.hoc_range_mm + (/mm/.test(b.hoc_range_mm) ? '' : ' mm') : '')); t.appendChild(tr); }); rl.b.appendChild(t); }
+      if (rg) rl.b.appendChild(rich(rg)); panel.appendChild(rl.d); }
+  }
+  // every part number the catalogue has for this model
+  var cr = (DB.catRows || []).filter(function (r) { return r.slug === CUR.slug; });
+  if (cr.length) { var pc = sec2('Every part in the catalogue for this model', cr.length, !!(S.no && !S.pid)), t2 = el('table', 'x3-tbl'), hr2 = el('tr'); [['Part', ''], ['Part no.', ''], ['Genuine', 'n'], ['Aftermarket', 'n'], ['Shelf', 'n']].forEach(function (h) { hr2.appendChild(el('th', h[1] || null, h[0])); }); t2.appendChild(hr2);
+    cr.forEach(function (r) { var tr = el('tr', 'go'); tr.title = 'Show where this part is on the machine'; tr.appendChild(el('td', null, r.name)); tr.appendChild(el('td', null, r.part_no)); tr.appendChild(el('td', 'n', r.g_price != null ? money(r.g_price) : 'quote')); tr.appendChild(el('td', 'n', r.am_price != null ? money(r.am_price) : '')); tr.appendChild(el('td', 'n', r.on_hand ? num(r.on_hand, 1) : ''));
+      tr.addEventListener('click', function () { pending = { no: r.part_no }; applyPending(); }); t2.appendChild(tr); });
+    pc.b.appendChild(t2); panel.appendChild(pc.d); }
+  if (u) {
+    var stk = DB.stock.filter(function (r) { return (r.fleets || []).indexOf(u.fleet) >= 0 && r.on_hand > 0; });
+    if (stk.length) { var ss = sec2('On the workshop shelf for this machine', stk.length, false); ss.b.appendChild(ul(stk.map(function (r) { return num(r.on_hand, 1) + ' × ' + (r.part_no && String(r.name || '').indexOf(r.part_no) < 0 ? r.part_no + ' ' : '') + r.name; }), 'plain')); panel.appendChild(ss.d); }
+    var hist = DB.hist.filter(function (h) { return h.fleet === u.fleet; }).slice(0, 15);
+    if (hist.length) { var hh = sec2('Recent service and repair record', hist.length, false); hh.b.appendChild(ul(hist.map(function (h) { return fmtD(h.date) + ': ' + h.item + (h.hours ? ' (' + num(h.hours) + ' h)' : '') + (h.kind ? ' · ' + h.kind : ''); }), 'plain')); panel.appendChild(hh.d); }
+  }
+  if (m && (m.sources || []).length) { var so = sec2('Manuals and sources', m.sources.length, false); so.b.appendChild(ul(m.sources.map(function (s) { return s.url ? link(s.url, s.title || s.url) : (s.title || ''); }))); panel.appendChild(so.d); }
+  var foot = el('div', 'x3-pf'); if (M.CAT) foot.appendChild(link(M.CAT, M.catLabel || 'Parts book (PDF)')); if (M.OM) { if (foot.firstChild) foot.appendChild(document.createTextNode(' · ')); foot.appendChild(link(M.OM, "Operator's manual")); }
+  if (M.LOOKUP) { foot.appendChild(document.createTextNode(' · ')); foot.appendChild(link(M.LOOKUP, M.lookupLabel || 'Parts lookup')); } foot.appendChild(document.createTextNode(' · ')); foot.appendChild(shareBtn(null)); panel.appendChild(foot);
+}
+
+// ------------------------------------------------------------------ search across every machine
+function sindex() {
+  if (SIDX) return SIDX; var A = [];
+  REG.forEach(function (m) {
+    A.push({ k: 'Machine', t: m.title, s: m.sub || '', id: m.id, q: (m.title + ' ' + (m.sub || '') + ' ' + (m.pick || '')).toLowerCase(), w: 3 });
+    var x = DB.x[m.id];
+    if (x) {
+      (x.units || []).forEach(function (u) { A.push({ k: 'Fleet', t: u, s: m.title, id: m.id, sel: { unit: u }, q: u.toLowerCase(), w: 2 }); });
+      (x.idx || []).forEach(function (c) { A.push({ k: 'Component', t: c[1], s: m.title + (c[2] ? ' · ' + c[2] : ''), id: m.id, sel: { pid: c[0] }, q: String(c[1]).toLowerCase(), w: 1 });
+        (c[3] || []).forEach(function (no) { var nm = (x.pn || {})[no] || ((DB.cat[m.slug] || {})[norm(no)] || {}).name || ''; A.push({ k: 'Part', t: no + (nm ? '  ' + nm : ''), s: m.title + ' · ' + c[1], id: m.id, sel: { pid: c[0], no: no }, q: (no + ' ' + norm(no) + ' ' + nm).toLowerCase(), w: 0, no: norm(no) }); }); });
+      (x.sub || []).forEach(function (c) { (c[2] || []).forEach(function (no) { var nm = (x.pn || {})[no] || ((DB.cat[m.slug] || {})[norm(no)] || {}).name || ''; A.push({ k: 'Part', t: no + (nm ? '  ' + nm : ''), s: m.title + ' · ' + c[1], id: m.id, sel: { no: no }, q: (no + ' ' + norm(no) + ' ' + nm).toLowerCase(), w: 0, no: norm(no) }); }); });
+    }
+  });
+  if (!Object.keys(DB.x).length && M) Object.keys(COMP).forEach(function (k) { A.push({ k: 'Component', t: COMP[k].name, s: CUR.title, id: S.id, sel: { pid: k }, q: COMP[k].name.toLowerCase(), w: 1 }); });
+  SIDX = A; return A;
+}
+function bindSearch() {
+  var inp = head.querySelector('#x3-q'), box = head.querySelector('.x3-results'), cur = -1, res = [];
+  var draw = function () {
+    var q = inp.value.toLowerCase().trim(); box.replaceChildren(); cur = -1; res = [];
+    if (q.length < 2) { box.hidden = true; return; }
+    var tk = q.split(/\s+/), nq = norm(q), seen = {};
+    sindex().forEach(function (r) { if (!tk.every(function (t) { return r.q.indexOf(t) >= 0; }) && !(r.no && nq.length > 2 && r.no.indexOf(nq) >= 0)) return;
+      var key = r.k + '|' + r.t + '|' + r.id; if (seen[key]) return; seen[key] = 1;
+      var sc = r.w * 10 + (r.q.indexOf(q) === 0 ? 0 : 3) + (r.no && r.no === nq ? -20 : 0) + (r.id === S.id ? -1 : 0); res.push({ r: r, sc: sc }); });
+    res.sort(function (a, b) { return a.sc - b.sc; }); res = res.slice(0, 14);
+    if (!res.length) { box.appendChild(el('div', 'x3-res', 'Nothing found. Try a part number, a part name or a machine.')); box.hidden = false; return; }
+    res.forEach(function (x, i) { var b = el('button', 'x3-res'); b.type = 'button'; var t = el('b'); t.appendChild(el('i', null, x.r.k)); t.appendChild(document.createTextNode(x.r.t)); b.appendChild(t); b.appendChild(el('span', null, x.r.s)); b.addEventListener('click', function () { go(i); }); box.appendChild(b); });
+    box.hidden = false;
+  };
+  var go = function (i) { var x = res[i]; if (!x) return; box.hidden = true; inp.value = ''; stopTour(); open(x.r.id, x.r.sel || null); };
+  var mark = function () { Array.prototype.forEach.call(box.children, function (b, i) { b.classList.toggle('on', i === cur); }); };
+  inp.addEventListener('input', draw); inp.addEventListener('focus', function () { if (inp.value.trim().length >= 2) draw(); });
+  inp.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown') { e.preventDefault(); cur = Math.min(res.length - 1, cur + 1); mark(); } else if (e.key === 'ArrowUp') { e.preventDefault(); cur = Math.max(0, cur - 1); mark(); } else if (e.key === 'Enter') { e.preventDefault(); go(cur < 0 ? 0 : cur); } else if (e.key === 'Escape') { box.hidden = true; } });
+  document.addEventListener('click', function (e) { if (!head.querySelector('.x3-search').contains(e.target)) box.hidden = true; });
+}
+
+// ------------------------------------------------------------------ boot
+var lastSig = null;
+function sig() { var a = []; ['m_explorer', 'm_catalog', 'm_items', 'm_fleet', 'm_faults', 'm_models', 'm_history', 'm_stock'].forEach(function (i) { var d = null; try { d = dash.data(i); } catch (e) {} a.push(d && d.data ? d.data : null); }); return a; }
+function changed() { var n = sig(), ch = !lastSig || n.some(function (x, i) { return x !== lastSig[i]; }); lastSig = n; return ch; }
+function refresh() {   // the datasets refresh every hour; a plain resize must not redraw the panel someone is reading
+  if (!inited || !M || !scene) return;
+  if (changed()) { loadDB(); pickUnit(); drawHead(); buildList(); paintStatus(); drawPanel(); }
+  fit(); measure(); kick();
+}
+function fromHash() { var m = /^#x\/([\w-]+)(?:\/([\w-]+))?(?:\/([\w-]+))?/.exec(location.hash || ''); if (!m || !MODELS[m[1]]) return null; return { id: m[1], sel: m[2] ? { pid: m[2], sub: m[3] || null } : null }; }
+function shown() {
+  if (!inited && !init()) return;
+  if (!S.id) { var h = fromHash(); open(h ? h.id : REG[0].id, h ? h.sel : pending); } else { onResize(); }
+}
+window.MX3D = { open: open, openFor: openFor, has: has, MODELS: MODELS, state: S };
+try { if (window.MXH && MXH.redraw) MXH.redraw(); } catch (e) {}
 (function () {
-  var sec = document.getElementById('explore'), root = document.getElementById('x3'), api = null;
-  function chk() { if (!sec || sec.hidden) { if (api && api.pause) api.pause(true); return; } if (!api) { api = window.MX3D.mount(root); var RMq = false; try { RMq = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-      if (!RMq && api) { var tries = 0; (function peek() { var a = root.__mx3d; if (!a || !a.explode) { if (++tries < 40) setTimeout(peek, 250); return; } if (sec.hidden) return;
-        setTimeout(function () { var sl = root.querySelector('.x3-ex'); if (sl && +sl.value !== 0) return; a.explode(.6); setTimeout(function () { if (!sl || +sl.value === 60) a.explode(0); }, 1600); }, 700); })(); } } else { if (api.pause) api.pause(false); api.resize(); } }
-  if (sec && window.MutationObserver) new MutationObserver(chk).observe(sec, { attributes: true, attributeFilter: ['hidden'] });
-  chk();
+  var s = document.getElementById('explore'); if (!s) return;
+  var chk = function () { if (!s.hidden) shown(); else if (inited) { stopTour(); if (S.xl) setXL(false); } };
+  if (window.MutationObserver) new MutationObserver(chk).observe(s, { attributes: true, attributeFilter: ['hidden'] });
+  try { if (window.dash && dash.onData) dash.onData(function () { if (inited && !s.hidden) refresh(); }); } catch (e) {}
+  var goHash = function () { var h = fromHash(); if (!h) return; var hh = H(); if (hh && hh.show) hh.show('explore'); if (inited || init()) open(h.id, h.sel); };
+  window.addEventListener('hashchange', goHash);
+  if (fromHash()) setTimeout(goHash, 0); else chk();
+})();
 })();
 </script>
+
 
 <script>
 (function(){
