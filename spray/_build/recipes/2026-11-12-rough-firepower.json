@@ -1,0 +1,143 @@
+{
+  "slug": "2026-11-12-rough-firepower",
+  "title": "Firepower, Rough",
+  "sheet_name": "JD 300L/Ha - Rough - Firepower - GPS (12 Nov)",
+  "sprayer": "JD HD200",
+  "applicator": [
+    "Nathan Ferguson",
+    "U06H9J0LBEC"
+  ],
+  "date": "Thu 12 Nov",
+  "date_long": "Thu 12 Nov 2026",
+  "date_iso": "2026-11-12",
+  "area_ha": 2.5,
+  "rate_lha": 300,
+  "mix_l": 750,
+  "tank_cap_l": 757,
+  "fill_l": 375,
+  "nozzles": "Grey Wilger",
+  "speed": "7.1 km/h",
+  "pressure": "3.4 bar",
+  "last_load": "PGR + Fert, Fairways (JD), Tue 10 Nov: run clean water through first",
+  "site_check": "Section control ON with the rough boundaries loaded. No overlap onto fairways, tees, surrounds or greens",
+  "weather": "Delta T 2–8 · wind under 15 km/h · gusts under 30",
+  "extra_checks": [
+    [
+      "jdfilter",
+      "JD filter back in, clean, with its O-ring",
+      "Tuesday's tank ran with the filter out (GreenLinks clogged it) and its O-ring went missing. No O-ring: don't fill, call Andy"
+    ],
+    [
+      "rinse",
+      "Clean water run through the boom first",
+      "Last load was Tuesday's fairway PGR + fert (iron sulphate)"
+    ],
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 3.4 bar",
+      "300 L/ha at 7.1 km/h needs about 2.7 L/min on 75 cm nozzle spacing. If it's out, call Andy before you fill"
+    ],
+    [
+      "gps",
+      "Section control ON, today's rough boundaries loaded",
+      "Firepower kills couch and bent: nothing on fairways, tees, surrounds or greens"
+    ],
+    [
+      "bufflabel",
+      "Buff-It drum label read",
+      "Rate, mixing and PPE"
+    ]
+  ],
+  "products": [
+    {
+      "id": "buffit",
+      "rate": "600 mL/ha",
+      "rate_lha": 0.6,
+      "unit": "mL",
+      "sheet": 1
+    },
+    {
+      "id": "firepower",
+      "rate": "100 mL/ha",
+      "rate_lha": 0.1,
+      "unit": "mL",
+      "sheet": 2,
+      "why": "Goes in once the water is buffered. Small measure: it's 900 g/L. You're at {before} L."
+    },
+    {
+      "id": "hasten",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "unit": "L",
+      "sheet": 3
+    }
+  ],
+  "ppe_note": "Firepower 900 is a Schedule 6 poison: impervious elbow gloves and a face shield when you pour it. Buff-It has no SDS on file: goggles.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "Rough only, today's boundaries in the GPS. Section control ON: no overlap onto fairways, tees, surrounds or greens. Firepower kills couch and bent",
+    "Good morning for it: Delta T 2.2 at 7, 2.6 at 8 and under 5 till noon. ESE 7–11 km/h, gusts under 22 till noon, so drift goes west. Stop if it gusts over 30 or blows toward a fairway, tee or green",
+    "Never spray near golfers: work in the gaps behind groups",
+    "No irrigation on the rough tonight. No mowing the sprayed rough for 2 days, and don't collect clippings from the first 3 mows",
+    "Log the area sprayed"
+  ],
+  "spray_more": "Firepower 900: Schedule 6, impervious elbow gloves and eye or face protection. Hasten: add last and keep agitating until it's sprayed out.",
+  "post_checks": [
+    [
+      "decon",
+      "JD decontaminated before it goes near a green again",
+      "Tank cleaner, then triple rinse through tank, boom and filters. Firepower residue kills bent"
+    ],
+    [
+      "log",
+      "Area sprayed logged",
+      ""
+    ],
+    [
+      "irrig",
+      "No irrigation on the rough tonight",
+      ""
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "JD filter O-ring went missing on Tuesday",
+      "d": "Mitch, 10 Nov in #spraying: the JD filter O-ring was misplaced in Tuesday's clean-up, and that tank ran with the filter out because GreenLinks clogged it. A new O-ring has to be in before this tank goes in. It's the first rig check.",
+      "s": "#spraying 10 Nov"
+    },
+    {
+      "c": "red",
+      "t": "Decontaminate the JD before anything else goes in it",
+      "d": "Firepower (haloxyfop) kills couch and bent at very low doses. The JD is the greens and fairway sprayer: tank cleaner and a triple rinse through tank, boom and filters before it goes on anything else. It's on the post-application checklist.",
+      "s": "Firepower SDS"
+    },
+    {
+      "c": "",
+      "t": "Fairway edges are couch",
+      "d": "Firepower kills couch, so any overlap or drift onto fairway edges will show. Wind ESE 7–11 km/h through the morning pushes drift to the west side of each rough: keep section control on the boundaries and the boom low.",
+      "s": "Firepower tech note · AccuWeather"
+    },
+    {
+      "c": "info",
+      "t": "Buff-It: no label or SDS on file",
+      "d": "Handled as an acidifier (goggles, elbow gloves) with a 'drum label read' tick. It goes in first; haloxyfop's ester is more stable in buffered water.",
+      "s": "Turf Data stock records"
+    },
+    {
+      "c": "info",
+      "t": "Off-label and turf safety",
+      "d": "Firepower 900 is registered for forestry and industrial grass control, not turf; 90 g/ha haloxyfop here is under its label rates, which Victoria allows off-label. Its label doesn't list fescue as tolerant.",
+      "s": "ADAMA Firepower tech note · Quinstar guide"
+    },
+    {
+      "c": "info",
+      "t": "Nozzles: grey at 3.4 bar is about 284 L/ha",
+      "d": "Grey is ISO size 06: about 2.5 L/min at 3.4 bar. At 7.1 km/h that's about 284 L/ha on 75 cm nozzle spacing. The bucket test confirms it.",
+      "s": "ISO 10625 nozzle colour code · ADAMA Quinstar guide"
+    }
+  ]
+}

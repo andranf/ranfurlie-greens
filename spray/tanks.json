@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-12-rough-firepower",
+   "title": "Firepower, Rough",
+   "sprayer": "JD HD200",
+   "date_iso": "2026-11-12",
+   "date": "Thu 12 Nov",
+   "applicator": "Nathan Ferguson",
+   "method": "boom"
+  },
+  {
    "slug": "2026-11-11-bunkers-preem-penetrant",
    "title": "Pre-Emergent + Penetrant, Bunker Faces",
    "sprayer": "Silvan 2000 L",
