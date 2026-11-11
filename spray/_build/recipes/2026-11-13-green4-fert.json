@@ -1,0 +1,145 @@
+{
+  "slug": "2026-11-13-green4-fert",
+  "title": "Fert, 4th Green",
+  "sheet_name": "5800 - 300L/Ha - Fert to 4th Green ONLY",
+  "sprayer": "Toro 5800",
+  "date": "Fri 13 Nov",
+  "date_long": "Fri 13 Nov 2026",
+  "date_iso": "2026-11-13",
+  "area_ha": 1.0,
+  "rate_lha": 300,
+  "mix_l": 300,
+  "tank_cap_l": 1200,
+  "fill_l": 200,
+  "nozzles": "Red AIC",
+  "speed": "6.9 km/h",
+  "pressure": "4 bar",
+  "facts": [
+    "Toro 5800 · Red AIC · 6.9 km/h · 4 bar",
+    "300 L/ha",
+    "Quarter tank: 300 L",
+    "4th green only: 800 m², about 24 L"
+  ],
+  "last_load": "PGR + Fert, Fairways, 9 to 10 Nov, on Blue nozzles. It had iron sulphate and GreenMaxx in it: flush the tank, boom and filters with clean water first",
+  "site_check": "Spray sign out at the 4th green. Green mown, clippings and debris cleared",
+  "weather": "Delta T 2–8 · wind under 15 km/h · best 9am to 1pm · rain due from about 8pm",
+  "extra_checks": [
+    [
+      "nozzles",
+      "Red AIC nozzles fitted",
+      "The 5800 last ran Blue on fairways. Red AIC is the 300 L/ha greens setup"
+    ],
+    [
+      "rinse",
+      "Tank, boom and filters flushed with clean water",
+      "The fairway tanks had iron sulphate in them. This mix is alkaline, and iron left in the lines can drop out as sludge"
+    ],
+    [
+      "boxout",
+      "No GPS on the 5800: box out the 4th green, then fill in",
+      "Every part of the green"
+    ]
+  ],
+  "products": [
+    {
+      "id": "companion",
+      "rate": "300 mL/ha",
+      "rate_lha": 0.3,
+      "unit": "mL",
+      "sheet": 1,
+      "why": "The label says Companion goes in first, before anything else. There's no copper in this tank, so its copper restraint is clear."
+    },
+    {
+      "id": "urea",
+      "rate": "44 kg/ha",
+      "rate_lha": 44,
+      "unit": "kg",
+      "sheet": 2,
+      "why": "Big solid: goes in early, into plain water, so it's fully dissolved before the liquids go in. The tank will go cold. You're at {before} L."
+    },
+    {
+      "id": "prokelp",
+      "rate": "20 L/ha",
+      "rate_lha": 20,
+      "unit": "L",
+      "sheet": 3,
+      "haz": "Strongly alkaline (pH above 10).",
+      "why": "Strongly alkaline. Goes in once the GroMaxx is fully dissolved, agitator running. You're at {before} L."
+    },
+    {
+      "id": "highk",
+      "rate": "20 L/ha",
+      "rate_lha": 20,
+      "unit": "L",
+      "sheet": 4,
+      "why": "Strongly alkaline. In after the kelp, agitator running. You're at {before} L."
+    },
+    {
+      "id": "phozfight",
+      "rate": "10 L/ha",
+      "rate_lha": 10,
+      "unit": "L",
+      "sheet": 5,
+      "why": "Goes in last, as the sheet has it. Its label says check compatibility before tank mixing: watch the tank as it goes in. You're at {before} L."
+    }
+  ],
+  "ppe_note": "High K and Pro Kelp are strongly alkaline and irritate eyes: goggles, PVC gloves and apron when you pour them. Companion will damage eyes: face shield. GroMaxx dust irritates eyes: goggles on when you tip the bags. Eyewash on the rig.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "4th green only: 800 m², about 24 L. No GPS on this sprayer: box out the green (a lap round the edge), then fill in",
+    "Green mown, clippings and debris cleared first",
+    "Spray when Delta T is 2 to 8 and wind is under 15 km/h. Stop if it's blowing off target",
+    "Foliar pass: do NOT water in. No irrigation or hand watering on the 4th for 24 h",
+    "Never spray with golfers on or near the green, and keep people off it until it's dry",
+    "About 276 L will be left in the tank. Don't spray it out anywhere until Andy says where it goes"
+  ],
+  "spray_more": "Pro Kelp and Phoz Fight labels give their rates in 700 L of water per ha and both say check compatibility before tank mixing. GroMaxx: let every bag dissolve before the next product goes in.",
+  "post_checks": [
+    [
+      "irrig",
+      "4th green irrigation off for 24 h and nobody hand watering it",
+      "Foliar pass: it has to stay on the leaf"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "Leftover: about 276 L, Andy to say where it goes",
+      "d": "The 4th is 800 m², about 24 L at 300 L/ha. The quarter tank leaves about 276 L, enough for about 9,200 m². Andy to name the area before the boom comes on. Until it's sprayed out, the post-application checklist is 'Not finished' with the litres left.",
+      "s": "Andy, 12 Nov"
+    },
+    {
+      "c": "",
+      "t": "N: 0.23 kg per 100 m², foliar",
+      "d": "GroMaxx at 44 kg/ha is 20.2 kg N/ha (0.202 kg per 100 m²). Andy asked for 0.2; GreenKeeper rounds 43.5 kg/ha up to 44. High K adds 2.6 kg N/ha, so the tank is 22.9 kg N/ha. The 5 Nov greens tank ran GroMaxx at 50 kg/ha in the same water volume.",
+      "s": "GreenKeeper sheets 13 Nov and 5 Nov"
+    },
+    {
+      "c": "",
+      "t": "Alkaline tank: flush the 5800 first",
+      "d": "High K is potassium carbonate (pH 12.4–12.8) and Pro Kelp is pH 10–12.5. GreenMaxx came off the sheet because carbonate drops its iron and magnesium sulphate out as sludge. The 5800's last tanks carried iron sulphate and GreenMaxx, so the tank, boom and filters get a clean-water flush before this fill. Companion's 300 mL won't hold the pH down against 40 L of alkaline product: it's in as the penetrant.",
+      "s": "High K SDS 2025 · Pro Kelp SDS Nov 2025 · GreenMaxx SDS · Andy, 12 Nov"
+    },
+    {
+      "c": "",
+      "t": "24 h irrigation hold on the 4th",
+      "d": "Foliar pass, no water-in. Friday night's greens irrigation needs the 4th green's heads held. About 2 mm of rain is forecast from 8pm Friday.",
+      "s": "GreenKeeper sheet notes · Open-Meteo forecast fetched 12 Nov 6:22am"
+    },
+    {
+      "c": "info",
+      "t": "Boom setup: about 317 L/ha at 4 bar",
+      "d": "Toro's own colour code: Red is the 0.4 gpm size (1.51 L/min at 2.76 bar). At 4 bar that's about 1.82 L/min a nozzle; on 50 cm spacing at 6.9 km/h it's about 317 L/ha. The rate controller will sit near 3.6 bar to hold 300 L/ha.",
+      "s": "Toro Multi Pro Spray Nozzle Selection Guide (metric, 50 cm spacing)"
+    },
+    {
+      "c": "info",
+      "t": "Water volume is under the Pro Kelp and Phoz Fight labels",
+      "d": "Both labels give their rates in 700 L of water per ha. This is a 300 L/ha foliar pass, the same volume Phoz Fight went out in on the 21 Oct greens tank.",
+      "s": "Pro Kelp label · Phoz Fight label · GreenKeeper sheet 21 Oct"
+    }
+  ]
+}
