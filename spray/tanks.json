@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-13-green4-fert",
+   "title": "Fert, 4th Green",
+   "sprayer": "Toro 5800",
+   "date_iso": "2026-11-13",
+   "date": "Fri 13 Nov",
+   "applicator": "",
+   "method": "boom"
+  },
+  {
    "slug": "2026-11-12-rough-firepower",
    "title": "Firepower, Rough",
    "sprayer": "JD HD200",
