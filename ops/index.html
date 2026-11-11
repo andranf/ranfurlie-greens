@@ -890,7 +890,7 @@ function render(){
   if(AREAS[S.tab].embed&&$(`#view .mapcard[data-embed="${S.tab}"]`)){/* keep the page as it is */}
   else if(S.tab==="map"&&$("#view .mapcard:not([data-embed])")){/* keep the map frame as it is: reloading it would lose the valves you shut */}
   else{$("#view").innerHTML=v;wire()}
-  $("#foot").innerHTML=`Jobs, maps and stock rebuild from Slack and Notion every hour. Stocktakes, sand and Turfco loads from this page show within a minute or two.<br>Separate pages: <a href="../">Greens Live</a> · <a href="../machinery/">Machinery</a> · <a href="../stock.html">Shed stocktake</a> · <a href="../spray/">Spraying</a>`;
+  $("#foot").innerHTML=`Jobs, maps and stock rebuild from Slack and Notion every hour. Stocktakes, sand and Turfco loads from this page show within a minute or two.<br>Separate pages: <a href="../">Greens Live</a> · <a href="../moisture/">Moisture map</a> · <a href="../machinery/">Machinery</a> · <a href="../stock.html">Shed stocktake</a> · <a href="../spray/">Spraying</a>`;
 }
 function wire(){
   $$("[data-act=stocktake]").forEach(b=>b.onclick=()=>stocktakeSheet(b.dataset.area));
