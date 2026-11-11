@@ -875,10 +875,11 @@ details.mx-iv[open]>*:not(summary){animation:mxDown .3s ease-out;}
   --pv-red1:#ff5247;--pv-red2:#e8362b;--pv-amb1:#ffc53d;--pv-amb2:#ffab0a;--pv-amb-ink:#3a2500;
 }
 
-/* ---- canvas: morning light over turf (green from the left, sky from the right), fading into the system grey */
+/* ---- canvas: morning light over turf (green from the left, sky from the right), fading into the system grey.
+   Both washes die out inside the box, so there is no edge where the page column is narrower than the window. */
 #dash-root .mx::before{display:block;background:
-  radial-gradient(980px 560px at 6% -150px,var(--pv-wash1),transparent 72%),
-  radial-gradient(980px 600px at 97% -170px,var(--pv-wash2),transparent 72%),
+  radial-gradient(ellipse 35% 580px at 25% -150px,var(--pv-wash1),transparent 70%),
+  radial-gradient(ellipse 35% 620px at 75% -170px,var(--pv-wash2),transparent 70%),
   var(--ios-bg);background-repeat:no-repeat}
 
 /* ---- header */
