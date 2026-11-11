@@ -118,6 +118,7 @@ button{cursor:pointer}
 .facts{display:flex;flex-wrap:wrap;gap:6px}
 .fact{background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);border-radius:999px;padding:3px 12px;font-family:var(--display);font-weight:700;font-size:16px;white-space:nowrap}
 .fact.acc{background:var(--acc);color:var(--acc-ink);box-shadow:none}
+.fact.late{box-shadow:inset 0 0 0 2px #d08a1e}
 .iconbtn{width:40px;height:40px;border-radius:12px;border:0;background:var(--glass-lo);box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2);display:grid;place-items:center}
 .iconbtn svg{width:20px;height:20px}
 .testbar{background:var(--med-bg);color:var(--med);font-weight:600;text-align:center;padding:6px 12px;font-size:14px}
@@ -876,7 +877,7 @@ function facts(){
   if(k==="topdressing"){const c=S.live?.td?.call;if(c&&c.date===today()&&c.loads)f.push(`<span class="fact acc">Call ~${c.loads} loads · ${c.mm} mm</span>`)}
   else if(d){const j=jobsOf(k);const o=j.filter(isOpen);f.push(`<span class="fact acc">${o.length} open</span>`);const h=o.filter(x=>x.prio==="High").length;if(h)f.push(`<span class="fact">${h} high</span>`)}
   const gen=k==="topdressing"?(S.live?.updated?melTime(new Date(S.live.updated))+" "+shortDate(melYmd(new Date(S.live.updated))):""):(d?.generated?melTime(new Date(genUtc(d.generated)))+" "+shortDate(d.generated):"");
-  if(gen)f.push(`<span class="fact">Updated ${gen}</span>`);
+  if(gen){const gm=k==="topdressing"?0:genUtc(d.generated),late=gm&&Date.now()-gm>30*3600e3;f.push(`<span class="fact${late?" late":""}">${late?"No update since":"Updated"} ${gen}${late?" · "+ago(new Date(gm).toISOString()):""}</span>`)}
   $("#facts").innerHTML=f.join("");
 }
 let lastSig="";
