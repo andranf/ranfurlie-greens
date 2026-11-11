@@ -131,13 +131,13 @@
       "c": "info",
       "t": "Off-label and turf safety",
       "d": "Firepower 900 is registered for forestry and industrial grass control, not turf; 90 g/ha haloxyfop here is under its label rates, which Victoria allows off-label. Its label doesn't list fescue as tolerant.",
-      "s": "ADAMA Firepower tech note · Quinstar guide"
+      "s": "ADAMA Firepower tech note"
     },
     {
       "c": "info",
       "t": "Nozzles: grey at 3.4 bar is about 284 L/ha",
       "d": "Grey is ISO size 06: about 2.5 L/min at 3.4 bar. At 7.1 km/h that's about 284 L/ha on 75 cm nozzle spacing. The bucket test confirms it.",
-      "s": "ISO 10625 nozzle colour code · ADAMA Quinstar guide"
+      "s": "ISO 10625 nozzle colour code"
     }
   ]
 }
