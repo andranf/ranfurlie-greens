@@ -82,6 +82,8 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
     <div class="stat"><div class="k">Sprayed today</div><div class="v" id="sUsed">0 L</div></div>
     <div class="stat"><div class="k">Still to do</div><div class="v" id="sLeft">0 L</div></div>
   </div>
+  <p class="note" id="sync" style="margin:-4px 0 10px;font-weight:600"></p>
+  <div class="gun"><span>Your name:</span><input id="who" type="text" autocomplete="given-name" maxlength="30" placeholder="First name" style="width:150px"></div>
   <div class="gun"><span>Gun output from your bucket test:</span><input id="lpm" type="number" inputmode="decimal" min="1" max="60" step="0.5" value="10"><span>L/min</span></div>
   <div class="holes" id="holes"></div>
   <div class="mapbox"><svg id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of bunkers"></svg></div>
@@ -104,16 +106,23 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
     date:Q.get("date")||TODAY, label:Q.get("label")||"",
     lha:+(Q.get("lha")||3000), faceHa:+(Q.get("ha")||1.3),
     prods:[["Barricade",4.0/3000*1000],["Pervade",5.0/3000*1000]], // mL per L of mix at 3000 L/ha
-    data:"../../bunkers/data.json", recipe:"../2026-11-11-bunkers-preem-penetrant/"
+    data:"../../bunkers/data.json", recipe:"../2026-11-11-bunkers-preem-penetrant/",
+    // Shared progress: ticks go to the Zapier hook, which commits them to live.json; every phone reads live.json.
+    hook:"", live:"live.json",
+    api:"https://api.github.com/repos/andranf/ranfurlie-greens/contents/spray/bunker-map/live.json"
   };
-  var KEY="ranfurlie-bunkermap-"+CFG.job, st={done:{},base:{},hist:[],lpm:10};
+  var TEST=Q.get("test")==="1";
+  var KEY="ranfurlie-bunkermap-"+CFG.job, st={done:{},base:{},hist:[],lpm:10,out:[],sync:{},sent:{},gone:{}};
   try{var s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s){st=Object.assign(st,s)}}catch(e){}
   // Ticks saved on this phone by the earlier map (one list per day): earlier days show as done, today's carry over.
-  var LEGACY={};
+  var LEGACY={},LEGACY_AT={};
   try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);
     if(!/^ranfurlie-bunkermap-\d{4}-\d{2}-\d{2}$/.test(k)||k.slice(-10)<CFG.start)continue;
     var o=JSON.parse(localStorage.getItem(k)||"{}");
-    Object.keys(o.done||{}).forEach(function(n){var d=dayOf(o.done[n]); if(d===CFG.date){if(!st.done[n])st.done[n]=o.done[n]} else if(d<CFG.date) LEGACY[n]=d})}}catch(e){}
+    Object.keys(o.done||{}).forEach(function(n){var d=dayOf(o.done[n]); if(d===CFG.date){if(!st.done[n])st.done[n]=o.done[n]} else if(d<CFG.date){LEGACY[n]=d;LEGACY_AT[n]=o.done[n]}})}}catch(e){}
+  var who=""; try{who=localStorage.getItem("ranfurlie-bunkermap-who")||""; if(!who){who=(JSON.parse(localStorage.getItem("ranfurlie-spray-me")||"{}").name||"").split(" ")[0]}}catch(e){}
+  function me(){return who||"Someone"}
+  function esc(x){return String(x).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function before(n){if(st.done[n]){var d=dayOf(st.done[n]);return d<CFG.date?d:""} return DONE_BEFORE[n]||LEGACY[n]||""}
   function isToday(n){return !!st.done[n]&&dayOf(st.done[n])===CFG.date}
   function isDone(n){return !!(st.done[n]||before(n))}
@@ -122,7 +131,7 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
   var $=function(id){return document.getElementById(id)};
   $("when").textContent="Ranfurlie · "+CFG.label+" · Pre-Emergent + Penetrant · "+CFG.lha+" L/ha";
-  $("lpm").value=st.lpm||10;
+  $("lpm").value=st.lpm||10; $("who").value=who;
   var B=[],MAP=[],BOUNDS=[0,0,1000,700],FACE=0,PERL=0,hole="all",sel=null;
   function per(p){var s=0;p.forEach(function(r){for(var i=0;i<r.length-1;i++){s+=Math.hypot(r[i+1][0]-r[i][0],r[i+1][1]-r[i][1])}});return s}
   function path(p){return p.map(function(r){return "M"+r.map(function(q){return q[0].toFixed(1)+" "+q[1].toFixed(1)}).join("L")+"Z"}).join("")}
@@ -139,9 +148,9 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
     B.sort(function(a,b){return (a.h-b.h)||(a.n-b.n)});
     var totPer=B.reduce(function(s,b){return s+b.per},0);
     FACE=CFG.faceHa*10000/totPer; PERL=FACE*CFG.lha/10000;
-    $("basis").textContent="Each bunker's amount is its face, about "+FACE.toFixed(1)+" m down from the lip all the way round, at "+CFG.lha+" L/ha: about "+Math.round(PERL*10)+" L per 10 m of edge, or "+Math.round(CFG.lha/100)+" L per 10 × 10 m. Base too adds the raked base at "+CFG.lha+" L/ha. Green bunkers are done. Ticks are saved on this phone.";
-    legacyCard();
-    holesBar(); draw(); list(); stats();
+    $("basis").textContent="Each bunker's amount is its face, about "+FACE.toFixed(1)+" m down from the lip all the way round, at "+CFG.lha+" L/ha: about "+Math.round(PERL*10)+" L per 10 m of edge, or "+Math.round(CFG.lha/100)+" L per 10 × 10 m. Base too adds the raked base at "+CFG.lha+" L/ha. Green bunkers are done.";
+    if(!CFG.hook)legacyCard();
+    holesBar(); draw(); list(); stats(); syncNote(); pull();
   }).catch(function(){ $("list").innerHTML='<div class="rule"><b>Couldn\'t load the bunker list.</b><p>Check you have signal and reload.</p></div>' });
   function holesBar(){
     var hs=[]; B.forEach(function(b){if(hs.indexOf(b.h)<0)hs.push(b.h)});
@@ -184,7 +193,9 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
     h+='<div class="m">'+mlOf(m.face)+'</div>';
     if(st.base[b.n]) h+='<div class="m" style="color:var(--base)">Base too: about <b>'+fmtL(m.base)+'</b> more, '+secs(m.base)+'</div>';
     if(weedy(b)&&isFair(b)) h+='<div class="weed">Weeds noted in the last bunker audit</div>';
-    if(bf) h+='<div class="m" style="color:var(--go);font-weight:700">Sprayed '+dayName(bf)+'. Leave it</div>';
+    var lr=liveRec(b.n), lby=lr&&lr.by&&lr.by!=="Someone"?lr.by:"";
+    if(bf) h+='<div class="m" style="color:var(--go);font-weight:700">Sprayed '+dayName(bf)+(lby?' by '+esc(lby):'')+'. Leave it</div>';
+    else if(dn&&lby&&lby!==me()) h+='<div class="m" style="color:var(--go);font-weight:700">Done today by '+esc(lby)+'</div>';
     h+='</div><div class="act">'+(bf?'<button class="tick" type="button" disabled>Done '+dayName(bf)+'</button>':'<button class="tick" type="button" data-act="tick">'+(dn?"Done ✓":"Tick")+'</button>');
     if(isFair(b)&&!bf) h+='<button class="basebtn'+(st.base[b.n]?" on":"")+'" type="button" data-act="base">Base too</button>';
     h+='</div></div>';
@@ -228,6 +239,63 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
       copyText(s,"Copied. Paste it in the #spraying thread");
     });
   }
+  // ---------- shared progress ----------
+  var LIVE={},liveAt="",pulled=false,flushing=false,lastApi=0,armed=null;
+  function liveRec(n){var r=LIVE[n];return r&&(TEST||!r.test)?r:null}
+  function syncNote(){var e=$("sync"); if(!e)return;
+    if(!CFG.hook){e.textContent="Ticks are saved on this phone.";return}
+    var n=st.out.length;
+    e.textContent=n?"Sending your ticks to the shared map. Keep this page open until this line changes.":(pulled?"Shared map: everyone's ticks show here, and yours reach the others within a couple of minutes.":"Loading the shared map…");
+    e.style.color=n?"var(--base)":"var(--go)";
+  }
+  function queue(p){ if(!CFG.hook)return; p.job=CFG.job; p.by=me(); p.sent_at=new Date().toISOString(); if(TEST)p.__test="1"; st.out.push(p); save(); syncNote(); flush() }
+  function flush(){
+    if(!CFG.hook||flushing||!st.out.length)return; flushing=true;
+    fetch(CFG.hook,{method:"POST",mode:"no-cors",body:JSON.stringify(st.out[0])}).then(function(){st.out.shift();flushing=false;save();syncNote();flush()},function(){flushing=false;syncNote()});
+  }
+  function dropPending(kind,n){for(var i=st.out.length-1;i>=(flushing?1:0);i--){if(st.out[i].kind===kind&&st.out[i].n===n){st.out.splice(i,1);return true}}return false}
+  function tick(n){
+    st.done[n]=new Date().toISOString(); st.hist.push(n); delete st.gone[n];
+    if(dropPending("untick",n)){st.sync[n]=1;return}
+    delete st.sync[n]; st.sent[n]=Date.now();
+    queue({kind:"tick",n:n,at:st.done[n],base:st.base[n]?"1":"0"});
+  }
+  function untick(n){
+    var was=st.sync[n]; delete st.done[n]; delete st.sync[n];
+    if(dropPending("tick",n)&&!was)return;
+    if(CFG.hook)st.gone[n]=Date.now();
+    queue({kind:"untick",n:n});
+  }
+  function merge(j){
+    if(!j||!j.jobs||(liveAt&&j.updated&&j.updated<liveAt))return;   // not a newer copy than the one showing
+    liveAt=j.updated||liveAt; LIVE=(j.jobs[CFG.job]&&j.jobs[CFG.job].done)||{}; pulled=true;
+    var now=Date.now(),pend={},up=[];
+    st.out.forEach(function(p){if(p.kind==="ticks"){try{JSON.parse(p.items).forEach(function(x){pend[x.n]=1})}catch(e){}}else pend[p.n]=1});
+    Object.keys(LIVE).forEach(function(n){var r=liveRec(n); if(!r)return;
+      if(st.gone[n]){ if(now-st.gone[n]<15*60000)return; delete st.gone[n] }   // un-ticked here, waiting for it to drop off
+      if(r.base&&!st.sync[n])st.base[n]=1;
+      st.done[n]=r.at; st.sync[n]=1 });
+    Object.keys(st.gone).forEach(function(n){if(!liveRec(n))delete st.gone[n]});
+    if(CFG.hook){
+      Object.keys(st.done).forEach(function(n){ if(liveRec(n)||pend[n])return;
+        if(st.sync[n]){delete st.done[n];delete st.sync[n];return}                 // un-ticked on another phone
+        if(!st.sent[n]||now-st.sent[n]>10*60000){st.sent[n]=now;up.push({n:+n,at:st.done[n],base:st.base[n]?1:0})} });   // on this phone only: send it
+      Object.keys(LEGACY).forEach(function(n){ if(liveRec(n)||pend[n]||st.done[n])return; var k="L"+n;
+        if(!st.sent[k]||now-st.sent[k]>10*60000){st.sent[k]=now;up.push({n:+n,at:LEGACY_AT[n],base:0})} });
+      if(up.length)queue({kind:"ticks",items:JSON.stringify(up)});
+    }
+    if(B.length)refresh(); else save();
+    syncNote();
+  }
+  function pull(){
+    fetch(CFG.live+"?t="+Date.now()).then(function(r){return r.ok?r.json():null}).then(merge).catch(function(){});
+    var now=Date.now(); if(now-lastApi<170000)return; lastApi=now;   // fresher copy straight from GitHub, a few times an hour
+    fetch(CFG.api).then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&d.content)merge(JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\s/g,""))))))}).catch(function(){});
+  }
+  setInterval(function(){if(!document.hidden){pull();flush()}},45000);
+  document.addEventListener("visibilitychange",function(){if(!document.hidden){pull();flush()}});
+  window.addEventListener("online",flush);
+  $("who").addEventListener("change",function(){who=this.value.replace(/\s+/g," ").trim().slice(0,30);try{localStorage.setItem("ranfurlie-bunkermap-who",who)}catch(e){}});   // no redraw here: it would swallow the tap that follows
   function toast(t){var e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on")},1800)}
   function refresh(){holesBar();draw();list();stats();save()}
   function select(n,scroll){sel=n;draw();list();if(scroll){var e=$("bk"+n);if(e)e.scrollIntoView({behavior:"smooth",block:"center"})}}
@@ -236,12 +304,16 @@ h2{font-family:var(--display);font-weight:700;font-size:24px;margin:16px 0 6px}
   $("list").addEventListener("click",function(e){
     var btn=e.target.closest("button"), card=e.target.closest(".bk"); if(!card)return; var n=+card.dataset.n;
     if(!btn){select(n,false);return}
-    if(btn.dataset.act==="tick"){ if(before(n))return; if(st.done[n]){delete st.done[n]} else {st.done[n]=new Date().toISOString(); st.hist.push(n); toast("Bunker "+n+" done")} }
-    if(btn.dataset.act==="base"){ if(st.base[n]) delete st.base[n]; else st.base[n]=1 }
+    if(btn.dataset.act==="tick"){ if(before(n))return;
+      if(st.done[n]){ var r=liveRec(n);
+        if(r&&r.by&&r.by!==me()&&armed!==n){armed=n;setTimeout(function(){if(armed===n)armed=null},4000);toast("Ticked by "+r.by+". Tap again to un-tick");return}
+        armed=null; untick(n) }
+      else { tick(n); toast("Bunker "+n+" done") } }
+    if(btn.dataset.act==="base"){ if(st.base[n]) delete st.base[n]; else { st.base[n]=1; if(st.done[n])queue({kind:"tick",n:n,at:st.done[n],base:"1"}) } }
     sel=n; refresh();
   });
   $("lpm").addEventListener("input",function(){st.lpm=+this.value||10;list();save()});
-  $("undo").addEventListener("click",function(){var n=st.hist.pop();if(n&&isToday(n)){delete st.done[n];toast("Bunker "+n+" un-ticked");refresh()}else toast("Nothing to undo")});
+  $("undo").addEventListener("click",function(){var n=st.hist.pop();if(n&&isToday(n)){untick(n);toast("Bunker "+n+" un-ticked");refresh()}else toast("Nothing to undo")});
   $("copy").addEventListener("click",function(){
     var dn=B.filter(function(b){return isToday(b.n)});
     var bases=B.filter(function(b){return st.base[b.n]&&isToday(b.n)}).map(function(b){return b.n});
