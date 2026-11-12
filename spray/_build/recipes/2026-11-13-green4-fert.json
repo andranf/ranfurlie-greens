@@ -6,23 +6,23 @@
   "date": "Fri 13 Nov",
   "date_long": "Fri 13 Nov 2026",
   "date_iso": "2026-11-13",
-  "area_ha": 1.0,
+  "area_ha": 0.3333,
   "rate_lha": 300,
-  "mix_l": 300,
+  "mix_l": 100,
   "tank_cap_l": 1200,
-  "fill_l": 200,
+  "fill_l": 65,
   "nozzles": "Red AIC",
   "speed": "6.9 km/h",
   "pressure": "4 bar",
   "facts": [
     "Toro 5800 · Red AIC · 6.9 km/h · 4 bar",
     "300 L/ha",
-    "Quarter tank: 300 L",
+    "100 L tank",
     "4th green only: 800 m², about 24 L"
   ],
   "last_load": "PGR + Fert, Fairways, 9 to 10 Nov, on Blue nozzles. It had iron sulphate and GreenMaxx in it: flush the tank, boom and filters with clean water first",
   "site_check": "Spray sign out at the 4th green. Green mown, clippings and debris cleared",
-  "weather": "Delta T 2–8 · wind under 15 km/h · best 9am to 1pm · rain due from about 8pm",
+  "weather": "Delta T 2–8 · wind under 15 km/h · Delta T was 1.5 at 4:45am: check the 6th-green station before you spray",
   "extra_checks": [
     [
       "nozzles",
@@ -42,19 +42,20 @@
   ],
   "products": [
     {
-      "id": "companion",
-      "rate": "300 mL/ha",
-      "rate_lha": 0.3,
+      "id": "buffit",
+      "rate": "500 mL/ha",
+      "rate_lha": 0.5,
       "unit": "mL",
-      "sheet": 1,
-      "why": "The label says Companion goes in first, before anything else. There's no copper in this tank, so its copper restraint is clear."
+      "sheet": 5,
+      "note": "Goes in 1st (sheet has it last).",
+      "why": "Buffering agents go in first, into plain water with the agitator on, before the fertilisers. You're at {before} L."
     },
     {
       "id": "urea",
       "rate": "44 kg/ha",
       "rate_lha": 44,
       "unit": "kg",
-      "sheet": 2,
+      "sheet": 1,
       "why": "Big solid: goes in early, into plain water, so it's fully dissolved before the liquids go in. The tank will go cold. You're at {before} L."
     },
     {
@@ -62,7 +63,7 @@
       "rate": "20 L/ha",
       "rate_lha": 20,
       "unit": "L",
-      "sheet": 3,
+      "sheet": 2,
       "haz": "Strongly alkaline (pH above 10).",
       "why": "Strongly alkaline. Goes in once the GroMaxx is fully dissolved, agitator running. You're at {before} L."
     },
@@ -71,7 +72,7 @@
       "rate": "20 L/ha",
       "rate_lha": 20,
       "unit": "L",
-      "sheet": 4,
+      "sheet": 3,
       "why": "Strongly alkaline. In after the kelp, agitator running. You're at {before} L."
     },
     {
@@ -79,22 +80,22 @@
       "rate": "10 L/ha",
       "rate_lha": 10,
       "unit": "L",
-      "sheet": 5,
+      "sheet": 4,
       "why": "Goes in last, as the sheet has it. Its label says check compatibility before tank mixing: watch the tank as it goes in. You're at {before} L."
     }
   ],
-  "ppe_note": "High K and Pro Kelp are strongly alkaline and irritate eyes: goggles, PVC gloves and apron when you pour them. Companion will damage eyes: face shield. GroMaxx dust irritates eyes: goggles on when you tip the bags. Eyewash on the rig.",
+  "ppe_note": "High K and Pro Kelp are strongly alkaline and irritate eyes: goggles, PVC gloves and apron when you pour them. Buff-It: no label on file, so treat it as an acid and read the drum label: goggles and elbow gloves. GroMaxx dust irritates eyes: goggles on when you tip the bags. Eyewash on the rig.",
   "spray_ppe": [
     "overalls",
     "gloves"
   ],
   "spray_rules": [
     "4th green only: 800 m², about 24 L. No GPS on this sprayer: box out the green (a lap round the edge), then fill in",
-    "Green mown, clippings and debris cleared first",
-    "Spray when Delta T is 2 to 8 and wind is under 15 km/h. Stop if it's blowing off target",
+    "Dew off the green first, clippings and debris cleared",
+    "Check Delta T at the 6th-green station before you spray: it was 1.5 at 4:45am and needs to be 2 to 8. If it's still under 2 at 7, call Andy. Stop if it's blowing off target",
+    "Shotgun start is 8:00 and groups reach the 4th about 8:15. Be off the green before then and keep people off it until it's dry",
     "Foliar pass: do NOT water in. No irrigation or hand watering on the 4th for 24 h",
-    "Never spray with golfers on or near the green, and keep people off it until it's dry",
-    "About 276 L will be left in the tank. Don't spray it out anywhere until Andy says where it goes"
+    "About 76 L will be left in the tank. Check with Andy where it goes before you spray it out"
   ],
   "spray_more": "Pro Kelp and Phoz Fight labels give their rates in 700 L of water per ha and both say check compatibility before tank mixing. GroMaxx: let every bag dissolve before the next product goes in.",
   "post_checks": [
@@ -107,9 +108,27 @@
   "flags": [
     {
       "c": "red",
-      "t": "Leftover: about 276 L, Andy to say where it goes",
-      "d": "The 4th is 800 m², about 24 L at 300 L/ha. The quarter tank leaves about 276 L, enough for about 9,200 m². Andy to name the area before the boom comes on. Until it's sprayed out, the post-application checklist is 'Not finished' with the litres left.",
-      "s": "Andy, 12 Nov"
+      "t": "Sheet changed since Thursday: 100 L tank, Buff-It in for Companion",
+      "d": "The GreenKeeper sheet now covers 3,333 m² (100 L) and has Buff-It 500 mL/ha in place of Companion. This page was rebuilt from the sheet at 5am Friday. The sheet's notes still say 'QUARTER TANK - 300 L': that line is out of date. Buff-It is last on the sheet; the page has it first, into plain water.",
+      "s": "GreenKeeper sheet 13 Nov, read 5:02am Fri"
+    },
+    {
+      "c": "red",
+      "t": "Brief says 'watered in'. The sheet says do NOT water in",
+      "d": "This morning's #dailycoursesetup brief says to make sure the 4th is 'watered in and dry' before the 8:15 groups. The sheet is a foliar pass: do not water in, no irrigation on the 4th for 24 h. This page follows the sheet.",
+      "s": "#dailycoursesetup dawn re-check 13 Nov · GreenKeeper sheet notes"
+    },
+    {
+      "c": "",
+      "t": "Delta T 1.5 at 4:45am, spray on the board for 7am",
+      "d": "SpecConnect 6th station at 4:45am: 13.5 °C, RH 85%, Delta T 1.5, wind SSE 2 km/h, heavy dew. It needs 2 to 8 before the boom goes on. The board has mix 6:30 and spray 7:00, ahead of the 8:00 shotgun; groups reach the 4th about 8:15.",
+      "s": "#dailycoursesetup dawn re-check 13 Nov"
+    },
+    {
+      "c": "",
+      "t": "Leftover: about 76 L",
+      "d": "The 4th is 800 m², about 24 L at 300 L/ha. The 100 L tank leaves about 76 L, enough for about 2,500 m². Andy to say where it goes.",
+      "s": "GreenKeeper sheet 13 Nov"
     },
     {
       "c": "",
@@ -120,7 +139,7 @@
     {
       "c": "",
       "t": "Alkaline tank: flush the 5800 first",
-      "d": "High K is potassium carbonate (pH 12.4–12.8) and Pro Kelp is pH 10–12.5. GreenMaxx came off the sheet because carbonate drops its iron and magnesium sulphate out as sludge. The 5800's last tanks carried iron sulphate and GreenMaxx, so the tank, boom and filters get a clean-water flush before this fill. Companion's 300 mL won't hold the pH down against 40 L of alkaline product: it's in as the penetrant.",
+      "d": "High K is potassium carbonate (pH 12.4–12.8) and Pro Kelp is pH 10–12.5. GreenMaxx came off the sheet because carbonate drops its iron and magnesium sulphate out as sludge. The 5800's last tanks carried iron sulphate and GreenMaxx, so the tank, boom and filters get a clean-water flush before this fill. Buff-It at 500 mL/ha won't hold the pH down against 40 L/ha of alkaline product.",
       "s": "High K SDS 2025 · Pro Kelp SDS Nov 2025 · GreenMaxx SDS · Andy, 12 Nov"
     },
     {
@@ -141,5 +160,9 @@
       "d": "Both labels give their rates in 700 L of water per ha. This is a 300 L/ha foliar pass, the same volume Phoz Fight went out in on the 21 Oct greens tank.",
       "s": "Pro Kelp label · Phoz Fight label · GreenKeeper sheet 21 Oct"
     }
+  ],
+  "applicator": [
+    "Mitch Mahoney",
+    "U08K55E3QJU"
   ]
 }
