@@ -803,5 +803,77 @@
   ],
   "why": "Fertiliser goes in last. You're at {before} L.",
   "src": "Oasis Turf SDS 2025 · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2025/05/HIGH-K-SDS-2025.pdf\" target=\"_blank\" rel=\"noopener\">SDS</a> · <a href=\"https://www.oasisturf.com.au/wp-content/uploads/2024/03/OT-High-K.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "brek": {
+  "name": "Brek 500 SC",
+  "gk_name": "Brek 500 SC",
+  "sig": "POISON",
+  "sigc": "poison",
+  "form": "Suspension concentrate (SC)",
+  "what": "Herbicide: propyzamide 500 g/L (winter grass in couch)",
+  "haz": "Irritates eyes and skin. Damages bent, fescue, rye and bluegrass.",
+  "hazFull": "Label: will irritate the eyes and skin. PPE when mixing and when spraying: cotton overalls buttoned to neck and wrist, washable hat, elbow-length PVC gloves. DO NOT use on bluegrass, ryegrass, fescue or bent grass. Water in with 12–25 mm straight after application and again 24 hours later. Spray in 400–800 L/ha water.",
+  "ppe": [
+   "overalls",
+   "hat",
+   "gloves"
+  ],
+  "how": [
+   "Shake the drum hard",
+   "Measure {amt}",
+   "Pour into moving water, agitator on",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "A suspension concentrate goes in once the water is buffered and before the EC, so it disperses first. You're at {before} L.",
+  "src": "Turf Culture Brek 500 SC label, APVMA 62471/103758 · <a href=\"https://greenwayturfsolutions.com/wp-content/uploads/2024/10/TC-Brek-500-SC-Herbicide-Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "luximax": {
+  "name": "LuxiMax",
+  "gk_name": "Luximax",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Emulsifiable concentrate (EC)",
+  "what": "Herbicide: cinmethylin 750 g/L",
+  "haz": "Irritates eyes and skin. Repeated exposure may cause allergic disorders.",
+  "soft": true,
+  "hazFull": "Label: irritates the eyes and skin; repeated exposure may cause allergic disorders. PPE when opening the drum and mixing: cotton overalls buttoned to neck and wrist, washable hat, PVC or rubber apron, elbow-length chemical-resistant gloves, and a face shield or goggles. Wash gloves and clothing after each day's use.",
+  "ppe": [
+   "overalls",
+   "hat",
+   "gloves",
+   "shield",
+   "apron"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour into moving water, agitator on",
+   "Rinse the measure and drum 3 times into the tank"
+  ],
+  "why": "An EC goes in after the suspension concentrate has dispersed. You're at {before} L.",
+  "src": "BASF Luximax label, APVMA 86413 · <a href=\"https://www.apvma.gov.au/sites/default/files/publication/55631-86413_-_115720_-_luximax_herbicide_-_public_release_summary.pdf\" target=\"_blank\" rel=\"noopener\">APVMA summary</a>"
+ },
+ "broadwet": {
+  "name": "Broadwet",
+  "gk_name": "Broadwet",
+  "sig": "No label on file",
+  "sigc": "",
+  "form": "Wetting agent",
+  "what": "Soil wetting agent",
+  "haz": "No label or SDS on file: read the drum label.",
+  "soft": true,
+  "hazFull": "No label or SDS in Turf Data. Read the drum label before use; until then goggles and elbow gloves when pouring. It can foam: pour it in slowly, with most of the water already in the tank.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Read the drum label first",
+   "Measure {amt}",
+   "Pour in slowly, agitator on. Reactor Defoamer if it foams",
+   "Rinse the drums 3 times into the tank"
+  ],
+  "why": "Wetting agents go in last, with most of the water already in, so they don't foam the tank. You're at {before} L.",
+  "src": "Turf Data stock records · no label or SDS found"
  }
 }

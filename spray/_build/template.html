@@ -568,11 +568,12 @@ function saveMe(w){try{localStorage.setItem(MEKEY,JSON.stringify(w))}catch(e){}}
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function hm(t){if(!t)return"";return new Date(t).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}
-function litres(){if(st.topAt)return SHEET.total;if(!st.fillAt)return 0;var v=SHEET.startFill;P.forEach(function(p){if(st.added[p.id])v+=p.amt});return v}
-function beforeAdd(p){var v=SHEET.startFill;for(var j=0;j<P.length;j++){if(P[j]===p)break;v+=P[j].amt}return v}
+function litres(){if(st.topAt)return SHEET.total;if(!st.fillAt)return 0;var v=SHEET.startFill;P.forEach(function(p){if(st.added[p.id])v+=(p.pre_l||0)+p.amt});return v}
+/* pre_l (16 Nov 2026): water topped up just before a product, e.g. most of the water in before a big wetting agent. */
+function beforeAdd(p){var v=SHEET.startFill;for(var j=0;j<P.length;j++){if(P[j]===p){v+=(p.pre_l||0);break}v+=(P[j].pre_l||0)+P[j].amt}return v}
 function afterAdd(p){return beforeAdd(p)+p.amt}
 var ALL=afterAdd(P[P.length-1]);
-var PROD_L=ALL-SHEET.startFill;
+var PROD_L=0;P.forEach(function(p){PROD_L+=p.amt});
 function fmt(v,d){d=d==null?1:d;return (Math.round(v*Math.pow(10,d))/Math.pow(10,d)).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:d})}
 function pct(v){return Math.min(100,v/SHEET.cap*100)}
 function amtText(p){return p.show+" "+p.u}
@@ -676,13 +677,14 @@ function render(){
       '<div class="amount">'+big(String(SHEET.startFill),"L")+tank(0,SHEET.startFill,!!st.fillAt)+'<div class="sub"><span>clean water</span><span>agitator on</span></div></div>'+
       '<ol class="how"><li>Fill to '+SHEET.startFill+' L on the gauge</li><li>Agitator on until sprayed out</li><li>Rinse empty drums into the tank as you go</li></ol>'+
       '<div class="actions">'+back()+'<button class="btn go" type="button" data-act="fill">'+(st.fillAt?"Filled "+hm(st.fillAt)+" · Next":SHEET.startFill+" L in")+'</button></div>'+
-      '<details class="more"><summary>Why '+SHEET.startFill+' L</summary><div class="morebody"><p style="margin:0">About two-thirds of the '+SHEET.total+' L mix, so every product goes into plenty of moving water. The '+N+' products add about '+fmt(PROD_L,0)+' L, then you top up to '+SHEET.total+' L.</p></div></details>';
+      '<details class="more"><summary>Why '+SHEET.startFill+' L</summary><div class="morebody"><p style="margin:0">'+(R.fill_why?esc(R.fill_why):'About two-thirds of the '+SHEET.total+' L mix, so every product goes into plenty of moving water. The '+N+' products add about '+fmt(PROD_L,0)+' L, then you top up to '+SHEET.total+' L.')+'</p></div></details>';
   }
   else if(s.k==="prod"){
     var p=s.p, done=st.added[p.id];
     h='<div class="kicker"><span class="ordn">'+(s.i+1)+' of '+N+'</span><span class="chip '+p.sigc+'">'+p.sig+'</span></div>'+
       '<h2 class="pname">'+p.name+'</h2>'+
       '<div class="amount">'+big(p.show,p.u)+tank(beforeAdd(p),afterAdd(p),!!done)+'<div class="sub"><span>'+p.rate+' × '+AREA+'</span><span>tank after <b>'+fmt(afterAdd(p))+' L</b></span></div></div>'+
+      (p.pre_l?'<div class="note"><b>Water first</b><span>Top up with water to '+fmt(beforeAdd(p),0)+' L on the gauge before this goes in</span></div>':'')+
       (p.note?'<div class="note"><b>Order</b><span>'+p.note+'</span></div>':'')+
       (p.haz?'<div class="haz'+(p.soft?' soft':' hot')+'">'+WARN+'<span>'+p.haz+'</span></div>':'')+
       ppeRow(p.ppe,p.sigc==="poison")+
@@ -693,7 +695,7 @@ function render(){
         '<dt>What</dt><dd>'+p.what+'</dd><dt>Type</dt><dd>'+p.form+'</dd>'+
         '<dt>Why here</dt><dd>'+fill(p.why,p)+'</dd><dt>Hazard</dt><dd>'+p.hazFull+'</dd>'+
         '<dt>PPE</dt><dd>'+p.ppe.map(function(k){return FULL[k]}).join("; ")+'</dd>'+
-        '<dt>Sheet</dt><dd>Order '+p.sheet+' on the GreenKeeper sheet</dd></dl>'+
+        (p.sheet?'<dt>Sheet</dt><dd>Order '+p.sheet+' on the GreenKeeper sheet</dd>':'')+'</dl>'+
         '<div class="src">'+p.src+'</div></div></details>';
   }
   else if(s.k==="topup"){
@@ -745,7 +747,8 @@ function renderRecipe(){
   var h='<li class="'+(st.fillAt?"done":(cur.k==="fill"?"now":""))+'"><span class="o">'+(st.fillAt?"✓":"W")+'</span><span class="nm">Water</span><span class="q">'+SHEET.startFill+'<u>L</u></span></li>';
   P.forEach(function(p,i){
     var cls=st.added[p.id]?"done":(cur.p===p?"now":"");
-    h+='<li class="'+cls+'"><span class="o">'+(st.added[p.id]?"✓":(i+1))+'</span><span class="nm">'+p.name+'<small>'+p.rate+(p.sheet!==i+1?' · sheet order '+p.sheet:'')+'</small></span><span class="q">'+p.show+'<u>'+p.u+'</u></span></li>';
+    if(p.pre_l)h+='<li class="'+cls+'"><span class="o">'+(st.added[p.id]?"✓":"W")+'</span><span class="nm">Water to '+fmt(beforeAdd(p),0)+' L</span><span class="q">'+fmt(p.pre_l,0)+'<u>L</u></span></li>';
+    h+='<li class="'+cls+'"><span class="o">'+(st.added[p.id]?"✓":(i+1))+'</span><span class="nm">'+p.name+'<small>'+p.rate+(p.sheet&&p.sheet!==i+1?' · sheet order '+p.sheet:'')+'</small></span><span class="q">'+p.show+'<u>'+p.u+'</u></span></li>';
   });
   h+='<li class="'+(st.topAt?"done":(cur.k==="topup"?"now":""))+'"><span class="o">'+(st.topAt?"✓":"W")+'</span><span class="nm">Top up to '+SHEET.total+' L</span><span class="q">'+fmt(SHEET.total-ALL)+'<u>L</u></span></li>';
   $("recipe").innerHTML=h;

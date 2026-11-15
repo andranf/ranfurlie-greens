@@ -1,0 +1,149 @@
+{
+  "slug": "2026-11-16-fairways-brek-luximax",
+  "title": "Brek + LuxiMax + Broadwet, Fairways",
+  "sprayer": "Toro 5800",
+  "date": "Mon 16 Nov",
+  "date_long": "Mon 16 Nov 2026",
+  "date_iso": "2026-11-16",
+  "area_ha": 2.4,
+  "rate_lha": 500,
+  "mix_l": 1200,
+  "tank_cap_l": 1200,
+  "fill_l": 600,
+  "fill_why": "Half the tank first, so the Buff-It, Brek and LuxiMax go into plenty of moving water. Most of the rest of the water goes in before the Broadwet, so it doesn't foam.",
+  "nozzles": "Blue AIC 110-10",
+  "speed": "9.0 km/h",
+  "pressure": "3.0 bar",
+  "last_load": "Fert, 4th Green, Fri 13 Nov. The tank must be empty and flushed. Anything still in it: call Andy before you fill",
+  "site_check": "Spray signs out at the fairways you're on",
+  "weather": "Wind 3–10 km/h and not gusting · no inversion · no heavy rain due",
+  "facts": [
+    "Toro 5800 · Blue AIC 110-10 · 9.0 km/h · 3.0 bar",
+    "500 L/ha",
+    "2.4 ha a tank",
+    "Fairways only"
+  ],
+  "extra_checks": [
+    [
+      "swap",
+      "Red AIC swapped back to Blue AIC 110-10",
+      "Red went on for the 4th green on Friday"
+    ],
+    [
+      "sections",
+      "Every boom section switches off",
+      "They go OFF before every approach and at every fairway edge"
+    ],
+    [
+      "holes",
+      "You know which holes this rig is doing",
+      "The JD is on fairways too: agreed with Ben or Neil before you start"
+    ],
+    [
+      "labels",
+      "Buff-It and Broadwet drum labels read",
+      "Rate, mixing and PPE"
+    ],
+    [
+      "stock",
+      "Enough for the tanks you need",
+      "Each tank: 1.44 L Buff-It, 6.0 L Brek, 2.4 L LuxiMax, 64.8 L Broadwet"
+    ]
+  ],
+  "products": [
+    {
+      "id": "buffit",
+      "rate": "600 mL/ha",
+      "rate_lha": 0.6,
+      "unit": "L"
+    },
+    {
+      "id": "brek",
+      "rate": "2.5 L/ha",
+      "rate_lha": 2.5,
+      "unit": "L",
+      "note": "First tank of the day only: tip in the 100 mL of Propaz 500 SC and use 100 mL less Brek."
+    },
+    {
+      "id": "luximax",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "unit": "L"
+    },
+    {
+      "id": "broadwet",
+      "rate": "27 L/ha",
+      "rate_lha": 27.0,
+      "unit": "L",
+      "fill_to": 1100,
+      "note": "Goes in last, and slowly."
+    }
+  ],
+  "ppe_note": "Brek 500 SC and LuxiMax both irritate eyes and skin: apron and a face shield or goggles when you pour. Buff-It and Broadwet have no label on file, so read the drum labels. Eyewash on the rig.",
+  "spray_ppe": [
+    "overalls",
+    "hat",
+    "gloves"
+  ],
+  "spray_rules": [
+    "Fairways only. This mix damages cool-season grass: do not overspray into the rough or onto approaches",
+    "Boom low. Sections OFF before every approach and at every fairway edge. Never spray through a turn",
+    "Edge passes only with the wind blowing off the rough onto the fairway. If it isn't, leave the edge pass out",
+    "Keep off tees, fescue rough and any bent",
+    "Wind 3 to 10 km/h and not gusting. Over 10 or gusting: stop",
+    "No inversion. Dead calm with fog, mist or smoke hanging: wait",
+    "Water in straight after each hole is finished: 12 to 25 mm, and again 24 h later. Spray App Fairways program, 45 min per head each time, run in cycles so nothing runs off onto an approach, surround or rough",
+    "Nobody drives or walks from a sprayed fairway onto an approach, surround or green until that hole is watered in. Wet spray tracks on tyres and shoes",
+    "2.4 ha a tank. Mix another tank on the page each time you refill"
+  ],
+  "spray_more": "Brek 500 SC label: 400–800 L/ha water; water in with 12–25 mm straight after and again 24 hours later; not for use on bluegrass, ryegrass, fescue or bent. Spray App Fairways program: 10 min is about 2.7 mm, so 45 min per head each time. Rain: no heavy rain forecast within 3 days; Friday is the one to watch if this slips to Tuesday or Wednesday.",
+  "post_checks": [
+    [
+      "water",
+      "Water-in started on every hole sprayed",
+      "12–25 mm now (45 min per head on Spray App Fairways), and again in 24 h"
+    ],
+    [
+      "decon",
+      "Full clean-out before this sprayer goes near greens or tees",
+      "Tank cleaner, then triple rinse tank, boom, filters and nozzles. Rinse water out over a sprayed fairway"
+    ],
+    [
+      "tanks",
+      "Number of tanks and fairways done written in GreenKeeper",
+      ""
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "This mix damages cool-season grass",
+      "d": "Fairways only. Do not overspray into the rough. Do not overspray onto approaches. Sections off before every approach and at every fairway edge. This is the number one priority on this job.",
+      "s": "Andy, 15 Nov"
+    },
+    {
+      "c": "",
+      "t": "Blue AIC 110-10 back on",
+      "d": "Red AIC went on for the 4th green on Friday. Swap back to Blue AIC 110-10 before you fill, and make sure the tank is empty and flushed.",
+      "s": "13 Nov 4th green recipe"
+    },
+    {
+      "c": "",
+      "t": "Tentative for Monday",
+      "d": "If conditions aren't right to keep it on the fairway, it doesn't go out. No drama if it waits.",
+      "s": "Andy, 15 Nov"
+    },
+    {
+      "c": "",
+      "t": "Two rigs on fairways: agree the holes",
+      "d": "Each 5800 tank covers 2.4 ha and each JD tank covers 1.5 ha. All fairways is 14.5 ha, about 7,270 L. Ben or Neil to say which holes each rig does before you start, so nothing gets missed or double-sprayed.",
+      "s": "GreenKeeper sheets, 16 Nov"
+    },
+    {
+      "c": "info",
+      "t": "First tank of the day: use up the Propaz",
+      "d": "Tip the last 100 mL of Propaz 500 SC into the first tank of the day and use 100 mL less Brek in that tank. Same active as Brek.",
+      "s": "Andy"
+    }
+  ]
+}

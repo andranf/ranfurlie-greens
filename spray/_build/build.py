@@ -67,6 +67,7 @@ def main():
         sys.exit("slug must be lower-case letters, numbers and dashes.")
 
     prods = []
+    level = None
     for e in R["products"]:
         base = lib.get(e["id"])
         if base is None:
@@ -83,12 +84,26 @@ def main():
             amt = e["rate_lha"] * R["area_ha"]
             p["show"], p["u"] = shown(amt, unit)
         p["amt"] = round(amt, 4)
+        # fill_to (16 Nov 2026): top the tank up with water to this level just before the product goes in,
+        # e.g. most of the water in before a big wetting agent so it doesn't foam. Needs fill_l set in the recipe.
+        if e.get("fill_to"):
+            if "fill_l" not in R:
+                sys.exit("fill_to needs fill_l set in the recipe.")
+            if level is None:
+                level = R["fill_l"] + sum(q.get("pre_l", 0) + q["amt"] for q in prods)
+            pre = e["fill_to"] - level
+            if pre <= 0:
+                sys.exit(f"fill_to {e['fill_to']} L for '{e['id']}' is below the tank level ({level:.1f} L).")
+            p["pre_l"] = round(pre, 4)
+            p.pop("fill_to", None)
+        if "fill_l" in R:
+            level = R["fill_l"] + sum(q.get("pre_l", 0) + q["amt"] for q in prods) + p.get("pre_l", 0) + p["amt"]
         prods.append(p)
     R["products"] = prods
 
     if abs(R["area_ha"] * R["rate_lha"] - R["mix_l"]) > 1:
         print("WARNING: area x water rate does not equal the mix volume")
-    prod_l = sum(p["amt"] for p in prods)
+    prod_l = sum(p["amt"] + p.get("pre_l", 0) for p in prods)
     if "fill_l" not in R:
         R["fill_l"] = int(round(R["mix_l"] * 2 / 3 / 50) * 50)
     if R["fill_l"] + prod_l > R["mix_l"]:
@@ -142,8 +157,11 @@ def main():
     lvl = R["fill_l"]
     print(f'\nFill {lvl} L')
     for i, p in enumerate(prods, 1):
+        if p.get("pre_l"):
+            lvl += p["pre_l"]
+            print(f'     water                {p["pre_l"]:6.1f} L             -> {lvl:6.1f} L')
         lvl += p["amt"]
-        print(f'  {i}. {p["name"]:<20} {p["show"]:>6} {p["u"]:<2}  sheet {p["sheet"]}  -> {lvl:6.1f} L')
+        print(f'  {i}. {p["name"]:<20} {p["show"]:>6} {p["u"]:<2}  sheet {p.get("sheet", "-")}  -> {lvl:6.1f} L')
     print(f'Top up {R["mix_l"] - lvl:.1f} L to {R["mix_l"]} L')
     print(f'Post-application checks: {len(R["post_checks"])} · crew {len(R["crew"])} · date {R["date_iso"]}')
     print_slack_post(R, prods, cfg)
@@ -208,10 +226,17 @@ def print_slack_post(R, prods, cfg):
              ':rotating_light: **FILTER OUT? O-RING BACK IN.** Check the O-ring on every filter before it goes back in. No O-ring = leaks like crazy.', '',
              '**Mixing order' + (' (changed from the sheet):**' if changed else ':**'),
              f'1. Water to {R["fill_l"]} L, agitator on']
-    for i, p in enumerate(prods, 2):
+    n, lvl = 1, R["fill_l"]
+    for p in prods:
+        if p.get("pre_l"):
+            n += 1
+            lvl += p["pre_l"]
+            lines.append(f'{n}. Top up with water to {lvl:,.0f} L')
+        n += 1
+        lvl += p["amt"]
         amt = f'{p["name"]} {p["show"]} {p["u"]}'
-        lines.append(f'{i}. **{amt}** ({p["note"].rstrip(".").split(" (")[0].lower()})' if p.get("note") else f'{i}. {amt}')
-    top = f'{len(prods) + 2}. Top up to {R["mix_l"]} L'
+        lines.append(f'{n}. **{amt}** ({p["note"].rstrip(".").split(" (")[0].lower()})' if p.get("note") else f'{n}. {amt}')
+    top = f'{n + 1}. Top up to {R["mix_l"]} L'
     if R.get("ph_max"):
         top += f', then **check pH: must be under {R["ph_max"]}**. If it\'s {R["ph_max"]} or above, don\'t spray. Call Ben or Andy.'
     lines += [top, '']

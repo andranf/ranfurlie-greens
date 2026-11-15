@@ -1,6 +1,24 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-16-fairways-brek-luximax-jd",
+   "title": "Brek + LuxiMax + Broadwet, Fairways (JD)",
+   "sprayer": "JD HD200",
+   "date_iso": "2026-11-16",
+   "date": "Mon 16 Nov",
+   "applicator": "",
+   "method": "boom"
+  },
+  {
+   "slug": "2026-11-16-fairways-brek-luximax",
+   "title": "Brek + LuxiMax + Broadwet, Fairways",
+   "sprayer": "Toro 5800",
+   "date_iso": "2026-11-16",
+   "date": "Mon 16 Nov",
+   "applicator": "",
+   "method": "boom"
+  },
+  {
    "slug": "2026-11-13-green4-fert",
    "title": "Fert, 4th Green",
    "sprayer": "Toro 5800",
