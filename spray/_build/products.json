@@ -875,5 +875,52 @@
   ],
   "why": "Wetting agents go in last, with most of the water already in, so they don't foam the tank. You're at {before} L.",
   "src": "Turf Data stock records · no label or SDS found"
+ },
+ "velista": {
+  "name": "Velista",
+  "gk_name": "Velista (AU)",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Water-dispersible granule (WG)",
+  "what": "Fungicide: penthiopyrad 500 g/kg (Group 7). Fairy ring, washed into the root zone",
+  "haz": "Irritates the eyes.",
+  "soft": true,
+  "hazFull": "Irritates the eyes. Label PPE when opening, mixing and loading: cotton overalls buttoned to the neck and wrist, washable hat, goggles. Fairy ring 1.5 kg/ha: irrigate within 1 hour with 6–10 mm. Wind 3–20 km/h, no spraying in an inversion, medium droplets or coarser. Max 2 consecutive applications, 7.5 kg/ha a year.",
+  "ppe": [
+   "overalls",
+   "hat",
+   "goggles"
+  ],
+  "how": [
+   "Weigh {amt} on the scales",
+   "Tank a quarter to half full, agitator on. Never into an empty tank",
+   "Sprinkle it into the moving water",
+   "Let it disperse fully before the next product"
+  ],
+  "why": "Granules go in early, into a tank a quarter to half full (label), so they disperse before anything else. You're at {before} L.",
+  "src": "Label APVMA 65718 · <a href=\"https://nuturf.com.au/images/product-tech-sds/velista_turf_fungicide_label.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "lexicon": {
+  "name": "Lexicon Intrinsic",
+  "gk_name": "Lexicon Intrinsic",
+  "sig": "CAUTION",
+  "sigc": "caution",
+  "form": "Suspension concentrate (SC)",
+  "what": "Fungicide: fluxapyroxad 167 g/L + pyraclostrobin 333 g/L (Group 7 + 11). Fairy ring and Pythium",
+  "haz": "Harmful if swallowed.",
+  "soft": true,
+  "hazFull": "Harmful if swallowed. Label PPE when opening, mixing and spraying: cotton overalls buttoned to the neck and wrist, elbow-length chemical-resistant gloves. Keep people off until the spray has dried or been watered in. Don't irrigate to runoff for 3 days. Don't apply if heavy rain or storms are forecast within 3 days. Max 6 L/ha a year.",
+  "ppe": [
+   "overalls",
+   "gloves"
+  ],
+  "how": [
+   "Shake the drum hard",
+   "Measure {amt}",
+   "Pour into moving water, agitator on",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "A suspension concentrate goes in after the granules and before the wetting agent so it disperses properly. You're at {before} L.",
+  "src": "BASF label (Apr 2023) · <a href=\"https://nuturf.com.au/images/product-tech-sds/BASF_Lexicon_Fungicide_Label_April_2023.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
  }
 }

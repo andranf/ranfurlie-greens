@@ -1,0 +1,177 @@
+{
+  "slug": "2026-11-18-greens-fairy-ring-lexicon",
+  "title": "Fairy Ring + Pythium, Greens",
+  "sheet_name": "JD 600L/Ha - Fairy Ring + Wetting Agent + Pythium (Lexicon) to Greens",
+  "sprayer": "JD HD200",
+  "applicator": [
+    "Brodie Macdonald",
+    "U0839HLQA8G"
+  ],
+  "date": "Wed 18 Nov",
+  "date_long": "Wed 18 Nov 2026",
+  "date_iso": "2026-11-18",
+  "area_ha": 1.25,
+  "rate_lha": 600,
+  "mix_l": 750,
+  "tank_cap_l": 757,
+  "fill_l": 375,
+  "nozzles": "White Wilger SR110-08",
+  "speed": "4.9 km/h",
+  "pressure": "4.1 bar",
+  "facts": [
+    "JD HD200 · White Wilger SR110-08 · 4.9 km/h · 4.1 bar",
+    "600 L/ha",
+    "All greens (1.25 ha) in this 750 L",
+    "Water each green in on #24 straight after"
+  ],
+  "last_load": "Last tank planned in the JD: Brek + LuxiMax to fairways, Mon 16 Nov. Brek kills bent: tank cleaner and a triple rinse first unless Andy says it's done",
+  "site_check": "Spray signs out on every green. Greens mown, clippings off",
+  "weather": "Delta T 2–8 · wind 3–20 km/h · gusts under 30",
+  "extra_checks": [
+    [
+      "decon",
+      "JD clean of the Brek + LuxiMax fairway tank",
+      "Brek (propyzamide) kills bentgrass. If the JD hasn't had tank cleaner and a triple rinse through tank, boom, filters and nozzles since 16 Nov, do it now. Not sure? Call Andy before you fill"
+    ],
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 4.1 bar",
+      "About 3.7 L. If it's well out, call Andy before you fill"
+    ],
+    [
+      "hydrostock",
+      "16 L of HydroForce Ultra in the shed",
+      "You need 15.6 L. Not enough? Call Andy before you start"
+    ],
+    [
+      "prog24",
+      "Program #24 open on your phone",
+      "You start each green on #24 the moment it's sprayed"
+    ]
+  ],
+  "products": [
+    {
+      "id": "buffit",
+      "rate": "0.9 L/ha",
+      "rate_lha": 0.9,
+      "unit": "mL",
+      "sheet": 1
+    },
+    {
+      "id": "velista",
+      "rate": "1.5 kg/ha",
+      "rate_lha": 1.5,
+      "unit": "g",
+      "sheet": 2
+    },
+    {
+      "id": "lexicon",
+      "rate": "1.5 L/ha",
+      "rate_lha": 1.5,
+      "unit": "mL",
+      "sheet": 4,
+      "note": "Goes in 3rd, before the wetting agent (sheet had it last)."
+    },
+    {
+      "id": "hydroforce",
+      "rate": "12.5 L/ha",
+      "rate_lha": 12.5,
+      "unit": "L",
+      "sheet": 3,
+      "fill_to": 700,
+      "note": "Goes in last, with most of the water in."
+    }
+  ],
+  "ppe_note": "Velista irritates the eyes: goggles and a hat when you weigh and pour it. Lexicon: elbow gloves. Buff-It has no SDS on file: goggles.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "Every part of each green. Box out each green first, then fill in. Surrounds don't need it",
+    "Water in as you go: the moment a green is sprayed, run that green on program #24 (about 2 mm). It must go on within 1 hour (Velista label). No waiting for it to dry",
+    "Good morning for it: Delta T 2.0 at 7, 3.1 at 9, under 5 till noon. ESE 7–9 km/h, gusts under 22 till noon. Southerly from 2 pm, gusting 30+ by 4 pm. Stop if the wind is over 20 km/h",
+    "Never spray near golfers: work in the gaps behind groups. Keep people off each green until it's watered in",
+    "Tell Andy when the last green is watered in: tonight's irrigation tops it up"
+  ],
+  "spray_more": "Velista label: wind 3–20 km/h, no spraying in an inversion, medium droplets or coarser, irrigate within 1 hour with 6–10 mm in total. Lexicon label: keep people off until it's dry or watered in, don't irrigate to the point of runoff for 3 days.",
+  "post_checks": [
+    [
+      "waterin",
+      "Every green started on #24 within 1 hour of being sprayed",
+      "About 2 mm each. It must not sit on the leaf"
+    ],
+    [
+      "jdclean",
+      "JD flushed and rinsed",
+      "Rinse water out over a sprayed green"
+    ],
+    [
+      "told",
+      "Andy told the last green is watered in",
+      "For tonight's top-up water"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "JD's last tank was Brek: no record it was cleaned out",
+      "d": "The 16 Nov fairway tank in the JD was Brek 500 SC (propyzamide) + LuxiMax. Brek's label: do not use on bent grass. No mix or post-application sign-off came through for that tank, so nothing confirms the JD was decontaminated. Tank cleaner and a triple rinse through tank, boom, filters and nozzles before this tank, unless you know it's done.",
+      "s": "Brek 500 SC label · Spray Records (Notion), checked 18 Nov 5:30 am"
+    },
+    {
+      "c": "",
+      "t": "Storms forecast Friday: inside Lexicon's 3-day restraint",
+      "d": "Lexicon label: don't apply if heavy rain or storms are forecast within 3 days. Forecast: a shower Thu night (about 1.7 mm), then Fri heavy showers (about 6.4 mm, thunderstorms 26% by day, 43% Fri evening). Totals are light and the product will be two days into the root zone, so runoff risk is low, but it is a label condition.",
+      "s": "BASF Lexicon label (Apr 2023) · AccuWeather Botanic Ridge, 18 Nov 5:24 am"
+    },
+    {
+      "c": "",
+      "t": "Two Group 7 (SDHI) fungicides in one tank",
+      "d": "Velista (penthiopyrad) and Lexicon (fluxapyroxad) are both Group 7 and both labelled for fairy ring. Legal at these rates, but it doubles up one mode of action. Velista: max 2 consecutive, then 2 sprays of another group before reuse, and no more than a third of the year's fungicide sprays. Lexicon: max 3 in a row for fairy ring, 2 for Pythium, 6 L/ha a year. Plan the next fairy ring and Pythium sprays around a non-SDHI.",
+      "s": "Velista label APVMA 65718 · BASF Lexicon label (Apr 2023)"
+    },
+    {
+      "c": "",
+      "t": "Wash-in: 2 mm now, the rest tonight",
+      "d": "Velista wants 6–10 mm within 1 hour. Program #24 puts about 2 mm on each green now (1.7–2.2 mm by head), and tonight's irrigation brings the total up. Lexicon: no irrigating to the point of runoff for 3 days, so cycle and soak tonight.",
+      "s": "Velista label · Lexicon label · Cirrus Pro program #24"
+    },
+    {
+      "c": "",
+      "t": "600 L/ha is under Velista's fairy ring water volume",
+      "d": "Velista label: about 1000 L/ha with air-induction 08 nozzles, plus a non-ionic surfactant at 0.25%. At 600 L/ha the wash-in does more of the work, so start each green straight after spraying. HydroForce does the wetting job in the root zone; there's no leaf surfactant in this tank.",
+      "s": "Velista label APVMA 65718"
+    },
+    {
+      "c": "",
+      "t": "HydroForce stock: 15.6 L needed",
+      "d": "GreenKeeper showed no HydroForce Ultra on the shelf on 17 Nov. Check before Brodie fills.",
+      "s": "GreenKeeper inventory, 17 Nov"
+    },
+    {
+      "c": "info",
+      "t": "Pythium cover here is root zone, not leaf",
+      "d": "Lexicon covers Pythium blight (leaf) and Pythium root dysfunction (root, irrigate straight after) at 1.5 L/ha. Watered in straight away, this tank is the root-zone use. Leaf cover for Pythium blight will be light.",
+      "s": "BASF Lexicon label (Apr 2023)"
+    },
+    {
+      "c": "info",
+      "t": "HydroForce 12.5 L/ha is its monthly greens rate",
+      "d": "Tech sheet: 12.5 L/ha every 30 days (curative 12.5–19 L/ha), then a light irrigation. Last on greens 19–20 Oct at 6 L/ha.",
+      "s": "Indigo HydroForce Ultra tech sheet"
+    },
+    {
+      "c": "info",
+      "t": "Boom setup checks out: about 600 L/ha",
+      "d": "White Wilger SR110-08 is rated 0.8 US gpm at 2.8 bar, so about 3.7 L/min at 4.1 bar. On 75 cm spacing at 4.9 km/h that's about 600 L/ha, matching the GreenKeeper config.",
+      "s": "Wilger rated flows · GreenKeeper JD 600 L/ha White config"
+    },
+    {
+      "c": "info",
+      "t": "Order changed from the sheet",
+      "d": "Lexicon (suspension concentrate) moves ahead of HydroForce, following Velista's mixing order: granules, then suspension concentrates, then surfactants last. Most of the water goes in before HydroForce so it doesn't foam.",
+      "s": "Velista label mixing order"
+    }
+  ]
+}
