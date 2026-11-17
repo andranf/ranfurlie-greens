@@ -24,14 +24,14 @@
     "All greens (1.25 ha) in this 750 L",
     "Water each green in on #24 straight after"
   ],
-  "last_load": "Last tank planned in the JD: Brek + LuxiMax to fairways, Mon 16 Nov. Brek kills bent: tank cleaner and a triple rinse first unless Andy says it's done",
+  "last_load": "Firepower to the rough, Fri 13 Nov. Firepower kills bent: tank cleaner and a triple rinse first unless Andy says it's done",
   "site_check": "Spray signs out on every green. Greens mown, clippings off",
   "weather": "Delta T 2–8 · wind 3–20 km/h · gusts under 30",
   "extra_checks": [
     [
       "decon",
-      "JD clean of the Brek + LuxiMax fairway tank",
-      "Brek (propyzamide) kills bentgrass. If the JD hasn't had tank cleaner and a triple rinse through tank, boom, filters and nozzles since 16 Nov, do it now. Not sure? Call Andy before you fill"
+      "JD clean of the Firepower rough tank",
+      "Firepower (haloxyfop) kills bentgrass. The last tank recorded in the JD was Firepower on the rough, Fri 13 Nov. If the JD hasn't had tank cleaner and a triple rinse through tank, boom, filters and nozzles since then, do it now. Not sure? Call Andy before you fill"
     ],
     [
       "catch",
@@ -115,9 +115,9 @@
   "flags": [
     {
       "c": "red",
-      "t": "JD's last tank was Brek: no record it was cleaned out",
-      "d": "The 16 Nov fairway tank in the JD was Brek 500 SC (propyzamide) + LuxiMax. Brek's label: do not use on bent grass. No mix or post-application sign-off came through for that tank, so nothing confirms the JD was decontaminated. Tank cleaner and a triple rinse through tank, boom, filters and nozzles before this tank, unless you know it's done.",
-      "s": "Brek 500 SC label · Spray Records (Notion), checked 18 Nov 5:30 am"
+      "t": "JD's last tank was Firepower: no record it was cleaned out",
+      "d": "GreenKeeper's last JD application is Firepower 900 (haloxyfop) + Hasten to the rough, Fri 13 Nov. The 12 Nov tank was signed off with the JD decontaminated, but no sign-off came through for the 13 Nov tank, so nothing confirms the JD was cleaned after it. Haloxyfop kills bentgrass. Tank cleaner and a triple rinse through tank, boom, filters and nozzles before this tank, unless you know it's done.",
+      "s": "GreenKeeper applied applications · Spray Records (Notion), checked 18 Nov 5:45 am"
     },
     {
       "c": "",
