@@ -1,0 +1,157 @@
+{
+  "slug": "2026-11-18-rough-firepower-5800",
+  "title": "Firepower, Rough (thick patches)",
+  "sheet_name": "5800 300L/Ha - Rough - Firepower - GPS (18 Nov)",
+  "sprayer": "Toro 5800",
+  "applicator": [
+    "Nathan Ferguson",
+    "U06H9J0LBEC"
+  ],
+  "date": "Wed 18 Nov",
+  "date_long": "Wed 18 Nov 2026",
+  "date_iso": "2026-11-18",
+  "area_ha": 3.0,
+  "rate_lha": 300,
+  "mix_l": 900,
+  "tank_cap_l": 1200,
+  "fill_l": 450,
+  "nozzles": "Red AIC",
+  "speed": "6.9 km/h",
+  "pressure": "4 bar",
+  "last_load": "If it was the fairway Brek + LuxiMax tank: tank cleaner and a triple rinse first, both hurt fescue",
+  "site_check": "Section control ON with the rough boundaries loaded. No overlap onto fairways, tees, surrounds or greens",
+  "weather": "Delta T 2–8 · wind under 15 km/h · gusts under 30",
+  "extra_checks": [
+    [
+      "lastload",
+      "5800 clean before it's filled",
+      "Fairway Brek (propyzamide) or LuxiMax residue would hurt the fescue. If either was the last load, tank cleaner and a triple rinse first"
+    ],
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 4 bar",
+      "About 1.8 L. If it's well out, call Andy before you fill"
+    ],
+    [
+      "gps",
+      "Section control ON, rough boundaries loaded",
+      "Firepower kills couch and bent: nothing on fairways, tees, surrounds or greens"
+    ],
+    [
+      "patches",
+      "Thick patches only",
+      "Boom off over clean fescue"
+    ],
+    [
+      "bufflabel",
+      "Buff-It drum label read",
+      "Rate, mixing and PPE"
+    ]
+  ],
+  "products": [
+    {
+      "id": "buffit",
+      "rate": "600 mL/ha",
+      "rate_lha": 0.6,
+      "unit": "mL",
+      "sheet": 1
+    },
+    {
+      "id": "firepower",
+      "rate": "230 mL/ha",
+      "rate_lha": 0.23,
+      "unit": "mL",
+      "sheet": 2,
+      "why": "Goes in once the water is buffered. Small measure: it's 900 g/L. You're at {before} L."
+    },
+    {
+      "id": "hasten",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "unit": "L",
+      "sheet": 3
+    }
+  ],
+  "ppe_note": "Firepower 900 is a Schedule 6 poison: impervious elbow gloves and a face shield when you pour it. Buff-It has no SDS on file: goggles.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "Thick ryegrass, couch and kikuyu patches only, inside the rough boundaries. Boom off over clean fescue",
+    "Section control ON: no overlap onto fairways, tees, surrounds or greens. Firepower kills couch and bent",
+    "Delta T 2.0 at 7, 2.9 at 9, 4.6 by noon. ESE 7–9 km/h with gusts under 22 till 1 pm, so drift goes west. Southerly 20 gusting 35 from 4 pm: be finished by then. Stop if it gusts over 30 or blows toward a fairway, tee or green",
+    "Never spray near golfers: work in the gaps behind groups",
+    "No irrigation on the rough tonight. No mowing the sprayed rough for 2 days, and don't collect clippings from the first 3 mows",
+    "Log the areas sprayed",
+    "Decontaminate the 5800 after: tank cleaner and a triple rinse through tank, boom and filters before it goes on fairways, tees or greens"
+  ],
+  "spray_more": "Firepower 900: Schedule 6, impervious elbow gloves and eye or face protection. Hasten: add last and keep agitating until it's sprayed out.",
+  "post_checks": [
+    [
+      "decon",
+      "5800 decontaminated before anything else goes in it",
+      "Tank cleaner, then triple rinse through tank, boom and filters. Firepower residue kills couch and bent"
+    ],
+    [
+      "log",
+      "Areas sprayed logged",
+      ""
+    ],
+    [
+      "irrig",
+      "No irrigation on the rough tonight",
+      ""
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "Elevated rate: Firepower 230 mL/ha is 207 g/ha haloxyfop",
+      "d": "More than double the 90 g/ha of the earlier rough tanks. It's the bottom of the haloxyfop 520 labels' rate for established couch (400–800 mL/ha of the 520 = 208–416 g/ha). Glasshouse work halved tall fescue regrowth at about 4 g/ha and red fescue at about 40 g/ha, so keep it on the thick patches.",
+      "s": "Genfarm Haloxyfop 520 label · Stoltenberg et al. 1989, Weed Science 37:512"
+    },
+    {
+      "c": "red",
+      "t": "Decontaminate the 5800 before anything else goes in it",
+      "d": "The 5800 sprays couch fairways and greens. Tank cleaner and a triple rinse through tank, boom and filters. It's on the post-application checklist.",
+      "s": "Firepower 900 label"
+    },
+    {
+      "c": "",
+      "t": "5800's last load",
+      "d": "If the 5800 carried the fairway Brek (propyzamide) + LuxiMax tank, its residue would hurt the fescue: tank cleaner and a triple rinse before this fill. It's the first rig check.",
+      "s": "Brek and LuxiMax labels"
+    },
+    {
+      "c": "",
+      "t": "Fairway edges are couch",
+      "d": "Any overlap or drift onto fairway edges will show. ESE 7–9 km/h this morning pushes drift to the west side of each rough.",
+      "s": "AccuWeather Cranbourne West 18 Nov"
+    },
+    {
+      "c": "info",
+      "t": "Boom setup: about 317 L/ha at 4 bar",
+      "d": "Toro's own colour code: Red is the 0.4 gpm size (1.51 L/min at 2.76 bar). At 4 bar that's about 1.82 L/min a nozzle; on 50 cm spacing at 6.9 km/h it's about 317 L/ha. The rate controller holds 300 near 3.6 bar.",
+      "s": "Toro Multi Pro nozzle guide"
+    },
+    {
+      "c": "info",
+      "t": "Off-label and turf safety",
+      "d": "Firepower 900 is registered for forestry and industrial grass control, not turf. Its label doesn't list fescue as tolerant.",
+      "s": "Firepower 900 label"
+    },
+    {
+      "c": "info",
+      "t": "Buff-It: no label or SDS on file",
+      "d": "Goggles and gloves when pouring.",
+      "s": "products.json"
+    }
+  ],
+  "facts": [
+    "Toro 5800 · Red AIC · 6.9 km/h · 4 bar",
+    "300 L/ha",
+    "3.0 ha in this 900 L",
+    "Thick ryegrass, couch and kikuyu patches only"
+  ]
+}

@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-18-rough-firepower-5800",
+   "title": "Firepower, Rough (thick patches)",
+   "sprayer": "Toro 5800",
+   "date_iso": "2026-11-18",
+   "date": "Wed 18 Nov",
+   "applicator": "Nathan Ferguson",
+   "method": "boom"
+  },
+  {
    "slug": "2026-11-16-fairways-brek-luximax-jd",
    "title": "Brek + LuxiMax + Broadwet, Fairways (JD)",
    "sprayer": "JD HD200",
