@@ -1,6 +1,6 @@
 {
  "build_label": "week of 18 November 2026",
- "built": "2026-11-18T06:20+1100",
+ "built": "2026-11-18T13:33+1100",
  "asof": "2026-11-17",
  "asof_label": "Tue 17 Nov",
  "asof_long": "Tuesday 17 November 2026",
@@ -245,30 +245,30 @@
     "d": "2026-11-19",
     "dow": "Thu",
     "lab": "19 Nov",
-    "tmax": 26.0,
-    "tmin": 12.7,
-    "t": 19.4,
-    "c": 0.993,
-    "w": 0.2503,
+    "tmax": 27.9,
+    "tmin": 12.5,
+    "t": 20.2,
+    "c": 0.9993,
+    "w": 0.3042,
     "hot": false
    },
    {
     "d": "2026-11-20",
     "dow": "Fri",
     "lab": "20 Nov",
-    "tmax": 25.3,
-    "tmin": 17.9,
-    "t": 21.6,
-    "c": 0.9586,
-    "w": 0.4059,
+    "tmax": 26.4,
+    "tmin": 18.2,
+    "t": 22.3,
+    "c": 0.9163,
+    "w": 0.4619,
     "hot": false
    },
    {
     "d": "2026-11-21",
     "dow": "Sat",
     "lab": "21 Nov",
-    "tmax": 23.7,
-    "tmin": 14.3,
+    "tmax": 23.5,
+    "tmin": 14.5,
     "t": 19.0,
     "c": 0.9836,
     "w": 0.2301,
@@ -289,11 +289,11 @@
     "d": "2026-11-23",
     "dow": "Mon",
     "lab": "23 Nov",
-    "tmax": 16.5,
-    "tmin": 9.4,
-    "t": 12.9,
-    "c": 0.4398,
-    "w": 0.036,
+    "tmax": 18.8,
+    "tmin": 9.6,
+    "t": 14.2,
+    "c": 0.5735,
+    "w": 0.0561,
     "hot": false
    },
    {
@@ -301,40 +301,40 @@
     "dow": "Tue",
     "lab": "24 Nov",
     "tmax": 16.0,
-    "tmin": 7.8,
-    "t": 11.9,
-    "c": 0.3381,
-    "w": 0.0242,
+    "tmin": 6.9,
+    "t": 11.4,
+    "c": 0.2987,
+    "w": 0.0202,
     "hot": false
    },
    {
     "d": "2026-11-25",
     "dow": "Wed",
     "lab": "25 Nov",
-    "tmax": 22.8,
-    "tmin": 7.4,
-    "t": 15.1,
-    "c": 0.6724,
-    "w": 0.0758,
+    "tmax": 21.8,
+    "tmin": 6.3,
+    "t": 14.1,
+    "c": 0.557,
+    "w": 0.0533,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  11.9,
-  21.8
+  11.4,
+  22.3
  ],
  "headline_fc": "Strong growth to Sun, then a <em>cold change</em>",
  "takeaways": [
   {
    "tone": "cool",
    "head": "Greens: strong to Sun, slow from Mon",
-   "detail": "Bent and Poa GP averages 97% Thu to Sun, then 48% once the cold change arrives Mon."
+   "detail": "Bent and Poa GP averages 96% Thu to Sun, then 48% once the cold change arrives Mon."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 21%, best on Sun at 42%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 22%, best on Fri at 46%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
