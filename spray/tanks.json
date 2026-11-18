@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-19-greens-pgr-poachek-fert-fungicide",
+   "title": "PGR + Poachek + Fert + Fungicide, Greens",
+   "sprayer": "JD HD200",
+   "date_iso": "2026-11-19",
+   "date": "Thu 19 Nov",
+   "applicator": "Nathan Ferguson",
+   "method": "boom"
+  },
+  {
    "slug": "2026-11-18-rough-firepower-5800",
    "title": "Firepower, Rough (thick patches)",
    "sprayer": "Toro 5800",

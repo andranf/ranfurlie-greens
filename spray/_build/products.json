@@ -922,5 +922,101 @@
   ],
   "why": "A suspension concentrate goes in after the granules and before the wetting agent so it disperses properly. You're at {before} L.",
   "src": "BASF label (Apr 2023) · <a href=\"https://nuturf.com.au/images/product-tech-sds/BASF_Lexicon_Fungicide_Label_April_2023.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "manganite": {
+  "name": "MP Manganite",
+  "gk_name": "MP Manganite (0-0-0)",
+  "sig": "Hazardous",
+  "sigc": "",
+  "form": "Liquid micronutrient (chelated)",
+  "what": "Living Turf manganese: Mn 10.5%, Cu 0.23%, Co 0.12%, S 6.6%, chelated, with surfactant",
+  "haz": "Causes serious eye damage.",
+  "soft": true,
+  "hazFull": "Harmful if swallowed, causes serious eye damage, organ damage with prolonged or repeated exposure. Label PPE: protective gloves, protective clothing, eye or face protection. Label rate 10-20 L/ha monthly. Contains copper (0.23%).",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles",
+   "shield"
+  ],
+  "how": [
+   "Shake well",
+   "Measure {amt}",
+   "Pour in with the agitator running"
+  ],
+  "why": "Micronutrient liquid, goes in with the other fertilisers. You're at {before} L.",
+  "src": "Living Turf label · <a href=\"https://ltsaproductdocuments.blob.core.windows.net/ltcontainerproductdocuments/Label%20MP%20Manganite.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "dacogreen": {
+  "name": "Dacogreen 720 WeatherShield",
+  "gk_name": "Dacogreen 720 WeatherShield (AU)",
+  "sig": "POISON",
+  "sigc": "poison",
+  "form": "Liquid flowable (720 g/L)",
+  "what": "Fungicide: chlorothalonil 720 g/L (Group M5). Dollar spot, brown patch",
+  "haz": "Schedule 6 poison. Harmful if swallowed or inhaled.",
+  "hazFull": "Schedule 6 POISON. Harmful if swallowed or inhaled, eye and skin irritant, may cause an allergic skin reaction. Label PPE when mixing and spraying: cotton overalls buttoned to the neck and wrist, washable hat, elbow-length PVC gloves, goggles and a disposable mist mask. Turf: 130-200 mL/100 m2 in 5-20 L water/100 m2, 7-14 days. Don't mow or water until the turf is thoroughly dry. Don't mix with spraying oils.",
+  "ppe": [
+   "overalls",
+   "hat",
+   "gloves",
+   "goggles",
+   "mask"
+  ],
+  "how": [
+   "Shake or roll the drum well",
+   "Measure {amt}",
+   "Pour in with the agitator running",
+   "Rinse the drum 3 times into the tank"
+  ],
+  "why": "Flowable fungicide, goes in after the fertilisers with the agitator running hard. You're at {before} L.",
+  "src": "Label APVMA 63121 · <a href=\"https://ltsaproductdocuments.blob.core.windows.net/ltcontainerproductdocuments/Label%20Dacogreen.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "magellan": {
+  "name": "Magellan 800WG",
+  "gk_name": "Magellan",
+  "sig": "Irritant",
+  "sigc": "",
+  "form": "Water-dispersible granule (WG)",
+  "what": "Fungicide: fosetyl-aluminium 800 g/kg (Group 33). Pythium, on the leaf",
+  "haz": "May irritate the eyes and skin.",
+  "soft": true,
+  "hazFull": "May irritate the eyes and skin; avoid breathing dust or spray mist. Turf Pythium: 125 g/100 m2 as a foliar spray in 5-20 L water/100 m2, about every 21 days. Add it last. Label advises against mixing with more than one other pesticide. Don't mix with copper products (ADAMA). Don't mow or water until the foliage is completely dry.",
+  "ppe": [
+   "overalls",
+   "gloves",
+   "goggles",
+   "mask"
+  ],
+  "how": [
+   "Weigh {amt} on the scales",
+   "Agitator on full",
+   "Sprinkle it slowly into the moving water",
+   "Keep agitating: no lumps on the strainer"
+  ],
+  "why": "The label says Magellan goes in last, once everything else is mixed in. You're at {before} L.",
+  "src": "ADAMA label · <a href=\"https://adama.com/australia/en/media/4516/download\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "greenlinks": {
+  "name": "Green Links Tour",
+  "gk_name": "Green Links Tour",
+  "sig": "",
+  "sigc": "",
+  "form": "Liquid",
+  "what": "Green Links Tour (read the drum label)",
+  "haz": "No label or SDS on file.",
+  "soft": true,
+  "hazFull": "No label or SDS in Turf Data and none found online. Read the drum label before use; until then gloves and goggles when pouring.",
+  "ppe": [
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Shake well",
+   "Measure {amt}",
+   "Pour in with the agitator running"
+  ],
+  "why": "Goes in just before the Magellan, which the label wants last. You're at {before} L.",
+  "src": "No label or SDS found"
  }
 }

@@ -1,0 +1,215 @@
+{
+  "slug": "2026-11-19-greens-pgr-poachek-fert-fungicide",
+  "title": "PGR + Poachek + Fert + Fungicide, Greens",
+  "sheet_name": "JD 300L/Ha - Greens - PGR + Poachek + Urea + Fe + Mn + Phosphite",
+  "sprayer": "JD HD200",
+  "applicator": [
+    "Nathan Ferguson",
+    "U06H9J0LBEC"
+  ],
+  "date": "Thu 19 Nov",
+  "date_long": "Thu 19 Nov 2026",
+  "date_iso": "2026-11-19",
+  "area_ha": 1.75,
+  "rate_lha": 300,
+  "mix_l": 525,
+  "tank_cap_l": 757,
+  "fill_l": 300,
+  "nozzles": "Grey Wilger SR110-06",
+  "speed": "7.8 km/h",
+  "pressure": "4.1 bar",
+  "facts": [
+    "JD HD200 · Grey Wilger SR110-06 · 7.8 km/h · 4.1 bar",
+    "300 L/ha",
+    "1.75 ha in this 525 L (part tank)",
+    "All greens · foliar: DO NOT water in"
+  ],
+  "last_load": "Fairy Ring + Pythium (Velista + Lexicon), Greens, Wed 18 Nov: flush the boom with clean water first",
+  "site_check": "Spray signs out on every green. Greens mown and blown: dew, debris and clippings off, dry leaf",
+  "weather": "Delta T 2–8 · wind under 15 km/h · under 25 °C · dry for 24 h",
+  "extra_checks": [
+    [
+      "rinse",
+      "Clean water run through the boom first",
+      "Yesterday's tank was Velista + Lexicon on the greens"
+    ],
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 4.1 bar",
+      "About 2.8 L. If it's well out, call Andy before you fill"
+    ],
+    [
+      "jar",
+      "Jar test before you fill",
+      "Tank water in a clear jar with each product in order at the sheet ratio, Magellan last. Shake, wait 10 min. Curdling, lumps or a layer on the bottom: stop and call Andy"
+    ],
+    [
+      "greenlinks",
+      "Green Links Tour drum label read",
+      "Rate, mixing and PPE. No label on file"
+    ]
+  ],
+  "products": [
+    {
+      "id": "buffit",
+      "rate": "0.45 L/ha",
+      "rate_lha": 0.45,
+      "unit": "mL",
+      "sheet": 1
+    },
+    {
+      "id": "urea",
+      "rate": "50 kg/ha",
+      "rate_lha": 50,
+      "unit": "kg",
+      "sheet": 2,
+      "why": "Big solid: goes in early so it's fully dissolved before anything else. 87.5 kg turns the tank cold and dissolves slowly. Nothing left on the strainer before the Shadow goes in. You're at {before} L."
+    },
+    {
+      "id": "shadow",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "unit": "L",
+      "sheet": 3
+    },
+    {
+      "id": "poachek",
+      "rate": "0.75 L/ha",
+      "rate_lha": 0.75,
+      "unit": "L",
+      "sheet": 4
+    },
+    {
+      "id": "phozfight",
+      "rate": "10 L/ha",
+      "rate_lha": 10,
+      "unit": "L",
+      "sheet": 5
+    },
+    {
+      "id": "manganite",
+      "rate": "10 L/ha",
+      "rate_lha": 10,
+      "unit": "L",
+      "sheet": 6
+    },
+    {
+      "id": "iron",
+      "rate": "20 L/ha",
+      "rate_lha": 20,
+      "unit": "L",
+      "sheet": 7
+    },
+    {
+      "id": "dacogreen",
+      "rate": "200 mL/100 m² (20 L/ha)",
+      "rate_lha": 20,
+      "unit": "L",
+      "sheet": 8
+    },
+    {
+      "id": "greenlinks",
+      "rate": "1.0 L/ha",
+      "rate_lha": 1.0,
+      "unit": "L",
+      "sheet": 10,
+      "note": "Goes in 9th, before the Magellan (sheet had it last)."
+    },
+    {
+      "id": "magellan",
+      "rate": "12.5 kg/ha",
+      "rate_lha": 12.5,
+      "unit": "kg",
+      "sheet": 9,
+      "note": "Goes in last (label)."
+    }
+  ],
+  "ppe_note": "Poachek is a Schedule 6 poison and fatal if breathed in: respirator, elbow PVC gloves and a face shield when you pour it, and the respirator stays on while you spray. Dacogreen is a Schedule 6 poison: mist mask, goggles, hat and elbow PVC gloves. MP Manganite and the iron damage eyes: goggles and face shield.",
+  "spray_ppe": [
+    "overalls",
+    "gloves",
+    "mask"
+  ],
+  "spray_rules": [
+    "All greens. Mown and blown first: dew, debris and clippings off, dry leaf",
+    "Start at 8:00 (Delta T 2.1, 3.0 by 9). Light ENE wind 4–7 km/h, gusts under 15 till 11. Must be finished by 12:00: Poachek can't go on above 25 °C and it's 25 °C by 1 pm",
+    "Foliar pass: do NOT water in. No irrigation or hand watering on the greens for 24 h",
+    "Never spray a green with golfers on or near it: work in the gaps behind groups",
+    "Keep people off each green until it's dry"
+  ],
+  "spray_more": "Poachek label: not above 25 °C, dry turf, keep dry for 24 h after, fine spray 500–1000 L/ha. Dacogreen and Magellan labels: don't mow or water until the turf is completely dry. Shadow Ultra: no rain or irrigation within 1 h, no entry without protective clothing until dry. Magellan: add it last.",
+  "post_checks": [
+    [
+      "irrig",
+      "Greens irrigation off for 24 h, including #38 tonight, and nobody hand watering",
+      "Poachek needs 24 h dry"
+    ],
+    [
+      "nomow",
+      "No mowing the greens until the spray is completely dry",
+      "Dacogreen and Magellan labels"
+    ]
+  ],
+  "flags": [
+    {
+      "c": "red",
+      "t": "Magellan: label says one other pesticide at most, and no copper",
+      "d": "This tank has Magellan with three other pesticides (Shadow Ultra, Poachek, Dacogreen); the label advises against more than one. ADAMA also says don't mix Magellan with copper products, and MP Manganite carries 0.23% copper. Kept in on Andy's call (19 Nov): added last, after a jar test.",
+      "s": "Magellan 800WG label · ADAMA Magellan product page · MP Manganite label"
+    },
+    {
+      "c": "",
+      "t": "Showers forecast tonight: inside Poachek's 24 h dry",
+      "d": "Poachek: keep the turf dry for 24 h after spraying. Forecast: a shower or two late tonight (about 3.8 mm, 70%), then heavy showers Friday (about 11 mm). Sprayed by noon, that's roughly 12–18 h dry before the rain.",
+      "s": "Poachek label APVMA 47841 · AccuWeather Botanic Ridge, 19 Nov 5:15 am"
+    },
+    {
+      "c": "",
+      "t": "Heavy leaf load on a 26 °C day",
+      "d": "23 kg N/ha of urea, 20 L/ha iron (pH about 2), Mn, phosphite, chlorothalonil, fosetyl and Poachek, all left on the leaf with no water-in. 5 Nov's tank had the urea and iron on a 17 °C day; today reaches 26 °C (25 °C by 1 pm). Spraying 8–12 under cloud keeps the burn risk down.",
+      "s": "Sheet · AccuWeather hourly"
+    },
+    {
+      "c": "",
+      "t": "Two phosphonates in one tank",
+      "d": "Magellan (fosetyl-Al, 10 kg ai/ha) and Phoz Fight (potassium phosphite) both put phosphite on the leaf. Phosphite is gentlest near neutral pH, and the iron and Buff-It will make this tank acidic. Watch the greens for tip burn over the next 2 days.",
+      "s": "Magellan label · Phoz Fight tech sheet"
+    },
+    {
+      "c": "",
+      "t": "300 L/ha is under three labels' water volume",
+      "d": "Dacogreen and Magellan: 5–20 L/100 m² (500–2000 L/ha). Poachek: fine spray at 500–1000 L/ha. All go on at 300 L/ha here, so each green gets less coverage per droplet.",
+      "s": "Dacogreen label APVMA 63121 · Magellan label · Poachek label"
+    },
+    {
+      "c": "info",
+      "t": "Dacogreen at the top of its label range",
+      "d": "200 mL/100 m² is the top of the 130–200 mL dollar spot and brown patch range (the high rate is for established disease). Repeat interval 7–14 days.",
+      "s": "Dacogreen label APVMA 63121"
+    },
+    {
+      "c": "info",
+      "t": "PGR clocks",
+      "d": "Trinexapac about 195 of 200 GDD since 5 Nov (due today); Shadow at 1.0 L/ha is double the last two greens passes. Paclobutrazol (Regulate 28 Oct) at about 318 of 350 GDD, still working. Ethephon day 14 of its 14–28 day window, not in this tank.",
+      "s": "Greens dashboard PGR clocks (18 Nov) + 1 day"
+    },
+    {
+      "c": "info",
+      "t": "Poachek 3rd pass",
+      "d": "21 Oct, 5 Nov, now 19 Nov: 14 days apart, the third of the label's 2–3 sprays 10–14 days apart. 0.75 L/ha is half the 1.5 L/ha label rate.",
+      "s": "Poachek label APVMA 47841"
+    },
+    {
+      "c": "info",
+      "t": "Boom setup: about 285 L/ha",
+      "d": "Grey Wilger SR110-06 is rated 0.6 US gpm at 2.8 bar, so about 2.8 L/min at 4.1 bar. On 75 cm spacing at 7.8 km/h that's about 285 L/ha, 5% under the GreenKeeper config's 300. Expect a little left in the tank at the end.",
+      "s": "Wilger rated flows · GreenKeeper JD 300 L/ha Grey config"
+    },
+    {
+      "c": "info",
+      "t": "Order changed from the sheet",
+      "d": "Green Links Tour moves ahead of Magellan: Magellan's label says add it last. The urea goes in 2nd and must be fully dissolved before the Shadow.",
+      "s": "Magellan label"
+    }
+  ]
+}
