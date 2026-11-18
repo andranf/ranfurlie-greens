@@ -1018,5 +1018,25 @@
   ],
   "why": "Goes in just before the Magellan, which the label wants last. You're at {before} L.",
   "src": "No label or SDS found"
+ },
+ "trublue": {
+  "name": "Tru Blue",
+  "gk_name": "Tru Blue Spray Indicator",
+  "sig": "MARKER",
+  "sigc": "caution",
+  "form": "Spray marker dye (soluble liquid)",
+  "soft": true,
+  "what": "Blue marker dye so you can see where you've sprayed (Acid Blue 9, 105 g/L)",
+  "haz": "Stains skin and clothes.",
+  "hazFull": "Campbell Tru-Blue Spray Indicator, APVMA 68258/57849, unscheduled. Temporary colourant: breaks down with sunlight and moisture. Water-based mixes only. Label rate: boom 225–300 mL per 100 L, knapsacks 22–30 mL per 10 L. The label lists no PPE and points to the SDS, which wasn't found online: gloves when pouring, and keep it off paths, carts and clothes.",
+  "ppe": [
+   "gloves"
+  ],
+  "how": [
+   "Measure {amt}",
+   "Pour into the tank"
+  ],
+  "why": "Dye before the oil adjuvant, which goes in last. You're at {before} L.",
+  "src": "Label APVMA 68258 · <a href=\"https://cdn.shopify.com/s/files/1/0036/9603/3903/files/Tru-Blue.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · SDS not found online"
  }
 }
