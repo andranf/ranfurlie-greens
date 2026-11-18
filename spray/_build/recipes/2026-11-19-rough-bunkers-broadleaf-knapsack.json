@@ -1,0 +1,284 @@
+{
+ "slug": "2026-11-19-rough-bunkers-broadleaf-knapsack",
+ "title": "Broadleaf, Rough + Bunker Surrounds, Knapsack",
+ "sheet_name": "Milwaukee 15L 450L/Ha - Rough + Bunker Surrounds/Tongues - Broadleaf (19 Nov)",
+ "sprayer": "Milwaukee 15 L knapsack",
+ "method": "handgun",
+ "applicator": [
+  "Michael K + Nathan Drew",
+  "U07QSB7HVM1"
+ ],
+ "date": "Thu 19 Nov",
+ "date_long": "Thu 19 Nov 2026",
+ "date_iso": "2026-11-19",
+ "area_ha": 0.033333,
+ "rate_lha": 450,
+ "mix_l": 15,
+ "tank_cap_l": 15,
+ "fill_l": 10,
+ "nozzles": "Wand",
+ "speed": "4.5 L per 10 × 10 m",
+ "pressure": "Setting 3",
+ "facts": [
+  "Milwaukee 15 L knapsack · setting 3",
+  "450 L/ha",
+  "about 330 m² a tank (18 × 18 m)",
+  "4.5 L per 10 × 10 m"
+ ],
+ "fill_sub": "lid on, swirl to mix",
+ "fill_how": [
+  "Fill to the 10 L mark with clean water",
+  "No agitator on a knapsack: lid on and swirl the tank after each product",
+  "Rinse the measuring jug into the tank as you go"
+ ],
+ "check_title": "Knapsack check",
+ "checks": [
+  [
+   "pre",
+   "Pre-start done in TurfDog",
+   ""
+  ],
+  [
+   "rinse",
+   "Tank, hose and wand rinsed since the last job",
+   "Residue from the last mix can damage this one"
+  ],
+  [
+   "filters",
+   "Tank strainer and wand filter clean, lid seal good",
+   ""
+  ],
+  [
+   "battery",
+   "Battery charged and clicked in",
+   ""
+  ],
+  [
+   "wand",
+   "Wand, trigger and nozzle work, no drips or leaks at the hose",
+   ""
+  ],
+  [
+   "setting",
+   "Dial on setting 3",
+   "One tank should cover about 18 × 18 m at a steady walk. Emptying it over less ground is too heavy"
+  ],
+  [
+   "kit",
+   "Wash water, eyewash and spill kit on the cart",
+   ""
+  ],
+  [
+   "sds",
+   "Labels and SDSs for all 5 products at the shed",
+   ""
+  ],
+  [
+   "site",
+   "Spray signs out where you're working",
+   ""
+  ],
+  [
+   "wx",
+   "Weather OK",
+   "Wind 3–20 km/h (Tri-Kombi label). Today: not before about 10am, once the dew is off and the breeze is up"
+  ]
+ ],
+ "extra_checks": [
+  [
+   "clear",
+   "Staying off greens and collars",
+   "Stop the spray short of the bent. No drift onto putting surfaces"
+  ],
+  [
+   "bufflabel",
+   "Buff-It drum label read",
+   "Rate, mixing and PPE"
+  ]
+ ],
+ "products": [
+  {
+   "id": "buffit",
+   "rate": "900 mL/ha",
+   "rate_lha": 0.9,
+   "unit": "mL",
+   "sheet": 1,
+   "note": "First, before the herbicides.",
+   "how": [
+    "Read the drum label first",
+    "Measure {amt}",
+    "Pour into the water, lid on, swirl"
+   ]
+  },
+  {
+   "id": "sportsground",
+   "rate": "4.5 L/ha",
+   "rate_lha": 4.5,
+   "unit": "mL",
+   "sheet": 2,
+   "note": "Then the two broadleaf herbicides.",
+   "how": [
+    "Measure {amt}",
+    "Pour into the tank",
+    "Lid on, swirl to mix"
+   ],
+   "why": "Soluble amine salts go in after the buffer. You're at {before} L."
+  },
+  {
+   "id": "trikombi",
+   "rate": "4.5 L/ha",
+   "rate_lha": 4.5,
+   "unit": "mL",
+   "sheet": 3,
+   "how": [
+    "Measure {amt}",
+    "Pour into the tank",
+    "Lid on, swirl to mix"
+   ],
+   "why": "The second amine-salt hormone. You're at {before} L."
+  },
+  {
+   "id": "trublue",
+   "rate": "1.05 L/ha",
+   "rate_lha": 1.05,
+   "unit": "mL",
+   "sheet": 5,
+   "note": "Dye goes in 4th (sheet has it 5th), before the Hasten."
+  },
+  {
+   "id": "hasten",
+   "rate": "1.0 L/ha",
+   "rate_lha": 1.0,
+   "unit": "mL",
+   "sheet": 4,
+   "note": "Goes in last (Hasten's label).",
+   "how": [
+    "Measure {amt}",
+    "Pour in last",
+    "Lid on tight and swirl well. Swirl again each time you pick the tank back up"
+   ]
+  }
+ ],
+ "ppe_note": "Tri-Kombi's label asks for a half-face respirator with organic vapour cartridges, elbow gloves and chemical-resistant clothing buttoned at the neck and wrist when mixing and when spraying by hand. Goggles when pouring.",
+ "spray_rules": [
+  "Broadleaf weeds on bunker tongues, surrounds and rough only. One light, even pass until the dye shows, not to run-off",
+  "Stay off greens and collars. Stop the spray short of the bent and keep the wand low",
+  "Not before about 10am: wait for the dew to dry and the breeze to pick up. Wind 3–20 km/h. Stop when it gusts toward a green, tee or garden bed",
+  "Stay out from under tree drip lines and away from garden beds",
+  "Keep golfers off until it's dry. Write down where you sprayed: no mowing there for 2 days"
+ ],
+ "spray_more": "Tri-Kombi label: wind 3–20 km/h, no spraying in a surface inversion (calm, dewy mornings), don't mow 2 days before or after, don't irrigate to run-off for 3 days. One tank is about 330 m²: if it empties over less ground it's going on too heavy.",
+ "post_checks": [
+  [
+   "out",
+   "Tank sprayed out on the target area",
+   "Anything left: write it below"
+  ],
+  [
+   "flush",
+   "Tank, hose and wand flushed with clean water",
+   ""
+  ],
+  [
+   "rinsate",
+   "Rinse water sprayed back over the rough you treated",
+   "Not down a drain or onto hard surfaces"
+  ],
+  [
+   "nozzles",
+   "Nozzle and filters cleaned",
+   ""
+  ],
+  [
+   "ppe",
+   "Suit, gloves and goggles washed. Respirator wiped, cartridges sealed in a bag",
+   ""
+  ],
+  [
+   "areas",
+   "Areas sprayed written below",
+   "So the mowing (not before Sat 21 Nov) can skip them"
+  ],
+  [
+   "battery",
+   "Battery back on the charger",
+   ""
+  ]
+ ],
+ "post_fields": [
+  [
+   "areas",
+   "Areas sprayed",
+   "e.g. tongues and surrounds 17, 18, 8, 9 · clover at the 6th tee",
+   "text"
+  ],
+  [
+   "left",
+   "Litres left in the tank",
+   "e.g. 0",
+   "num"
+  ]
+ ],
+ "flags": [
+  {
+   "c": "red",
+   "t": "Tri-Kombi label: not by backpack sprayer",
+   "d": "Restraint on the current label: DO NOT apply by spraying equipment carried on the back of the user. This tank goes out through the Milwaukee knapsacks. For hand-held spraying the label asks for chemical-resistant clothing, elbow gloves and a half-face respirator. Flagged to Andy 19 Nov.",
+   "s": "APVMA 31536 label"
+  },
+  {
+   "c": "red",
+   "t": "Tri-Kombi label: no heavy rain or storms within 3 days",
+   "d": "Restraint: DO NOT apply if heavy rains or storms are forecast within 3 days. This morning's brief has about 20 mm for Friday 20 Nov. The label also says don't irrigate to run-off for 3 days. Flagged to Andy 19 Nov.",
+   "s": "APVMA 31536 label · #dailycoursesetup brief, 19 Nov"
+  },
+  {
+   "c": "red",
+   "t": "Methar Tri-Kombi 4.5 L/ha is over its label maximum",
+   "d": "The label sets 4.2 L/ha as the maximum (its greens and lawns row still reads 45 mL per 100 m², which is 4.5 L/ha). This tank has 150 mL; at the label max it would be 140 mL. Victoria allows off-label use at or below the label rate, not above it. Built as the sheet stands (Andy, 19 Nov: normal rates).",
+   "s": "APVMA 31536 label"
+  },
+  {
+   "c": "red",
+   "t": "Sportsground + Tri-Kombi: the same three-way twice",
+   "d": "Both are Campbell three-ways with mecoprop 336 + dicamba 40 g/L. At 4.5 L/ha each that's about 3.0 kg/ha mecoprop and 360 g/ha dicamba, against 1.4 kg/ha and 168 g/ha at Tri-Kombi's label maximum. Same loading as the 19 Oct handgun tank on the rough. The page keeps the crew off greens and collars.",
+   "s": "APVMA 31536 label · Colin Campbell catalogue"
+  },
+  {
+   "c": "",
+   "t": "Sportsground label not read",
+   "d": "APVMA 31538. The eLabel is a scan with no readable text and GreenKeeper's label link is dead. Campbell's catalogue lists mecoprop 336 + MCPA 80 + dicamba 40 g/L. PPE on this page follows the Tri-Kombi label. Check the drum for its rate and for any backpack restraint.",
+   "s": "Colin Campbell catalogue · APVMA eLabel 31538 (unreadable)"
+  },
+  {
+   "c": "",
+   "t": "Hasten isn't on the Tri-Kombi label",
+   "d": "The label doesn't call for an oil adjuvant. Oil with hormone herbicides bites harder in heat: 28 °C forecast, warm from 1pm.",
+   "s": "APVMA 31536 label · Vicchem Hasten label"
+  },
+  {
+   "c": "info",
+   "t": "Water rate",
+   "d": "Sheet is 450 L/ha, the Tri-Kombi label water rate. Andy: setting 3 on these knapsacks typically puts out about 400 L/ha, 450 kept. At 400 L/ha a tank covers about 375 m² and the rates land about 11% under the sheet.",
+   "s": "Andy, 19 Nov"
+  },
+  {
+   "c": "info",
+   "t": "Order changed from the sheet",
+   "d": "Hasten's label says add it last, so Tru Blue goes in 4th and Hasten 5th. Rates are as the sheet.",
+   "s": "Hasten label · Tru-Blue label"
+  },
+  {
+   "c": "info",
+   "t": "Spray window today",
+   "d": "6th station 4:50am: 13.4 °C, RH 96%, calm, Delta T 0.7, heavy dew. Brief has Delta T under 2 until about 10am, 3–6 from 11am with 4–8 km/h, gusts to about 22 late morning, 28 °C. Label wind is 3–20 km/h with no spraying in an inversion, so not before about 10am.",
+   "s": "#dailycoursesetup brief, 19 Nov"
+  },
+  {
+   "c": "info",
+   "t": "Mowing and irrigation after",
+   "d": "Tri-Kombi: don't mow 2 days before or after, don't irrigate to run-off for 3 days. The post-application checklist asks for the areas sprayed so the mowing can skip them.",
+   "s": "APVMA 31536 label"
+  }
+ ]
+}
