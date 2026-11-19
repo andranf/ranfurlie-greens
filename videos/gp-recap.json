@@ -1,6 +1,6 @@
 {
  "build_label": "week of 19 November 2026",
- "built": "2026-11-19T06:22+1100",
+ "built": "2026-11-19T13:00+1100",
  "asof": "2026-11-18",
  "asof_label": "Wed 18 Nov",
  "asof_long": "Wednesday 18 November 2026",
@@ -245,11 +245,11 @@
     "d": "2026-11-19",
     "dow": "Thu",
     "lab": "19 Nov",
-    "tmax": 27.4,
+    "tmax": 26.2,
     "tmin": 12.0,
-    "t": 19.7,
-    "c": 0.9985,
-    "w": 0.2717,
+    "t": 19.1,
+    "c": 0.9867,
+    "w": 0.2357,
     "hot": false
    },
    {
@@ -257,54 +257,54 @@
     "dow": "Fri",
     "lab": "20 Nov",
     "tmax": 25.8,
-    "tmin": 17.5,
-    "t": 21.6,
-    "c": 0.956,
-    "w": 0.4098,
+    "tmin": 17.8,
+    "t": 21.8,
+    "c": 0.9479,
+    "w": 0.4216,
     "hot": false
    },
    {
     "d": "2026-11-21",
     "dow": "Sat",
     "lab": "21 Nov",
-    "tmax": 24.6,
-    "tmin": 15.0,
-    "t": 19.8,
+    "tmax": 24.7,
+    "tmin": 15.7,
+    "t": 20.2,
     "c": 0.9993,
-    "w": 0.278,
+    "w": 0.3042,
     "hot": false
    },
    {
     "d": "2026-11-22",
     "dow": "Sun",
     "lab": "22 Nov",
-    "tmax": 29.9,
-    "tmin": 14.0,
-    "t": 21.9,
-    "c": 0.9391,
-    "w": 0.4336,
+    "tmax": 29.7,
+    "tmin": 15.2,
+    "t": 22.4,
+    "c": 0.9055,
+    "w": 0.4743,
     "hot": false
    },
    {
     "d": "2026-11-23",
     "dow": "Mon",
     "lab": "23 Nov",
-    "tmax": 19.9,
-    "tmin": 11.1,
-    "t": 15.5,
-    "c": 0.7155,
-    "w": 0.0862,
+    "tmax": 20.0,
+    "tmin": 12.4,
+    "t": 16.2,
+    "c": 0.7877,
+    "w": 0.107,
     "hot": false
    },
    {
     "d": "2026-11-24",
     "dow": "Tue",
     "lab": "24 Nov",
-    "tmax": 17.6,
-    "tmin": 8.1,
-    "t": 12.9,
-    "c": 0.4296,
-    "w": 0.0347,
+    "tmax": 16.2,
+    "tmin": 10.1,
+    "t": 13.1,
+    "c": 0.4604,
+    "w": 0.0387,
     "hot": false
    },
    {
@@ -312,29 +312,29 @@
     "dow": "Wed",
     "lab": "25 Nov",
     "tmax": 26.5,
-    "tmin": 7.8,
+    "tmin": 7.7,
     "t": 17.1,
-    "c": 0.8744,
-    "w": 0.1412,
+    "c": 0.8702,
+    "w": 0.1392,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  12.9,
-  21.9
+  13.1,
+  22.4
  ],
- "headline_fc": "Strong growth to Sun, then a <em>cold change</em>",
+ "headline_fc": "Close to <em>ideal</em> growing weather for the greens",
  "takeaways": [
   {
    "tone": "cool",
-   "head": "Greens: strong to Sun, easing from Mon",
-   "detail": "Bent and Poa GP averages 97% Thu to Sun, then 67% once the cold change arrives Mon."
+   "head": "Greens: near peak growth",
+   "detail": "Bent and Poa GP averages 85% this week. Expect strong clip yields and quick recovery."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 24%, best on Sun at 43%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 25%, best on Sun at 47%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
