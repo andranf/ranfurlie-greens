@@ -37,6 +37,7 @@ main{padding:12px 0 140px}
 .edit input.note{flex:1 1 200px}
 .var{font-size:.8rem;font-weight:600}.var.neg{color:var(--bad)}.var.pos{color:var(--ok)}
 .last{font-size:.76rem;color:var(--muted)}
+.last.adj{color:var(--fg)}
 .lvl{font-size:.76rem;color:var(--muted);margin-top:2px}.lvl.lowt{color:var(--bad);font-weight:600}.lvl.onl{color:var(--warn);font-weight:600}
 .card.low{box-shadow:inset 4px 0 0 var(--bad)}
 .ro{margin-top:7px;border:1px solid var(--line);background:none;color:var(--muted);border-radius:999px;padding:5px 12px;font:inherit;font-size:.8rem;cursor:pointer;touch-action:manipulation}
@@ -168,6 +169,8 @@ function total(i,s){const n=parseFloat(s.full)||0,p=parseFloat(s.part)||0;return
 const hasCnt=(s)=>s&&s.st==='diff'&&((s.full??'')!==''||(s.part??'')!=='');
 const onHand=(i,s)=>hasCnt(s)?total(i,s):i.expected;
 const dmy=(d)=>{const t=new Date(d+'T00:00');return isNaN(t)?d:t.toLocaleDateString('en-AU',{day:'numeric',month:'short'})};
+const dmyY=(d)=>{const t=new Date(d+'T00:00');if(isNaN(t))return d;const dm=t.toLocaleDateString('en-AU',{day:'numeric',month:'short'});return t.getFullYear()===new Date().getFullYear()?t.toLocaleDateString('en-AU',{weekday:'short'})+' '+dm:dm+' '+t.getFullYear()};
+const hm=(t)=>{const m=/^(\d{1,2}):(\d{2})$/.exec(t||'');if(!m)return'';const h=+m[1];return `, ${h%12||12}:${m[2]} ${h<12?'am':'pm'}`};
 const grpOf=(i)=>i.group&&G[i.group]?G[i.group]:null;
 const gUnit=(g)=>g.unit==='kg ai'?'kg active':g.unit;
 const gOn=(g)=>g.members.reduce((t,id)=>{const i=BY[id];return t+(i?onHand(i,state[id]||{})*(i.gf||0):0)},0);
@@ -191,7 +194,9 @@ function pills(i){const g=grpOf(i);if(!g)return'';let p='';if(g.pick===i.id&&i.u
 let k=0;
 function cardEl(i,inG){
   const s=state[i.id]||{};const c=document.createElement('div');c.className='card'+(s.st==='ok'?' ok':s.st==='diff'?' diff':'')+(!inG&&isLow(i,s)?' low':'');if(!inG)c.style.animationDelay=Math.min(k++,14)*25+'ms';
-  const last=(i.last_count?`<div class="last">Last counted ${dmy(i.last_count.date)} by ${esc(i.last_count.by)}: ${fmt(i.last_count.counted)} ${i.unit}</div>`:'')+(i.recv?`<div class="last">Received ${dmy(i.recv.date)} by ${esc(i.recv.by)}: +${fmt(i.recv.qty)} ${i.unit}</div>`:'');
+  /* 20 Nov 2026 (Andy): every item shows when its stock was last adjusted (a count or a delivery), and who did it */
+  const a=i.adj,cl=i.last_count?`<div class="last">Last counted ${dmy(i.last_count.date)} by ${esc(i.last_count.by)}: ${fmt(i.last_count.counted)} ${i.unit}</div>`:'',rl=i.recv?`<div class="last">Received ${dmy(i.recv.date)} by ${esc(i.recv.by)}: +${fmt(i.recv.qty)} ${i.unit}</div>`:'';
+  const last=a?`<div class="last adj">Last adjusted <b>${dmyY(a.date)}${hm(a.time)}</b> by <b>${esc(a.by||'?')}</b> · ${a.kind==='arrived'?'stock arrived, +'+fmt(a.qty):'counted '+fmt(a.qty)} ${i.unit}</div>`+(a.kind==='arrived'?cl:rl):cl+rl;
   c.innerHTML=`<div class="row"><div>${aiLine(i,inG)}<div class="nm"></div><div class="exp">${expTxt(i)}</div>${i.flag?`<div class="flag">⚠ ${esc(i.flag)}</div>`:''}${last}${metaHtml(i)}${inG?pills(i):''}<div class="lvl"></div>${i.reorder?'<button class="ro req" disabled>✓ On re-order list</button>':`<button class="ro" aria-pressed="${!!s.ro}">${s.ro?'✓ Re-order':'Re-order'}</button>`}</div>
     <div class="btns"><button class="b okb" aria-pressed="${s.st==='ok'}" aria-label="Matches">✓</button><button class="b dfb" aria-pressed="${s.st==='diff'}" aria-label="Different">≠</button></div></div>
     <div class="edit">${i.cont?`<label>Full ${fmt(i.cont)} ${i.unit} containers<input type="number" inputmode="decimal" min="0" step="1" class="full" value="${s.full??''}"></label>`:''}
