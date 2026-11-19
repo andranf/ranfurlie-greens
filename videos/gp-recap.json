@@ -1,14 +1,14 @@
 {
- "build_label": "week of 19 November 2026",
- "built": "2026-11-19T13:00+1100",
- "asof": "2026-11-18",
- "asof_label": "Wed 18 Nov",
- "asof_long": "Wednesday 18 November 2026",
+ "build_label": "week of 20 November 2026",
+ "built": "2026-11-20T06:24+1100",
+ "asof": "2026-11-19",
+ "asof_label": "Thu 19 Nov",
+ "asof_long": "Thursday 19 November 2026",
  "latest": {
-  "t": 16.7,
-  "cool": 0.835,
-  "warm": 0.1241,
-  "label": "Wed 18 Nov"
+  "t": 20.2,
+  "cool": 0.999,
+  "warm": 0.3042,
+  "label": "Thu 19 Nov"
  },
  "model": {
   "cool_opt": 20.0,
@@ -18,13 +18,6 @@
   "crossover": 24.84
  },
  "hist": [
-  {
-   "d": "2026-10-20",
-   "lab": "20 Oct",
-   "t": 22.8,
-   "c": 0.878,
-   "w": 0.5035
-  },
   {
    "d": "2026-10-21",
    "lab": "21 Oct",
@@ -227,102 +220,109 @@
    "t": 16.7,
    "c": 0.835,
    "w": 0.1241
+  },
+  {
+   "d": "2026-11-19",
+   "lab": "19 Nov",
+   "t": 20.2,
+   "c": 0.999,
+   "w": 0.3042
   }
  ],
  "stats": {
-  "cool14": 0.629,
-  "cool14_prev": 0.651,
-  "warm14": 0.08176204964031548,
-  "warm14_prev": 0.1460621968510498,
-  "clip14": 4.96,
-  "gvx21": 17.7
+  "cool14": 0.662,
+  "cool14_prev": 0.627,
+  "warm14": 0.0998733180595645,
+  "warm14_prev": 0.1143110138363218,
+  "clip14": 4.97,
+  "gvx21": 17.2
  },
  "headline_hist": "Greens GP is <em>holding</em> steady",
  "forecast": {
   "source": "Open-Meteo",
   "days": [
    {
-    "d": "2026-11-19",
-    "dow": "Thu",
-    "lab": "19 Nov",
-    "tmax": 26.2,
-    "tmin": 12.0,
-    "t": 19.1,
-    "c": 0.9867,
-    "w": 0.2357,
-    "hot": false
-   },
-   {
     "d": "2026-11-20",
     "dow": "Fri",
     "lab": "20 Nov",
-    "tmax": 25.8,
-    "tmin": 17.8,
-    "t": 21.8,
-    "c": 0.9479,
-    "w": 0.4216,
+    "tmax": 25.1,
+    "tmin": 17.3,
+    "t": 21.2,
+    "c": 0.9765,
+    "w": 0.3753,
     "hot": false
    },
    {
     "d": "2026-11-21",
     "dow": "Sat",
     "lab": "21 Nov",
-    "tmax": 24.7,
-    "tmin": 15.7,
-    "t": 20.2,
-    "c": 0.9993,
-    "w": 0.3042,
+    "tmax": 24.5,
+    "tmin": 15.4,
+    "t": 19.9,
+    "c": 1.0,
+    "w": 0.2877,
     "hot": false
    },
    {
     "d": "2026-11-22",
     "dow": "Sun",
     "lab": "22 Nov",
-    "tmax": 29.7,
-    "tmin": 15.2,
-    "t": 22.4,
-    "c": 0.9055,
-    "w": 0.4743,
+    "tmax": 28.7,
+    "tmin": 14.3,
+    "t": 21.5,
+    "c": 0.9635,
+    "w": 0.3982,
     "hot": false
    },
    {
     "d": "2026-11-23",
     "dow": "Mon",
     "lab": "23 Nov",
-    "tmax": 20.0,
-    "tmin": 12.4,
-    "t": 16.2,
-    "c": 0.7877,
-    "w": 0.107,
+    "tmax": 20.7,
+    "tmin": 10.6,
+    "t": 15.6,
+    "c": 0.7314,
+    "w": 0.0903,
     "hot": false
    },
    {
     "d": "2026-11-24",
     "dow": "Tue",
     "lab": "24 Nov",
-    "tmax": 16.2,
-    "tmin": 10.1,
-    "t": 13.1,
-    "c": 0.4604,
-    "w": 0.0387,
+    "tmax": 17.8,
+    "tmin": 9.5,
+    "t": 13.7,
+    "c": 0.5135,
+    "w": 0.0463,
     "hot": false
    },
    {
     "d": "2026-11-25",
     "dow": "Wed",
     "lab": "25 Nov",
-    "tmax": 26.5,
-    "tmin": 7.7,
-    "t": 17.1,
-    "c": 0.8702,
-    "w": 0.1392,
+    "tmax": 24.7,
+    "tmin": 8.3,
+    "t": 16.5,
+    "c": 0.8167,
+    "w": 0.117,
+    "hot": false
+   },
+   {
+    "d": "2026-11-26",
+    "dow": "Thu",
+    "lab": "26 Nov",
+    "tmax": 25.0,
+    "tmin": 12.5,
+    "t": 18.8,
+    "c": 0.9745,
+    "w": 0.2163,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  13.1,
-  22.4
+  13.7,
+  21.5
  ],
  "headline_fc": "Close to <em>ideal</em> growing weather for the greens",
  "takeaways": [
@@ -334,7 +334,7 @@
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 25%, best on Sun at 47%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 22%, best on Sun at 40%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
