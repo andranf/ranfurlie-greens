@@ -114,7 +114,14 @@ def main():
     R["tanks_url"] = R["page_url"] + "tanks.json"
     R["data_url"] = cfg.get("data_url", "")
     R["crew"] = cfg.get("crew", [])
-    R["post_checks"] = merge_checks(cfg.get("post_checks", []), R.get("post_checks"))
+    # Sprayer-specific checks (config.json sprayer_checks), e.g. JD HD200 valves (Andy, 20 Nov 2026)
+    sc = cfg.get("sprayer_checks", {}).get(R["sprayer"], {})
+    if sc:
+        R["check_replace"] = {**sc.get("check_replace", {}), **R.get("check_replace", {})}
+        if sc.get("fill_sub") and not R.get("fill_sub"):
+            R["fill_sub"] = sc["fill_sub"]
+        R["spray_rules"] = sc.get("spray_rules_first", []) + [x for x in R.get("spray_rules", []) if x not in sc.get("spray_rules_first", [])]
+    R["post_checks"] = merge_checks(merge_checks(cfg.get("post_checks", []), sc.get("post_checks")), R.get("post_checks"))
 
     facts = "".join(
         f'<span class="fact">{html.escape(x)}</span>'

@@ -532,6 +532,8 @@ var CHECKS=(R.checks||[
  ["site",R.site_check||"Spray signs out",""],
  ["wx","Weather in the window",R.weather||"Delta T 2–8 · wind under 15 km/h · gusts under 30"]
 ]).concat(R.extra_checks||[]);
+/* Sprayer-specific swaps (build.py from config.json sprayer_checks): one default row -> one or more rows. JD valves, Andy 20 Nov 2026. */
+if(R.check_replace){var _cr=[];CHECKS.forEach(function(r){var x=typeof r!=="string"&&R.check_replace[r[0]];if(x){x.forEach(function(y){_cr.push(y)})}else _cr.push(r)});CHECKS=_cr}
 var CHECK_T=R.check_title||"Sprayer check";
 var FACTS=R.facts||[R.mix_l+" L",R.area_ha.toFixed(2)+" ha",R.rate_lha+" L/ha",R.nozzles,R.speed,R.pressure];
 var POSTF=R.post_fields||[];

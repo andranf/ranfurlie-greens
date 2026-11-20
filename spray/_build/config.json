@@ -111,5 +111,35 @@
       "Job ticked off in TurfDog",
       ""
     ]
-  ]
+  ],
+  "sprayer_checks": {
+    "JD HD200": {
+      "_why": "Andy 20 Nov 2026: JD wasn't getting up to pressure. Yellow agitator valve open to mix, shut to spray; red recirc tap back right always shut.",
+      "check_replace": {
+        "agit": [
+          [
+            "agit",
+            "Round yellow agitator valve: OPEN to mix, SHUT before you spray",
+            "Left open, the sprayer won't get up to pressure"
+          ],
+          [
+            "recirc",
+            "Red recirculation tap (back right) SHUT",
+            "It sends flow back into the tank: open, the sprayer won't get up to pressure"
+          ]
+        ]
+      },
+      "fill_sub": "yellow agitator valve open",
+      "spray_rules_first": [
+        "<b>Before you spray:</b> round yellow agitator valve SHUT and red recirculation tap (back right) SHUT. Either one open and it won't get up to pressure"
+      ],
+      "post_checks": [
+        [
+          "valves",
+          "Round yellow agitator valve and red recirculation tap (back right) both SHUT",
+          "Left ready for the next tank: either one open and it won't get up to pressure"
+        ]
+      ]
+    }
+  }
 }
