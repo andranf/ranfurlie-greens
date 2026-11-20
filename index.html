@@ -378,6 +378,7 @@ and the ethephon window opens <b data-source="eth_window" data-field="opens">—
   const dshort = (s) => { const d = pd(s); return d ? DAY[d.getDay()] + ' ' + d.getDate() + ' ' + MON[d.getMonth()] : '?'; };
   const dmon = (s) => { const d = pd(s); return d ? d.getDate() + ' ' + MON[d.getMonth()] + (d.getFullYear() !== new Date().getFullYear() ? ' ' + d.getFullYear() : '') : '?'; };
   const first = (n) => String(n || '').split(' ')[0];
+  const hm = (t) => { const m = /^(\d{1,2}):(\d{2})$/.exec(t || ''); if (!m) return ''; const h = +m[1]; return ', ' + (h % 12 || 12) + ':' + m[2] + ' ' + (h < 12 ? 'am' : 'pm'); };   // 20 Nov 2026: time of the last count / arrival
   const wk = (w) => w == null ? '' : w < 1 ? (w * 7 < 1 ? 'out' : Math.round(w * 7) + ' days left') : num(w, 1) + ' wk left';
   let D = null, L = { orders: [] }, loaded = false, view = 'overview', filt = 'often', q = '', open = {}, showAll = false;
   const BY = {}, ON = {};
@@ -475,7 +476,7 @@ and the ethephon window opens <b data-source="eth_window" data-field="opens">—
   function row(i) {
     const b = i.buy, lc = i.last_count;
     const st = i.cover_wk == null ? '' : i.cover_wk <= (D.cover_weeks || 4) ? 'low' : i.cover_wk <= 8 ? 'watch' : 'ok';
-    let h = `<div class="st-row" data-id="${esc(i.id)}" tabindex="0" role="button" aria-expanded="${!!open[i.id]}"><span class="nm">${esc(i.name)}${st && st !== 'ok' ? ` <span class="st-chip ${st}">${esc(wk(i.cover_wk))}</span>` : ''} ${onOrder(i.id)}<br><span class="c2">${lc ? 'counted ' + dmon(lc.date) + ' by ' + esc(first(lc.by)) : 'not counted since 13 Oct'}${i.ai_key ? ' · ' + esc(i.ai_key) : ''}</span></span>`;
+    let h = `<div class="st-row" data-id="${esc(i.id)}" tabindex="0" role="button" aria-expanded="${!!open[i.id]}"><span class="nm">${esc(i.name)}${st && st !== 'ok' ? ` <span class="st-chip ${st}">${esc(wk(i.cover_wk))}</span>` : ''} ${onOrder(i.id)}<br><span class="c2">${i.adj ? (i.adj.kind === 'arrived' ? 'arrived ' : 'counted ') + dmon(i.adj.date) + hm(i.adj.time) + ' by ' + esc(first(i.adj.by)) : lc ? 'counted ' + dmon(lc.date) + ' by ' + esc(first(lc.by)) : 'not counted since 13 Oct'}${i.ai_key ? ' · ' + esc(i.ai_key) : ''}</span></span>`;
     h += `<span class="n"><b>${num(i.expected)} ${esc(i.unit)}</b>${i.weekly_use ? `<br><span class="c2">${num(i.weekly_use)}/wk</span>` : ''}</span>`;
     h += `<span class="c3">${b ? `${money(b.last.pp, 2)} / ${esc(b.last.pack)}<br><span class="c2">${b.last.up ? money(b.last.up, 2) + '/' + esc(i.unit) + ' · ' : ''}${dmon(b.last.d)}</span>` : (i.price ? `<span class="c2">~${money(i.price, 2)}/${esc(i.unit)} (GreenKeeper)</span>` : '<span class="c2">no invoice</span>')}</span>`;
     h += `<span class="c4">${b && b.usual ? `${esc(b.usual.s)}<br><span class="c2">${esc(b.usual.why)}${b.cheap && b.cheap.s !== b.usual.s && b.cheap.up && b.usual.up && b.cheap.up < b.usual.up - 0.005 ? ' · cheaper at ' + esc(b.cheap.s) : ''}</span>` : '<span class="c2">?</span>'}</span>`;
