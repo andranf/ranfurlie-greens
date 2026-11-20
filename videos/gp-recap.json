@@ -1,6 +1,6 @@
 {
  "build_label": "week of 20 November 2026",
- "built": "2026-11-20T06:24+1100",
+ "built": "2026-11-20T12:51+1100",
  "asof": "2026-11-19",
  "asof_label": "Thu 19 Nov",
  "asof_long": "Thursday 19 November 2026",
@@ -245,66 +245,66 @@
     "d": "2026-11-20",
     "dow": "Fri",
     "lab": "20 Nov",
-    "tmax": 25.1,
-    "tmin": 17.3,
-    "t": 21.2,
-    "c": 0.9765,
-    "w": 0.3753,
+    "tmax": 27.4,
+    "tmin": 18.1,
+    "t": 22.8,
+    "c": 0.8825,
+    "w": 0.4993,
     "hot": false
    },
    {
     "d": "2026-11-21",
     "dow": "Sat",
     "lab": "21 Nov",
-    "tmax": 24.5,
-    "tmin": 15.4,
-    "t": 19.9,
+    "tmax": 24.9,
+    "tmin": 15.2,
+    "t": 20.0,
     "c": 1.0,
-    "w": 0.2877,
+    "w": 0.2942,
     "hot": false
    },
    {
     "d": "2026-11-22",
     "dow": "Sun",
     "lab": "22 Nov",
-    "tmax": 28.7,
+    "tmax": 29.9,
     "tmin": 14.3,
-    "t": 21.5,
-    "c": 0.9635,
-    "w": 0.3982,
+    "t": 22.1,
+    "c": 0.9297,
+    "w": 0.4456,
     "hot": false
    },
    {
     "d": "2026-11-23",
     "dow": "Mon",
     "lab": "23 Nov",
-    "tmax": 20.7,
-    "tmin": 10.6,
-    "t": 15.6,
-    "c": 0.7314,
-    "w": 0.0903,
+    "tmax": 20.8,
+    "tmin": 11.1,
+    "t": 15.9,
+    "c": 0.7625,
+    "w": 0.0991,
     "hot": false
    },
    {
     "d": "2026-11-24",
     "dow": "Tue",
     "lab": "24 Nov",
-    "tmax": 17.8,
-    "tmin": 9.5,
-    "t": 13.7,
-    "c": 0.5135,
-    "w": 0.0463,
+    "tmax": 16.8,
+    "tmin": 9.6,
+    "t": 13.2,
+    "c": 0.4657,
+    "w": 0.0394,
     "hot": false
    },
    {
     "d": "2026-11-25",
     "dow": "Wed",
     "lab": "25 Nov",
-    "tmax": 24.7,
-    "tmin": 8.3,
-    "t": 16.5,
-    "c": 0.8167,
-    "w": 0.117,
+    "tmax": 24.2,
+    "tmin": 7.9,
+    "t": 16.1,
+    "c": 0.7727,
+    "w": 0.1022,
     "hot": false
    },
    {
@@ -321,20 +321,20 @@
   ]
  },
  "fc_band": [
-  13.7,
-  21.5
+  13.2,
+  22.8
  ],
  "headline_fc": "Close to <em>ideal</em> growing weather for the greens",
  "takeaways": [
   {
    "tone": "cool",
    "head": "Greens: near peak growth",
-   "detail": "Bent and Poa GP averages 85% this week. Expect strong clip yields and quick recovery."
+   "detail": "Bent and Poa GP averages 83% this week. Expect strong clip yields and quick recovery."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 22%, best on Sun at 40%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 24%, best on Fri at 50%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
