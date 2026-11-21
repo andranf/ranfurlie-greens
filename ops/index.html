@@ -5,11 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ranfurlie Course Ops</title>
 <meta name="description" content="Irrigation, drainage, bunkers, topdressing, rough, grounds and safety at Ranfurlie in one place: open jobs, maps, stock and stocktakes, bunker sand and live Turfco loads.">
-<meta name="theme-color" content="#e4f1f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#06121b" media="(prefers-color-scheme: dark)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 /* Ranfurlie Course Ops v1.0 (24 Oct 2026). One page for irrigation, drainage, bunkers, topdressing and grounds.
@@ -372,6 +369,181 @@ input.field:focus,select.field:focus,textarea.field:focus{box-shadow:inset 0 0 0
 body.bigmap{overflow:hidden}
 body.bigmap .card{-webkit-backdrop-filter:none;backdrop-filter:none}
 body.bigmap .in{animation:none}
+
+/* ===================== MACHINERY LOOK (21 Nov 2026) =====================
+   Andy: "have the course ops dashboard look like the machinery dashboard". Same skin as the machinery page
+   (automation/apple-skin.css, Apple look + POLISH v2 "instrument panel"): system type, grey canvas with a soft
+   turf/sky wash, solid white cards with layered shadows, a segmented tab control with a raised thumb, the KPI row
+   as one dark instrument cluster with tell-tale lamps, solid priority capsules and a red "Do first" bar.
+   Each area keeps its own colour (iOS system colours). Delete this block to go back to the glass look. */
+:root{
+  --display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI Variable Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI Variable Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --rounded:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Inter","Segoe UI Variable Display","Segoe UI",Roboto,sans-serif;
+  --bg:#f2f2f7;--card:#ffffff;--card2:#f5f5f7;
+  --glass:#ffffff;--glass-hi:#ffffff;--glass-lo:rgba(118,118,128,.08);--glass-solid:#ffffff;
+  --rim:transparent;--rim2:transparent;--edge:transparent;
+  --fg:#16201b;--muted:#5f6964;--faint:#8b938f;--line:rgba(60,60,67,.14);
+  --hi:#ff3b30;--hi-ink:#d70015;--hi-bg:rgba(255,59,48,.12);--med:#ff9500;--med-ink:#c93400;--med-bg:rgba(255,149,0,.16);--lo:#6e6e73;--lo-bg:rgba(118,118,128,.12);
+  --ok:#34c759;--ok-ink:#248a3d;--ok-bg:rgba(52,199,89,.14);
+  --shadow:0 0 0 .5px rgba(18,32,25,.09),0 1px 1px rgba(18,32,25,.04),0 10px 22px -12px rgba(18,32,25,.15),0 28px 50px -32px rgba(18,32,25,.26);
+  --float:0 10px 34px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.06);
+  --track:rgba(118,118,128,.12);--thumb:#ffffff;--bar:rgba(242,242,247,.82);
+  --wash1:rgba(52,199,89,.17);--wash2:rgba(0,122,255,.14);
+  --cl-a:#28302c;--cl-b:#151a18;--cl-line:rgba(255,255,255,.085);--cl-t:#f4f7f5;--cl-t2:rgba(236,243,239,.70);
+  --cl-shadow:inset 0 1px 0 rgba(255,255,255,.13),inset 0 0 0 1px rgba(255,255,255,.05),0 1px 1px rgba(10,20,15,.25),0 16px 30px -14px rgba(10,20,15,.5),0 38px 64px -36px rgba(10,20,15,.65);
+  --l-blue:#63b3ff;--l-red:#ff6259;--l-amber:#ffb62e;--l-green:#45d47e;
+  --red1:#e9392e;--red2:#d0271c;--amb1:#ffc53d;--amb2:#ffab0a;--amb-ink:#3a2500;
+  --scrim:rgba(0,0,0,.32);
+  --r:20px;--r2:14px;--ease:cubic-bezier(.32,.72,0,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#000000;--card:#1c1c1e;--card2:#2c2c2e;
+  --glass:#1c1c1e;--glass-hi:#1c1c1e;--glass-lo:rgba(118,118,128,.18);--glass-solid:#1c1c1e;
+  --fg:#f4f7f5;--muted:#9aa29e;--faint:#6f7672;--line:rgba(84,84,88,.55);
+  --hi:#ff453a;--hi-ink:#ff6961;--hi-bg:rgba(255,69,58,.18);--med:#ff9f0a;--med-ink:#ff9f0a;--med-bg:rgba(255,159,10,.18);--lo:#98989d;--lo-bg:rgba(118,118,128,.24);
+  --ok:#30d158;--ok-ink:#30d158;--ok-bg:rgba(48,209,88,.16);
+  --shadow:inset 0 1px 0 rgba(255,255,255,.07),0 0 0 .5px rgba(255,255,255,.10),0 20px 38px -24px rgba(0,0,0,.9);
+  --float:0 10px 34px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
+  --track:rgba(118,118,128,.24);--thumb:#636366;--bar:rgba(22,22,24,.80);
+  --wash1:rgba(48,209,88,.14);--wash2:rgba(10,132,255,.16);
+  --cl-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.08),0 24px 50px -30px #000;
+  --red1:#ff5247;--red2:#e8362b;--scrim:rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --bg:#000000;--card:#1c1c1e;--card2:#2c2c2e;
+  --glass:#1c1c1e;--glass-hi:#1c1c1e;--glass-lo:rgba(118,118,128,.18);--glass-solid:#1c1c1e;
+  --fg:#f4f7f5;--muted:#9aa29e;--faint:#6f7672;--line:rgba(84,84,88,.55);
+  --hi:#ff453a;--hi-ink:#ff6961;--hi-bg:rgba(255,69,58,.18);--med:#ff9f0a;--med-ink:#ff9f0a;--med-bg:rgba(255,159,10,.18);--lo:#98989d;--lo-bg:rgba(118,118,128,.24);
+  --ok:#30d158;--ok-ink:#30d158;--ok-bg:rgba(48,209,88,.16);
+  --shadow:inset 0 1px 0 rgba(255,255,255,.07),0 0 0 .5px rgba(255,255,255,.10),0 20px 38px -24px rgba(0,0,0,.9);
+  --float:0 10px 34px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);
+  --track:rgba(118,118,128,.24);--thumb:#636366;--bar:rgba(22,22,24,.80);
+  --wash1:rgba(48,209,88,.14);--wash2:rgba(10,132,255,.16);
+  --cl-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 0 0 1px rgba(255,255,255,.08),0 24px 50px -30px #000;
+  --red1:#ff5247;--red2:#e8362b;--scrim:rgba(0,0,0,.6);
+}
+/* area colours, iOS system palette (light value / dark value) */
+body,body[data-area="irrigation"],body[data-area="map"]{--accL:#007aff;--accD:#0a84ff;--deepL:#0058c4;--deepD:#64aaff}
+body[data-area="drainage"]{--accL:#5856d6;--accD:#7d7aff;--deepL:#3a37b8;--deepD:#b4b2ff}
+body[data-area="bunkers"]{--accL:#c26a00;--accD:#ff9f0a;--deepL:#8a4a00;--deepD:#ffd08a}
+body[data-area="topdressing"]{--accL:#e2470e;--accD:#ff7a45;--deepL:#a83208;--deepD:#ffbfa3}
+body[data-area="grounds"]{--accL:#248a3d;--accD:#30d158;--deepL:#1b6a2f;--deepD:#9be9ad}
+body[data-area="rough"]{--accL:#5f8a00;--accD:#b6d84a;--deepL:#456300;--deepD:#e0f0a0}
+body[data-area="safety"]{--accL:#636366;--accD:#a1a1a6;--deepL:#3a3a3c;--deepD:#d1d1d6}
+body[data-area="keys"]{--accL:#e0245e;--accD:#ff375f;--deepL:#a3123f;--deepD:#ffb3c4}
+body{font-family:var(--body);-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.1}
+
+/* canvas: morning light over turf (green from the left, sky from the right), fading into system grey */
+.sky{background:radial-gradient(ellipse 45% 620px at 22% -170px,var(--wash1),transparent 70%),radial-gradient(ellipse 45% 660px at 78% -190px,var(--wash2),transparent 70%),var(--bg);background-repeat:no-repeat}
+.sky i{display:none}
+
+/* surfaces: solid cards that sit above the canvas */
+.card,.toast,.sheet .panel{background:var(--card);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:var(--shadow)}
+.card{border-radius:var(--r)}
+.card h2{font-size:21px;font-weight:700;letter-spacing:-.018em}
+.card h2 .count{font-size:14px;font-weight:600;color:var(--muted);background:var(--glass-lo);padding:2px 9px}
+.eyebrow{font-family:var(--body);text-transform:none;letter-spacing:0;font-weight:600;font-size:14px}
+.sub,.note{color:var(--muted)}
+
+/* header: big title, LIVE capsule, one-sentence take, small updated line */
+.top .wrap{padding-block:22px 4px;gap:4px}
+.top h1{font-size:clamp(34px,7.4vw,46px);font-weight:800;letter-spacing:-.03em;gap:12px;flex-wrap:wrap}
+.top h1 .dot{display:none}
+.top h1 .live{display:inline-flex;align-items:center;gap:6px;font-family:var(--body);font-size:12.5px;font-weight:700;letter-spacing:.06em;color:var(--ok-ink);
+  padding:3px 10px;border-radius:99px;background:color-mix(in srgb,var(--ok) 17%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 30%,transparent);transform:translateY(2px)}
+.top h1 .live i{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pvPing 2.2s cubic-bezier(.2,.6,.3,1) infinite}
+.top h1 .live.stale{color:var(--med-ink);background:var(--med-bg);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--med) 35%,transparent)}
+.top h1 .live.stale i{background:var(--med);animation:none}
+@keyframes pvPing{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent)}70%,100%{box-shadow:0 0 0 7px transparent}}
+@media (prefers-reduced-motion: reduce){.top h1 .live i{animation:none}}
+.facts{display:block;max-width:820px}
+.facts .take{margin:2px 0 0;font-size:18px;line-height:1.45;color:var(--fg)}
+.facts .take b{font-weight:700}
+.facts .upd{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
+.facts .upd.late{color:var(--med-ink);font-weight:600}
+.fact{font-family:var(--body);font-size:14px;font-weight:600;background:var(--glass-lo);box-shadow:none}
+.iconbtn{background:var(--card);box-shadow:var(--shadow);border-radius:12px}
+
+/* tabs: segmented control, recessed track and a raised thumb (the bar floats on the navigation layer) */
+.tabs{padding-bottom:10px}
+.tabs .bar{background:var(--bar);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);
+  box-shadow:inset 0 1px 2px rgba(18,32,25,.09),inset 0 0 0 .5px rgba(18,32,25,.06);border-radius:16px;padding:4px;gap:2px;width:fit-content;max-width:100%}
+.tabs .bar::before{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--track);pointer-events:none;z-index:-1}
+.tabs .bar{position:relative;isolation:isolate}
+.tab{font-family:var(--body);font-weight:500;font-size:15px;letter-spacing:-.01em;color:var(--fg);border-radius:12px;padding:7px 14px;flex:0 0 auto}
+.tab svg{width:17px;height:17px}
+.tab b{font-size:12px;font-weight:600;background:var(--glass-lo);color:var(--muted);line-height:18px;min-width:20px}
+.tab:hover{background:color-mix(in srgb,var(--thumb) 45%,transparent)}
+.tab[aria-selected="true"]{background:var(--thumb);color:var(--fg);font-weight:600;
+  box-shadow:0 0 0 .5px rgba(18,32,25,.07),0 1px 1px rgba(18,32,25,.09),0 6px 14px -4px rgba(18,32,25,.26)}
+.tab[aria-selected="true"] svg{color:var(--c)}
+.tab[aria-selected="true"] b{background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
+@media (min-width:901px) and (max-width:1180px){.tab{padding:7px 9px;font-size:14px}.tab svg{width:16px;height:16px}}
+@media (max-width:900px){.tabs .bar{width:auto;border-radius:18px}.tab{font-size:clamp(11.5px,3.1vw,14px);padding:7px 2px 6px;border-radius:13px}.tab svg{width:20px;height:20px}.tab b{font-size:10.5px;line-height:16px;min-width:17px;background:var(--card);color:var(--muted);box-shadow:0 0 0 1.5px var(--bar)}.tab[aria-selected="true"] b{background:var(--c);color:#fff;box-shadow:0 0 0 1.5px var(--thumb)}}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tab svg{color:color-mix(in srgb,var(--c) 70%,#fff)}:root:not([data-theme="light"]) .tab[aria-selected="true"] svg{color:color-mix(in srgb,var(--c) 45%,#fff)}:root:not([data-theme="light"]) .tab[aria-selected="true"] b{background:rgba(255,255,255,.22);color:#fff}}
+:root[data-theme="dark"] .tab svg{color:color-mix(in srgb,var(--c) 70%,#fff)}:root[data-theme="dark"] .tab[aria-selected="true"] svg{color:color-mix(in srgb,var(--c) 45%,#fff)}:root[data-theme="dark"] .tab[aria-selected="true"] b{background:rgba(255,255,255,.22);color:#fff}
+.job .t .note{white-space:nowrap}
+
+/* KPI row = instrument cluster: one graphite panel, a cell per reading, a tell-tale lamp on each */
+.kpis{position:relative;isolation:isolate;overflow:hidden;gap:1px;padding:0;border-radius:26px;
+  background:radial-gradient(760px 260px at 0% 0%,rgba(69,212,126,.13),transparent 70%),radial-gradient(700px 260px at 100% 0%,rgba(99,179,255,.12),transparent 70%),linear-gradient(180deg,var(--cl-a),var(--cl-b));
+  box-shadow:var(--cl-shadow)}
+.tile{--kl:var(--l-blue);position:relative;overflow:hidden;background:transparent;border-radius:0;padding:16px 18px 16px;gap:3px;
+  box-shadow:-1px 0 0 var(--cl-line),0 -1px 0 var(--cl-line),-1px -1px 0 var(--cl-line)}
+.tile:nth-child(2){--kl:var(--l-red)} .tile:nth-child(3){--kl:var(--l-amber)} .tile:nth-child(4){--kl:var(--l-green)}
+.tile::before{content:"";position:absolute;left:-4px;top:-6px;width:58px;height:58px;border-radius:50%;background:radial-gradient(closest-side,var(--kl),transparent);opacity:.24;filter:blur(5px);pointer-events:none}
+.tile .k{display:flex;align-items:center;gap:8px;color:var(--cl-t2);font-weight:500;font-size:13.5px;min-height:1.4em}
+.tile .k::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:var(--kl);box-shadow:0 0 8px var(--kl)}
+.tile .v{font-family:var(--rounded);font-weight:700;font-size:38px;line-height:1.14;letter-spacing:-.01em;margin-top:4px;color:var(--cl-t)}
+.tile .v small{font-family:var(--body);font-size:15px;font-weight:600;color:var(--cl-t2);margin-left:5px}
+.tile.acc .v{color:var(--cl-t)}
+.tile.hi .v{color:var(--l-red)}
+.tile .viz{color:var(--cl-t2)}
+.tile .viz .note{color:var(--cl-t2)!important}
+.tile .viz svg{--acc:var(--kl);--acc-soft:rgba(255,255,255,.12);--line:rgba(255,255,255,.12)}
+@media (max-width:759px){.tile .v{font-size:32px}}
+
+/* Do first: the red alert bar */
+.dofirst{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:16px 20px;border-radius:var(--r);cursor:pointer;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--hi) 11%,var(--card)),var(--card) 75%);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--hi) 30%,transparent),var(--shadow)}
+.dofirst .ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:20px;
+  background:linear-gradient(180deg,var(--red1),var(--red2));box-shadow:0 6px 14px -6px var(--red2)}
+.dofirst .lab{color:var(--hi-ink);font-weight:700;font-size:13.5px}
+.dofirst .t{font-weight:700;font-size:18px;letter-spacing:-.015em;line-height:1.3}
+.dofirst .m{color:var(--muted);font-size:14px}
+.dofirst .more{font-size:14px;font-weight:600;color:var(--hi-ink);white-space:nowrap}
+@media (max-width:560px){.dofirst{grid-template-columns:auto minmax(0,1fr)}.dofirst .more{display:none}.dofirst .t{font-size:16.5px}}
+
+/* priority capsules: solid, like Overdue / Due */
+.tag{font-weight:600;font-size:12.5px;padding:2px 9px}
+.tag.High{background:linear-gradient(180deg,var(--red1),var(--red2));color:#fff}
+.tag.Medium{background:linear-gradient(180deg,var(--amb1),var(--amb2));color:var(--amb-ink)}
+.tag.ok{color:var(--ok-ink)}
+.pd.High{background:var(--hi)} .pd.Medium{background:var(--med)} .pd.Low{background:var(--lo)}
+.job{border-top-color:var(--line)}
+.job .go{border-radius:99px;padding:4px 11px;font-weight:600}
+.job.sel{background:var(--acc-soft);border-radius:12px}
+
+/* controls */
+.btn{border-radius:12px;font-weight:600;background:var(--glass-lo);box-shadow:none;min-height:44px}
+.btn.primary{background:var(--acc);color:#fff;box-shadow:0 8px 18px -10px var(--acc)}
+.btn.ghost{box-shadow:inset 0 0 0 1px var(--acc-line)}
+.chip{font-weight:500;background:var(--glass-lo);box-shadow:none}
+.seg{background:var(--track);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:inset 0 1px 2px rgba(18,32,25,.09);border-radius:12px;padding:3px;gap:2px}
+.seg button{font-family:var(--body);font-weight:500;font-size:15px;color:var(--fg);border-radius:9px;padding:7px 13px}
+.seg button[aria-pressed="true"]{background:var(--thumb);color:var(--fg);font-weight:600;box-shadow:0 0 0 .5px rgba(18,32,25,.07),0 1px 1px rgba(18,32,25,.09),0 6px 14px -4px rgba(18,32,25,.26)}
+.seg button[aria-pressed="true"] i{background:var(--c)}
+.tile,.stat,.krow,.count input,.stepper button,input.field,select.field,textarea.field,.mapbar select,.gbtn{font-family:inherit}
+.stat,.krow,.kpill{background:var(--card2);box-shadow:none}
+.si .q,.stat .v,.call .big,.ring .big,.kno,.loadlog b,.alert b,.stepper input,.gbtn{font-family:var(--rounded);letter-spacing:-.01em}
+.loadbtn{font-family:var(--display);letter-spacing:-.02em;border-radius:20px}
+.map .ctl button,.map .hint{background:var(--card);box-shadow:var(--float)}
+.full .bar{background:var(--bar);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%)}
+.mapcard .mhead b{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.015em}
+.foot{color:var(--muted)}
 </style>
 </head>
 <body data-area="irrigation">
@@ -386,7 +558,7 @@ body.bigmap .in{animation:none}
         <button class="iconbtn" id="theme" aria-label="Light or dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
       </div>
     </div>
-    <h1><span class="dot"></span><span id="title">Irrigation</span></h1>
+    <h1><span class="dot"></span><span id="title">Irrigation</span><span class="live" id="live"><i></i>LIVE</span></h1>
     <div class="facts" id="facts"></div>
     <span class="outbox" id="outbox" hidden><i></i><span></span></span>
   </div>
@@ -404,15 +576,15 @@ const HOOK = "https://hooks.zapier.com/hooks/catch/18429017/R9IHP2aX1ajxyU3o/";
 const SLACK = "https://ranfurliegolfclub.slack.com/archives/";
 const CREW = ["Andy Anderson","Ben Hartley","Neil Harper","Kyle Craig","Nathan Drew","Nathan Ferguson","Brodie Macdonald","Nicholas Debrincat","Flynn Sinclair","James King","Joshua Cope","Mitch Mahoney","Samuel Cope","Tremayne Gallagher","Michael K"];
 const AREAS = {
-  map:{label:"Map",c:"#0aa6dc"},
-  irrigation:{label:"Irrigation",long:"",c:"#0a7fd0",data:"../irrigation/data.json",full:"../irrigation/",ch:"C06HV77DBQV",chName:"#irrigation",pfx:"IRR"},
-  drainage:{label:"Drainage",c:"#6a46f5",data:"../drainage/data.json",full:"../drainage/",ch:"C0B885SR474",chName:"#drainage",pfx:"DRN"},
-  bunkers:{label:"Bunkers",c:"#c27a06",data:"../bunkers/data.json",full:"../bunkers/",ch:"C06SNC8QM7T",chName:"#bunkers",pfx:"BNK"},
-  topdressing:{label:"Topdressing",c:"#dc5222",ch:"C0AMNEELZND",chName:"#topdressing"},
-  grounds:{label:"Grounds",c:"#169552",data:"../grounds/data.json",full:"../grounds/",pfx:""},
-  keys:{label:"Keys",c:"#c8336b"},
-  rough:{label:"Rough",c:"#6f8a0a",embed:"../rough/",embedTitle:"Rough plan: mow, let grow and seed areas"},
-  safety:{label:"Safety",c:"#4b5d73",embed:"https://andranf.github.io/ranfurlie-safety/",embedTitle:"Ranfurlie Safety: sign-offs and registers"}
+  map:{label:"Map",c:"#30b0c7"},
+  irrigation:{label:"Irrigation",long:"",c:"#007aff",data:"../irrigation/data.json",full:"../irrigation/",ch:"C06HV77DBQV",chName:"#irrigation",pfx:"IRR"},
+  drainage:{label:"Drainage",c:"#5856d6",data:"../drainage/data.json",full:"../drainage/",ch:"C0B885SR474",chName:"#drainage",pfx:"DRN"},
+  bunkers:{label:"Bunkers",c:"#e08600",data:"../bunkers/data.json",full:"../bunkers/",ch:"C06SNC8QM7T",chName:"#bunkers",pfx:"BNK"},
+  topdressing:{label:"Topdressing",c:"#e2470e",ch:"C0AMNEELZND",chName:"#topdressing"},
+  grounds:{label:"Grounds",c:"#28a745",data:"../grounds/data.json",full:"../grounds/",pfx:""},
+  keys:{label:"Keys",c:"#e0245e"},
+  rough:{label:"Rough",c:"#6f9a00",embed:"../rough/",embedTitle:"Rough plan: mow, let grow and seed areas"},
+  safety:{label:"Safety",c:"#8e8e93",embed:"https://andranf.github.io/ranfurlie-safety/",embedTitle:"Ranfurlie Safety: sign-offs and registers"}
 };
 AREAS.topdressing.short="Topdress";AREAS.irrigation.short="Irrigation";
 const ORDER = ["map","irrigation","drainage","bunkers","topdressing","rough","grounds","safety","keys"];
@@ -872,13 +1044,30 @@ function renderTabs(){
   $$("#tabs .tab").forEach(b=>b.onclick=()=>go(b.dataset.tab));
 }
 function facts(){
-  const k=S.tab;const d=S.data[k];const f=[];
-  if(k==="keys"){const K=S.keys;if(K&&K.keys){const o=keysOut();const lost=o.filter(x=>x.status==="Lost").length,out=o.length-lost,late=o.filter(x=>x.overdue&&x.status!=="Lost").length;if(!o.length)f.push(`<span class="fact acc">All in</span>`);if(out)f.push(`<span class="fact acc">${out} out</span>`);if(late)f.push(`<span class="fact">${late} overdue</span>`);if(lost)f.push(`<span class="fact${out?"":" acc"}">${lost} missing</span>`);if(K.at)f.push(`<span class="fact">Checked ${melTime(new Date(K.at))}</span>`)}$("#facts").innerHTML=f.join("");return}
-  if(k==="topdressing"){const c=S.live?.td?.call;if(c&&c.date===today()&&c.loads)f.push(`<span class="fact acc">Call ~${c.loads} loads · ${c.mm} mm</span>`)}
-  else if(d){const j=jobsOf(k);const o=j.filter(isOpen);f.push(`<span class="fact acc">${o.length} open</span>`);const h=o.filter(x=>x.prio==="High").length;if(h)f.push(`<span class="fact">${h} high</span>`)}
-  const gen=k==="topdressing"?(S.live?.updated?melTime(new Date(S.live.updated))+" "+shortDate(melYmd(new Date(S.live.updated))):""):(d?.generated?melTime(new Date(genUtc(d.generated)))+" "+shortDate(d.generated):"");
-  if(gen){const gm=k==="topdressing"?0:genUtc(d.generated),late=gm&&Date.now()-gm>30*3600e3;f.push(`<span class="fact${late?" late":""}">${late?"No update since":"Updated"} ${gen}${late?" · "+ago(new Date(gm).toISOString()):""}</span>`)}
-  $("#facts").innerHTML=f.join("");
+  /* machinery look: one plain sentence with the numbers in bold, then a small "Updated" line */
+  const k=S.tab;const d=S.data[k];let take="",upd="",late=false;
+  const pl=(n,a,b)=>n===1?a:(b||a+"s");
+  if(k==="keys"){const K=S.keys;if(K&&K.keys){const o=keysOut();const lost=o.filter(x=>x.status==="Lost").length,out=o.length-lost,lt=o.filter(x=>x.overdue&&x.status!=="Lost").length;
+      take=!o.length?"Every key is in.":[out?`<b>${out}</b> ${pl(out,"key is","keys are")} out`:"",lt?`<b>${lt}</b> overdue`:"",lost?`<b>${lost}</b> missing`:""].filter(Boolean).join(", ")+".";
+      if(K.at)upd=`Checked ${melTime(new Date(K.at))}`}else take="Who has which key, and what is out."}
+  else if(k==="topdressing"){const c=S.live?.td?.call;take=c&&c.date===today()&&c.loads?`Today's sand call is <b>~${c.loads} loads</b>${c.mm?` at <b>${c.mm} mm</b>`:""}. Tap a load when it goes out.`:"No sand call yet today. Tap a load when it goes out.";
+      if(S.live?.updated)upd=`Updated ${melTime(new Date(S.live.updated))} ${shortDate(melYmd(new Date(S.live.updated)))} · loads and stocktakes show within a minute or two`}
+  else if(k==="map")take="Every head, pit, bunker and pin on one map.";
+  else if(k==="rough")take="Rough plan: where to mow, let grow and seed.";
+  else if(k==="safety")take="Safety sign-offs and registers.";
+  else if(d){const o=sortJobs(jobsOf(k).filter(isOpen));const h=o.filter(x=>x.prio==="High").length;const lab={bunkers:"bunker"}[k]||AREAS[k].label.toLowerCase();const top=o[0];const tw=top&&top.where&&!String(top.title).toLowerCase().includes(String(top.where).toLowerCase())?", "+esc(top.where):"";
+      take=o.length?`<b>${o.length}</b> ${lab} ${pl(o.length,"job is","jobs are")} open${h?` (<b>${h}</b> high priority)`:""}.`+(h?` Do first: <b>${esc(top.title)}</b>${tw}.`:""):`No open ${lab} jobs.`;
+      const gm=genUtc(d.generated);late=gm&&Date.now()-gm>30*3600e3;
+      upd=d.generated?`${late?"No update since":"Updated"} ${melTime(new Date(gm))} ${shortDate(d.generated)}${late?" · "+ago(new Date(gm).toISOString()):""} · rebuilt every 3 hours from Slack and Notion`:""}
+  $("#facts").innerHTML=`<p class="take">${take}</p>${upd?`<p class="upd${late?" late":""}">${upd}</p>`:""}`;
+  const lv=$("#live");if(lv){lv.classList.toggle("stale",!!late);lv.lastChild.textContent=late?"NOT UPDATING":"LIVE"}
+}
+/* the red "Do first" bar: the most urgent open job, only when something is high priority */
+function doFirst(){
+  const k=S.tab;if(!["irrigation","drainage","bunkers","grounds"].includes(k)||!S.data[k])return "";
+  const o=sortJobs(jobsOf(k).filter(isOpen));const j=o[0];if(!j||j.prio!=="High")return "";
+  const age=daysAgo(j.reported);const tw=j.where&&!String(j.title).toLowerCase().includes(String(j.where).toLowerCase())?" · "+esc(j.where):"";
+  return `<div class="dofirst in" data-dofirst="${esc(j.ref)}" role="button" tabindex="0"><span class="ic">!</span><div><div class="lab">Do first</div><div class="t">${esc(j.title)}${tw}</div><div class="m">${esc(j.ref)}${age!=null?" · reported "+(age===0?"today":age===1?"yesterday":age+" days ago"):""}</div></div><span class="more">Show on map ›</span></div>`;
 }
 let lastSig="";
 function sig(){return [S.tab,S.sub,S.keys&&S.keys.at,S.keys&&S.keys.err,S.live&&S.live.updated,...["irrigation","drainage","bunkers","grounds"].map(k=>S.data[k]&&S.data[k].generated),JSON.stringify(pending()),outbox().length].join("|")}
@@ -889,10 +1078,11 @@ function render(){
   const v={map:viewMap,irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds,keys:viewKeys,rough:()=>viewEmbed("rough"),safety:()=>viewEmbed("safety")}[S.tab]();
   if(AREAS[S.tab].embed&&$(`#view .mapcard[data-embed="${S.tab}"]`)){/* keep the page as it is */}
   else if(S.tab==="map"&&$("#view .mapcard:not([data-embed])")){/* keep the map frame as it is: reloading it would lose the valves you shut */}
-  else{$("#view").innerHTML=v;wire()}
-  $("#foot").innerHTML=`Jobs, maps and stock rebuild from Slack and Notion every hour. Stocktakes, sand and Turfco loads from this page show within a minute or two.<br>Separate pages: <a href="../">Greens Live</a> · <a href="../moisture/">Moisture map</a> · <a href="../machinery/">Machinery</a> · <a href="../stock.html">Shed stocktake</a> · <a href="../spray/">Spraying</a>`;
+  else{$("#view").innerHTML=doFirst()+v;wire()}
+  $("#foot").innerHTML=`Jobs, maps and stock rebuild from Slack and Notion every 3 hours (5:50am to 5:50pm). Stocktakes, sand and Turfco loads from this page show within a minute or two.<br>Separate pages: <a href="../">Greens Live</a> · <a href="../moisture/">Moisture map</a> · <a href="../machinery/">Machinery</a> · <a href="../stock.html">Shed stocktake</a> · <a href="../spray/">Spraying</a>`;
 }
 function wire(){
+  $$("[data-dofirst]").forEach(b=>{const f=()=>{pickJob(S.tab,b.dataset.dofirst,true);const r=$(`.job[data-job="${CSS.escape(b.dataset.dofirst)}"]`);if(r)r.scrollIntoView({behavior:"smooth",block:"center"})};b.onclick=f;b.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}}});
   $$("[data-act=stocktake]").forEach(b=>b.onclick=()=>stocktakeSheet(b.dataset.area));
   $$("[data-act=delivery]").forEach(b=>b.onclick=()=>deliverySheet(b.dataset.area));
   $$("[data-act=full]").forEach(b=>b.onclick=()=>openFull(b.dataset.area));
