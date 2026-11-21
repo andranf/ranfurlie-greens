@@ -546,6 +546,33 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.1}
 .mapcard .mhead b{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.015em}
 .foot{color:var(--muted)}
 a.dofirst{color:inherit;text-decoration:none}
+body[data-area="today"]{--accL:#007aff;--accD:#0a84ff;--deepL:#0058c4;--deepD:#64aaff}
+/* Today: the do-first list and one tile per area */
+.dolist{display:grid;gap:0;padding:6px 8px}
+.dorow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 12px;align-items:center;padding:11px 10px;border-top:1px solid var(--line);cursor:pointer;border-radius:12px;color:inherit;text-decoration:none;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%}
+.dorow:first-child{border-top:0}
+.dorow:hover{background:var(--glass-lo)}
+.dorow .ai{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#fff;background:var(--c)}
+.dorow .ai svg{width:19px;height:19px}
+.dorow .t{font-weight:600;line-height:1.3}
+.dorow .m{color:var(--muted);font-size:13.5px}
+.dorow .go{font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+.areas{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.atile{display:grid;gap:6px;align-content:start;text-align:left;border:0;border-radius:var(--r);padding:16px 18px;background:var(--card);box-shadow:var(--shadow);color:inherit;min-height:132px;transition:transform .2s var(--ease)}
+.atile:active{transform:scale(.98)}
+.atile .ah{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-.015em}
+.atile .ah .ai{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:#fff;background:var(--c)}
+.atile .ah .ai svg{width:17px;height:17px}
+.atile .ah .chev{margin-left:auto;color:var(--faint);font-weight:500}
+.atile .an{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.atile .an b{font-family:var(--rounded);font-size:30px;font-weight:700;line-height:1.1;letter-spacing:-.01em}
+.atile .an span{color:var(--muted);font-size:14px}
+.atile .top{color:var(--muted);font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.atile .top b{color:var(--fg);font-weight:600}
+.atile.quiet .an b{color:var(--muted)}
+@media (max-width:900px){.tabs .bar{grid-template-columns:repeat(6,minmax(0,1fr))}.tab{font-size:clamp(10.5px,2.75vw,13px)}}
+@media (min-width:1181px){.tab{padding:7px 9px}}
+@media (max-width:560px){.areas{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.atile{min-height:0;padding:13px 14px;gap:4px}.atile .ah{font-size:15px;gap:8px}.atile .ah .ai{width:26px;height:26px}.atile .an b{font-size:26px}.atile .an span,.atile .top{font-size:13px}}
 @media (min-width:1181px){.tab{padding:7px 11px}}
 .mach-k{font-size:12px;font-weight:600;border-radius:99px;padding:1px 8px;background:var(--glass-lo);color:var(--muted)}
 .mach-share{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
@@ -582,6 +609,7 @@ const HOOK = "https://hooks.zapier.com/hooks/catch/18429017/R9IHP2aX1ajxyU3o/";
 const SLACK = "https://ranfurliegolfclub.slack.com/archives/";
 const CREW = ["Andy Anderson","Ben Hartley","Neil Harper","Kyle Craig","Nathan Drew","Nathan Ferguson","Brodie Macdonald","Nicholas Debrincat","Flynn Sinclair","James King","Joshua Cope","Mitch Mahoney","Samuel Cope","Tremayne Gallagher","Michael K"];
 const AREAS = {
+  today:{label:"Today",c:"#007aff"},
   map:{label:"Map",c:"#30b0c7"},
   irrigation:{label:"Irrigation",long:"",c:"#007aff",data:"../irrigation/data.json",full:"../irrigation/",ch:"C06HV77DBQV",chName:"#irrigation",pfx:"IRR"},
   drainage:{label:"Drainage",c:"#5856d6",data:"../drainage/data.json",full:"../drainage/",ch:"C0B885SR474",chName:"#drainage",pfx:"DRN"},
@@ -593,10 +621,11 @@ const AREAS = {
   rough:{label:"Rough",c:"#6f9a00",embed:"../rough/",embedTitle:"Rough plan: mow, let grow and seed areas"},
   safety:{label:"Safety",c:"#8e8e93",embed:"https://andranf.github.io/ranfurlie-safety/",embedTitle:"Ranfurlie Safety: sign-offs and registers"}
 };
-AREAS.topdressing.short="Topdress";AREAS.irrigation.short="Irrigation";
-const ORDER = ["map","irrigation","drainage","bunkers","topdressing","rough","grounds","machinery","safety","keys"];
+AREAS.topdressing.short="Topdress";AREAS.machinery.short="Machines";AREAS.irrigation.short="Irrigation";
+const ORDER = ["today","map","irrigation","drainage","bunkers","topdressing","rough","grounds","machinery","safety","keys"];
 /* tab icons (24px stroke) */
 const TAB_ICON = {
+  today:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15l2.5 2.5L16 13"/>',
   map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
   irrigation:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
   drainage:'<path d="M3 7c3 0 3 2 6 2s3-2 6-2 3 2 6 2M3 13c3 0 3 2 6 2s3-2 6-2 3 2 6 2"/><path d="M12 17v4"/>',
@@ -700,7 +729,7 @@ async function loadAll(){
 /* machinery: ../machinery/data.json is the whole machinery board (~390 KB zipped); keep only what this tab shows */
 async function loadMach(){try{const d=await getJSON(AREAS.machinery.data);const old=S.mach&&S.mach.built;
   S.mach={sum:(d.m_summary||[])[0]||{},wl:d.m_worklist||[],faults:d.m_faults||[],built:d._built||""};S.machErr=false;
-  if(old!==S.mach.built&&$("#sheet").hidden&&$("#full").hidden){if(S.tab==="machinery")render();else renderTabs()}}
+  if(old!==S.mach.built&&$("#sheet").hidden&&$("#full").hidden){if(S.tab==="machinery"||S.tab==="today")render();else renderTabs()}}
   catch(e){S.machErr=true;if(S.tab==="machinery"&&!S.mach)render()}}
 async function loadLive(){try{S.live=await getJSON("live.json")}catch(e){S.live=S.live||{events:[],td:{jobs:[],call:null},stock:{}}}prunePending()}
 
@@ -811,6 +840,43 @@ function wireMap(area,onTap){
   const done=$("[data-bigdone]",box.closest(".mapwrap"));if(done)done.onclick=closeBig;
 }
 const opts_greenFocus={topdressing:true};
+
+/* ------------------------------------------------------------------ today: one screen across every area */
+const JOB_AREAS=["irrigation","drainage","bunkers","grounds"];
+function todayTotals(){let open=0,high=0;JOB_AREAS.forEach(a=>{const o=jobsOf(a).filter(isOpen);open+=o.length;high+=o.filter(j=>j.prio==="High").length});return {open,high}}
+function aIcon(k){return `<span class="ai" style="--c:${AREAS[k].c}">${TAB_SVG(k)}</span>`}
+function viewToday(){
+  const t=todayTotals();const M=S.mach;const call=S.live?.td?.call;const callOn=call&&call.date===today()&&call.loads;
+  const kOut=S.keys&&S.keys.keys?keysOut().length:null;
+  /* do first: the most urgent open job in each area that has something high priority, plus machinery's top job */
+  const rows=[];
+  JOB_AREAS.forEach(a=>{const o=sortJobs(jobsOf(a).filter(isOpen));const h=o.filter(j=>j.prio==="High");if(!h.length)return;const j=h[0];const age=daysAgo(j.reported);
+    const tw=j.where&&!String(j.title).toLowerCase().includes(String(j.where).toLowerCase())?" · "+esc(j.where):"";
+    rows.push({sort:0,age:age||0,html:`<button class="dorow" data-goto="${a}" data-gojob="${esc(j.ref)}">${aIcon(a)}<div><div class="t">${esc(j.title)}${tw}</div><div class="m">${AREAS[a].label} · ${esc(j.ref)}${age!=null?" · "+(age===0?"today":age+" days"):""}${h.length>1?` · ${h.length-1} more high`:""}</div></div><span class="go">›</span></button>`})});
+  if(M&&M.wl[0]){const w=M.wl[0];const safe=(w.flags||[]).includes("safety");rows.push({sort:safe?-1:1,age:0,html:`<button class="dorow" data-goto="machinery">${aIcon("machinery")}<div><div class="t">${MJ(w.machine,w.job)}</div><div class="m">Machinery${safe?' · <span class="tag High">Safety</span>':""}${w.ref?" · "+esc(w.ref):""} · ${esc(w.why||"")}</div></div><span class="go">›</span></button>`})}
+  if(kOut&&keysOut().some(x=>x.overdue||x.status==="Lost")){const o=keysOut();const lost=o.filter(x=>x.status==="Lost").length,late=o.filter(x=>x.overdue&&x.status!=="Lost").length;rows.push({sort:2,age:0,html:`<button class="dorow" data-goto="keys">${aIcon("keys")}<div><div class="t">${[late?late+" "+(late===1?"key":"keys")+" overdue":"",lost?lost+" missing":""].filter(Boolean).join(", ")}</div><div class="m">Keys</div></div><span class="go">›</span></button>`})}
+  rows.sort((a,b)=>a.sort-b.sort||b.age-a.age);
+  const doCard=rows.length?`<div class="card in" style="padding:14px 10px 8px"><div class="head" style="padding:0 12px;margin-bottom:4px"><h2>Do first</h2><span class="note">the most urgent job in each area</span></div><div class="dolist">${rows.map(r=>r.html).join("")}</div></div>`:`<div class="card in"><h2>Nothing high priority</h2><p class="sub" style="margin:6px 0 0">No area has a high-priority job open.</p></div>`;
+  /* one tile per area */
+  const tile=(k,big,small,top,quiet)=>`<button class="atile${quiet?" quiet":""}" data-goto="${k}"><div class="ah">${aIcon(k)}${AREAS[k].label}<span class="chev">›</span></div><div class="an"><b>${big}</b><span>${small}</span></div>${top?`<div class="top">${top}</div>`:""}</button>`;
+  const tiles=[];
+  JOB_AREAS.forEach(a=>{if(!S.data[a]){tiles.push(tile(a,"–","not loaded","",true));return}const o=sortJobs(jobsOf(a).filter(isOpen));const h=o.filter(j=>j.prio==="High").length;
+    tiles.push(tile(a,o.length,`open${h?` · ${h} high`:""}`,o[0]?`Next: <b>${esc(o[0].title)}</b>`:"Nothing open",!o.length))});
+  tiles.push(tile("topdressing",callOn?"~"+call.loads:"–",callOn?`loads called${call.mm?" · "+call.mm+" mm":""}`:"no sand call yet today","",!callOn));
+  if(M)tiles.push(tile("machinery",M.sum.faults_open||0,`faults open${M.sum.faults_safety?` · ${M.sum.faults_safety} safety`:""}`,`<b>${M.sum.units_overdue||0}</b> machines overdue · <b>${M.sum.worklist_n||0}</b> on today's list`,false));
+  else tiles.push(tile("machinery","…","loading","",true));
+  tiles.push(tile("keys",kOut==null?"–":kOut,kOut==null?"not loaded":kOut?`${kOut===1?"key":"keys"} out`:"all in","",!kOut));
+  tiles.push(tile("map","","Every head, pit and pin","",true));
+  tiles.push(tile("rough","","Mow, let grow and seed","",true));
+  tiles.push(tile("safety","","Sign-offs and registers","",true));
+  return `${kpiTiles([
+      {k:"Open jobs",v:t.open,cls:"acc",viz:`<div class="note" style="line-height:26px">all areas</div>`},
+      {k:"High priority",v:t.high,cls:t.high?"hi":"",viz:meter(t.high,Math.max(t.open,1))},
+      {k:"Machinery faults",v:M?M.sum.faults_open||0:"–",viz:`<div class="note" style="line-height:26px">${M?(M.sum.units_overdue||0)+" machines overdue":"loading"}</div>`},
+      {k:"Sand call today",v:callOn?call.loads:"–",u:callOn?"loads":"",viz:`<div class="note" style="line-height:26px">${callOn&&call.mm?call.mm+" mm":"no call yet"}</div>`}])}
+  ${doCard}
+  <div class="areas">${tiles.join("")}</div>`;
+}
 
 /* ------------------------------------------------------------------ machinery (summary of the separate machinery board) */
 function viewMachinery(){
@@ -1087,6 +1153,10 @@ function facts(){
       if(K.at)upd=`Checked ${melTime(new Date(K.at))}`}else take="Who has which key, and what is out."}
   else if(k==="topdressing"){const c=S.live?.td?.call;take=c&&c.date===today()&&c.loads?`Today's sand call is <b>~${c.loads} loads</b>${c.mm?` at <b>${c.mm} mm</b>`:""}. Tap a load when it goes out.`:"No sand call yet today. Tap a load when it goes out.";
       if(S.live?.updated)upd=`Updated ${melTime(new Date(S.live.updated))} ${shortDate(melYmd(new Date(S.live.updated)))} · loads and stocktakes show within a minute or two`}
+  else if(k==="today"){const t=todayTotals();
+      take=`<b>${t.open}</b> ${pl(t.open,"job is","jobs are")} open across the course${t.high?`, <b>${t.high}</b> high priority`:""}.`+(S.mach?` Machinery: <b>${S.mach.sum.faults_open||0}</b> ${pl(S.mach.sum.faults_open,"fault","faults")} open${S.mach.sum.faults_safety?` (<b>${S.mach.sum.faults_safety}</b> safety)`:""}, <b>${S.mach.sum.units_overdue||0}</b> machines overdue for service.`:"");
+      const gs=["irrigation","drainage","bunkers","grounds"].map(a=>S.data[a]&&genUtc(S.data[a].generated)).filter(Boolean);
+      if(gs.length){const g=Math.min(...gs);late=Date.now()-g>30*3600e3;upd=`${late?"Some areas have not updated since":"Jobs updated"} ${melTime(new Date(Math.max(...gs)))} ${shortDate(melYmd(new Date(Math.max(...gs))))} · tap any area for the detail`}}
   else if(k==="machinery"){const M=S.mach;if(M){const m=M.sum,df=m.do_first;
       take=`<b>${m.units_overdue||0}</b> machines have overdue servicing and <b>${m.faults_open||0}</b> ${pl(m.faults_open,"fault is","faults are")} open${m.faults_safety?` (<b>${m.faults_safety}</b> safety)`:""}.`+(df?` Do first: <b>${MJ(df.machine,df.job)}</b>.`:"");
       const bt=Date.parse(String(m.built||"").replace(/([+-]\d\d)(\d\d)$/,"$1:$2"));late=bt&&Date.now()-bt>30*3600e3;
@@ -1117,13 +1187,14 @@ function render(){
   lastSig=sig();
   document.body.dataset.area=S.tab;$("#title").textContent=AREAS[S.tab].label;document.title=AREAS[S.tab].label+" · Ranfurlie Course Ops";
   renderTabs();facts();
-  const v={map:viewMap,irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds,keys:viewKeys,machinery:viewMachinery,rough:()=>viewEmbed("rough"),safety:()=>viewEmbed("safety")}[S.tab]();
+  const v={map:viewMap,irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds,keys:viewKeys,machinery:viewMachinery,today:viewToday,rough:()=>viewEmbed("rough"),safety:()=>viewEmbed("safety")}[S.tab]();
   if(AREAS[S.tab].embed&&$(`#view .mapcard[data-embed="${S.tab}"]`)){/* keep the page as it is */}
   else if(S.tab==="map"&&$("#view .mapcard:not([data-embed])")){/* keep the map frame as it is: reloading it would lose the valves you shut */}
   else{$("#view").innerHTML=doFirst()+v;wire()}
   $("#foot").innerHTML=`Jobs, maps and stock rebuild from Slack and Notion every 3 hours (5:50am to 5:50pm). Stocktakes, sand and Turfco loads from this page show within a minute or two.<br>Separate pages: <a href="../">Greens Live</a> · <a href="../moisture/">Moisture map</a> · <a href="../machinery/">Machinery</a> · <a href="../stock.html">Shed stocktake</a> · <a href="../spray/">Spraying</a>`;
 }
 function wire(){
+  $$("[data-goto]").forEach(b=>b.onclick=()=>{const a=b.dataset.goto,j=b.dataset.gojob;go(a);if(j)setTimeout(()=>{pickJob(a,j,true);const r=$(`.job[data-job="${CSS.escape(j)}"]`);if(r)r.scrollIntoView({behavior:"smooth",block:"center"})},60)});
   $$("[data-dofirst]").forEach(b=>{const f=()=>{pickJob(S.tab,b.dataset.dofirst,true);const r=$(`.job[data-job="${CSS.escape(b.dataset.dofirst)}"]`);if(r)r.scrollIntoView({behavior:"smooth",block:"center"})};b.onclick=f;b.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}}});
   $$("[data-act=stocktake]").forEach(b=>b.onclick=()=>stocktakeSheet(b.dataset.area));
   $$("[data-act=delivery]").forEach(b=>b.onclick=()=>deliverySheet(b.dataset.area));
@@ -1230,8 +1301,8 @@ function wireTd(){
 }
 
 /* ------------------------------------------------------------------ routing */
-function go(tab){if(!AREAS[tab])tab="map";S.tab=tab;LS.set("tab",tab);history.replaceState(null,"","#"+(tab==="grounds"?"grounds-"+S.sub:tab));render();window.scrollTo({top:0})}
-function fromHash(){const h=location.hash.slice(1);if(h.startsWith("grounds")){S.tab="grounds";const s=h.split("-")[1];if(GROUNDS[s])S.sub=s}else if(AREAS[h])S.tab=h;else{S.tab=LS.get("tab","map");S.sub=LS.get("sub","amstel")}}
+function go(tab){if(!AREAS[tab])tab="today";S.tab=tab;LS.set("tab",tab);history.replaceState(null,"","#"+(tab==="grounds"?"grounds-"+S.sub:tab));render();window.scrollTo({top:0})}
+function fromHash(){const h=location.hash.slice(1);if(h.startsWith("grounds")){S.tab="grounds";const s=h.split("-")[1];if(GROUNDS[s])S.sub=s}else if(AREAS[h])S.tab=h;else{S.tab=LS.get("tab","today");S.sub=LS.get("sub","amstel")}}
 window.addEventListener("hashchange",()=>{fromHash();render()});
 
 /* theme: follow the phone, or pick */
@@ -1241,7 +1312,7 @@ $("#who").onclick=()=>openSheet(`<h3>Who's using this phone?</h3><p class="sub">
 
 /* ------------------------------------------------------------------ start */
 applyTheme();if(TEST)$("#testbar").hidden=false;fromHash();showOutbox();S.keys=LS.get("keys",null);if(S.keys)delete S.keys.err;
-loadKeys().then(()=>{if(S.tab==="keys")render();else if($("#tabs .tab"))renderTabs()});
+loadKeys().then(()=>{if(S.tab==="keys"||S.tab==="today")render();else if($("#tabs .tab"))renderTabs()});
 loadAll().then(()=>{render();flush()});
 let lastLive=Date.now();
 let lastKeys=Date.now();
