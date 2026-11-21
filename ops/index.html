@@ -431,6 +431,7 @@ body[data-area="topdressing"]{--accL:#e2470e;--accD:#ff7a45;--deepL:#a83208;--de
 body[data-area="grounds"]{--accL:#248a3d;--accD:#30d158;--deepL:#1b6a2f;--deepD:#9be9ad}
 body[data-area="rough"]{--accL:#5f8a00;--accD:#b6d84a;--deepL:#456300;--deepD:#e0f0a0}
 body[data-area="safety"]{--accL:#636366;--accD:#a1a1a6;--deepL:#3a3a3c;--deepD:#d1d1d6}
+body[data-area="machinery"]{--accL:#8a6a3f;--accD:#c9a77a;--deepL:#5e4626;--deepD:#ead2b0}
 body[data-area="keys"]{--accL:#e0245e;--accD:#ff375f;--deepL:#a3123f;--deepD:#ffb3c4}
 body{font-family:var(--body);-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
 h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.1}
@@ -544,6 +545,11 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.1}
 .full .bar{background:var(--bar);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%)}
 .mapcard .mhead b{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.015em}
 .foot{color:var(--muted)}
+a.dofirst{color:inherit;text-decoration:none}
+@media (min-width:1181px){.tab{padding:7px 11px}}
+.mach-k{font-size:12px;font-weight:600;border-radius:99px;padding:1px 8px;background:var(--glass-lo);color:var(--muted)}
+.mach-share{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.mach-share .sub{flex:1;min-width:220px}
 </style>
 </head>
 <body data-area="irrigation">
@@ -583,11 +589,12 @@ const AREAS = {
   topdressing:{label:"Topdressing",c:"#e2470e",ch:"C0AMNEELZND",chName:"#topdressing"},
   grounds:{label:"Grounds",c:"#28a745",data:"../grounds/data.json",full:"../grounds/",pfx:""},
   keys:{label:"Keys",c:"#e0245e"},
+  machinery:{label:"Machinery",c:"#a2845e",data:"../machinery/data.json",full:"../machinery/"},
   rough:{label:"Rough",c:"#6f9a00",embed:"../rough/",embedTitle:"Rough plan: mow, let grow and seed areas"},
   safety:{label:"Safety",c:"#8e8e93",embed:"https://andranf.github.io/ranfurlie-safety/",embedTitle:"Ranfurlie Safety: sign-offs and registers"}
 };
 AREAS.topdressing.short="Topdress";AREAS.irrigation.short="Irrigation";
-const ORDER = ["map","irrigation","drainage","bunkers","topdressing","rough","grounds","safety","keys"];
+const ORDER = ["map","irrigation","drainage","bunkers","topdressing","rough","grounds","machinery","safety","keys"];
 /* tab icons (24px stroke) */
 const TAB_ICON = {
   map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
@@ -598,7 +605,8 @@ const TAB_ICON = {
   rough:'<path d="M4 20c1-5 1-9 0-13M9 20c0-6 1-10 3-14M14 20c0-5 1-8 4-11M19 20c0-3 0-5 1-7"/>',
   grounds:'<path d="M12 21v-6M5 15c0-4 3-8 7-12 4 4 7 8 7 12a7 7 0 0 1-14 0z"/>',
   safety:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
-  keys:'<circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l2 2M14 9l2 2"/>'
+  keys:'<circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l2 2M14 9l2 2"/>',
+  machinery:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.1L3 17.7 6.3 21l6.3-6.3a4 4 0 0 0 5.1-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>'
 };
 /* Shed key register lives on the Ranfurlie Safety site (keys.html + its Apps Script register) */
 const KEYS_API = "https://script.google.com/macros/s/AKfycbyqLHwwPqJumh5_J5VXVVeTZvoJ8onW6vO9BWHVRu4owCzTT09riW7mKt0wkghRIpKj/exec";
@@ -687,7 +695,13 @@ async function loadAll(){
   const res=await Promise.allSettled(keys.map(k=>getJSON(AREAS[k].data)));
   res.forEach((r,i)=>{if(r.status==="fulfilled")S.data[keys[i]]=keys[i]==="grounds"?r.value:flipData(r.value)});
   await loadLive();
+  loadMach();
 }
+/* machinery: ../machinery/data.json is the whole machinery board (~390 KB zipped); keep only what this tab shows */
+async function loadMach(){try{const d=await getJSON(AREAS.machinery.data);const old=S.mach&&S.mach.built;
+  S.mach={sum:(d.m_summary||[])[0]||{},wl:d.m_worklist||[],faults:d.m_faults||[],built:d._built||""};S.machErr=false;
+  if(old!==S.mach.built&&$("#sheet").hidden&&$("#full").hidden){if(S.tab==="machinery")render();else renderTabs()}}
+  catch(e){S.machErr=true;if(S.tab==="machinery"&&!S.mach)render()}}
 async function loadLive(){try{S.live=await getJSON("live.json")}catch(e){S.live=S.live||{events:[],td:{jobs:[],call:null},stock:{}}}prunePending()}
 
 /* ------------------------------------------------------------------ jobs, normalised across areas */
@@ -797,6 +811,27 @@ function wireMap(area,onTap){
   const done=$("[data-bigdone]",box.closest(".mapwrap"));if(done)done.onclick=closeBig;
 }
 const opts_greenFocus={topdressing:true};
+
+/* ------------------------------------------------------------------ machinery (summary of the separate machinery board) */
+function viewMachinery(){
+  const M=S.mach;const full=`<a class="btn primary" href="../machinery/" target="_blank" rel="noopener">${TAB_SVG("machinery")}Open the full machinery board</a>`;
+  if(!M)return `<div class="card in"><p class="sub">${S.machErr?"Couldn't load the machinery board just now.":"Loading the machinery board…"}</p><div class="row" style="margin-top:10px">${full}</div></div>`;
+  const m=M.sum;
+  const prio=w=>(w.flags||[]).includes("safety")?"High":w.kind==="fault"?"Medium":/overdue/i.test(w.why||"")?"Medium":"Low";
+  const wl=M.wl.slice(0,12).map(w=>`<div class="job"><span class="pd ${prio(w)}"></span><div class="t">${MJ(w.machine,w.job)} ${w.ref?`<span class="note">${esc(w.ref)}</span>`:""}</div><span class="mach-k">${w.kind==="fault"?"Fault":w.kind==="service"?"Service":esc(w.kind||"")}</span><div class="m">${(w.flags||[]).includes("safety")?'<span class="tag High">Safety</span>':""}${esc(w.why||"")}${w.labour_h?` · ~${w.labour_h} h`:""}${(w.parts||[]).length?` · ${w.parts.length} ${w.parts.length===1?"part":"parts"}`:""}</div></div>`).join("");
+  const fl=M.faults.slice().sort((a,b)=>(b.safety-a.safety)||((PR[a.priority]??3)-(PR[b.priority]??3))||((b.days_open||0)-(a.days_open||0)));
+  const fr=fl.slice(0,12).map(f=>`<div class="job"><span class="pd ${esc(f.safety?"High":f.priority||"Low")}"></span><div class="t">${MJ(f.fleet,f.job)} <span class="note">${esc(f.id)}</span></div><span></span><div class="m">${f.safety?'<span class="tag High">Safety</span>':f.priority?`<span class="tag ${esc(f.priority)}">${esc(f.priority)}</span>`:""}${f.days_open!=null?` ${f.days_open} days open`:""}${f.status&&f.status!=="Open"?` · ${esc(f.status)}`:""}</div></div>`).join("");
+  return `${kpiTiles([
+      {k:"Jobs on today's list",v:m.worklist_n||0,cls:"acc",viz:`<div class="note" style="line-height:26px">${m.worklist_total||0} need attention</div>`},
+      {k:"Machines overdue",v:m.units_overdue||0,cls:m.units_overdue?"hi":"",viz:meter(m.units_overdue||0,Math.max(m.active||1,1))},
+      {k:"Services due, 7 days",v:m.items_due7||0,viz:`<div class="note" style="line-height:26px">projected from use</div>`},
+      {k:"Open faults",v:m.faults_open||0,viz:`<div class="note" style="line-height:26px">${m.faults_safety||0} safety-related</div>`}])}
+  <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Mechanic worklist <span class="count">${M.wl.length}</span></h2></div><p class="sub" style="margin:-4px 0 6px">Most urgent first: safety faults, then other faults, then overdue servicing on the machines used most.</p><div class="jobs">${wl||'<div class="empty">Nothing on the list.</div>'}</div>${M.wl.length>12?`<p class="note" style="margin:8px 4px 0">${M.wl.length-12} more on the machinery board.</p>`:""}</div></div>
+  <div class="stack"><div class="card in"><div class="head"><h2>Open faults <span class="count">${m.faults_open||fl.length}</span></h2></div><div class="jobs">${fr||'<div class="empty">No open faults.</div>'}</div>${fl.length>12?`<p class="note" style="margin:8px 4px 0">${fl.length-12} more on the machinery board.</p>`:""}</div>
+  <div class="card in"><div class="head"><h2>Full machinery board</h2></div><div class="mach-share"><p class="sub">Service plan, fleet, parts, parts explorer, costs and Log a job. The machinery board is also its own page for contractors: it shows machinery only, nothing from Course Ops.</p>${full}</div></div></div></div>`;
+}
+function MJ(m,j){m=String(m||"").trim();j=String(j||"").trim();if(!m)return esc(j);if(j.toLowerCase().startsWith(m.toLowerCase()))return esc(j);return esc(m)+": "+esc(j)}
+function TAB_SVG(k){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TAB_ICON[k]||""}</svg>`}
 
 /* ------------------------------------------------------------------ shared cards */
 function kpiTiles(tiles){return `<div class="kpis">${tiles.map(t=>`<div class="tile ${t.cls||""}"><div class="k">${t.k}</div><div class="v num">${t.v}${t.u?`<small>${t.u}</small>`:""}</div><div class="viz">${t.viz||""}</div></div>`).join("")}</div>`}
@@ -1040,7 +1075,7 @@ $("#fullClose").onclick=closeFull;
 /* ------------------------------------------------------------------ render */
 function openCount(area){const j=jobsOf(area==="grounds"?"grounds":area);return area==="topdressing"?tdJobs().filter(j=>j.status==="In progress").length:j.filter(isOpen).length}
 function renderTabs(){
-  $("#tabs").innerHTML=ORDER.map(k=>{const a=AREAS[k];const n=k==="keys"?keysOut().length:(S.data[k]||k==="topdressing"?openCount(k):0);return `<button class="tab" role="tab" aria-selected="${k===S.tab}" data-tab="${k}" style="--c:${a.c}" title="${a.label}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TAB_ICON[k]||""}</svg><span>${a.short||a.label}</span>${n?`<b>${n}</b>`:""}</button>`}).join("");
+  $("#tabs").innerHTML=ORDER.map(k=>{const a=AREAS[k];const n=k==="keys"?keysOut().length:k==="machinery"?(S.mach?S.mach.sum.faults_open||0:0):(S.data[k]||k==="topdressing"?openCount(k):0);return `<button class="tab" role="tab" aria-selected="${k===S.tab}" data-tab="${k}" style="--c:${a.c}" title="${a.label}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TAB_ICON[k]||""}</svg><span>${a.short||a.label}</span>${n?`<b>${n}</b>`:""}</button>`}).join("");
   $$("#tabs .tab").forEach(b=>b.onclick=()=>go(b.dataset.tab));
 }
 function facts(){
@@ -1052,6 +1087,11 @@ function facts(){
       if(K.at)upd=`Checked ${melTime(new Date(K.at))}`}else take="Who has which key, and what is out."}
   else if(k==="topdressing"){const c=S.live?.td?.call;take=c&&c.date===today()&&c.loads?`Today's sand call is <b>~${c.loads} loads</b>${c.mm?` at <b>${c.mm} mm</b>`:""}. Tap a load when it goes out.`:"No sand call yet today. Tap a load when it goes out.";
       if(S.live?.updated)upd=`Updated ${melTime(new Date(S.live.updated))} ${shortDate(melYmd(new Date(S.live.updated)))} · loads and stocktakes show within a minute or two`}
+  else if(k==="machinery"){const M=S.mach;if(M){const m=M.sum,df=m.do_first;
+      take=`<b>${m.units_overdue||0}</b> machines have overdue servicing and <b>${m.faults_open||0}</b> ${pl(m.faults_open,"fault is","faults are")} open${m.faults_safety?` (<b>${m.faults_safety}</b> safety)`:""}.`+(df?` Do first: <b>${MJ(df.machine,df.job)}</b>.`:"");
+      const bt=Date.parse(String(m.built||"").replace(/([+-]\d\d)(\d\d)$/,"$1:$2"));late=bt&&Date.now()-bt>30*3600e3;
+      upd=`${late?"No update since":"Updated"} ${esc(m.built_label||M.built)} · rebuilt every hour from Toro Intelli360, the #machinery fault log and the service log`}
+    else take=S.machErr?"The machinery board didn't load. Pull down to refresh, or open it on its own.":"Loading the machinery board…"}
   else if(k==="map")take="Every head, pit, bunker and pin on one map.";
   else if(k==="rough")take="Rough plan: where to mow, let grow and seed.";
   else if(k==="safety")take="Safety sign-offs and registers.";
@@ -1064,18 +1104,20 @@ function facts(){
 }
 /* the red "Do first" bar: the most urgent open job, only when something is high priority */
 function doFirst(){
-  const k=S.tab;if(!["irrigation","drainage","bunkers","grounds"].includes(k)||!S.data[k])return "";
+  const k=S.tab;
+  if(k==="machinery"){const w=S.mach&&S.mach.wl[0];if(!w)return "";const hot=(w.flags||[]).includes("safety")||w.kind==="fault";
+    return `<a class="dofirst in" href="../machinery/" target="_blank" rel="noopener"><span class="ic">!</span><div><div class="lab">Do first${(w.flags||[]).includes("safety")?" · safety":""}</div><div class="t">${MJ(w.machine,w.job)}</div><div class="m">${w.ref?esc(w.ref)+" · ":""}${esc(w.why||"")}</div></div><span class="more">Open on the machinery board ›</span></a>`}if(!["irrigation","drainage","bunkers","grounds"].includes(k)||!S.data[k])return "";
   const o=sortJobs(jobsOf(k).filter(isOpen));const j=o[0];if(!j||j.prio!=="High")return "";
   const age=daysAgo(j.reported);const tw=j.where&&!String(j.title).toLowerCase().includes(String(j.where).toLowerCase())?" · "+esc(j.where):"";
   return `<div class="dofirst in" data-dofirst="${esc(j.ref)}" role="button" tabindex="0"><span class="ic">!</span><div><div class="lab">Do first</div><div class="t">${esc(j.title)}${tw}</div><div class="m">${esc(j.ref)}${age!=null?" · reported "+(age===0?"today":age===1?"yesterday":age+" days ago"):""}</div></div><span class="more">Show on map ›</span></div>`;
 }
 let lastSig="";
-function sig(){return [S.tab,S.sub,S.keys&&S.keys.at,S.keys&&S.keys.err,S.live&&S.live.updated,...["irrigation","drainage","bunkers","grounds"].map(k=>S.data[k]&&S.data[k].generated),JSON.stringify(pending()),outbox().length].join("|")}
+function sig(){return [S.tab,S.sub,S.mach&&S.mach.built,S.keys&&S.keys.at,S.keys&&S.keys.err,S.live&&S.live.updated,...["irrigation","drainage","bunkers","grounds"].map(k=>S.data[k]&&S.data[k].generated),JSON.stringify(pending()),outbox().length].join("|")}
 function render(){
   lastSig=sig();
   document.body.dataset.area=S.tab;$("#title").textContent=AREAS[S.tab].label;document.title=AREAS[S.tab].label+" · Ranfurlie Course Ops";
   renderTabs();facts();
-  const v={map:viewMap,irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds,keys:viewKeys,rough:()=>viewEmbed("rough"),safety:()=>viewEmbed("safety")}[S.tab]();
+  const v={map:viewMap,irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds,keys:viewKeys,machinery:viewMachinery,rough:()=>viewEmbed("rough"),safety:()=>viewEmbed("safety")}[S.tab]();
   if(AREAS[S.tab].embed&&$(`#view .mapcard[data-embed="${S.tab}"]`)){/* keep the page as it is */}
   else if(S.tab==="map"&&$("#view .mapcard:not([data-embed])")){/* keep the map frame as it is: reloading it would lose the valves you shut */}
   else{$("#view").innerHTML=doFirst()+v;wire()}
