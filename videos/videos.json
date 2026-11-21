@@ -1,13 +1,13 @@
 [
  {
-  "file": "videos/gp-recap.mp4?v=202611210621",
-  "poster": "videos/gp-recap.jpg?v=202611210621",
+  "file": "videos/gp-recap.mp4?v=202611211242",
+  "poster": "videos/gp-recap.jpg?v=202611211242",
   "title": "Growth potential",
   "date": "2026-11-20",
-  "caption": "PACE Turf growth potential for the greens (bent and Poa) and couch: the latest day, the last 30 days and the next 7. Rebuilt automatically every time this dashboard updates. Forecast: MET Norway.",
+  "caption": "PACE Turf growth potential for the greens (bent and Poa) and couch: the latest day, the last 30 days and the next 7. Rebuilt automatically every time this dashboard updates. Forecast: Open-Meteo.",
   "kind": "gp-recap",
-  "built": "2026-11-21T06:21+1100",
+  "built": "2026-11-21T12:42+1100",
   "seconds": 47.7,
-  "inputs": "d76756e37b23463b"
+  "inputs": "9b3fc356fab575d1"
  }
 ]
