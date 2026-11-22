@@ -811,6 +811,118 @@ input.field,select.field,textarea.field,.count input,.count .ok,.stepper button,
   #view.enter .viz .sb,#view.enter .viz .fill,#view.enter .bw .b,#view.enter .bw .bv,#view.enter .atile,#view.enter .dorow,#view.enter .job,#view.enter .si,#view.enter .krow,#view.enter .alert,#title.swap,#facts.swap{animation:none!important}
   .sky i:nth-child(4){display:none}
 }
+
+/* ===================== GLOW WIDGETS (22 Nov 2026) =====================
+   Andy: "also really like this, use this style where possible" (himco.design's turn-by-turn widget reel).
+   Style only: dark matte widgets lit from inside — a glowing route beam with a light running up it, a glowing nav
+   arrow, warm light pooling at the bottom and spilling onto the page, small caps labels over clean white type.
+   Used where a card is "the thing to act on": Do first, the Today do-first route, Cirrus alarms / sand log, the key
+   status and the live topdressing job. Delete this block (and the .gw classes in the script) to go back. */
+.gw{--glow:#ff5a1f;--glow-hot:color-mix(in srgb,var(--glow) 55%,#ffe0a8);
+  position:relative;overflow:hidden;isolation:isolate;color:#f5f6f8;border-radius:30px;
+  background:linear-gradient(180deg,#2c2d33 0%,#16171b 34%,#0a0a0c 100%);-webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.17),inset 0 0 0 1px rgba(255,255,255,.06),inset 0 -1px 0 color-mix(in srgb,var(--glow) 70%,transparent),
+    0 28px 46px -24px color-mix(in srgb,var(--glow) 80%,transparent),0 16px 32px -20px rgba(0,0,0,.6);
+  /* the maps inside a glow widget are always the night version */
+  --turf:#1b3524;--fair:#22472f;--appr:#295a3b;--tee:#2d6845;--green:#3f915f;--sand:#a8925f;--sand-edge:#0d120c;--water:#38c6ff;--pipe:#e39a52;--pit:#f2d27a;--ag:#7fb3a3;--holeTxt:#f1f8fb;--map-bg1:#0b1d2a;--map-bg2:#06121b;--map-edge:#06121b;--lo-map:#93a9d6;
+  --fg:#f5f6f8;--muted:rgba(255,255,255,.62);--faint:rgba(255,255,255,.42);--line:rgba(255,255,255,.09);--glass-lo:rgba(255,255,255,.08);--glass-hi:rgba(255,255,255,.14);--rim2:rgba(255,255,255,.08)}
+/* light pooling up from the bottom edge, breathing slowly */
+.gw::before{content:"";position:absolute;left:0;right:0;bottom:0;height:80%;z-index:-1;pointer-events:none;transform-origin:50% 100%;
+  background:radial-gradient(46% 62% at var(--gx,50%) 118%,var(--glow-hot) 0%,var(--glow) 24%,color-mix(in srgb,var(--glow) 38%,transparent) 50%,transparent 74%),
+    radial-gradient(120% 50% at 50% 116%,color-mix(in srgb,var(--glow) 62%,transparent),color-mix(in srgb,var(--glow) 18%,transparent) 55%,transparent 78%);
+  animation:pool 4.5s ease-in-out infinite}
+@keyframes pool{0%,100%{opacity:.88;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.07)}}
+.gw h2,.gw h3{color:#fff}
+.gw .sub,.gw .note{color:rgba(255,255,255,.6)}
+.gw .eyebrow,.gw .lab{font-family:var(--body);font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.gw a{color:color-mix(in srgb,var(--glow) 40%,#fff)}
+.gw .btn{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),inset 0 0 0 1px rgba(255,255,255,.08)}
+.gw .btn.ghost{background:transparent;color:color-mix(in srgb,var(--glow) 40%,#fff);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--glow) 55%,transparent)}
+.gw .card h2 .count,.gw h2 .count{background:rgba(255,255,255,.1);color:#fff}
+
+/* Do first: the turn-by-turn card. Text on the left, the lit road on the right, a glass button bottom-left */
+.dofirst.gw{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-content:space-between;min-height:172px;padding:18px 110px 16px 20px;cursor:pointer;text-decoration:none;--gx:calc(100% - 54px)}
+.gw-road{position:absolute;top:0;bottom:0;right:22px;width:64px;pointer-events:none}
+.gw-road .ln{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.16) 35%,rgba(255,255,255,.07))}
+.gw-road .ln.l{left:4px}.gw-road .ln.r{right:4px}
+.gw-road .beam{position:absolute;left:50%;top:14%;bottom:0;width:4px;margin-left:-2px;border-radius:4px;overflow:hidden;transform-origin:50% 100%;
+  background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--glow) 80%,transparent) 20%,var(--glow) 55%,color-mix(in srgb,var(--glow) 78%,#fff) 100%);
+  filter:drop-shadow(0 0 4px var(--glow)) drop-shadow(0 0 14px var(--glow))}
+.gw-road .beam::after{content:"";position:absolute;left:0;right:0;height:52px;top:100%;background:linear-gradient(180deg,transparent,#fff,transparent);animation:beamRun 2.6s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes beamRun{from{top:100%}to{top:-52px}}
+.gw-road .nav{position:absolute;left:50%;top:46%;width:36px;height:36px;margin:-18px 0 0 -18px;fill:color-mix(in srgb,var(--glow) 22%,#16161a);stroke:#fff;stroke-width:1.9;stroke-linejoin:round;
+  filter:drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 14px var(--glow));animation:navBob 3.2s ease-in-out infinite}
+@keyframes navBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.dofirst.gw .t{font-family:var(--display);font-size:23px;font-weight:600;letter-spacing:-.02em;line-height:1.18;color:#fff;margin-top:5px}
+.dofirst.gw .m{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:rgba(255,255,255,.62);font-size:14px;margin-top:7px}
+.gdot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--glow);box-shadow:0 0 0 3px color-mix(in srgb,var(--glow) 25%,transparent),0 0 10px var(--glow)}
+.dofirst.gw .more{display:inline-flex;justify-self:start;align-items:center;gap:8px;padding:9px 14px 9px 11px;border-radius:16px;font-size:14px;font-weight:600;color:#fff;white-space:nowrap;
+  background:rgba(255,255,255,.1);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 0 0 1px rgba(255,255,255,.08)}
+.dofirst.gw .more svg{width:18px;height:18px}
+.dofirst.gw:active{transform:scale(.985)}
+@media (max-width:560px){.dofirst.gw{padding-right:96px;min-height:164px}.dofirst.gw .t{font-size:20px}.gw-road{right:16px;width:56px}}
+
+/* Today: the do-first list is a route, one stop per area, a light running down the line */
+.gw-list{padding:18px 10px 12px!important}
+.gw-list .head{padding:0 12px!important}
+.gw-list .head h2{font-size:13px;font-family:var(--body);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.gw-list .dolist{position:relative}
+.gw-list .dolist::before{content:"";position:absolute;left:33.5px;top:30px;bottom:30px;width:3px;border-radius:3px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--glow) 70%,#fff),var(--glow));box-shadow:0 0 10px var(--glow),0 0 26px color-mix(in srgb,var(--glow) 50%,transparent)}
+.gw-list .dolist::after{content:"";position:absolute;left:33.5px;width:3px;height:44px;top:30px;border-radius:3px;background:linear-gradient(180deg,transparent,#fff,transparent);animation:routeRun 3.2s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes routeRun{0%{transform:translateY(-10px);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateY(calc(var(--route-h,160px) - 30px));opacity:0}}
+.gw .dorow{position:relative;z-index:1;border-top-color:rgba(255,255,255,.08)}
+.gw .dorow:hover{background:rgba(255,255,255,.05)}
+.gw .dorow .t{color:#fff}.gw .dorow .m{color:rgba(255,255,255,.58)}.gw .dorow .go{color:rgba(255,255,255,.45)}
+.gw .dorow .ai{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 4px #141518,0 0 16px 2px var(--c)}
+
+/* alarm and sand logs: night panel in the area colour, station codes glow in dot-matrix */
+.gw-alerts{--glow:var(--accD)}
+.gw .alert{border-top-color:rgba(255,255,255,.08);color:rgba(255,255,255,.88)}
+.gw .alert b{font-family:var(--dot);font-variation-settings:"ROND" 100;font-weight:900;letter-spacing:.04em;font-size:19px;color:color-mix(in srgb,var(--glow) 35%,#fff);text-shadow:0 0 10px var(--glow)}
+.gw .alert span{color:rgba(255,255,255,.48)}
+
+/* keys: green when everything's in, amber when keys are out, red when one is overdue or missing */
+.gw-keys .kallin .ok{background:color-mix(in srgb,var(--glow) 22%,transparent);color:var(--glow);box-shadow:0 0 0 1px color-mix(in srgb,var(--glow) 40%,transparent),0 0 22px color-mix(in srgb,var(--glow) 70%,transparent)}
+.gw-keys .kallin b{color:#fff}
+.gw .kpill,.gw .krow{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);color:#fff}
+.gw .kpill i{box-shadow:0 0 8px currentColor}
+.gw .krow.hi{background:rgba(255,69,58,.16);box-shadow:inset 0 0 0 1.5px rgba(255,69,58,.6)}
+.gw .kno{color:color-mix(in srgb,var(--glow) 40%,#fff);text-shadow:0 0 12px var(--glow)}
+.gw .kwho{color:#fff}.gw .kmeta{color:rgba(255,255,255,.6)}
+
+/* the live topdressing job: orange night widget, the ring glows and a light orbits it */
+.gw-td{--glow:#ff6a1f;--gx:30%}
+.gw .ring .bg{stroke:rgba(255,255,255,.08)}
+.gw .ring .fg{stroke:var(--glow);filter:none}
+.gw .ring svg{filter:drop-shadow(0 0 5px var(--glow)) drop-shadow(0 0 16px var(--glow))}
+.ring .comet{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round;animation:comet 3.4s linear infinite}
+@keyframes comet{to{stroke-dashoffset:-100}}
+.gw .ring .big{color:#fff;text-shadow:0 0 20px color-mix(in srgb,var(--glow) 75%,transparent)}
+.gw .ring .of{color:rgba(255,255,255,.6)}
+.gw .stat{background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.gw .stat .k{color:rgba(255,255,255,.6)}.gw .stat .v{color:#fff}
+.stat .v[style]{font-family:var(--body);font-variation-settings:normal;font-weight:700;letter-spacing:-.01em}
+.gw .gbtn{background:rgba(255,255,255,.07);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.gw .gbtn[aria-pressed="true"]{background:linear-gradient(135deg,color-mix(in srgb,var(--glow) 70%,#fff),var(--glow));box-shadow:0 0 16px -2px var(--glow)}
+.gw .loadlog div{border-top-color:rgba(255,255,255,.08)}.gw .loadlog span{color:rgba(255,255,255,.75)}
+.gw .loadbtn{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -16px 30px -16px rgba(0,0,0,.25),0 0 30px -4px var(--glow)}
+.gw .map{box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.gw .mapbar select,.gw input.field,.gw select.field{background:rgba(255,255,255,.08);color:#fff}
+
+/* glow widgets light up as they arrive: the pool swells, the beam draws upward, the arrow drops in */
+#view.enter .gw::before{animation:ignite 1.2s var(--glide) .2s both,pool 4.5s ease-in-out 1.4s infinite}
+#view.enter .gw-road .beam{animation:beamDraw 1s var(--glide) .35s both}
+#view.enter .gw-road .nav{animation:navIn .8s var(--spring) .8s both,navBob 3.2s ease-in-out 1.6s infinite}
+#view.enter .gw .alert b{animation:dotOn 1.1s var(--glide) both;animation-delay:calc(300ms + var(--i,0)*60ms)}
+@keyframes ignite{from{opacity:0;transform:scaleY(.3)}to{opacity:.88;transform:scaleY(1)}}
+@keyframes beamDraw{from{transform:scaleY(0)}to{transform:none}}
+@keyframes navIn{from{opacity:0;transform:translateY(-16px) scale(.6)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion: reduce){
+  .gw::before,#view.enter .gw::before,.gw-road .beam::after,.gw-road .nav,#view.enter .gw-road .nav,#view.enter .gw-road .beam,.gw-list .dolist::after,.ring .comet,#view.enter .gw .alert b{animation:none!important}
+  .gw-list .dolist::after,.ring .comet{display:none}
+}
 </style>
 </head>
 <body data-area="irrigation">
@@ -1090,7 +1202,7 @@ function viewToday(){
   if(M&&M.wl[0]){const w=M.wl[0];const safe=(w.flags||[]).includes("safety");rows.push({sort:safe?-1:1,age:0,html:`<button class="dorow" data-goto="machinery">${aIcon("machinery")}<div><div class="t">${MJ(w.machine,w.job)}</div><div class="m">Machinery${safe?' · <span class="tag High">Safety</span>':""}${w.ref?" · "+esc(w.ref):""} · ${esc(w.why||"")}</div></div><span class="go">›</span></button>`})}
   if(kOut&&keysOut().some(x=>x.overdue||x.status==="Lost")){const o=keysOut();const lost=o.filter(x=>x.status==="Lost").length,late=o.filter(x=>x.overdue&&x.status!=="Lost").length;rows.push({sort:2,age:0,html:`<button class="dorow" data-goto="keys">${aIcon("keys")}<div><div class="t">${[late?late+" "+(late===1?"key":"keys")+" overdue":"",lost?lost+" missing":""].filter(Boolean).join(", ")}</div><div class="m">Keys</div></div><span class="go">›</span></button>`})}
   rows.sort((a,b)=>a.sort-b.sort||b.age-a.age);
-  const doCard=rows.length?`<div class="card in" style="padding:14px 10px 8px"><div class="head" style="padding:0 12px;margin-bottom:4px"><h2>Do first</h2><span class="note">the most urgent job in each area</span></div><div class="dolist">${rows.map(r=>r.html).join("")}</div></div>`:`<div class="card in"><h2>Nothing high priority</h2><p class="sub" style="margin:6px 0 0">No area has a high-priority job open.</p></div>`;
+  const doCard=rows.length?`<div class="card in gw gw-list" style="padding:14px 10px 8px"><div class="head" style="padding:0 12px;margin-bottom:4px"><h2>Do first</h2><span class="note">the most urgent job in each area</span></div><div class="dolist">${rows.map(r=>r.html).join("")}</div></div>`:`<div class="card in"><h2>Nothing high priority</h2><p class="sub" style="margin:6px 0 0">No area has a high-priority job open.</p></div>`;
   /* one tile per area */
   const tile=(k,big,small,top,quiet)=>`<button class="atile${quiet?" quiet":""}" data-goto="${k}" style="--c:${AREAS[k].c}"><div class="ah">${aIcon(k)}${AREAS[k].label}<span class="chev">›</span></div><div class="an"><b>${big}</b><span>${small}</span></div>${top?`<div class="top">${top}</div>`:""}</button>`;
   const tiles=[];
@@ -1171,7 +1283,7 @@ function viewIrrigation(){
   const alerts=(d.alerts||[]).slice(0,10);
   return `${kpiTiles([{k:"Open jobs",v:open.length,viz:spark(flow),cls:"acc"},{k:"High priority",v:hi,viz:meter(hi,Math.max(open.length,1)),cls:hi?"hi":""},{k:"Waiting on parts",v:wait,viz:meter(wait,Math.max(open.length,1))},{k:"Fixed, 30 days",v:fixed30,viz:spark((d.flow||[]).map(f=>f.fixed),{c:"var(--ok)"})}])}
   <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Where the jobs are</h2>${fullBtn("irrigation")}</div>${mapCard("irrigation",inner,{hint:"Tap a pin",legend:'<span><i style="background:var(--hi)"></i>High</span><span><i style="background:var(--med)"></i>Medium</span><span><i style="background:var(--lo-map)"></i>Low</span>'})}<div id="pick-irrigation"></div></div>
-  ${alerts.length?`<div class="card in"><div class="head"><h2>Cirrus alarms</h2><span class="sub">last 14 days</span></div><div class="alerts">${alerts.map(a=>`<div class="alert"><b>${esc(a.station)}</b><div>${esc(a.text)}${a.job?` · <a href="#" data-pickjob="IRR-${a.job}">IRR-${a.job}</a>`:""}</div><span>${shortDate(a.at)} ${esc(a.at.slice(11,16))}</span></div>`).join("")}</div></div>`:""}</div>
+  ${alerts.length?`<div class="card in gw gw-alerts"><div class="head"><h2>Cirrus alarms</h2><span class="sub">last 14 days</span></div><div class="alerts">${alerts.map(a=>`<div class="alert"><b>${esc(a.station)}</b><div>${esc(a.text)}${a.job?` · <a href="#" data-pickjob="IRR-${a.job}">IRR-${a.job}</a>`:""}</div><span>${shortDate(a.at)} ${esc(a.at.slice(11,16))}</span></div>`).join("")}</div></div>`:""}</div>
   <div class="stack">${jobsCard("irrigation",jobs,{ch:AREAS.irrigation.ch,chName:"#irrigation"})}${stockCard("irrigation",{title:"Parts on hand"})}</div></div>`}
 
 /* ------------------------------------------------------------------ DRAINAGE */
@@ -1211,7 +1323,7 @@ function viewBunkers(){
   <div class="grid2"><div class="stack"><div class="card in"><div class="head"><h2>Tap a bunker to add sand</h2>${fullBtn("bunkers")}</div>
   ${mapCard("bunkers",inner,{hint:"Pick a hole, then tap the bunker",legend:'<span><i style="background:var(--hi)"></i>High</span><span><i style="background:var(--med)"></i>Medium</span><span><i style="background:var(--lo-map)"></i>Low</span><span><i style="background:var(--sand)"></i>No open work</span><span><i style="background:transparent;box-shadow:inset 0 0 0 2px var(--ok)"></i>Sanded, last 14 days</span><span><i style="background:transparent;border:1.5px dashed var(--muted)"></i>No bunker number</span>'})}
   <div class="sec" style="margin-top:12px"><div class="eyebrow" style="margin-bottom:6px">Or pick from the list</div><div class="chips" id="bkHoles">${Object.keys(baseLayers().holes).sort((a,b)=>a-b).map(h=>`<button class="chip sm" data-bkhole="${h}">${h}</button>`).join("")}</div><div class="chips" id="bkList" style="margin-top:8px"></div></div></div>
-  ${sev.length?`<div class="card in"><div class="head"><h2>Sand added</h2><span class="sub">latest first</span></div><div class="alerts">${sev.slice(0,12).map(e=>{const b=(d.bunkers||[]).find(x=>x.n===e.bunker);return `<div class="alert"><b>${e.bunker}</b><div>${b?esc(holeName(b.h)+" "+b.d)+" · ":""}${fmt(e.qty)} ${esc(e.unit||"")} ${esc(e.material||"")}${e.by?" · "+esc(e.by):""}${e.pend?" · sending…":""}</div><span>${e.old?shortDate(e.at):shortDate(melYmd(new Date(e.at)))+" "+melTime(new Date(e.at))}</span></div>`}).join("")}</div></div>`:""}</div>
+  ${sev.length?`<div class="card in gw gw-alerts"><div class="head"><h2>Sand added</h2><span class="sub">latest first</span></div><div class="alerts">${sev.slice(0,12).map(e=>{const b=(d.bunkers||[]).find(x=>x.n===e.bunker);return `<div class="alert"><b>${e.bunker}</b><div>${b?esc(holeName(b.h)+" "+b.d)+" · ":""}${fmt(e.qty)} ${esc(e.unit||"")} ${esc(e.material||"")}${e.by?" · "+esc(e.by):""}${e.pend?" · sending…":""}</div><span>${e.old?shortDate(e.at):shortDate(melYmd(new Date(e.at)))+" "+melTime(new Date(e.at))}</span></div>`}).join("")}</div></div>`:""}</div>
   <div class="stack">${jobsCard("bunkers",jobs,{ch:AREAS.bunkers.ch,chName:"#bunkers"})}${stockCard("bunkers",{title:"Bunker sand & materials"})}</div></div>`}
 function holeName(h){const n=Number(h);const s=["th","st","nd","rd"];const v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
 function bunkerSheet(n){
@@ -1284,8 +1396,8 @@ function tdActive(job,call){
   const n=job.loads.length;const target=(job.call&&job.call.loads)||(call&&job.area==="Greens"?call.loads:null);const last=job.loads[n-1];
   const R=84,C=2*Math.PI*R;const frac=target?Math.min(1,n/target):(n?1:0);
   const greens=job.area==="Greens"||job.area==="Practice greens";const gList=job.area==="Practice greens"?["PG","CG"]:Array.from({length:18},(_,i)=>String(i+1)).concat(["PG","CG"]);
-  return `<div class="card in"><div class="head"><div><span class="eyebrow">${esc(job.id&&job.id!=="TD"?job.id:"New job")} · started ${job.started?melTime(new Date(job.started)):""} by ${esc(job.by||"")}</span><h2>${esc(job.area)}${job.holes?" "+esc(job.holes):""} · ${esc(job.sand||"")}</h2></div>${job.card?`<a class="btn small ghost" href="${esc(job.card)}" target="_blank" rel="noopener">${ICON.slack}Thread</a>`:""}</div>
-  <div class="td-hero"><div class="ring"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="${R}"/><circle class="fg" cx="100" cy="100" r="${R}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-frac)).toFixed(1)}"/></svg><div class="ct"><div><div class="big">${n}</div><div class="of">${target?"of ~"+target+" loads":(n===1?"load":"loads")}</div></div></div></div>
+  return `<div class="card in gw gw-td"><div class="head"><div><span class="eyebrow">${esc(job.id&&job.id!=="TD"?job.id:"New job")} · started ${job.started?melTime(new Date(job.started)):""} by ${esc(job.by||"")}</span><h2>${esc(job.area)}${job.holes?" "+esc(job.holes):""} · ${esc(job.sand||"")}</h2></div>${job.card?`<a class="btn small ghost" href="${esc(job.card)}" target="_blank" rel="noopener">${ICON.slack}Thread</a>`:""}</div>
+  <div class="td-hero"><div class="ring"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="${R}"/><circle class="fg" cx="100" cy="100" r="${R}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-frac)).toFixed(1)}"/><circle class="comet" cx="100" cy="100" r="${R}" pathLength="100" stroke-dasharray="2.5 97.5"/></svg><div class="ct"><div><div class="big">${n}</div><div class="of">${target?"of ~"+target+" loads":(n===1?"load":"loads")}</div></div></div></div>
   <div class="stack" style="gap:12px"><button class="loadbtn" id="tdLoad">${ICON.load}<span>Another Turfco load<small>${fmt(job.load_t||1)} t of ${esc(job.sand||"sand")}</small></span></button>
   <div class="stats"><div class="stat"><div class="k">Sand so far</div><div class="v">${fmt(job.t)} t</div></div><div class="stat"><div class="k">Last load</div><div class="v" style="font-size:20px"${last?` data-ago="${last.at}"`:""}>${last?ago(last.at):"–"}</div></div><div class="stat"><div class="k">Going</div><div class="v" style="font-size:20px"${job.started?` data-ago="${job.started}" data-trim=" ago"`:""}>${job.started?ago(job.started).replace(" ago",""):"–"}</div></div></div>
   <div class="row">${last?`<button class="btn small" id="tdUndo">${ICON.undo}Undo load ${n}</button>`:""}<span class="spacer"></span><button class="btn small ghost" id="tdFinish">${ICON.flag}Finish</button></div></div></div>
@@ -1408,12 +1520,16 @@ function facts(){
 }
 /* the red "Do first" bar: the most urgent open job, only when something is high priority */
 function doFirst(){
+  /* glow widget (22 Nov 2026): the most urgent job as a turn-by-turn card */
   const k=S.tab;
-  if(k==="machinery"){const w=S.mach&&S.mach.wl[0];if(!w)return "";const hot=(w.flags||[]).includes("safety")||w.kind==="fault";
-    return `<a class="dofirst in" href="../machinery/" target="_blank" rel="noopener"><span class="ic">!</span><div><div class="lab">Do first${(w.flags||[]).includes("safety")?" · safety":""}</div><div class="t">${MJ(w.machine,w.job)}</div><div class="m">${w.ref?esc(w.ref)+" · ":""}${esc(w.why||"")}</div></div><span class="more">Open on the machinery board ›</span></a>`}if(!["irrigation","drainage","bunkers","grounds"].includes(k)||!S.data[k])return "";
+  const road=`<div class="gw-road" aria-hidden="true"><i class="ln l"></i><i class="ln r"></i><i class="beam"></i><svg class="nav" viewBox="0 0 24 24"><path d="M12 2.8 19.4 20.6 12 16.4 4.6 20.6Z"/></svg></div>`;
+  const ic=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  if(k==="machinery"){const w=S.mach&&S.mach.wl[0];if(!w)return "";const safe=(w.flags||[]).includes("safety");
+    return `<a class="dofirst gw in" href="../machinery/" target="_blank" rel="noopener"${safe?' style="--glow:#ff3b30"':""}>${road}<div><div class="lab">Do first · Machinery${safe?" · safety":""}</div><div class="t">${MJ(w.machine,w.job)}</div><div class="m"><i class="gdot"></i>${w.ref?esc(w.ref)+" · ":""}${esc(w.why||"")}</div></div><span class="more">${ic('<path d="M7 17 17 7M9 7h8v8"/>')}Open the machinery board</span></a>`}
+  if(!["irrigation","drainage","bunkers","grounds"].includes(k)||!S.data[k])return "";
   const o=sortJobs(jobsOf(k).filter(isOpen));const j=o[0];if(!j||j.prio!=="High")return "";
   const age=daysAgo(j.reported);const tw=j.where&&!String(j.title).toLowerCase().includes(String(j.where).toLowerCase())?" · "+esc(j.where):"";
-  return `<div class="dofirst in" data-dofirst="${esc(j.ref)}" role="button" tabindex="0"><span class="ic">!</span><div><div class="lab">Do first</div><div class="t">${esc(j.title)}${tw}</div><div class="m">${esc(j.ref)}${age!=null?" · reported "+(age===0?"today":age===1?"yesterday":age+" days ago"):""}</div></div><span class="more">Show on map ›</span></div>`;
+  return `<div class="dofirst gw in" data-dofirst="${esc(j.ref)}" role="button" tabindex="0">${road}<div><div class="lab">Do first · ${esc(AREAS[k].label)}</div><div class="t">${esc(j.title)}${tw}</div><div class="m"><i class="gdot"></i>${esc(j.ref)}${age!=null?" · reported "+(age===0?"today":age===1?"yesterday":age+" days ago"):""}</div></div><span class="more">${ic('<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>')}Show on map</span></div>`;
 }
 /* ------------------------------------------------------------------ motion (22 Nov 2026)
    Entrance, count-up and growing charts play when a tab opens or the first time the data lands; on a refresh or a tap
@@ -1427,6 +1543,7 @@ function motionApply(enter){
   idx("#view .in",8);idx("#view .kpis .tile");idx("#view .atile");idx("#view .dorow");idx("#view .job",12);idx("#view .si",12);idx("#view .krow");idx("#view .alert",12);
   $$("#view .viz svg").forEach(s=>$$(".sb",s).forEach((r,j)=>r.style.setProperty("--j",j)));
   $$("#view .bars .bc").forEach((c,j)=>c.style.setProperty("--j",j));
+  $$("#view .gw-list .dolist").forEach(d=>d.style.setProperty("--route-h",d.offsetHeight+"px"));
   if(enter&&!RM.matches){["#title","#facts"].forEach(id=>{const e=$(id);if(!e)return;e.classList.remove("swap");void e.offsetWidth;e.classList.add("swap")});
     const t=$("#tabs .tab[aria-selected=true]");if(t)t.classList.add("pop");
     $$("#view .ring .fg").forEach(c=>{const to=c.getAttribute("stroke-dashoffset"),from=c.getAttribute("stroke-dasharray");c.style.transition="none";c.style.strokeDashoffset=from;void c.getBoundingClientRect();c.style.transition="";requestAnimationFrame(()=>requestAnimationFrame(()=>{c.style.strokeDashoffset=to}))})}
@@ -1510,11 +1627,11 @@ function viewKeys(){
   const rec=K.recent;
   let hero;
   if(out.length){
-    hero=`<div class="card in"><div class="head"><h2>${(()=>{const l=out.filter(k=>k.status==="Lost").length,n=out.length-l;return [n?(n===1?"1 key out":n+" keys out"):"",l?l+" missing":""].filter(Boolean).join(" · ")})()}</h2>${K.dueRule&&out.some(k=>k.status!=="Lost")?`<span class="sub">due back ${esc(K.dueRule)}</span>`:""}</div><div class="kout">${out.map(k=>{const bad=k.overdue||k.status==="Lost";
+    hero=`<div class="card in gw gw-keys" style="--glow:${out.some(k=>k.overdue||k.status==="Lost")?"#ff453a":"#ff9f0a"}"><div class="head"><h2>${(()=>{const l=out.filter(k=>k.status==="Lost").length,n=out.length-l;return [n?(n===1?"1 key out":n+" keys out"):"",l?l+" missing":""].filter(Boolean).join(" · ")})()}</h2>${K.dueRule&&out.some(k=>k.status!=="Lost")?`<span class="sub">due back ${esc(K.dueRule)}</span>`:""}</div><div class="kout">${out.map(k=>{const bad=k.overdue||k.status==="Lost";
       return `<div class="krow${bad?" hi":""}"><div class="kno">${keyNo(k.key)}</div><div><div class="kwho">${esc(k.with||"Unknown")}</div><div class="kmeta"><span>Taken ${esc(k.since||"")}${k.sinceIso?` · <span data-ago="${k.sinceIso}">${ago(k.sinceIso)}</span>`:""}</span>${k.status==="Lost"?"<span>Reported missing</span>":k.due?`<span>Due back ${esc(k.due)}</span>`:""}</div></div>${k.status==="Lost"?'<span class="tag High">Missing</span>':k.overdue?'<span class="tag High">Overdue</span>':'<span class="tag Medium">Out</span>'}</div>`}).join("")}</div>
       ${keyBoard(K.keys)}</div>`;
   }else{
-    hero=`<div class="card in"><div class="kallin"><span class="ok">${KEY_ICON.ok}</span><div><b>All keys are in</b><span class="note">${K.keys.length} spare key${K.keys.length===1?"":"s"} on the board</span></div></div>
+    hero=`<div class="card in gw gw-keys" style="--glow:#30d158"><div class="kallin"><span class="ok">${KEY_ICON.ok}</span><div><b>All keys are in</b><span class="note">${K.keys.length} spare key${K.keys.length===1?"":"s"} on the board</span></div></div>
       ${keyBoard(K.keys)}</div>`;
   }
   const recent=rec&&rec.length?`<div class="card in"><div class="head"><h2>${out.length?"Recent sign-outs":"Last taken"}</h2><span class="sub">newest first</span></div><div class="jobs">${rec.slice(0,8).map(r=>`<div class="job"><span class="kno" style="font-size:24px;min-width:2.4ch">${keyNo(r.key)}</span><div class="t">${esc(r.who)}</div>${keyStatusTag(r.status)}<div class="m"><span>Out ${esc(r.out)}</span>${r.back?`<span>Back ${esc(r.back)}${r.by&&r.by!==r.who?" · by "+esc(r.by.replace(/\s*\(for .*\)\s*$/,"")):""}</span>`:""}</div></div>`).join("")}</div></div>`
