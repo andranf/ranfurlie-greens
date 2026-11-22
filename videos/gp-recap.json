@@ -1,14 +1,14 @@
 {
- "build_label": "week of 22 November 2026",
- "built": "2026-11-22T11:37+1100",
- "asof": "2026-11-21",
- "asof_label": "Sat 21 Nov",
- "asof_long": "Saturday 21 November 2026",
+ "build_label": "week of 23 November 2026",
+ "built": "2026-11-23T06:18+1100",
+ "asof": "2026-11-22",
+ "asof_label": "Sun 22 Nov",
+ "asof_long": "Sunday 22 November 2026",
  "latest": {
-  "t": 19.5,
-  "cool": 0.996,
-  "warm": 0.2594,
-  "label": "Sat 21 Nov"
+  "t": 19.7,
+  "cool": 0.999,
+  "warm": 0.2717,
+  "label": "Sun 22 Nov"
  },
  "model": {
   "cool_opt": 20.0,
@@ -18,13 +18,6 @@
   "crossover": 24.84
  },
  "hist": [
-  {
-   "d": "2026-10-23",
-   "lab": "23 Oct",
-   "t": 24.1,
-   "c": 0.757,
-   "w": 0.6152
-  },
   {
    "d": "2026-10-24",
    "lab": "24 Oct",
@@ -227,114 +220,121 @@
    "t": 19.5,
    "c": 0.996,
    "w": 0.2594
+  },
+  {
+   "d": "2026-11-22",
+   "lab": "22 Nov",
+   "t": 19.7,
+   "c": 0.999,
+   "w": 0.2717
   }
  ],
  "stats": {
-  "cool14": 0.737,
-  "cool14_prev": 0.576,
-  "warm14": 0.13340377348247182,
-  "warm14_prev": 0.06565792218291337,
-  "clip14": 4.97,
-  "gvx21": 13.7
+  "cool14": 0.778,
+  "cool14_prev": 0.569,
+  "warm14": 0.1504697612090141,
+  "warm14_prev": 0.06474884104211455,
+  "clip14": 3.99,
+  "gvx21": 13.5
  },
  "headline_hist": "Greens GP has <em>climbed</em> with the warmth",
  "forecast": {
   "source": "Open-Meteo",
   "days": [
    {
-    "d": "2026-11-22",
-    "dow": "Sun",
-    "lab": "22 Nov",
-    "tmax": 28.9,
-    "tmin": 14.2,
-    "t": 21.5,
-    "c": 0.9611,
-    "w": 0.402,
-    "hot": false
-   },
-   {
     "d": "2026-11-23",
     "dow": "Mon",
     "lab": "23 Nov",
-    "tmax": 20.6,
-    "tmin": 12.4,
-    "t": 16.5,
-    "c": 0.8167,
-    "w": 0.117,
+    "tmax": 20.5,
+    "tmin": 12.6,
+    "t": 16.6,
+    "c": 0.8214,
+    "w": 0.1188,
     "hot": false
    },
    {
     "d": "2026-11-24",
     "dow": "Tue",
     "lab": "24 Nov",
-    "tmax": 17.4,
-    "tmin": 9.5,
-    "t": 13.4,
-    "c": 0.4921,
-    "w": 0.0432,
+    "tmax": 17.9,
+    "tmin": 9.6,
+    "t": 13.8,
+    "c": 0.5243,
+    "w": 0.048,
     "hot": false
    },
    {
     "d": "2026-11-25",
     "dow": "Wed",
     "lab": "25 Nov",
-    "tmax": 25.0,
-    "tmin": 7.3,
-    "t": 16.1,
-    "c": 0.7827,
-    "w": 0.1054,
+    "tmax": 24.7,
+    "tmin": 8.0,
+    "t": 16.4,
+    "c": 0.8024,
+    "w": 0.1119,
     "hot": false
    },
    {
     "d": "2026-11-26",
     "dow": "Thu",
     "lab": "26 Nov",
-    "tmax": 27.7,
+    "tmax": 27.4,
     "tmin": 13.1,
-    "t": 20.4,
-    "c": 0.9974,
-    "w": 0.3177,
+    "t": 20.2,
+    "c": 0.999,
+    "w": 0.3075,
     "hot": false
    },
    {
     "d": "2026-11-27",
     "dow": "Fri",
     "lab": "27 Nov",
-    "tmax": 28.4,
-    "tmin": 14.2,
-    "t": 21.3,
-    "c": 0.9725,
-    "w": 0.3829,
+    "tmax": 26.7,
+    "tmin": 15.1,
+    "t": 20.9,
+    "c": 0.9867,
+    "w": 0.3531,
     "hot": false
    },
    {
     "d": "2026-11-28",
     "dow": "Sat",
     "lab": "28 Nov",
-    "tmax": 22.4,
-    "tmin": 11.6,
-    "t": 17.0,
-    "c": 0.8618,
-    "w": 0.1353,
+    "tmax": 22.6,
+    "tmin": 14.7,
+    "t": 18.6,
+    "c": 0.9703,
+    "w": 0.2109,
+    "hot": false
+   },
+   {
+    "d": "2026-11-29",
+    "dow": "Sun",
+    "lab": "29 Nov",
+    "tmax": 18.1,
+    "tmin": 11.4,
+    "t": 14.8,
+    "c": 0.6341,
+    "w": 0.0676,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  13.4,
-  21.5
+  13.8,
+  20.9
  ],
  "headline_fc": "Close to <em>ideal</em> growing weather for the greens",
  "takeaways": [
   {
    "tone": "cool",
    "head": "Greens: near peak growth",
-   "detail": "Bent and Poa GP averages 84% this week. Expect strong clip yields and quick recovery."
+   "detail": "Bent and Poa GP averages 82% this week. Expect strong clip yields and quick recovery."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 21%, best on Sun at 40%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 17%, best on Fri at 35%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
