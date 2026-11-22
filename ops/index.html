@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ranfurlie Course Ops</title>
 <meta name="description" content="Irrigation, drainage, bunkers, topdressing, rough, grounds and safety at Ranfurlie in one place: open jobs, maps, stock and stocktakes, bunker sand and live Turfco loads.">
-<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:ROND,wght@100,700..900&display=swap">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 /* Ranfurlie Course Ops v1.0 (24 Oct 2026). One page for irrigation, drainage, bunkers, topdressing and grounds.
@@ -577,6 +580,159 @@ body[data-area="today"]{--accL:#007aff;--accD:#0a84ff;--deepL:#0058c4;--deepD:#6
 .mach-k{font-size:12px;font-weight:600;border-radius:99px;padding:1px 8px;background:var(--glass-lo);color:var(--muted)}
 .mach-share{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .mach-share .sub{flex:1;min-width:220px}
+
+/* ===================== FROSTED GLASS LOOK (22 Nov 2026) =====================
+   Andy: "can you use this style on the course ops dashboard?" (rondesignlab's hydration-app reel on Instagram).
+   Style only, none of their screens or branding: frosted glass cards over a soft blurred photo of the course
+   (ops/bg.jpg, made from irrigation/aerial.jpg with a horizontal motion smear), fluid blue-to-coral gradient
+   tiles, dot-matrix numbers (Doto), clean system type. Each area keeps its own colour.
+   Sits on top of the machinery look above. Delete this block (and the Doto font link) to go back to it. */
+:root{
+  --dot:"Doto",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --bg:#eef1f5;
+  --card:rgba(255,255,255,.58);--card2:rgba(255,255,255,.42);
+  --glass:rgba(255,255,255,.56);--glass-hi:rgba(255,255,255,.76);--glass-lo:rgba(255,255,255,.42);--glass-solid:rgba(250,251,253,.9);
+  --fg:#111821;--muted:#475260;--faint:#768190;--line:rgba(30,45,70,.12);
+  --rim:rgba(255,255,255,.95);--rim2:rgba(255,255,255,.5);
+  --gshadow:0 1px 0 rgba(255,255,255,.65) inset,0 0 0 1px rgba(255,255,255,.55) inset,0 -1px 0 rgba(20,40,70,.06) inset,0 22px 44px -26px rgba(25,40,70,.38),0 2px 8px -4px rgba(25,40,70,.12);
+  --shadow:var(--gshadow);
+  --float:0 12px 30px -10px rgba(25,40,70,.35),0 0 0 1px rgba(255,255,255,.6) inset;
+  --blur:blur(26px) saturate(175%);
+  --wash:linear-gradient(180deg,rgba(242,245,249,.84) 0%,rgba(238,242,247,.66) 38%,rgba(238,242,247,.7) 70%,rgba(242,245,249,.88) 100%);
+  --track:rgba(255,255,255,.35);--thumb:rgba(255,255,255,.9);--bar:rgba(255,255,255,.5);
+  --coral:linear-gradient(118deg,#ff3f6c 0%,#ff5a58 52%,#ff8b4e 100%);
+  --violet:linear-gradient(118deg,#6a5cff 0%,#4d78ff 55%,#38a8ff 100%);
+  --bluecoral:linear-gradient(118deg,#3d86ff 0%,#9466ff 48%,#ff6a8e 100%);
+  --amber:linear-gradient(118deg,#ffb020 0%,#ff8a1f 100%);
+  --r:26px;--r2:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#07090d;
+  --card:rgba(40,46,60,.5);--card2:rgba(255,255,255,.07);
+  --glass:rgba(40,46,60,.5);--glass-hi:rgba(60,68,86,.6);--glass-lo:rgba(255,255,255,.08);--glass-solid:rgba(26,30,40,.92);
+  --fg:#f3f5f9;--muted:#a9b2c1;--faint:#7c8696;--line:rgba(255,255,255,.1);
+  --gshadow:0 1px 0 rgba(255,255,255,.14) inset,0 0 0 1px rgba(255,255,255,.07) inset,0 26px 50px -28px rgba(0,0,0,.85);
+  --float:0 12px 30px -10px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.1) inset;
+  --wash:linear-gradient(180deg,rgba(6,8,12,.86) 0%,rgba(6,8,12,.72) 40%,rgba(6,8,12,.76) 70%,rgba(6,8,12,.9) 100%);
+  --track:rgba(255,255,255,.06);--thumb:rgba(255,255,255,.16);--bar:rgba(30,34,46,.5);
+}}
+:root[data-theme="dark"]{
+  --bg:#07090d;
+  --card:rgba(40,46,60,.5);--card2:rgba(255,255,255,.07);
+  --glass:rgba(40,46,60,.5);--glass-hi:rgba(60,68,86,.6);--glass-lo:rgba(255,255,255,.08);--glass-solid:rgba(26,30,40,.92);
+  --fg:#f3f5f9;--muted:#a9b2c1;--faint:#7c8696;--line:rgba(255,255,255,.1);
+  --gshadow:0 1px 0 rgba(255,255,255,.14) inset,0 0 0 1px rgba(255,255,255,.07) inset,0 26px 50px -28px rgba(0,0,0,.85);
+  --float:0 12px 30px -10px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.1) inset;
+  --wash:linear-gradient(180deg,rgba(6,8,12,.86) 0%,rgba(6,8,12,.72) 40%,rgba(6,8,12,.76) 70%,rgba(6,8,12,.9) 100%);
+  --track:rgba(255,255,255,.06);--thumb:rgba(255,255,255,.16);--bar:rgba(30,34,46,.5);
+}
+
+/* backdrop: the course, blurred and smeared, washed pale (or dark), with two slow glows in the area colour */
+.sky{background:var(--wash),url(bg.jpg) center/cover no-repeat,var(--bg)}
+.sky i{display:block;filter:blur(40px);opacity:.55}
+.sky i:nth-child(1){width:70vmax;height:70vmax;left:-28vmax;top:-30vmax;background:radial-gradient(circle,color-mix(in srgb,var(--acc) 60%,transparent) 0,transparent 62%)}
+.sky i:nth-child(2){width:60vmax;height:60vmax;right:-30vmax;top:30vh;background:radial-gradient(circle,rgba(255,106,142,.45) 0,transparent 62%)}
+.sky i:nth-child(3){width:55vmax;height:55vmax;left:-20vmax;bottom:-30vmax;background:radial-gradient(circle,rgba(77,120,255,.4) 0,transparent 62%);opacity:.45}
+.sky i:nth-child(4){display:none}
+
+/* frosted glass: every card, sheet, toast and the tab bar */
+.card,.toast,.atile,.dofirst{background:linear-gradient(160deg,var(--glass-hi),var(--glass) 45%,var(--card2));
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:var(--gshadow)}
+.card{border-radius:var(--r)}
+.sheet .panel{background:var(--glass-solid);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);box-shadow:var(--gshadow)}
+.card h2{font-weight:650;letter-spacing:-.02em}
+.card h2 .count{font-family:var(--dot);font-variation-settings:"ROND" 100;font-weight:900;font-size:16px;color:var(--acc-deep);background:var(--acc-soft)}
+.iconbtn{border-radius:50%;background:var(--glass-hi);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:var(--float)}
+.top h1{font-weight:750;letter-spacing:-.035em}
+.top h1 .live{background:var(--glass-hi);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:var(--float)}
+.top h1 .live.stale{background:var(--med-bg)}
+
+/* tabs: a frosted bar; the open area is a glowing gradient pill in its own colour */
+.tabs .bar{background:var(--bar);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:var(--gshadow);border-radius:22px;padding:5px}
+.tabs .bar::before{background:transparent}
+.tab{border-radius:16px;color:var(--fg)}
+.tab:hover{background:var(--glass-lo)}
+.tab b{background:var(--glass-hi);color:var(--muted);box-shadow:none}
+.tab[aria-selected="true"]{color:#fff;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 72%,#fff 28%),var(--c) 55%,color-mix(in srgb,var(--c) 70%,#000 30%));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 18px -8px var(--c)}
+.tab[aria-selected="true"] svg{color:#fff}
+.tab[aria-selected="true"] b{background:rgba(255,255,255,.3);color:#fff;box-shadow:none}
+@media (max-width:900px){.tab b{background:var(--glass-solid);color:var(--muted);box-shadow:0 0 0 1.5px var(--bar)}.tab[aria-selected="true"] b{background:#fff;color:var(--c);box-shadow:none}}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tab[aria-selected="true"] svg{color:#fff}:root:not([data-theme="light"]) .tab[aria-selected="true"] b{background:#fff;color:var(--c)}}
+:root[data-theme="dark"] .tab[aria-selected="true"] svg{color:#fff}:root[data-theme="dark"] .tab[aria-selected="true"] b{background:#fff;color:var(--c)}
+
+/* KPI row: four separate gradient glass pills with dot-matrix readings (area colour, coral, violet, blue-to-coral) */
+.kpis{background:none;box-shadow:none;border-radius:0;overflow:visible;gap:10px;padding:0}
+.tile{--g:linear-gradient(140deg,color-mix(in srgb,var(--accL) 78%,#fff 22%) 0%,var(--accL) 45%,var(--deepL) 100%);
+  position:relative;overflow:hidden;isolation:isolate;border-radius:var(--r);padding:14px 16px 12px;gap:2px;color:#fff;background:var(--g);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 0 0 1px rgba(255,255,255,.16),inset 0 -14px 26px -14px rgba(0,0,0,.28),0 18px 32px -20px rgba(30,30,60,.55)}
+.tile:nth-child(2){--g:var(--coral)} .tile:nth-child(3){--g:var(--violet)} .tile:nth-child(4){--g:var(--bluecoral)}
+.tile::before{content:"";position:absolute;inset:0;z-index:-1;left:auto;top:0;width:auto;height:auto;border-radius:0;opacity:1;filter:none;
+  background:radial-gradient(90% 70% at 85% -10%,rgba(255,255,255,.42),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.16),transparent 45%)}
+.tile::after{content:"";position:absolute;right:-30px;bottom:-40px;width:130px;height:130px;border-radius:50%;z-index:-1;background:radial-gradient(closest-side,rgba(255,255,255,.28),transparent);filter:blur(6px)}
+.tile .k{color:rgba(255,255,255,.9);font-weight:600;font-size:13.5px;gap:7px}
+.tile .k::before{background:#fff;box-shadow:0 0 8px rgba(255,255,255,.9);width:7px;height:7px}
+.tile .v,.tile.acc .v,.tile.hi .v{font-family:var(--dot);font-variation-settings:"ROND" 100;font-weight:900;font-size:46px;line-height:1.05;letter-spacing:.02em;margin-top:2px;color:#fff;text-shadow:0 0 14px rgba(255,255,255,.35)}
+.tile .v small{font-family:var(--body);font-size:14px;font-weight:600;color:rgba(255,255,255,.82);letter-spacing:0;text-shadow:none}
+.tile .viz,.tile .viz .note{color:rgba(255,255,255,.85)!important}
+.tile .viz svg{--acc:#fff;--acc-soft:rgba(255,255,255,.28);--line:rgba(255,255,255,.22);--ok:#fff;--hi:#fff}
+.tile.hi{box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 0 0 1px rgba(255,255,255,.2),0 0 0 2px rgba(255,63,108,.35),0 18px 34px -16px rgba(255,63,108,.75)}
+@media (max-width:759px){.tile .v,.tile.acc .v,.tile.hi .v{font-size:40px}.tile{padding:13px 14px 11px}}
+
+/* Do first: glass with a coral glow */
+.dofirst{border-radius:var(--r);background:linear-gradient(100deg,rgba(255,63,108,.2),transparent 70%),linear-gradient(160deg,var(--glass-hi),var(--glass));
+  box-shadow:inset 0 0 0 1px rgba(255,90,100,.35),var(--gshadow)}
+.dofirst .ic{border-radius:14px;background:var(--coral);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 16px -6px rgba(255,63,108,.8)}
+
+/* Today: one frosted tile per area, washed in its colour, with a dot-matrix count */
+.atile{border-radius:var(--r);background:radial-gradient(120% 90% at 0% 0%,color-mix(in srgb,var(--c,#888) 26%,transparent),transparent 62%),linear-gradient(160deg,var(--glass-hi),var(--glass) 45%,var(--card2))}
+.atile .an b{font-family:var(--dot);font-variation-settings:"ROND" 100;font-weight:900;font-size:36px;line-height:1;letter-spacing:.02em;color:color-mix(in srgb,var(--c,#888) 75%,var(--fg))}
+.atile.quiet .an b{color:var(--muted)}
+.dorow .ai,.atile .ah .ai{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 70%,#fff 30%),var(--c) 60%);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 6px 12px -6px var(--c)}
+.dorow:hover{background:var(--glass-lo)}
+@media (max-width:560px){.atile .an b{font-size:32px}}
+
+/* priority capsules and controls */
+.tag.High{background:var(--coral);color:#fff}
+.tag.Medium{background:var(--amber);color:#3a2200}
+.btn{border-radius:14px;background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--rim2)}
+.btn.primary{color:#fff;background:linear-gradient(135deg,color-mix(in srgb,var(--accL) 75%,#fff 25%),var(--accL) 50%,var(--deepL));box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 10px 22px -10px var(--accL)}
+.btn.ghost{background:var(--glass-lo);box-shadow:inset 0 0 0 1.5px var(--acc-line)}
+.chip{background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--rim2)}
+.chip[aria-pressed="true"]{background:linear-gradient(135deg,color-mix(in srgb,var(--accL) 75%,#fff 25%),var(--accL));color:#fff}
+.seg{background:var(--track);box-shadow:inset 0 0 0 1px var(--rim2)}
+.seg button[aria-pressed="true"]{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 72%,#fff 28%),var(--c));color:#fff;box-shadow:0 6px 14px -6px var(--c)}
+.seg button[aria-pressed="true"] i{background:#fff}
+.stat,.krow,.kpill{background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--rim2)}
+.krow.hi{background:rgba(255,63,108,.14);box-shadow:inset 0 0 0 1.5px rgba(255,63,108,.6)}
+input.field,select.field,textarea.field,.count input,.count .ok,.stepper button,.mapbar select{background:var(--glass-lo);box-shadow:inset 0 0 0 1.5px var(--line)}
+.gbtn{background:var(--glass-lo);box-shadow:inset 0 0 0 1px var(--rim2)}
+.gbtn[aria-pressed="true"]{background:linear-gradient(135deg,color-mix(in srgb,var(--accL) 75%,#fff 25%),var(--accL));color:#fff;box-shadow:0 6px 14px -6px var(--accL)}
+
+/* dot-matrix readings */
+.si .q,.stat .v,.call .big,.ring .big,.kno,.kallin b{font-family:var(--dot);font-variation-settings:"ROND" 100;font-weight:900;letter-spacing:.03em}
+.si .q{font-size:25px}
+.si .q small{font-family:var(--body);letter-spacing:0}
+.stat .v{font-size:30px}
+.ring .big{font-size:78px}
+.ring .fg{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--acc) 60%,transparent))}
+.kno{font-size:38px}
+.kallin b{font-family:var(--display);font-variation-settings:normal;letter-spacing:-.02em}
+
+/* topdressing: the big load button and the bars take the gradient */
+.loadbtn{color:#fff;background:linear-gradient(118deg,var(--accL) 0%,color-mix(in srgb,var(--accL) 55%,#ff5f8f) 100%);border-radius:28px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -16px 30px -16px rgba(0,0,0,.25),0 20px 36px -18px var(--accL)}
+.bw .b{background:linear-gradient(180deg,color-mix(in srgb,var(--acc) 55%,#fff),var(--acc));border-radius:6px 6px 3px 3px}
+
+/* maps and overlays */
+.map{border-radius:20px}
+.map .ctl button,.map .hint{background:var(--glass-hi);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:var(--float)}
+.map .ctl button{border-radius:50%}
+.full .bar{background:var(--bar);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.mapcard.big,.mapwrap.big,.full{background:var(--bg)}
+@media (min-width:1181px) and (max-width:1400px){.tab{padding:7px 8px;gap:5px}}
+@media (min-width:901px) and (max-width:1180px){.tabs .bar{flex-wrap:wrap;justify-content:center;width:auto;overflow:visible}}
+.toast{border-radius:20px}
 </style>
 </head>
 <body data-area="irrigation">
@@ -858,7 +1014,7 @@ function viewToday(){
   rows.sort((a,b)=>a.sort-b.sort||b.age-a.age);
   const doCard=rows.length?`<div class="card in" style="padding:14px 10px 8px"><div class="head" style="padding:0 12px;margin-bottom:4px"><h2>Do first</h2><span class="note">the most urgent job in each area</span></div><div class="dolist">${rows.map(r=>r.html).join("")}</div></div>`:`<div class="card in"><h2>Nothing high priority</h2><p class="sub" style="margin:6px 0 0">No area has a high-priority job open.</p></div>`;
   /* one tile per area */
-  const tile=(k,big,small,top,quiet)=>`<button class="atile${quiet?" quiet":""}" data-goto="${k}"><div class="ah">${aIcon(k)}${AREAS[k].label}<span class="chev">›</span></div><div class="an"><b>${big}</b><span>${small}</span></div>${top?`<div class="top">${top}</div>`:""}</button>`;
+  const tile=(k,big,small,top,quiet)=>`<button class="atile${quiet?" quiet":""}" data-goto="${k}" style="--c:${AREAS[k].c}"><div class="ah">${aIcon(k)}${AREAS[k].label}<span class="chev">›</span></div><div class="an"><b>${big}</b><span>${small}</span></div>${top?`<div class="top">${top}</div>`:""}</button>`;
   const tiles=[];
   JOB_AREAS.forEach(a=>{if(!S.data[a]){tiles.push(tile(a,"–","not loaded","",true));return}const o=sortJobs(jobsOf(a).filter(isOpen));const h=o.filter(j=>j.prio==="High").length;
     tiles.push(tile(a,o.length,`open${h?` · ${h} high`:""}`,o[0]?`Next: <b>${esc(o[0].title)}</b>`:"Nothing open",!o.length))});
