@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:ROND,wght@100,700..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:ROND,wght@100,100..900&display=swap">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 /* Ranfurlie Course Ops v1.0 (24 Oct 2026). One page for irrigation, drainage, bunkers, topdressing and grounds.
@@ -733,6 +733,84 @@ input.field,select.field,textarea.field,.count input,.count .ok,.stepper button,
 @media (min-width:1181px) and (max-width:1400px){.tab{padding:7px 8px;gap:5px}}
 @media (min-width:901px) and (max-width:1180px){.tabs .bar{flex-wrap:wrap;justify-content:center;width:auto;overflow:visible}}
 .toast{border-radius:20px}
+
+/* ---- MOTION (22 Nov 2026). Andy: "needs some animation". Entrances, count-ups and growing charts play when a tab
+   opens (or the first time the data lands), never on a refresh or a tap. Everything is off with Reduce Motion. ---- */
+:root{--spring:cubic-bezier(.34,1.56,.64,1);--glide:cubic-bezier(.22,1,.36,1)}
+/* backdrop: the course photo drifts slowly behind the glass, a soft light streak passes across now and then */
+.sky{background:var(--bg)}
+.sky::before{content:"";position:absolute;inset:-8%;background:url(bg.jpg) center/cover no-repeat;animation:kb 80s ease-in-out infinite alternate;will-change:transform}
+.sky::after{content:"";position:absolute;inset:0;background:var(--wash)}
+.sky i{z-index:1}
+.sky i:nth-child(4){display:block;left:-70vw;top:30vh;width:70vw;height:22vh;border-radius:50%;opacity:1;filter:blur(22px);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),rgba(150,200,255,.25),transparent);animation:streak 19s linear 3s infinite}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sky i:nth-child(4){background:linear-gradient(90deg,transparent,rgba(120,170,255,.13),rgba(255,120,160,.1),transparent)}}
+:root[data-theme="dark"] .sky i:nth-child(4){background:linear-gradient(90deg,transparent,rgba(120,170,255,.13),rgba(255,120,160,.1),transparent)}
+@keyframes kb{0%{transform:scale(1) translate3d(0,0,0)}100%{transform:scale(1.13) translate3d(-3%,2%,0)}}
+@keyframes streak{0%{transform:translate3d(0,0,0)}60%,100%{transform:translate3d(240vw,-6vh,0)}}
+
+/* glass cards rise in and come into focus, one after another */
+.in{animation:none}
+#view.enter .in{animation:glassIn .7s var(--glide) both;animation-delay:calc(var(--i,0)*75ms)}
+@keyframes glassIn{from{opacity:0;transform:translateY(22px) scale(.98);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+
+/* KPI tiles: pop in, the gradient keeps flowing, a sheen sweeps across in turn, the light blob wanders */
+.tile{background-size:220% 220%;animation:flow 16s ease-in-out infinite;animation-delay:calc(var(--i,0)*-3.7s);transition:transform .45s var(--spring)}
+#view.enter .tile{animation:tileIn .75s var(--spring) both,flow 16s ease-in-out infinite;animation-delay:calc(120ms + var(--i,0)*80ms),calc(var(--i,0)*-3.7s)}
+.tile.hi{animation:flow 16s ease-in-out infinite,hiGlow 2.6s ease-in-out infinite;animation-delay:calc(var(--i,0)*-3.7s),0s}
+#view.enter .tile.hi{animation:tileIn .75s var(--spring) both,flow 16s ease-in-out infinite,hiGlow 2.6s ease-in-out 1s infinite;animation-delay:calc(120ms + var(--i,0)*80ms),calc(var(--i,0)*-3.7s),1s}
+.tile::before{background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.34) 50%,transparent 62%) 160% 0/260% 100% no-repeat,
+  radial-gradient(90% 70% at 85% -10%,rgba(255,255,255,.42),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.16),transparent 45%);
+  animation:sheen 8s var(--glide) infinite;animation-delay:calc(1.4s + var(--i,0)*.9s)}
+.tile::after{animation:orb 13s ease-in-out infinite;animation-delay:calc(var(--i,0)*-3s)}
+.tile:hover{transform:translateY(-3px) scale(1.012)}
+.tile:active{transform:scale(.97)}
+@keyframes tileIn{from{opacity:0;transform:translateY(26px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes flow{0%,100%{background-position:0% 30%}50%{background-position:100% 70%}}
+@keyframes sheen{0%,70%{background-position:160% 0,0 0,0 0}100%{background-position:-70% 0,0 0,0 0}}
+@keyframes orb{0%,100%{transform:translate3d(0,0,0) scale(1)}33%{transform:translate3d(-60px,-22px,0) scale(1.2)}66%{transform:translate3d(-24px,-58px,0) scale(.9)}}
+@keyframes hiGlow{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 0 0 1px rgba(255,255,255,.2),0 0 0 2px rgba(255,63,108,.32),0 18px 34px -16px rgba(255,63,108,.7)}
+  50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 0 0 1px rgba(255,255,255,.2),0 0 0 6px rgba(255,63,108,.14),0 22px 46px -12px rgba(255,63,108,.95)}}
+
+/* dot-matrix numbers power on: the dots swell from pin-pricks to full, then glow */
+#view.enter .tile .v,#view.enter .atile .an b,#view.enter .stat .v,#view.enter .ring .big,#view.enter .kno,#view.enter .call .big{animation:dotOn 1.1s var(--glide) both;animation-delay:calc(200ms + var(--i,0)*80ms)}
+@keyframes dotOn{0%{font-weight:100;opacity:.25}55%{opacity:1}100%{font-weight:900}}
+
+/* little charts in the tiles and the 21-day bars grow up; meters fill from the left */
+#view.enter .viz .sb,#view.enter .bw .b{transform-box:fill-box;transform-origin:50% 100%;animation:growUp .7s var(--spring) both;animation-delay:calc(350ms + var(--j,0)*28ms)}
+#view.enter .viz .fill{transform-box:fill-box;transform-origin:0 50%;animation:growRight 1s var(--glide) both;animation-delay:500ms}
+#view.enter .bw .bv{animation:fadeUp .4s var(--glide) both;animation-delay:calc(650ms + var(--j,0)*28ms)}
+@keyframes growUp{from{transform:scaleY(0)}to{transform:none}}
+@keyframes growRight{from{transform:scaleX(0)}to{transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}}
+
+/* Today: area tiles and do-first rows cascade in */
+#view.enter .atile{animation:tileIn .7s var(--spring) both;animation-delay:calc(250ms + var(--i,0)*55ms)}
+#view.enter .dorow,#view.enter .job,#view.enter .si,#view.enter .krow,#view.enter .alert{animation:rowIn .55s var(--glide) both;animation-delay:calc(260ms + min(var(--i,0),12)*40ms)}
+.atile{transition:transform .45s var(--spring),box-shadow .3s}
+.atile:hover{transform:translateY(-3px)}
+@keyframes rowIn{from{opacity:0;transform:translateX(-10px)}}
+
+/* the open tab pops, its gradient keeps moving; the title and the one-line summary slide in */
+.tab[aria-selected="true"]{background-size:200% 200%;animation:flow 9s ease-in-out infinite}
+.tab.pop{animation:pillPop .55s var(--spring),flow 9s ease-in-out infinite}
+@keyframes pillPop{0%{transform:scale(.82)}100%{transform:none}}
+#title.swap,#facts.swap{animation:titleIn .55s var(--glide) both}
+#facts.swap{animation-delay:70ms}
+@keyframes titleIn{from{opacity:0;transform:translateY(10px);filter:blur(4px)}}
+
+/* Do first: the alert icon sends out a soft ripple; the load button breathes */
+.dofirst .ic{animation:icPulse 2.4s ease-out infinite}
+@keyframes icPulse{0%{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 0 rgba(255,63,108,.55)}80%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 0 12px rgba(255,63,108,0)}}
+.loadbtn{background-size:200% 200%;animation:flow 10s ease-in-out infinite}
+.ring .fg{transition:stroke-dashoffset 1.2s var(--glide)}
+
+@media (prefers-reduced-motion: reduce){
+  .sky::before,.sky i,.tile,.tile::before,.tile::after,.tab,.tab.pop,.loadbtn,.dofirst .ic,
+  #view.enter .in,#view.enter .tile,#view.enter .tile.hi,.tile.hi,#view.enter .tile .v,#view.enter .atile .an b,#view.enter .stat .v,#view.enter .ring .big,#view.enter .kno,#view.enter .call .big,
+  #view.enter .viz .sb,#view.enter .viz .fill,#view.enter .bw .b,#view.enter .bw .bv,#view.enter .atile,#view.enter .dorow,#view.enter .job,#view.enter .si,#view.enter .krow,#view.enter .alert,#title.swap,#facts.swap{animation:none!important}
+  .sky i:nth-child(4){display:none}
+}
 </style>
 </head>
 <body data-area="irrigation">
@@ -919,8 +997,8 @@ function stockOf(area){
 
 /* ------------------------------------------------------------------ small svg helpers */
 function spark(vals,opt={}){if(!vals||!vals.length)return"";const w=120,h=26,max=Math.max(1,...vals);const bw=w/vals.length;
-  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${vals.map((v,i)=>`<rect x="${(i*bw+1).toFixed(1)}" y="${(h-(v/max)*(h-2)).toFixed(1)}" width="${Math.max(1,bw-2).toFixed(1)}" height="${((v/max)*(h-2)).toFixed(1)}" rx="1.5" fill="${opt.c||"var(--acc)"}" opacity="${i===vals.length-1?1:.55}"/>`).join("")}</svg>`}
-function meter(v,max){const p=Math.max(0,Math.min(1,max?v/max:0));return `<svg viewBox="0 0 120 26" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="9" width="120" height="8" rx="4" fill="var(--acc-soft)"/><rect x="0" y="9" width="${(120*p).toFixed(1)}" height="8" rx="4" fill="var(--acc)"/></svg>`}
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">${vals.map((v,i)=>`<rect x="${(i*bw+1).toFixed(1)}" y="${(h-(v/max)*(h-2)).toFixed(1)}" width="${Math.max(1,bw-2).toFixed(1)}" height="${((v/max)*(h-2)).toFixed(1)}" class="sb" rx="1.5" fill="${opt.c||"var(--acc)"}" opacity="${i===vals.length-1?1:.55}"/>`).join("")}</svg>`}
+function meter(v,max){const p=Math.max(0,Math.min(1,max?v/max:0));return `<svg viewBox="0 0 120 26" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="9" width="120" height="8" rx="4" fill="var(--acc-soft)"/><rect class="fill" x="0" y="9" width="${(120*p).toFixed(1)}" height="8" rx="4" fill="var(--acc)"/></svg>`}
 const ICON={
   expand:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
   shrink:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>',
@@ -1337,16 +1415,48 @@ function doFirst(){
   const age=daysAgo(j.reported);const tw=j.where&&!String(j.title).toLowerCase().includes(String(j.where).toLowerCase())?" · "+esc(j.where):"";
   return `<div class="dofirst in" data-dofirst="${esc(j.ref)}" role="button" tabindex="0"><span class="ic">!</span><div><div class="lab">Do first</div><div class="t">${esc(j.title)}${tw}</div><div class="m">${esc(j.ref)}${age!=null?" · reported "+(age===0?"today":age===1?"yesterday":age+" days ago"):""}</div></div><span class="more">Show on map ›</span></div>`;
 }
+/* ------------------------------------------------------------------ motion (22 Nov 2026)
+   Entrance, count-up and growing charts play when a tab opens or the first time the data lands; on a refresh or a tap
+   only the numbers that changed roll to their new value. Off with the phone's Reduce Motion. */
+const RM=matchMedia("(prefers-reduced-motion: reduce)");
+let mTab=null,mData=false;const MV={};
+function motionEnter(){const ready=Object.keys(S.data).length>0;const enter=S.tab!==mTab||(ready&&!mData);if(enter){mTab=S.tab;if(ready)mData=true}return enter}
+function motionApply(enter){
+  const v=$("#view");v.classList.toggle("enter",enter&&!RM.matches);
+  const idx=(sel,lim)=>$$(sel).forEach((e,i)=>e.style.setProperty("--i",Math.min(i,lim||40)));
+  idx("#view .in",8);idx("#view .kpis .tile");idx("#view .atile");idx("#view .dorow");idx("#view .job",12);idx("#view .si",12);idx("#view .krow");idx("#view .alert",12);
+  $$("#view .viz svg").forEach(s=>$$(".sb",s).forEach((r,j)=>r.style.setProperty("--j",j)));
+  $$("#view .bars .bc").forEach((c,j)=>c.style.setProperty("--j",j));
+  if(enter&&!RM.matches){["#title","#facts"].forEach(id=>{const e=$(id);if(!e)return;e.classList.remove("swap");void e.offsetWidth;e.classList.add("swap")});
+    const t=$("#tabs .tab[aria-selected=true]");if(t)t.classList.add("pop");
+    $$("#view .ring .fg").forEach(c=>{const to=c.getAttribute("stroke-dashoffset"),from=c.getAttribute("stroke-dasharray");c.style.transition="none";c.style.strokeDashoffset=from;void c.getBoundingClientRect();c.style.transition="";requestAnimationFrame(()=>requestAnimationFrame(()=>{c.style.strokeDashoffset=to}))})}
+  countUp(enter);
+}
+function countUp(enter){
+  const groups=["#view .tile .v","#view .atile .an b","#view .stat .v","#view .ring .big","#view .kno","#view .call .big","#view .si .q"];
+  groups.forEach((sel,g)=>$$(sel).forEach((el,i)=>{
+    const tn=[...el.childNodes].find(n=>n.nodeType===3&&/\d/.test(n.nodeValue));if(!tn)return;
+    const m=tn.nodeValue.match(/^(\D*?)(\d[\d,]*(?:\.\d+)?)(.*)$/s);if(!m)return;
+    const raw=m[2],to=parseFloat(raw.replace(/,/g,""));if(!isFinite(to))return;
+    const key=g+":"+(el.closest("[data-goto]")?.dataset.goto||"")+":"+i;const from=enter?0:MV[key];MV[key]=to;
+    if(RM.matches||from==null||from===to)return;
+    const dec=(raw.split(".")[1]||"").length,comma=raw.includes(",");
+    const fmt=x=>{const s=comma?x.toLocaleString("en-AU",{minimumFractionDigits:dec,maximumFractionDigits:dec}):x.toFixed(dec);return m[1]+s+m[3]};
+    const dur=enter?900+Math.min(i,8)*70:650,t0=performance.now()+(enter?250+Math.min(i,8)*80:0);
+    tn.nodeValue=fmt(from);
+    const step=now=>{if(!tn.isConnected)return;const p=Math.min(1,Math.max(0,(now-t0)/dur)),e=1-Math.pow(1-p,4);tn.nodeValue=p<1?fmt(from+(to-from)*e):m[1]+raw+m[3];if(p<1)requestAnimationFrame(step)};
+    requestAnimationFrame(step)}));
+}
 let lastSig="";
 function sig(){return [S.tab,S.sub,S.mach&&S.mach.built,S.keys&&S.keys.at,S.keys&&S.keys.err,S.live&&S.live.updated,...["irrigation","drainage","bunkers","grounds"].map(k=>S.data[k]&&S.data[k].generated),JSON.stringify(pending()),outbox().length].join("|")}
 function render(){
-  lastSig=sig();
+  lastSig=sig();const enter=motionEnter();
   document.body.dataset.area=S.tab;$("#title").textContent=AREAS[S.tab].label;document.title=AREAS[S.tab].label+" · Ranfurlie Course Ops";
   renderTabs();facts();
   const v={map:viewMap,irrigation:viewIrrigation,drainage:viewDrainage,bunkers:viewBunkers,topdressing:viewTopdressing,grounds:viewGrounds,keys:viewKeys,machinery:viewMachinery,today:viewToday,rough:()=>viewEmbed("rough"),safety:()=>viewEmbed("safety")}[S.tab]();
   if(AREAS[S.tab].embed&&$(`#view .mapcard[data-embed="${S.tab}"]`)){/* keep the page as it is */}
   else if(S.tab==="map"&&$("#view .mapcard:not([data-embed])")){/* keep the map frame as it is: reloading it would lose the valves you shut */}
-  else{$("#view").innerHTML=doFirst()+v;wire()}
+  else{$("#view").innerHTML=doFirst()+v;wire();motionApply(enter)}
   $("#foot").innerHTML=`Jobs, maps and stock rebuild from Slack and Notion every 3 hours (5:50am to 5:50pm). Stocktakes, sand and Turfco loads from this page show within a minute or two.<br>Separate pages: <a href="../">Greens Live</a> · <a href="../moisture/">Moisture map</a> · <a href="../machinery/">Machinery</a> · <a href="../stock.html">Shed stocktake</a> · <a href="../spray/">Spraying</a>`;
 }
 function wire(){
