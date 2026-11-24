@@ -1,6 +1,6 @@
 {
  "build_label": "week of 24 November 2026",
- "built": "2026-11-24T06:26+1100",
+ "built": "2026-11-24T16:02+1100",
  "asof": "2026-11-23",
  "asof_label": "Mon 23 Nov",
  "asof_long": "Monday 23 November 2026",
@@ -245,66 +245,66 @@
     "d": "2026-11-24",
     "dow": "Tue",
     "lab": "24 Nov",
-    "tmax": 18.1,
-    "tmin": 9.1,
-    "t": 13.6,
-    "c": 0.5081,
-    "w": 0.0455,
+    "tmax": 18.2,
+    "tmin": 8.8,
+    "t": 13.5,
+    "c": 0.4974,
+    "w": 0.0439,
     "hot": false
    },
    {
     "d": "2026-11-25",
     "dow": "Wed",
     "lab": "25 Nov",
-    "tmax": 24.4,
-    "tmin": 7.8,
-    "t": 16.1,
-    "c": 0.7777,
-    "w": 0.1038,
+    "tmax": 25.7,
+    "tmin": 7.5,
+    "t": 16.6,
+    "c": 0.8261,
+    "w": 0.1205,
     "hot": false
    },
    {
     "d": "2026-11-26",
     "dow": "Thu",
     "lab": "26 Nov",
-    "tmax": 27.2,
-    "tmin": 12.0,
-    "t": 19.6,
-    "c": 0.9974,
-    "w": 0.2655,
+    "tmax": 26.7,
+    "tmin": 12.2,
+    "t": 19.4,
+    "c": 0.995,
+    "w": 0.2563,
     "hot": false
    },
    {
     "d": "2026-11-27",
     "dow": "Fri",
     "lab": "27 Nov",
-    "tmax": 25.6,
-    "tmin": 16.0,
-    "t": 20.8,
-    "c": 0.9895,
-    "w": 0.3459,
+    "tmax": 25.7,
+    "tmin": 16.1,
+    "t": 20.9,
+    "c": 0.9867,
+    "w": 0.3531,
     "hot": false
    },
    {
     "d": "2026-11-28",
     "dow": "Sat",
     "lab": "28 Nov",
-    "tmax": 23.0,
+    "tmax": 23.1,
     "tmin": 15.4,
     "t": 19.2,
-    "c": 0.9895,
-    "w": 0.2415,
+    "c": 0.9907,
+    "w": 0.2444,
     "hot": false
    },
    {
     "d": "2026-11-29",
     "dow": "Sun",
     "lab": "29 Nov",
-    "tmax": 17.2,
-    "tmin": 11.8,
-    "t": 14.5,
-    "c": 0.6065,
-    "w": 0.0622,
+    "tmax": 17.8,
+    "tmin": 12.8,
+    "t": 15.3,
+    "c": 0.6941,
+    "w": 0.0808,
     "hot": false
    },
    {
@@ -321,15 +321,15 @@
   ]
  },
  "fc_band": [
-  13.6,
-  20.8
+  13.5,
+  20.9
  ],
  "headline_fc": "A <em>solid</em> growing week for the greens",
  "takeaways": [
   {
    "tone": "cool",
    "head": "Greens: growing well",
-   "detail": "Bent and Poa GP averages 77% this week, cooler than the 20 °C optimum."
+   "detail": "Bent and Poa GP averages 79% this week, cooler than the 20 °C optimum."
   },
   {
    "tone": "warm",
