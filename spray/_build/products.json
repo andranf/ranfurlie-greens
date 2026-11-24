@@ -1038,5 +1038,71 @@
   ],
   "why": "Dye before the oil adjuvant, which goes in last. You're at {before} L.",
   "src": "Label APVMA 68258 · <a href=\"https://cdn.shopify.com/s/files/1/0036/9603/3903/files/Tru-Blue.pdf\" target=\"_blank\" rel=\"noopener\">label</a> · SDS not found online"
+ },
+ "vitalise": {
+  "name": "MP Vitalise",
+  "gk_name": "MP Vitalise",
+  "sig": "",
+  "sigc": "",
+  "form": "Liquid organic biostimulant",
+  "what": "Living Turf biostimulant: 2.7-1-1.7, amino acids, kelp, humic and fulvic acids, carbohydrates, microbes",
+  "haz": "No hazards listed.",
+  "soft": true,
+  "hazFull": "Tech sheet lists no hazards. Foliar 20 L/ha, drench 40 L/ha. Gloves when pouring.",
+  "ppe": [
+   "gloves"
+  ],
+  "how": [
+   "Shake well",
+   "Measure {amt}",
+   "Pour in with the agitator running"
+  ],
+  "why": "Organic biostimulant, goes in last (sheet notes). You're at {before} L.",
+  "src": "Living Turf tech sheet · <a href=\"https://ltsaproductdocuments.blob.core.windows.net/ltcontainerproductdocumentnz/Tech%20Sheet%20MP%20Vitalise.pdf\" target=\"_blank\" rel=\"noopener\">tech sheet</a>"
+ },
+ "protesyn": {
+  "name": "ProteSyn 6-2-3",
+  "gk_name": "ProteSyn (6-2-3)",
+  "sig": "",
+  "sigc": "",
+  "form": "Liquid foliar fertiliser",
+  "what": "Floratine foliar N-P-K 6-2-3 (urea, ammonium phosphate, potassium thiosulfate)",
+  "haz": "No hazards listed.",
+  "soft": true,
+  "hazFull": "Label lists no hazards. Foliar maintenance 10-20 L/ha every 10-14 days in 200-350 L/ha. Don't water in: wait at least 2 h. Remove the tank strainer before adding. Gloves when pouring.",
+  "ppe": [
+   "gloves"
+  ],
+  "how": [
+   "Strainer out",
+   "Shake well",
+   "Measure {amt}",
+   "Pour straight into the tank, agitator running"
+  ],
+  "why": "Sheet notes order. Label: strainer out before it goes in. You're at {before} L.",
+  "src": "Floratine label · <a href=\"https://cdn.shopify.com/s/files/1/0320/9832/0516/files/ProteSyn-Label.pdf\" target=\"_blank\" rel=\"noopener\">label</a>"
+ },
+ "knifeplus": {
+  "name": "Knife Plus 12-0-0",
+  "gk_name": "Knife Plus (12-0-0)",
+  "sig": "",
+  "sigc": "",
+  "form": "Liquid foliar fertiliser",
+  "what": "Floratine N + iron: 12% N (urea), 6% Fe (ferrous sulphate), Mn 1.5%, Zn 1%, Cu 0.12%",
+  "haz": "Iron product: stains concrete.",
+  "soft": true,
+  "hazFull": "Label lists no hazards. 5-10 L/ha in 200-350 L/ha. Don't water in: wait at least 2 h. Remove the tank strainer before adding. 6% iron: stains concrete and hitting mats. Gloves and goggles when pouring.",
+  "ppe": [
+   "gloves",
+   "goggles"
+  ],
+  "how": [
+   "Strainer out",
+   "Shake well",
+   "Measure {amt}",
+   "Pour straight into the tank, agitator running"
+  ],
+  "why": "Sheet notes order. Label: strainer out before it goes in. You're at {before} L.",
+  "src": "Floratine tech sheet · <a href=\"https://cdn.specialistsales.com.au/wp-content/uploads/2021/02/09103254/Knife_Plus_Biostimulant_TechSheet.pdf\" target=\"_blank\" rel=\"noopener\">tech sheet</a>"
  }
 }

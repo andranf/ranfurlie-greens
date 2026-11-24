@@ -1,6 +1,15 @@
 {
  "tanks": [
   {
+   "slug": "2026-11-25-range-pgr-fert-biostim",
+   "title": "PGR + Fert + Biostimulants, Driving Range",
+   "sprayer": "JD HD200",
+   "date_iso": "2026-11-25",
+   "date": "Wed 25 Nov",
+   "applicator": "Brodie Macdonald",
+   "method": "boom"
+  },
+  {
    "slug": "2026-11-19-rough-bunkers-broadleaf-knapsack",
    "title": "Broadleaf, Rough + Bunker Surrounds, Knapsack",
    "sprayer": "Milwaukee 15 L knapsack",

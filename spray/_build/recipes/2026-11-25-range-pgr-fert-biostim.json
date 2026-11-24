@@ -1,0 +1,198 @@
+{
+  "slug": "2026-11-25-range-pgr-fert-biostim",
+  "title": "PGR + Fert + Biostimulants, Driving Range",
+  "sheet_name": "JD 300L/Ha - Driving Range - PGR + Fert + Biostimulants",
+  "sprayer": "JD HD200",
+  "applicator": [
+    "Brodie Macdonald",
+    "U0839HLQA8G"
+  ],
+  "date": "Wed 25 Nov",
+  "date_long": "Wed 25 Nov 2026",
+  "date_iso": "2026-11-25",
+  "area_ha": 1.6,
+  "rate_lha": 300,
+  "mix_l": 480,
+  "tank_cap_l": 757,
+  "fill_l": 300,
+  "nozzles": "Grey Wilger SR110-06",
+  "speed": "7.8 km/h",
+  "pressure": "4.1 bar",
+  "facts": [
+    "JD HD200 · Grey Wilger SR110-06 · 7.8 km/h · 4.1 bar",
+    "300 L/ha",
+    "Range mown area (1.6 ha) in this 480 L (part tank)",
+    "Foliar: DO NOT water in"
+  ],
+  "last_load": "Greens fungicide tanks (JD): flush the boom with clean water first",
+  "site_check": "Range closed: nobody hitting while you're out there. Ball picker off the area",
+  "weather": "Delta T 2–8 · wind under 15 km/h · gusts under 25",
+  "extra_checks": [
+    [
+      "rinse",
+      "Clean water run through the boom first",
+      "Last JD tanks were greens fungicides"
+    ],
+    [
+      "catch",
+      "Bucket test: one nozzle for 1 minute at 4.1 bar",
+      "About 2.8 L. If it's well out, call Andy before you fill"
+    ],
+    [
+      "jar",
+      "Jar test before you fill",
+      "Tank water in a clear jar with each product in order at the sheet ratio. Shake, wait 10 min. Curdling, lumps, rust-coloured flecks or a layer on the bottom: stop and call Andy"
+    ],
+    [
+      "rangeshut",
+      "Pro shop told: range closed while you spray",
+      "Nobody hitting, ball picker parked"
+    ]
+  ],
+  "products": [
+    {
+      "id": "shadow",
+      "rate": "0.38 L/ha",
+      "rate_lha": 0.375,
+      "unit": "mL",
+      "sheet": 1
+    },
+    {
+      "id": "manganite",
+      "rate": "10 L/ha",
+      "rate_lha": 10,
+      "unit": "L",
+      "sheet": 3,
+      "note": "Goes in 2nd (sheet notes order)."
+    },
+    {
+      "id": "knifeplus",
+      "rate": "5 L/ha",
+      "rate_lha": 5,
+      "unit": "L",
+      "sheet": 8,
+      "note": "Goes in 3rd (sheet notes order)."
+    },
+    {
+      "id": "highk",
+      "rate": "20 L/ha",
+      "rate_lha": 20,
+      "unit": "L",
+      "sheet": 5,
+      "note": "Goes in 4th (sheet notes order).",
+      "why": "Strongly alkaline (pH 12.4–12.8): pour it in slowly with the agitator running and watch for flecks or curdling. You're at {before} L."
+    },
+    {
+      "id": "phozfight",
+      "rate": "5 L/ha",
+      "rate_lha": 5,
+      "unit": "L",
+      "sheet": 2,
+      "note": "Goes in 5th (sheet notes order).",
+      "why": "Sheet notes order. You're at {before} L."
+    },
+    {
+      "id": "protesyn",
+      "rate": "10 L/ha",
+      "rate_lha": 10,
+      "unit": "L",
+      "sheet": 6
+    },
+    {
+      "id": "astron",
+      "rate": "5 L/ha",
+      "rate_lha": 5,
+      "unit": "L",
+      "sheet": 7,
+      "why": "High in solids, so the strainer stays out. You're at {before} L."
+    },
+    {
+      "id": "vitalise",
+      "rate": "25 L/ha",
+      "rate_lha": 25,
+      "unit": "L",
+      "sheet": 4,
+      "note": "Goes in last (sheet notes order)."
+    }
+  ],
+  "ppe_note": "Astron and MP Manganite damage eyes: goggles and face shield when you pour them. Grass Roots High K is strongly alkaline: goggles, PVC gloves and apron. Knife Plus is iron: it stains, so wipe spills straight away.",
+  "spray_ppe": [
+    "overalls",
+    "gloves"
+  ],
+  "spray_rules": [
+    "Range mown area only. Range closed while you're out: nobody hitting, ball picker parked",
+    "Go now: Delta T 6.3 at 11, 7.1 at 12, over 8 by 1 pm. NNW 15 km/h, gusts 22–26. Finish by 12:30. If you miss it, wait until after 6:30 pm",
+    "Keep spray off concrete paths, hitting mats and the tee line: iron stains. Boom off well short of them, more on the downwind side",
+    "Foliar pass: do NOT water in. No irrigation on the range for at least 2 h after",
+    "Keep people off until it's dry"
+  ],
+  "spray_more": "ProteSyn and Knife Plus labels: 200–350 L/ha, don't water in, wait at least 2 h before irrigating, strainer out before adding. Shadow Ultra: no rain or irrigation within 1 h, no entry without protective clothing until dry.",
+  "post_checks": [
+    [
+      "noirrig",
+      "No range irrigation for at least 2 h",
+      "ProteSyn and Knife Plus labels"
+    ],
+    [
+      "stains",
+      "Paths and hitting mats checked for spray, hosed off if hit",
+      "Iron stains if it dries on"
+    ],
+    [
+      "rangeopen",
+      "Pro shop told the range can reopen once it's dry",
+      ""
+    ]
+  ],
+  "flags": [
+    {
+      "c": "",
+      "t": "High K is strongly alkaline in a tank with iron, manganese and copper",
+      "d": "Grass Roots High K is pH 12.4–12.8. Knife Plus carries iron and manganese as sulphates plus copper, and MP Manganite and Astron add more metals. At high pH the sulphate metals can drop out as rusty flecks and block filters and nozzles. The jar test is the check: if it flecks or curdles, leave the High K out and call Andy.",
+      "s": "Grass Roots High K SDS · Knife Plus tech sheet · sheet notes"
+    },
+    {
+      "c": "",
+      "t": "Spray window closes about 12:30",
+      "d": "At 10:25: 21 °C, NNW 15 km/h gusting 22. Delta T 6.3 at 11, 7.1 at 12, 8.1 at 1 pm, 8.8 at 2 pm; gusts 24–30 through the afternoon. Next window after about 6:30 pm (Delta T 5.6 by 7 pm), though the wind swings SE 15 gusting 35 by 7 pm.",
+      "s": "AccuWeather Botanic Ridge hourly, 25 Nov 10:25 am"
+    },
+    {
+      "c": "info",
+      "t": "Shadow Ultra at 0.38 L/ha",
+      "d": "Label fairway rows: hybrid couch 0.15–0.6 L/ha, common couch 0.8–1.6 L/ha, kikuyu 1.6–4 L/ha. 0.38 L/ha sits in the hybrid couch row and is a light dose for common couch or kikuyu. 300 L/ha is under its 350–500 L/ha golf course water volume.",
+      "s": "Shadow Ultra label APVMA 88267"
+    },
+    {
+      "c": "info",
+      "t": "MP Vitalise 25 L/ha: above its foliar rate",
+      "d": "Tech sheet: 20 L/ha foliar, 40 L/ha as a drench watered in. 25 L/ha left on the leaf is a little over the foliar rate.",
+      "s": "MP Vitalise tech sheet"
+    },
+    {
+      "c": "info",
+      "t": "Trinexapac in an alkaline tank",
+      "d": "Trinexapac-ethyl breaks down faster at high pH, and the High K will make this tank alkaline. Mix it and spray it out straight away; don't let it sit.",
+      "s": "Sheet · Grass Roots High K SDS"
+    },
+    {
+      "c": "info",
+      "t": "Nutrient load",
+      "d": "About 5 kg N/ha in total (High K, ProteSyn, Knife Plus, Vitalise), about 0.4 kg Fe/ha from Knife Plus, plus Mn, Zn, Cu and phosphite. ProteSyn 10 L/ha and Knife Plus 5 L/ha are inside their label ranges, and 300 L/ha is inside their 200–350 L/ha.",
+      "s": "ProteSyn label · Knife Plus tech sheet · Grass Roots High K SDS"
+    },
+    {
+      "c": "info",
+      "t": "Order follows the sheet notes",
+      "d": "The GreenKeeper order column has Phoz Fight 2nd, Vitalise 4th and Knife Plus last; the sheet notes give Shadow, Manganite, Knife Plus, High K, Phoz Fight, ProteSyn, Astron, Vitalise last. This page follows the notes.",
+      "s": "Sheet"
+    },
+    {
+      "c": "info",
+      "t": "Boom setup: about 285 L/ha",
+      "d": "Grey Wilger SR110-06 is rated 0.6 US gpm at 2.8 bar, so about 2.8 L/min at 4.1 bar. On 75 cm spacing at 7.8 km/h that's about 285 L/ha, 5% under 300. Expect a little left at the end.",
+      "s": "Wilger rated flows · GreenKeeper JD 300 L/ha Grey config"
+    }
+  ]
+}
