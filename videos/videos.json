@@ -1,13 +1,13 @@
 [
  {
-  "file": "videos/gp-recap.mp4?v=202611251441",
-  "poster": "videos/gp-recap.jpg?v=202611251441",
+  "file": "videos/gp-recap.mp4?v=202611260625",
+  "poster": "videos/gp-recap.jpg?v=202611260625",
   "title": "Growth potential",
-  "date": "2026-11-24",
+  "date": "2026-11-25",
   "caption": "PACE Turf growth potential for the greens (bent and Poa) and couch: the latest day, the last 30 days and the next 7. Rebuilt automatically every time this dashboard updates. Forecast: Open-Meteo.",
   "kind": "gp-recap",
-  "built": "2026-11-25T14:41+1100",
+  "built": "2026-11-26T06:25+1100",
   "seconds": 47.7,
-  "inputs": "3b48bce6fee166c8"
+  "inputs": "87aa973424f20c7f"
  }
 ]

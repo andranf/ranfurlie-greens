@@ -1,14 +1,14 @@
 {
- "build_label": "week of 25 November 2026",
- "built": "2026-11-25T14:41+1100",
- "asof": "2026-11-24",
- "asof_label": "Tue 24 Nov",
- "asof_long": "Tuesday 24 November 2026",
+ "build_label": "week of 26 November 2026",
+ "built": "2026-11-26T06:25+1100",
+ "asof": "2026-11-25",
+ "asof_label": "Wed 25 Nov",
+ "asof_long": "Wednesday 25 November 2026",
  "latest": {
-  "t": 14.6,
-  "cool": 0.618,
-  "warm": 0.0643,
-  "label": "Tue 24 Nov"
+  "t": 18.0,
+  "cool": 0.936,
+  "warm": 0.1783,
+  "label": "Wed 25 Nov"
  },
  "model": {
   "cool_opt": 20.0,
@@ -18,13 +18,6 @@
   "crossover": 24.84
  },
  "hist": [
-  {
-   "d": "2026-10-26",
-   "lab": "26 Oct",
-   "t": 12.1,
-   "c": 0.356,
-   "w": 0.0261
-  },
   {
    "d": "2026-10-27",
    "lab": "27 Oct",
@@ -227,114 +220,121 @@
    "t": 14.6,
    "c": 0.618,
    "w": 0.0643
+  },
+  {
+   "d": "2026-11-25",
+   "lab": "25 Nov",
+   "t": 18.0,
+   "c": 0.936,
+   "w": 0.1783
   }
  ],
  "stats": {
-  "cool14": 0.763,
-  "cool14_prev": 0.644,
-  "warm14": 0.14109603959379077,
-  "warm14_prev": 0.08515354789027142,
-  "clip14": 2.86,
-  "gvx21": 14.5
+  "cool14": 0.768,
+  "cool14_prev": 0.673,
+  "warm14": 0.14416237504725044,
+  "warm14_prev": 0.09210422361739161,
+  "clip14": 1.37,
+  "gvx21": 12.4
  },
  "headline_hist": "Greens GP has <em>climbed</em> with the warmth",
  "forecast": {
   "source": "Open-Meteo",
   "days": [
    {
-    "d": "2026-11-25",
-    "dow": "Wed",
-    "lab": "25 Nov",
-    "tmax": 26.0,
-    "tmin": 7.2,
-    "t": 16.6,
-    "c": 0.8261,
-    "w": 0.1205,
-    "hot": false
-   },
-   {
     "d": "2026-11-26",
     "dow": "Thu",
     "lab": "26 Nov",
-    "tmax": 26.3,
-    "tmin": 12.7,
-    "t": 19.5,
-    "c": 0.9959,
-    "w": 0.2594,
+    "tmax": 27.2,
+    "tmin": 12.9,
+    "t": 20.1,
+    "c": 1.0,
+    "w": 0.2942,
     "hot": false
    },
    {
     "d": "2026-11-27",
     "dow": "Fri",
     "lab": "27 Nov",
-    "tmax": 22.2,
-    "tmin": 16.9,
-    "t": 19.5,
-    "c": 0.9967,
-    "w": 0.2624,
+    "tmax": 22.9,
+    "tmin": 16.5,
+    "t": 19.7,
+    "c": 0.9985,
+    "w": 0.2717,
     "hot": false
    },
    {
     "d": "2026-11-28",
     "dow": "Sat",
     "lab": "28 Nov",
-    "tmax": 23.0,
-    "tmin": 15.4,
-    "t": 19.2,
-    "c": 0.9895,
-    "w": 0.2415,
+    "tmax": 22.4,
+    "tmin": 14.8,
+    "t": 18.6,
+    "c": 0.9681,
+    "w": 0.2083,
     "hot": false
    },
    {
     "d": "2026-11-29",
     "dow": "Sun",
     "lab": "29 Nov",
-    "tmax": 17.0,
-    "tmin": 12.9,
-    "t": 14.9,
-    "c": 0.656,
-    "w": 0.0722,
+    "tmax": 17.2,
+    "tmin": 12.5,
+    "t": 14.8,
+    "c": 0.6451,
+    "w": 0.0698,
     "hot": false
    },
    {
     "d": "2026-11-30",
     "dow": "Mon",
     "lab": "30 Nov",
-    "tmax": 17.7,
-    "tmin": 9.4,
-    "t": 13.6,
-    "c": 0.5028,
-    "w": 0.0447,
+    "tmax": 16.2,
+    "tmin": 10.1,
+    "t": 13.1,
+    "c": 0.4604,
+    "w": 0.0387,
     "hot": false
    },
    {
     "d": "2026-12-01",
     "dow": "Tue",
     "lab": "1 Dec",
-    "tmax": 21.1,
-    "tmin": 9.2,
-    "t": 15.2,
-    "c": 0.6779,
-    "w": 0.077,
+    "tmax": 22.0,
+    "tmin": 10.1,
+    "t": 16.1,
+    "c": 0.7727,
+    "w": 0.1022,
+    "hot": false
+   },
+   {
+    "d": "2026-12-02",
+    "dow": "Wed",
+    "lab": "2 Dec",
+    "tmax": 29.5,
+    "tmin": 13.7,
+    "t": 21.6,
+    "c": 0.9586,
+    "w": 0.4059,
     "hot": false
    }
   ]
  },
  "fc_band": [
-  13.6,
-  19.5
+  13.1,
+  21.6
  ],
- "headline_fc": "Strong growth to Sat, then a <em>cold change</em>",
+ "headline_fc": "Close to <em>ideal</em> growing weather for the greens",
  "takeaways": [
   {
    "tone": "cool",
-   "head": "Greens: strong to Sat, easing from Sun",
-   "detail": "Bent and Poa GP averages 95% Wed to Sat, then 61% once the cold change arrives Sun."
+   "head": "Greens: near peak growth",
+   "detail": "Bent and Poa GP averages 83% this week. Expect strong clip yields and quick recovery."
   },
   {
    "tone": "warm",
    "head": "Couch: still slow",
-   "detail": "Warm-season GP averages 15%, best on Fri at 26%. Couch recovers best once GP holds above 50%."
+   "detail": "Warm-season GP averages 20%, best on Wed at 41%. Couch recovers best once GP holds above 50%."
   },
   {
    "tone": "neutral",
