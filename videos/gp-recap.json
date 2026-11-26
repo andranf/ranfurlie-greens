@@ -1,6 +1,6 @@
 {
  "build_label": "week of 27 November 2026",
- "built": "2026-11-27T06:20+1100",
+ "built": "2026-11-27T07:08+1100",
  "asof": "2026-11-26",
  "asof_label": "Thu 26 Nov",
  "asof_long": "Thursday 26 November 2026",
@@ -234,8 +234,8 @@
   "cool14_prev": 0.687,
   "warm14": 0.16869820776450736,
   "warm14_prev": 0.09553933951140657,
-  "clip14": 1.37,
-  "gvx21": 12.0
+  "clip14": 3.96,
+  "gvx21": 15.7
  },
  "headline_hist": "Greens GP has <em>climbed</em> with the warmth",
  "forecast": {
