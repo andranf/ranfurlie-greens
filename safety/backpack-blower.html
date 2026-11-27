@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Backpack Blower - SWP | Ranfurlie Golf Club</title>
+<meta name="description" content="Safe Work Procedure: Using a Backpack Blower">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6);--glass-hi:rgba(255,255,255,.8);--glass-lo:rgba(255,255,255,.36);--glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92);--rim2:rgba(255,255,255,.38);--edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);
+  --acc:#4b5d73;--acc-deep:#2f3d4f;--acc-soft:rgba(75,93,115,.15);--acc-line:rgba(75,93,115,.4);--acc-ink:#fff;
+  --ok:#13a356;--ok-bg:rgba(19,163,86,.14);
+  --hi:#e0313b;--hi-bg:rgba(224,49,59,.12);
+  --med:#b86a00;--med-bg:rgba(255,176,32,.2);
+  --warn-bg:rgba(224,49,59,.08);--warn-border:rgba(224,49,59,.25);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px;--r2:16px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+a{color:var(--acc-deep)}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,rgba(75,93,115,.45) 0,transparent 62%)}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,rgba(75,93,115,.2) 0,transparent 62%)}
+
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+  border-radius:var(--r);padding:20px;min-width:0;
+}
+@media(min-width:640px){.card{padding:28px}}
+
+.top{padding:16px 0 8px}
+.topline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:clamp(28px,6vw,42px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:14px;height:14px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px var(--acc-soft)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+.breadcrumb a{color:var(--acc);text-decoration:none;font-weight:600}
+.breadcrumb a:hover{text-decoration:underline}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.meta .tag{background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:4px 14px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+
+.warning-box{background:var(--warn-bg);border:1.5px solid var(--warn-border);border-radius:var(--r2);padding:16px 18px;margin-bottom:20px;font-weight:600;font-size:15px;line-height:1.45}
+.warning-box .icon{font-size:20px;margin-right:6px}
+
+.section{margin-bottom:24px}
+.section h2{font-size:22px;color:var(--acc-deep);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--acc-soft)}
+.section h3{font-size:17px;margin:14px 0 6px;color:var(--fg);font-family:var(--display);font-weight:700}
+.section ul{margin:6px 0 12px;padding-left:22px}
+.section ul li{margin-bottom:6px;line-height:1.45}
+.section ol{margin:6px 0 12px;padding-left:22px}
+.section ol li{margin-bottom:6px;line-height:1.45}
+.section p{margin:6px 0 10px}
+
+.ppe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0}
+.ppe-item{background:var(--acc-soft);border-radius:var(--r2);padding:12px;text-align:center;font-weight:600;font-size:14px}
+.ppe-item .ppe-icon{font-size:28px;display:block;margin-bottom:4px}
+
+.disclaimer{background:var(--glass-lo);border-radius:var(--r2);padding:16px 18px;margin-top:24px;font-size:13px;color:var(--muted);line-height:1.5}
+
+.auth{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
+@media(max-width:480px){.auth-grid{grid-template-columns:1fr}}
+.auth-label{color:var(--muted);font-weight:600}
+
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;text-decoration:none;color:var(--acc);margin-top:20px;padding:8px 16px;border-radius:999px;background:var(--acc-soft);transition:background .2s}
+.back:hover{background:var(--acc-line)}
+
+.theme-toggle{position:fixed;top:12px;right:12px;z-index:100;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
+
+@media print{
+  .sky,.theme-toggle{display:none}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ccc;backdrop-filter:none;background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i></div>
+<button class="theme-toggle" onclick="let r=document.documentElement,t=r.dataset.theme;r.dataset.theme=t==='dark'?'light':'dark'" aria-label="Toggle theme">&#9681;</button>
+
+<div class="gut">
+<div class="wrap">
+  <div class="top">
+    <div class="breadcrumb">
+      <a href="../">Ranfurlie</a> <span>/</span>
+      <a href="./">Safety &amp; SWPs</a> <span>/</span>
+      <span>Backpack Blower</span>
+    </div>
+    <div class="topline">
+      <h1><span class="dot"></span> Backpack Blower</h1>
+    </div>
+    <div class="meta">
+      <span class="tag">SWP</span>
+      <span class="tag">Issue: Nov 2026</span>
+      <span class="tag">Review: Nov 2027</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px">
+      <div><strong>Description:</strong> Using a Backpack Blower</div>
+      <div><strong>Make / Model:</strong> Stihl / Kress / Milwaukee Backpack Blowers</div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="icon">&#9888;</span> DO NOT operate this equipment unless you have been fully trained in its safe use and operation, have read the user manual, and have conducted a risk assessment using the Task Tracker QR system.
+  </div>
+
+  <div class="section card">
+    <h2>1. Potential Hazards</h2>
+    <ul>
+      <li>Noise Exposure: Combustion blowers emit high-decibel noise that can cause hearing damage and disturb residents, particularly during restricted hours.</li>
+    </ul>
+    <ul>
+      <li>Exhaust Fumes: Combustion engines release carbon monoxide and other toxic gases, posing respiratory risks in enclosed spaces or poor ventilation.</li>
+    </ul>
+    <ul>
+      <li>Fire Risk: Combustion engines and lithium-ion batteries present a fire hazard due to flammable fuels, battery overheating, or electrical faults.</li>
+    </ul>
+    <ul>
+      <li>Chemical Exposure: Fuel, oil, and leaking battery chemicals can cause skin irritation, burns, or environmental contamination.</li>
+    </ul>
+    <ul>
+      <li>Electrical Hazards: Faulty chargers or damaged lithium batteries can cause electric shock or fires.</li>
+    </ul>
+    <ul>
+      <li>Flying Debris: High-velocity airflow can propel debris, potentially injuring operators or bystanders.</li>
+    </ul>
+    <ul>
+      <li>Thermal Burns: Hot engine components, exhausts, or overheated batteries can cause burns upon contact.</li>
+    </ul>
+    <ul>
+      <li>Explosion Risk: Overcharged, punctured, or overheated lithium-ion batteries can release gases that ignite, causing explosions.</li>
+    </ul>
+    <ul>
+      <li>Ergonomic Strain: Improper strap adjustments or prolonged use can lead to back, neck, or shoulder strain.</li>
+    </ul>
+    <ul>
+      <li>Slip, Trip, and Fall: Uneven terrain or wet surfaces can increase the risk of accidents while using the equipment.</li>
+    </ul>
+    <ul>
+      <li>Environmental Harm: Improper disposal of fuels, oils, or batteries can damage ecosystems and violate legal regulations.</li>
+    </ul>
+    <ul>
+      <li>Mechanical Failures: Faulty equipment, such as blocked air intakes or jammed fans, can result in sudden loss of control or operation.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Required Personal Protective Equipment (PPE)</h2>
+    <ul>
+      <li>Mandatory:</li>
+    </ul>
+    <ul>
+      <li>Hearing Protection: Earplugs or earmuffs (for all blower types, especially combustion models).</li>
+    </ul>
+    <ul>
+      <li>Eye Protection: Safety glasses with side shields to protect against flying debris.</li>
+    </ul>
+    <ul>
+      <li>Gloves: Heat-resistant gloves for combustion blowers and chemical-resistant gloves for handling batteries.</li>
+    </ul>
+    <ul>
+      <li>Footwear: Steel-capped boots with slip-resistant soles.</li>
+    </ul>
+    <ul>
+      <li>Clothing: High-visibility clothing, long pants, and long sleeves to protect against scratches and sun exposure.</li>
+    </ul>
+    <ul>
+      <li>Recommended:</li>
+    </ul>
+    <ul>
+      <li>Dust mask or respirator in dry, dusty conditions.</li>
+    </ul>
+    <ul>
+      <li>Fire-resistant gloves for handling lithium batteries in the event of overheating.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Pre-Operational Checks</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Inspection of the Blower:</h2>
+    <ul>
+      <li>Combustion Models:</li>
+    </ul>
+    <ul>
+      <li>Check for fuel or oil leaks.</li>
+    </ul>
+    <ul>
+      <li>Inspect the fuel tank and lines for damage.</li>
+    </ul>
+    <ul>
+      <li>Verify the air filter and spark plug are clean and functional.</li>
+    </ul>
+    <ul>
+      <li>Lithium-Ion Models:</li>
+    </ul>
+    <ul>
+      <li>Inspect the battery for swelling, cracks, or physical damage.</li>
+    </ul>
+    <ul>
+      <li>Check the charging port and connections for debris or corrosion.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Noise Restrictions:</h2>
+    <ul>
+      <li>Combustion Models:</li>
+    </ul>
+    <ul>
+      <li>Do not operate near boundaries before 7:00am on weekdays or 9:00am on weekends and public holidays, as per EPA noise restrictions.</li>
+    </ul>
+    <ul>
+      <li>Plan operations accordingly to minimise disturbance.</li>
+    </ul>
+    <ul>
+      <li>Lithium-Ion Models:</li>
+    </ul>
+    <ul>
+      <li>Preferred for early operations due to lower noise levels.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Area Preparation:</h2>
+    <ul>
+      <li>Walk the work area and remove any objects that may become projectiles.</li>
+    </ul>
+    <ul>
+      <li>Identify potential hazards such as flammable materials, uneven terrain, or obstructions.</li>
+    </ul>
+    <ul>
+      <li>Ensure the area is clear of bystanders, animals, and vehicles.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Fuelling and Charging:</h2>
+    <ul>
+      <li>Combustion Models:</li>
+    </ul>
+    <ul>
+      <li>Refuel outdoors with the engine off and cool.</li>
+    </ul>
+    <ul>
+      <li>Avoid overfilling the tank and clean up any spills immediately.</li>
+    </ul>
+    <ul>
+      <li>Lithium-Ion Models:</li>
+    </ul>
+    <ul>
+      <li>Charge batteries in a well-ventilated, fire-resistant location.</li>
+    </ul>
+    <ul>
+      <li>Use only manufacturer-approved chargers.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Documentation and Competency:</h2>
+    <ul>
+      <li>Verify the operator has completed training for the equipment.</li>
+    </ul>
+    <ul>
+      <li>Record all pre-start checks in the equipment logbook.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Operation</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Starting the Blower:</h2>
+    <ul>
+      <li>For combustion models: Start the engine on a flat surface, ensuring the throttle is at idle and the blower is stable.</li>
+    </ul>
+    <ul>
+      <li>For lithium-ion models: Securely connect the battery and power on the blower according to the manufacturer’s instructions.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. During Use:</h2>
+    <ul>
+      <li>Use the blower at the lowest effective throttle to reduce noise and fuel consumption.</li>
+    </ul>
+    <ul>
+      <li>Maintain a safe distance from bystanders and direct airflow away from them.</li>
+    </ul>
+    <ul>
+      <li>Avoid directing airflow at fragile objects, loose gravel, or sensitive areas.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Ergonomic Safety:</h2>
+    <ul>
+      <li>Adjust shoulder straps to evenly distribute the weight of the blower.</li>
+    </ul>
+    <ul>
+      <li>Maintain an upright posture to reduce back and shoulder strain.</li>
+    </ul>
+    <ul>
+      <li>Take breaks every 30 minutes to prevent fatigue.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Noise Management:</h2>
+    <ul>
+      <li>Use combustion blowers only during permitted hours and in compliance with noise restrictions.</li>
+    </ul>
+    <ul>
+      <li>Choose lithium-ion blowers where feasible to minimise noise impacts.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Emergency Shutdown:</h2>
+    <ul>
+      <li>Turn off the blower immediately if abnormal sounds, excessive vibration, or overheating occurs.</li>
+    </ul>
+    <ul>
+      <li>Move the blower to a safe location and inspect it for issues before restarting.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Post-Operational Procedures</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Shutdown:</h2>
+    <ul>
+      <li>For combustion models: Allow the engine to cool before refuelling or storing.</li>
+    </ul>
+    <ul>
+      <li>For lithium-ion models: Disconnect the battery after use.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Cleaning and Inspection:</h2>
+    <ul>
+      <li>Clean debris from the air intake, nozzle, and housing.</li>
+    </ul>
+    <ul>
+      <li>Inspect straps, fasteners, and other components for wear or damage.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Storage:</h2>
+    <ul>
+      <li>Combustion Models: Store in a cool, ventilated area away from ignition sources.</li>
+    </ul>
+    <ul>
+      <li>Lithium-Ion Models: Store batteries in a cool, dry place, ideally at 40–80% charge.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Reporting Issues:</h2>
+    <ul>
+      <li>Report any faults, damage, or unusual performance to the supervisor immediately.</li>
+    </ul>
+    <ul>
+      <li>Record post-operation inspections in the logbook.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>6. Maintenance and Disposal</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Routine Maintenance:</h2>
+    <ul>
+      <li>Combustion Models: Clean air filters, replace spark plugs as needed, and check exhaust systems for blockages.</li>
+    </ul>
+    <ul>
+      <li>Lithium-Ion Models: Test batteries regularly for capacity and ensure chargers are clean and functional.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Disposal:</h2>
+    <ul>
+      <li>Dispose of lithium-ion batteries at authorised recycling centres.</li>
+    </ul>
+    <ul>
+      <li>Safely dispose of old fuel and oil in compliance with local environmental regulations.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>7. Emergency Procedures</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Fire Response:</h2>
+    <ul>
+      <li>For combustion blowers: Use a Class B fire extinguisher.</li>
+    </ul>
+    <ul>
+      <li>For lithium-ion blowers: Use a Class D extinguisher or smother with sand.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Chemical Exposure:</h2>
+    <ul>
+      <li>Rinse skin or eyes with water if exposed to fuel or battery chemicals.</li>
+    </ul>
+    <ul>
+      <li>Seek medical attention for persistent irritation or injury.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Flying Debris or Injuries:</h2>
+    <ul>
+      <li>Administer first aid for cuts or abrasions caused by debris.</li>
+    </ul>
+    <ul>
+      <li>Call emergency services for serious injuries.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Overheating or Explosion:</h2>
+    <ul>
+      <li>Shut off the blower immediately and move it to a safe area.</li>
+    </ul>
+    <ul>
+      <li>Do not attempt to puncture or cool batteries with water.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>8. Relevant Legislation and Standards</h2>
+    <ul>
+      <li>Occupational Health and Safety Act 2004 (Vic): Obligations to ensure a safe workplace.</li>
+    </ul>
+    <ul>
+      <li>Environmental Protection Act 2017 (Vic): Compliance with EPA noise and environmental regulations.</li>
+    </ul>
+    <ul>
+      <li>AS/NZS 60745.2.13: Standards for handheld motor-operated tools.</li>
+    </ul>
+    <p>Competent Persons</p>
+    <p>(The following persons are authorised to operate, supervise and test workers on the equipment/process.)</p>
+    <h3>Name</h3>
+    <h3>Date</h3>
+    <h3>Phone Number</h3>
+    <h3>Signature</h3>
+  </div>
+
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This SWP may not cover all possible hazards associated with this equipment on your specific site and should be used in conjunction with other references including the Operational or User Manual. It is designed as a guide, a safety reminder, and a training support document. Users must undertake an activity risk assessment prior to using any equipment and receive training in its safe use before operation.
+  </div>
+
+  <div class="auth">
+    <div class="auth-grid">
+      <div><span class="auth-label">Authorised By:</span> Andrew Anderson, Golf Course Superintendent</div>
+      <div><span class="auth-label">Issue Date:</span> November 2026</div>
+      <div><span class="auth-label">Organisation:</span> Ranfurlie Golf Club</div>
+      <div><span class="auth-label">Next Review:</span> November 2027</div>
+    </div>
+  </div>
+
+  <a href="./" class="back">&larr; Back to SWP Hub</a>
+  <div style="height:40px"></div>
+</div>
+</div>
+</body>
+</html>

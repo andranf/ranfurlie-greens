@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Safety &amp; SWPs | Ranfurlie Golf Club</title>
+<meta name="description" content="Safe Work Procedures hub for Ranfurlie Golf Club. Equipment SWPs, safety policies, and operational procedures for course maintenance.">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6);--glass-hi:rgba(255,255,255,.8);--glass-lo:rgba(255,255,255,.36);--glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92);--rim2:rgba(255,255,255,.38);--edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);
+  --acc:#4b5d73;--acc-deep:#2f3d4f;--acc-soft:rgba(75,93,115,.15);--acc-line:rgba(75,93,115,.4);--acc-ink:#fff;
+  --ok:#13a356;--ok-bg:rgba(19,163,86,.14);
+  --hi:#e0313b;--hi-bg:rgba(224,49,59,.12);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px;--r2:16px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+a{color:var(--acc-deep);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,rgba(75,93,115,.45) 0,transparent 62%);animation:drift1 40s ease-in-out infinite alternate}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,rgba(75,93,115,.2) 0,transparent 62%);animation:drift2 46s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(8vmax,6vmax) scale(1.08)}}
+@keyframes drift2{to{transform:translate(-7vmax,-5vmax) scale(1.1)}}
+@media(prefers-reduced-motion:reduce){.sky i{animation:none}}
+
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+  border-radius:var(--r);padding:20px;min-width:0;
+}
+@media(min-width:640px){.card{padding:24px}}
+
+.top{padding:16px 0 8px}
+.topline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:clamp(32px,7vw,48px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:16px;height:16px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 6px var(--acc-soft)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:4px}
+.breadcrumb a{color:var(--acc);font-weight:600}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.meta .tag{background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:4px 14px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+
+.search-wrap{margin-bottom:20px}
+.search-wrap input{width:100%;padding:12px 16px 12px 42px;border:1.5px solid var(--line);border-radius:var(--r2);background:var(--glass);color:var(--fg);font-size:16px;font-family:var(--body);outline:none;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--acc)}
+.search-wrap{position:relative}
+.search-wrap::before{content:"\1F50D";position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;opacity:.5}
+
+.cat{margin-bottom:28px}
+.cat h2{font-size:22px;color:var(--acc-deep);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--acc-soft);display:flex;align-items:center;gap:10px}
+.cat h2 .badge{font-size:13px;background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:2px 10px;font-weight:700}
+
+.swp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.swp-link{display:block;padding:12px 16px;border-radius:var(--r2);background:var(--glass-lo);border:1px solid transparent;transition:background .15s,border-color .15s;text-decoration:none;color:var(--fg)}
+.swp-link:hover{background:var(--acc-soft);border-color:var(--acc-line);text-decoration:none}
+.swp-link .name{font-weight:600;font-size:15px;display:block}
+.swp-link .sub{font-size:13px;color:var(--muted);display:block;margin-top:2px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+.stat{text-align:center;padding:14px;border-radius:var(--r2);background:var(--glass-lo)}
+.stat .num{font-family:var(--display);font-weight:700;font-size:32px;color:var(--acc-deep);display:block}
+.stat .label{font-size:13px;color:var(--muted);font-weight:600}
+
+.warning-box{background:rgba(224,49,59,.08);border:1.5px solid rgba(224,49,59,.25);border-radius:var(--r2);padding:16px 18px;margin-bottom:24px;font-weight:600;font-size:15px;line-height:1.45}
+
+.auth{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+
+.theme-toggle{position:fixed;top:12px;right:12px;z-index:100;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
+
+@media print{
+  .sky,.theme-toggle,.search-wrap{display:none}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ccc;backdrop-filter:none;background:#fff}
+  .swp-link{border:1px solid #ddd}
+}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i></div>
+<button class="theme-toggle" onclick="let r=document.documentElement,t=r.dataset.theme;r.dataset.theme=t==='dark'?'light':'dark'" aria-label="Toggle theme">&#9681;</button>
+
+<div class="gut">
+<div class="wrap">
+  <div class="top">
+    <div class="breadcrumb">
+      <a href="../">Ranfurlie</a> <span>/</span>
+      <span>Safety &amp; SWPs</span>
+    </div>
+    <div class="topline">
+      <h1><span class="dot"></span> Safety &amp; SWPs</h1>
+    </div>
+    <div class="meta">
+      <span class="tag">Issue: November 2026</span>
+      <span class="tag">Review: November 2027</span>
+      <span class="tag">Authorised: Andrew Anderson</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="num">72</span><span class="label">Total SWPs</span></div>
+    <div class="stat"><span class="num">10</span><span class="label">Categories</span></div>
+    <div class="stat"><span class="num">Nov 2026</span><span class="label">Current Issue</span></div>
+  </div>
+
+  <div class="warning-box">
+    <span style="font-size:20px;margin-right:6px">&#9888;</span> DO NOT operate any equipment unless you have been fully trained in its safe use and operation, have read the user manual, and have conducted a risk assessment using the Task Tracker QR system.
+  </div>
+
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Search SWPs..." autocomplete="off">
+  </div>
+
+  <!-- GREENS MOWERS -->
+  <div class="cat" data-cat>
+    <h2>Greens Mowers <span class="badge">5</span></h2>
+    <div class="swp-grid">
+      <a href="john-deere-2550-greens-mower.html" class="swp-link" data-swp><span class="name">JD 2550 Greens Mower</span><span class="sub">Walk-behind precision greens mower</span></a>
+      <a href="toro-eflex-2120.html" class="swp-link" data-swp><span class="name">Toro Greensmaster eFlex 2120</span><span class="sub">Walk-behind electric greens mower</span></a>
+      <a href="toro-etriflex-3370.html" class="swp-link" data-swp><span class="name">Toro Greensmaster eTriFlex 3370</span><span class="sub">Ride-on electric greens mower</span></a>
+      <a href="tru-turf-re50-roller.html" class="swp-link" data-swp><span class="name">Tru Turf RE50 Electric Roller</span><span class="sub">Electric greens roller</span></a>
+      <a href="tru-turf-rb70-roller.html" class="swp-link" data-swp><span class="name">Tru Turf RB70 Petrol Roller</span><span class="sub">Petrol greens roller</span></a>
+    </div>
+  </div>
+
+  <!-- TEES & FAIRWAY MOWERS -->
+  <div class="cat" data-cat>
+    <h2>Tees, Fairway &amp; Rough Mowers <span class="badge">8</span></h2>
+    <div class="swp-grid">
+      <a href="toro-greenmaster-3150.html" class="swp-link" data-swp><span class="name">Toro Greenmaster 3150</span><span class="sub">Ride-on tees mower</span></a>
+      <a href="john-deere-z977r-ztrac.html" class="swp-link" data-swp><span class="name">JD Z977R Z-Trac Zero Turn</span><span class="sub">Ride-on zero-turn mower</span></a>
+      <a href="toro-4000d-rough-mower.html" class="swp-link" data-swp><span class="name">Toro 4000D Rough Mower</span><span class="sub">Ride-on rough/semi-rough mower</span></a>
+      <a href="walk-behind-mower.html" class="swp-link" data-swp><span class="name">Walk-Behind Mower (Masport/Victa)</span><span class="sub">Walk-behind rotary mower</span></a>
+      <a href="husqvarna-battery-mower.html" class="swp-link" data-swp><span class="name">Husqvarna LC347IVX Battery Mower</span><span class="sub">Battery-powered walk-behind</span></a>
+      <a href="toro-hover-pro-450.html" class="swp-link" data-swp><span class="name">Toro Hover Pro 450</span><span class="sub">Hover mower for slopes and banks</span></a>
+      <a href="silvan-slasher.html" class="swp-link" data-swp><span class="name">Silvan Slasher</span><span class="sub">PTO slasher for rough areas</span></a>
+      <a href="karcher-push-sweeper.html" class="swp-link" data-swp><span class="name">Karcher Push Sweeper</span><span class="sub">Pedestrian push sweeper</span></a>
+    </div>
+  </div>
+
+  <!-- AUTONOMOUS MOWERS -->
+  <div class="cat" data-cat>
+    <h2>Autonomous &amp; Robotic Mowers <span class="badge">3</span></h2>
+    <div class="swp-grid">
+      <a href="turf-troniq-autonomous.html" class="swp-link" data-swp><span class="name">Turf Troniq Autonomous Mower</span><span class="sub">JD 7700A with Turf Troniq RMS kit</span></a>
+      <a href="rms-unit.html" class="swp-link" data-swp><span class="name">RMS Autonomous Mower Unit</span><span class="sub">RMS autonomous mowing procedures</span></a>
+      <a href="kress-robotic-mower.html" class="swp-link" data-swp><span class="name">Kress KR233 Robotic Mower</span><span class="sub">RTK robotic mower</span></a>
+    </div>
+  </div>
+
+  <!-- UTILITY VEHICLES -->
+  <div class="cat" data-cat>
+    <h2>Utility Vehicles &amp; Transport <span class="badge">6</span></h2>
+    <div class="swp-grid">
+      <a href="john-deere-gator.html" class="swp-link" data-swp><span class="name">JD HPX815E Gator</span><span class="sub">Golf cart / utility vehicle</span></a>
+      <a href="yamaha-umx.html" class="swp-link" data-swp><span class="name">Yamaha UMX Heavy Duty</span><span class="sub">Petrol utility vehicle</span></a>
+      <a href="toro-gtx-workman.html" class="swp-link" data-swp><span class="name">Toro GTX Lithium Workman</span><span class="sub">Electric utility vehicle</span></a>
+      <a href="mitsubishi-ute.html" class="swp-link" data-swp><span class="name">Mitsubishi Ute</span><span class="sub">Light commercial vehicle</span></a>
+      <a href="trailers.html" class="swp-link" data-swp><span class="name">Trailers (Dean/Roshar)</span><span class="sub">Trailer towing and operation</span></a>
+      <a href="fjdynamics-ball-picker.html" class="swp-link" data-swp><span class="name">FJDynamics Ball Picker</span><span class="sub">Autonomous range ball picker</span></a>
+    </div>
+  </div>
+
+  <!-- TRACTORS & HEAVY EQUIPMENT -->
+  <div class="cat" data-cat>
+    <h2>Tractors &amp; Heavy Equipment <span class="badge">7</span></h2>
+    <div class="swp-grid">
+      <a href="tractor-jd-kubota.html" class="swp-link" data-swp><span class="name">JD 3520 / Kubota L5740 Tractor</span><span class="sub">Agricultural tractor operation</span></a>
+      <a href="kobelco-excavator.html" class="swp-link" data-swp><span class="name">Kobelco 3.6t Excavator</span><span class="sub">Mini excavator operation</span></a>
+      <a href="track-loader.html" class="swp-link" data-swp><span class="name">New Holland C227 Track Loader</span><span class="sub">Compact track loader</span></a>
+      <a href="massey-ferguson-front-loader.html" class="swp-link" data-swp><span class="name">Massey Ferguson FL2850 Front Loader</span><span class="sub">Front loader tractor</span></a>
+      <a href="titan-bucket-loader.html" class="swp-link" data-swp><span class="name">Titan Bucket Loader</span><span class="sub">Bucket loader operations</span></a>
+      <a href="front-dumper.html" class="swp-link" data-swp><span class="name">9-Tonne Front Dumper</span><span class="sub">Heavy dumper operation</span></a>
+      <a href="front-dumper-moxy.html" class="swp-link" data-swp><span class="name">9-Tonne Front Dumper (Moxy)</span><span class="sub">Moxy dumper procedures</span></a>
+    </div>
+  </div>
+
+  <!-- SPRAYING & APPLICATION -->
+  <div class="cat" data-cat>
+    <h2>Spraying &amp; Application Equipment <span class="badge">6</span></h2>
+    <div class="swp-grid">
+      <a href="john-deere-hd200-sprayer.html" class="swp-link" data-swp><span class="name">JD HD 200 Boom Sprayer</span><span class="sub">Boom spraying - pesticides</span></a>
+      <a href="toro-5800-sprayer.html" class="swp-link" data-swp><span class="name">Toro 5800 Boom Sprayer</span><span class="sub">Boom spraying - pesticides</span></a>
+      <a href="handheld-sprayers.html" class="swp-link" data-swp><span class="name">Handheld Sprayers (BA/Milwaukee)</span><span class="sub">Backpack and handheld sprayers</span></a>
+      <a href="fertiliser-spreaders.html" class="swp-link" data-swp><span class="name">Fertiliser Spreaders (KSAB/Gamberini)</span><span class="sub">Granular fertiliser application</span></a>
+      <a href="turfco-top-dresser.html" class="swp-link" data-swp><span class="name">Turfco 1550 Top Dresser</span><span class="sub">Sand and topdressing application</span></a>
+      <a href="chemical-mixing-area.html" class="swp-link" data-swp><span class="name">Chemical Mixing Area</span><span class="sub">Chemical storage and mixing</span></a>
+    </div>
+  </div>
+
+  <!-- AERATION & CULTIVATION -->
+  <div class="cat" data-cat>
+    <h2>Aeration &amp; Cultivation <span class="badge">5</span></h2>
+    <div class="swp-grid">
+      <a href="redexim-verti-drain.html" class="swp-link" data-swp><span class="name">Redexim Verti-Drain 7007/7215</span><span class="sub">Deep tine aeration</span></a>
+      <a href="ua60-aera-vator.html" class="swp-link" data-swp><span class="name">1st Products UA60 Aera-Vator</span><span class="sub">Vibrating tine aeration</span></a>
+      <a href="toro-procore-648s.html" class="swp-link" data-swp><span class="name">Toro ProCore 648s</span><span class="sub">Walk-behind aerator</span></a>
+      <a href="sod-cutter.html" class="swp-link" data-swp><span class="name">Ryan Sod Cutter Jnr</span><span class="sub">Sod cutting operations</span></a>
+      <a href="trenchmaster-150.html" class="swp-link" data-swp><span class="name">TrenchMaster 150</span><span class="sub">Trenching operations</span></a>
+    </div>
+  </div>
+
+  <!-- BUNKER & GROUNDS -->
+  <div class="cat" data-cat>
+    <h2>Bunker Rakes &amp; Grounds Equipment <span class="badge">6</span></h2>
+    <div class="swp-grid">
+      <a href="john-deere-1200a-bunker-rake.html" class="swp-link" data-swp><span class="name">JD 1200A Bunker Rake</span><span class="sub">Mechanical bunker raking</span></a>
+      <a href="toro-3040-bunker-rake.html" class="swp-link" data-swp><span class="name">Toro 3040 Bunker Rake</span><span class="sub">Sand Pro bunker raking</span></a>
+      <a href="sand-pro-bunker-rake.html" class="swp-link" data-swp><span class="name">Sand Pro Bunker Rake</span><span class="sub">Bunker maintenance</span></a>
+      <a href="wiedenmann-terra-rake.html" class="swp-link" data-swp><span class="name">Wiedenmann Terra Rake</span><span class="sub">Surface scarification and raking</span></a>
+      <a href="kanga-landscape-rake.html" class="swp-link" data-swp><span class="name">Kanga Landscape Rake</span><span class="sub">Landscape levelling</span></a>
+      <a href="toro-proforce-blower.html" class="swp-link" data-swp><span class="name">Toro ProForce Blower</span><span class="sub">Ride-on debris blower</span></a>
+    </div>
+  </div>
+
+  <!-- HAND TOOLS & WORKSHOP -->
+  <div class="cat" data-cat>
+    <h2>Hand Tools, Workshop &amp; Arboriculture <span class="badge">14</span></h2>
+    <div class="swp-grid">
+      <a href="backpack-blower.html" class="swp-link" data-swp><span class="name">Backpack Blower</span><span class="sub">Stihl / Kress / Milwaukee blowers</span></a>
+      <a href="whipper-snipper.html" class="swp-link" data-swp><span class="name">Whipper Snipper</span><span class="sub">Stihl FS420 line trimmer</span></a>
+      <a href="hedge-trimmers.html" class="swp-link" data-swp><span class="name">Hedge Trimmers</span><span class="sub">Stihl / Kress hedge trimming</span></a>
+      <a href="chainsaws.html" class="swp-link" data-swp><span class="name">Chainsaws</span><span class="sub">Stihl / Kress chainsaw operation</span></a>
+      <a href="pole-saw.html" class="swp-link" data-swp><span class="name">Pole Saw</span><span class="sub">Elevated pruning</span></a>
+      <a href="chainsaw-sharpener.html" class="swp-link" data-swp><span class="name">Chainsaw Sharpener (Tecomec)</span><span class="sub">Chain grinding</span></a>
+      <a href="welder.html" class="swp-link" data-swp><span class="name">Welder (Cigweld)</span><span class="sub">MIG/Stick welding operations</span></a>
+      <a href="air-compressor.html" class="swp-link" data-swp><span class="name">Air Compressor (McMillan CP19)</span><span class="sub">Compressed air equipment</span></a>
+      <a href="drop-saw.html" class="swp-link" data-swp><span class="name">Drop Saw (Ozito)</span><span class="sub">Mitre saw operation</span></a>
+      <a href="compactor-plate.html" class="swp-link" data-swp><span class="name">Compactor Plate (Wacker Neuson)</span><span class="sub">Vibratory plate compaction</span></a>
+      <a href="earth-auger.html" class="swp-link" data-swp><span class="name">Earth Auger (Stihl BT131-Z)</span><span class="sub">Post hole boring</span></a>
+      <a href="water-pump.html" class="swp-link" data-swp><span class="name">Honda Water Pump</span><span class="sub">Portable water pump</span></a>
+      <a href="workshop-hoist.html" class="swp-link" data-swp><span class="name">Workshop Hoist (Molnar SM440-A)</span><span class="sub">4-post vehicle hoist</span></a>
+      <a href="fork-stacker.html" class="swp-link" data-swp><span class="name">Manual Fork Stacker (BIS)</span><span class="sub">Hydraulic pallet stacker</span></a>
+    </div>
+  </div>
+
+  <!-- ELEVATED WORK, BATTERIES & SPECIALIST -->
+  <div class="cat" data-cat>
+    <h2>EWP, Batteries &amp; Specialist Equipment <span class="badge">3</span></h2>
+    <div class="swp-grid">
+      <a href="elevated-work-platform.html" class="swp-link" data-swp><span class="name">Elevated Work Platform</span><span class="sub">Scissor lift operation</span></a>
+      <a href="lithium-ion-batteries.html" class="swp-link" data-swp><span class="name">Lithium-Ion Batteries &amp; Equipment</span><span class="sub">Battery safety, charging, storage</span></a>
+      <a href="diesel-heater.html" class="swp-link" data-swp><span class="name">Diesel Heater (Lavor PT70)</span><span class="sub">Portable diesel space heater</span></a>
+    </div>
+  </div>
+
+  <!-- POLICIES & PROCEDURES -->
+  <div class="cat" data-cat>
+    <h2>Safety Policies &amp; Procedures <span class="badge">9</span></h2>
+    <div class="swp-grid">
+      <a href="fuel-dispensing.html" class="swp-link" data-swp><span class="name">Fuel Dispensing Procedure</span><span class="sub">Refuelling procedures</span></a>
+      <a href="spill-procedure.html" class="swp-link" data-swp><span class="name">Spill Procedure</span><span class="sub">Fuel, chemical, and oil spills</span></a>
+      <a href="noise-restrictions.html" class="swp-link" data-swp><span class="name">Noise Restrictions</span><span class="sub">EPA Victoria noise compliance</span></a>
+      <a href="extreme-weather-policy.html" class="swp-link" data-swp><span class="name">Extreme Weather Policy</span><span class="sub">Heat, storm, and lightning procedures</span></a>
+      <a href="mobile-phone-policy.html" class="swp-link" data-swp><span class="name">Mobile Phone Policy</span><span class="sub">Workplace phone use</span></a>
+      <a href="wash-down-bay.html" class="swp-link" data-swp><span class="name">Wash Down Bay</span><span class="sub">Equipment cleaning procedures</span></a>
+      <a href="two-way-radios.html" class="swp-link" data-swp><span class="name">Two-Way Radios</span><span class="sub">Radio communication procedures</span></a>
+      <a href="volunteer-induction.html" class="swp-link" data-swp><span class="name">Volunteer Induction</span><span class="sub">Volunteer safety induction</span></a>
+      <a href="volunteer-working-bee.html" class="swp-link" data-swp><span class="name">Volunteer Working Bee Induction</span><span class="sub">Working bee safety</span></a>
+    </div>
+  </div>
+
+  <div class="auth card" style="margin-top:28px">
+    <p><strong>Authorised By:</strong> Andrew Anderson, Golf Course Superintendent</p>
+    <p><strong>Organisation:</strong> Ranfurlie Golf Club, 825 Cranbourne-Frankston Rd, Cranbourne VIC 3977</p>
+    <p><strong>Issue Date:</strong> November 2026 &nbsp;|&nbsp; <strong>Next Review:</strong> November 2027</p>
+    <p style="margin-top:12px;font-size:14px;color:var(--muted)">All staff must complete pre-start checks via the Task Tracker QR system before operating any equipment. Training records, incident reports, and servicing logs are maintained in Task Tracker. This SWP register is governed by the Occupational Health and Safety Act 2004 (Vic) and the Occupational Health and Safety Regulations 2017 (Vic).</p>
+  </div>
+
+  <div style="text-align:center;margin:20px 0 40px">
+    <a href="../" style="font-weight:600;font-size:15px;color:var(--acc)">&larr; Back to Ranfurlie</a>
+  </div>
+</div>
+</div>
+
+<script>
+document.getElementById('search').addEventListener('input', function(e){
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('[data-swp]').forEach(function(el){
+    const text = el.textContent.toLowerCase();
+    el.style.display = !q || text.includes(q) ? '' : 'none';
+  });
+  document.querySelectorAll('[data-cat]').forEach(function(cat){
+    const visible = cat.querySelectorAll('[data-swp]:not([style*="display: none"])');
+    cat.style.display = visible.length ? '' : 'none';
+  });
+});
+</script>
+</body>
+</html>

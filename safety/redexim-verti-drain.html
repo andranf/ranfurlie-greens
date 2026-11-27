@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Redexim Verti-Drain 7007/7215 - SWP | Ranfurlie Golf Club</title>
+<meta name="description" content="Safe Work Procedure: Deep Tine Aeration">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6);--glass-hi:rgba(255,255,255,.8);--glass-lo:rgba(255,255,255,.36);--glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92);--rim2:rgba(255,255,255,.38);--edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);
+  --acc:#4b5d73;--acc-deep:#2f3d4f;--acc-soft:rgba(75,93,115,.15);--acc-line:rgba(75,93,115,.4);--acc-ink:#fff;
+  --ok:#13a356;--ok-bg:rgba(19,163,86,.14);
+  --hi:#e0313b;--hi-bg:rgba(224,49,59,.12);
+  --med:#b86a00;--med-bg:rgba(255,176,32,.2);
+  --warn-bg:rgba(224,49,59,.08);--warn-border:rgba(224,49,59,.25);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px;--r2:16px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+a{color:var(--acc-deep)}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,rgba(75,93,115,.45) 0,transparent 62%)}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,rgba(75,93,115,.2) 0,transparent 62%)}
+
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+  border-radius:var(--r);padding:20px;min-width:0;
+}
+@media(min-width:640px){.card{padding:28px}}
+
+.top{padding:16px 0 8px}
+.topline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:clamp(28px,6vw,42px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:14px;height:14px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px var(--acc-soft)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+.breadcrumb a{color:var(--acc);text-decoration:none;font-weight:600}
+.breadcrumb a:hover{text-decoration:underline}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.meta .tag{background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:4px 14px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+
+.warning-box{background:var(--warn-bg);border:1.5px solid var(--warn-border);border-radius:var(--r2);padding:16px 18px;margin-bottom:20px;font-weight:600;font-size:15px;line-height:1.45}
+.warning-box .icon{font-size:20px;margin-right:6px}
+
+.section{margin-bottom:24px}
+.section h2{font-size:22px;color:var(--acc-deep);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--acc-soft)}
+.section h3{font-size:17px;margin:14px 0 6px;color:var(--fg);font-family:var(--display);font-weight:700}
+.section ul{margin:6px 0 12px;padding-left:22px}
+.section ul li{margin-bottom:6px;line-height:1.45}
+.section ol{margin:6px 0 12px;padding-left:22px}
+.section ol li{margin-bottom:6px;line-height:1.45}
+.section p{margin:6px 0 10px}
+
+.ppe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0}
+.ppe-item{background:var(--acc-soft);border-radius:var(--r2);padding:12px;text-align:center;font-weight:600;font-size:14px}
+.ppe-item .ppe-icon{font-size:28px;display:block;margin-bottom:4px}
+
+.disclaimer{background:var(--glass-lo);border-radius:var(--r2);padding:16px 18px;margin-top:24px;font-size:13px;color:var(--muted);line-height:1.5}
+
+.auth{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
+@media(max-width:480px){.auth-grid{grid-template-columns:1fr}}
+.auth-label{color:var(--muted);font-weight:600}
+
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;text-decoration:none;color:var(--acc);margin-top:20px;padding:8px 16px;border-radius:999px;background:var(--acc-soft);transition:background .2s}
+.back:hover{background:var(--acc-line)}
+
+.theme-toggle{position:fixed;top:12px;right:12px;z-index:100;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
+
+@media print{
+  .sky,.theme-toggle{display:none}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ccc;backdrop-filter:none;background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i></div>
+<button class="theme-toggle" onclick="let r=document.documentElement,t=r.dataset.theme;r.dataset.theme=t==='dark'?'light':'dark'" aria-label="Toggle theme">&#9681;</button>
+
+<div class="gut">
+<div class="wrap">
+  <div class="top">
+    <div class="breadcrumb">
+      <a href="../">Ranfurlie</a> <span>/</span>
+      <a href="./">Safety &amp; SWPs</a> <span>/</span>
+      <span>Redexim Verti-Drain 7007/7215</span>
+    </div>
+    <div class="topline">
+      <h1><span class="dot"></span> Redexim Verti-Drain 7007/7215</h1>
+    </div>
+    <div class="meta">
+      <span class="tag">SWP</span>
+      <span class="tag">Issue: Nov 2026</span>
+      <span class="tag">Review: Nov 2027</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px">
+      <div><strong>Description:</strong> Deep Tine Aeration</div>
+      <div><strong>Make / Model:</strong> Redexim Verti-Drain 7007 / 7215</div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="icon">&#9888;</span> DO NOT operate this equipment unless you have been fully trained in its safe use and operation, have read the user manual, and have conducted a risk assessment using the Task Tracker QR system.
+  </div>
+
+  <div class="section card">
+    <h2>1. Potential Hazards</h2>
+    <ul>
+      <li>Tine ejection: Tines can break or eject under force during operation, becoming high-speed projectiles.</li>
+      <li>Crush and entanglement: The reciprocating tine mechanism has powerful moving parts that can crush hands or entangle clothing.</li>
+      <li>PTO entanglement: The power take-off (PTO) shaft connecting to the tractor rotates at high speed. Loose clothing, long hair, or straps caught in the PTO can pull a person into the machinery with fatal consequences.</li>
+      <li>Noise and vibration: Operation produces significant noise from the tractor engine and the percussion mechanism. Whole-body vibration is transmitted through the tractor.</li>
+      <li>Ground damage to irrigation: Deep tines (up to 400 mm) can puncture irrigation pipes, cables, and drainage lines if sub-surface infrastructure is not mapped.</li>
+      <li>Manual handling: Tines, weights, and depth spacers are heavy and awkward to handle.</li>
+      <li>Struck-by risk: Objects buried in the soil (rocks, old pipe, debris) can be heaved to the surface by the tines.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Required Personal Protective Equipment (PPE)</h2>
+    <ul>
+      <li>Steel-capped boots (mandatory).</li>
+      <li>Hearing protection (mandatory).</li>
+      <li>Safety glasses (mandatory).</li>
+      <li>Gloves when handling tines.</li>
+      <li>Sun hat and SPF 50+ sunscreen.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Pre-Operational Checks</h2>
+    <h3>a. Machine Inspection</h3>
+    <ul>
+      <li>Complete pre-start via Task Tracker QR.</li>
+      <li>Inspect all tines for cracks, wear, and secure mounting. Replace any damaged tine before use.</li>
+      <li>Check PTO guard: must be intact and rotating freely. Never operate without the PTO guard.</li>
+      <li>Check hydraulic hoses on the depth control.</li>
+      <li>Verify tine depth and heave settings match the superintendent's program.</li>
+      <li>Ensure the tractor is rated for the Verti-Drain's PTO and weight requirements.</li>
+    </ul>
+    <h3>b. Work Area</h3>
+    <ul>
+      <li>Consult irrigation and drainage plans (Landmark Solutions drawings) to identify pipe and cable depths.</li>
+      <li>Flag or avoid areas where pipes are shallower than the tine depth setting.</li>
+      <li>Walk the area for surface debris, irrigation covers, and valve boxes.</li>
+      <li>Confirm the area is clear of golfers.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Operation</h2>
+    <h3>a. Start-Up</h3>
+    <ul>
+      <li>Connect to the tractor PTO. Set the PTO speed per the Verti-Drain manual.</li>
+      <li>Lower the unit and begin the first pass slowly to confirm depth and heave.</li>
+      <li>Increase speed gradually once settings are confirmed.</li>
+    </ul>
+    <h3>b. During Operation</h3>
+    <ul>
+      <li>Operate at a consistent speed for even aeration.</li>
+      <li>Do not turn sharply with the tines in the ground; lift the unit before turning.</li>
+      <li>Monitor for unusual noises (tine hitting an object underground) and stop immediately to investigate.</li>
+      <li>Keep all personnel at least 10 metres from the operating unit.</li>
+      <li>Never reach into the tine mechanism while the PTO is engaged.</li>
+    </ul>
+    <h3>c. Golf Course Specific Rules</h3>
+    <ul>
+      <li>Aerate greens and fairways only when scheduled by the superintendent.</li>
+      <li>Coordinate timing with the pro shop; aeration closes the area to play.</li>
+      <li>Backfill or topdress holes as directed to restore playing surface.</li>
+      <li>Avoid aeration over known shallow irrigation mains.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Emergency Procedures</h2>
+    <h3>a. Fire</h3>
+    <ul>
+      <li>Disengage PTO. Stop tractor engine. Use extinguisher. Call 000.</li>
+    </ul>
+    <h3>b. Injury</h3>
+    <ul>
+      <li>Disengage PTO. Stop engine. First aid.</li>
+      <li>Call 000 for serious injuries. Site: 825 Cranbourne-Frankston Rd, Cranbourne VIC 3977.</li>
+      <li>Report in Task Tracker.</li>
+    </ul>
+    <h3>c. Equipment-Specific Emergency</h3>
+    <ul>
+      <li>If a tine breaks, stop immediately. Locate the broken piece before resuming.</li>
+      <li>If an irrigation line is punctured, shut off the section valve and notify the superintendent.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>6. Post-Operational Procedures</h2>
+    <ul>
+      <li>Disengage PTO. Raise the unit. Drive to storage area.</li>
+      <li>Clean the tines and frame.</li>
+      <li>Inspect tines for damage after each use.</li>
+      <li>Report faults in Task Tracker.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>7. Maintenance and Servicing</h2>
+    <ul>
+      <li>Daily: clean, inspect tines.</li>
+      <li>Before each use: check PTO guard, tine torque, hose condition.</li>
+      <li>Replace worn tines promptly. Record in Task Tracker.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>8. Relevant Legislation</h2>
+    <ul>
+      <li>Occupational Health and Safety Act 2004 (Vic).</li>
+      <li>Occupational Health and Safety Regulations 2017 (Vic).</li>
+      <li>AS/NZS 4024.1 Safety of Machinery series.</li>
+      <li>EPA Victoria noise regulations - Environment Protection Act 2017.</li>
+      <li>Dangerous Goods (Storage and Handling) Regulations 2012 (Vic) where applicable.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>9. Record Keeping</h2>
+    <ul>
+      <li>Pre-start checklists completed daily via Task Tracker QR system.</li>
+      <li>All faults, repairs, and servicing recorded in Task Tracker.</li>
+      <li>Incident and near-miss reports submitted through Task Tracker.</li>
+      <li>Training records maintained for all operators with superintendent sign-off.</li>
+    </ul>
+  </div>
+
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This SWP may not cover all possible hazards associated with this equipment on your specific site and should be used in conjunction with other references including the Operational or User Manual. It is designed as a guide, a safety reminder, and a training support document. Users must undertake an activity risk assessment prior to using any equipment and receive training in its safe use before operation.
+  </div>
+
+  <div class="auth">
+    <div class="auth-grid">
+      <div><span class="auth-label">Authorised By:</span> Andrew Anderson, Golf Course Superintendent</div>
+      <div><span class="auth-label">Issue Date:</span> November 2026</div>
+      <div><span class="auth-label">Organisation:</span> Ranfurlie Golf Club</div>
+      <div><span class="auth-label">Next Review:</span> November 2027</div>
+    </div>
+  </div>
+
+  <a href="./" class="back">&larr; Back to SWP Hub</a>
+  <div style="height:40px"></div>
+</div>
+</div>
+</body>
+</html>

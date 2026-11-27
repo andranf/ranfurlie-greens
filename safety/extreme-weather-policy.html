@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Extreme Weather Policy - SWP | Ranfurlie Golf Club</title>
+<meta name="description" content="Safe Work Procedure: Ranfurlie Golf Club Extreme Weather Policy for Staff">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6);--glass-hi:rgba(255,255,255,.8);--glass-lo:rgba(255,255,255,.36);--glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92);--rim2:rgba(255,255,255,.38);--edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);
+  --acc:#4b5d73;--acc-deep:#2f3d4f;--acc-soft:rgba(75,93,115,.15);--acc-line:rgba(75,93,115,.4);--acc-ink:#fff;
+  --ok:#13a356;--ok-bg:rgba(19,163,86,.14);
+  --hi:#e0313b;--hi-bg:rgba(224,49,59,.12);
+  --med:#b86a00;--med-bg:rgba(255,176,32,.2);
+  --warn-bg:rgba(224,49,59,.08);--warn-border:rgba(224,49,59,.25);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px;--r2:16px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+a{color:var(--acc-deep)}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,rgba(75,93,115,.45) 0,transparent 62%)}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,rgba(75,93,115,.2) 0,transparent 62%)}
+
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+  border-radius:var(--r);padding:20px;min-width:0;
+}
+@media(min-width:640px){.card{padding:28px}}
+
+.top{padding:16px 0 8px}
+.topline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:clamp(28px,6vw,42px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:14px;height:14px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px var(--acc-soft)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+.breadcrumb a{color:var(--acc);text-decoration:none;font-weight:600}
+.breadcrumb a:hover{text-decoration:underline}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.meta .tag{background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:4px 14px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+
+.warning-box{background:var(--warn-bg);border:1.5px solid var(--warn-border);border-radius:var(--r2);padding:16px 18px;margin-bottom:20px;font-weight:600;font-size:15px;line-height:1.45}
+.warning-box .icon{font-size:20px;margin-right:6px}
+
+.section{margin-bottom:24px}
+.section h2{font-size:22px;color:var(--acc-deep);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--acc-soft)}
+.section h3{font-size:17px;margin:14px 0 6px;color:var(--fg);font-family:var(--display);font-weight:700}
+.section ul{margin:6px 0 12px;padding-left:22px}
+.section ul li{margin-bottom:6px;line-height:1.45}
+.section ol{margin:6px 0 12px;padding-left:22px}
+.section ol li{margin-bottom:6px;line-height:1.45}
+.section p{margin:6px 0 10px}
+
+.ppe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0}
+.ppe-item{background:var(--acc-soft);border-radius:var(--r2);padding:12px;text-align:center;font-weight:600;font-size:14px}
+.ppe-item .ppe-icon{font-size:28px;display:block;margin-bottom:4px}
+
+.disclaimer{background:var(--glass-lo);border-radius:var(--r2);padding:16px 18px;margin-top:24px;font-size:13px;color:var(--muted);line-height:1.5}
+
+.auth{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
+@media(max-width:480px){.auth-grid{grid-template-columns:1fr}}
+.auth-label{color:var(--muted);font-weight:600}
+
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;text-decoration:none;color:var(--acc);margin-top:20px;padding:8px 16px;border-radius:999px;background:var(--acc-soft);transition:background .2s}
+.back:hover{background:var(--acc-line)}
+
+.theme-toggle{position:fixed;top:12px;right:12px;z-index:100;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
+
+@media print{
+  .sky,.theme-toggle{display:none}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ccc;backdrop-filter:none;background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i></div>
+<button class="theme-toggle" onclick="let r=document.documentElement,t=r.dataset.theme;r.dataset.theme=t==='dark'?'light':'dark'" aria-label="Toggle theme">&#9681;</button>
+
+<div class="gut">
+<div class="wrap">
+  <div class="top">
+    <div class="breadcrumb">
+      <a href="../">Ranfurlie</a> <span>/</span>
+      <a href="./">Safety &amp; SWPs</a> <span>/</span>
+      <span>Extreme Weather Policy</span>
+    </div>
+    <div class="topline">
+      <h1><span class="dot"></span> Extreme Weather Policy</h1>
+    </div>
+    <div class="meta">
+      <span class="tag">SWP</span>
+      <span class="tag">Issue: Nov 2026</span>
+      <span class="tag">Review: Nov 2027</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px">
+      <div><strong>Description:</strong> Ranfurlie Golf Club Extreme Weather Policy for Staff</div>
+      <div><strong>Make / Model:</strong> Extreme Weather Policy</div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="icon">&#9888;</span> DO NOT operate this equipment unless you have been fully trained in its safe use and operation, have read the user manual, and have conducted a risk assessment using the Task Tracker QR system.
+  </div>
+
+  <div class="section card">
+    <h2>1. Thunderstorms and Lightning</h2>
+    <p>Lightning Warning and Evacuation Procedures</p>
+    <ul>
+      <li>Ranfurlie Golf Club utilises UBIMET for real-time lightning and wind monitoring.</li>
+    </ul>
+    <ul>
+      <li>Alerts are issued at 30 km, with a secondary warning at 10 km, which triggers an immediate evacuation from the course.</li>
+    </ul>
+    <ul>
+      <li>Staff must immediately cease all outdoor activities and seek shelter in the clubhouse, maintenance facility, or designated safe zones.</li>
+    </ul>
+    <ul>
+      <li>Work may only resume after UBIMET confirms a 30-minute period without a strike within a 10 km radius.</li>
+    </ul>
+    <ul>
+      <li>Supervisors will provide clearance for staff to resume outdoor work.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Extreme Wind</h2>
+    <p>Suspension of Outdoor Work</p>
+    <ul>
+      <li>Outdoor work will be suspended when:</li>
+    </ul>
+    <ul>
+      <li>Sustained wind speeds exceed 80 km/h.</li>
+    </ul>
+    <ul>
+      <li>Wind gusts exceed 100 km/h (as recorded at Ballam Park weather station).</li>
+    </ul>
+    <ul>
+      <li>Staff must inform a supervisor if they feel unsafe, who will assess the situation and provide direction.</li>
+    </ul>
+    <ul>
+      <li>No tree maintenance, high-lift operations, or use of lightweight materials will occur during these conditions.</li>
+    </ul>
+    <ul>
+      <li>PPE Requirement: On windy days, tasks that typically do not require PPE may now require additional protective gear (e.g., protective glasses to prevent dust and debris from getting into the eyes).</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Extreme Heat</h2>
+    <p>Hydration and Heat Safety Measures</p>
+    <ul>
+      <li>On days of high temperatures (38°C or higher), staff must:</li>
+    </ul>
+    <ul>
+      <li>Take regular hydration breaks in shaded or air-conditioned areas.</li>
+    </ul>
+    <ul>
+      <li>Wear lightweight, breathable, and sun-protective clothing.</li>
+    </ul>
+    <ul>
+      <li>Use sunscreen and wide-brim hats.</li>
+    </ul>
+    <ul>
+      <li>Modify work schedules where possible to reduce exposure during peak heat.</li>
+    </ul>
+    <p>Watering and Course Protection</p>
+    <ul>
+      <li>Watering during peak heat periods should be avoided but may be necessary to protect turf and prevent asset damage.</li>
+    </ul>
+    <ul>
+      <li>If watering is required, staff must proceed with caution and avoid prolonged exposure.</li>
+    </ul>
+    <ul>
+      <li>Supervisors will assess conditions and allocate tasks to ensure safety.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Frost</h2>
+    <ul>
+      <li>The Course Superintendent or senior maintenance staff will determine if work can proceed.</li>
+    </ul>
+    <ul>
+      <li>Machinery and carts will not operate on frost-covered greens or fairways to prevent damage.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Fog</h2>
+    <ul>
+      <li>Golf play will be suspended during heavy fog, but staff will continue working with caution.</li>
+    </ul>
+    <ul>
+      <li>Visibility assessments must be made before using machinery or driving vehicles.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>6. Personal Protective Equipment (PPE) Responsibility</h2>
+    <ul>
+      <li>PPE must be worn at all times where required, particularly during or leading into extreme weather.</li>
+    </ul>
+    <ul>
+      <li>A task that may not usually require PPE may now require it due to environmental conditions. Example: On windy days, protective glasses should be worn to prevent dust and debris from causing eye injuries.</li>
+    </ul>
+    <ul>
+      <li>All staff are issued PPE and are responsible for maintaining it.</li>
+    </ul>
+    <ul>
+      <li>If PPE is lost or damaged, it must be reported to senior staff immediately so that replacements can be provided.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>7. Communication & Operational Discipline</h2>
+    <ul>
+      <li>Communication is paramount during extreme weather events or when thresholds are approaching.</li>
+    </ul>
+    <ul>
+      <li>Two-way radios are mandatory for all staff to ensure immediate response and coordination.</li>
+    </ul>
+    <ul>
+      <li>Personal headphones (for music, radio, or podcasts) are strictly prohibited during extreme weather events or close to thresholds to prevent distractions.</li>
+    </ul>
+    <ul>
+      <li>Staff cannot suspend work of their own accord—if they feel unsafe, they must inform a supervisor, who will assess and provide direction.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>8. Compliance with Victorian OHS Legislation</h2>
+    <h3>This policy aligns with the Occupational Health and Safety Act 2004 (Vic) and Occupational Health and Safety Regulations 2017, ensuring compliance with</h3>
+    <ul>
+      <li>Risk management obligations: Identifying, assessing, and controlling extreme weather risks.</li>
+    </ul>
+    <ul>
+      <li>Employee safety responsibilities: Ensuring staff follow safety procedures, wear PPE, and communicate hazards.</li>
+    </ul>
+    <ul>
+      <li>Employer duty of care: Providing a safe working environment and appropriate safety measures in extreme weather conditions.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>9. Commitment to Safety</h2>
+    <ul>
+      <li>Ranfurlie Golf Club is committed to maintaining the highest safety standards.</li>
+    </ul>
+    <ul>
+      <li>This policy will be reviewed regularly to incorporate advancements in weather monitoring and safety practices.</li>
+    </ul>
+    <p>By following these guidelines, we ensure staff safety while upholding our responsibility to protect the golf course and its assets.</p>
+    <p>Competent Persons</p>
+    <p>(The following persons are authorised to operate, supervise and test workers on the equipment/process.)</p>
+    <h3>Name</h3>
+    <h3>Date</h3>
+    <h3>Phone Number</h3>
+    <h3>Signature</h3>
+  </div>
+
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This SWP may not cover all possible hazards associated with this equipment on your specific site and should be used in conjunction with other references including the Operational or User Manual. It is designed as a guide, a safety reminder, and a training support document. Users must undertake an activity risk assessment prior to using any equipment and receive training in its safe use before operation.
+  </div>
+
+  <div class="auth">
+    <div class="auth-grid">
+      <div><span class="auth-label">Authorised By:</span> Andrew Anderson, Golf Course Superintendent</div>
+      <div><span class="auth-label">Issue Date:</span> November 2026</div>
+      <div><span class="auth-label">Organisation:</span> Ranfurlie Golf Club</div>
+      <div><span class="auth-label">Next Review:</span> November 2027</div>
+    </div>
+  </div>
+
+  <a href="./" class="back">&larr; Back to SWP Hub</a>
+  <div style="height:40px"></div>
+</div>
+</div>
+</body>
+</html>

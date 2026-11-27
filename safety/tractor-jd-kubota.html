@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>John Deere / Kubota Tractor - SWP | Ranfurlie Golf Club</title>
+<meta name="description" content="Safe Work Procedure: Operating a Tractor">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6);--glass-hi:rgba(255,255,255,.8);--glass-lo:rgba(255,255,255,.36);--glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92);--rim2:rgba(255,255,255,.38);--edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);
+  --acc:#4b5d73;--acc-deep:#2f3d4f;--acc-soft:rgba(75,93,115,.15);--acc-line:rgba(75,93,115,.4);--acc-ink:#fff;
+  --ok:#13a356;--ok-bg:rgba(19,163,86,.14);
+  --hi:#e0313b;--hi-bg:rgba(224,49,59,.12);
+  --med:#b86a00;--med-bg:rgba(255,176,32,.2);
+  --warn-bg:rgba(224,49,59,.08);--warn-border:rgba(224,49,59,.25);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px;--r2:16px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+a{color:var(--acc-deep)}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,rgba(75,93,115,.45) 0,transparent 62%)}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,rgba(75,93,115,.2) 0,transparent 62%)}
+
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+  border-radius:var(--r);padding:20px;min-width:0;
+}
+@media(min-width:640px){.card{padding:28px}}
+
+.top{padding:16px 0 8px}
+.topline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:clamp(28px,6vw,42px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:14px;height:14px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px var(--acc-soft)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+.breadcrumb a{color:var(--acc);text-decoration:none;font-weight:600}
+.breadcrumb a:hover{text-decoration:underline}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.meta .tag{background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:4px 14px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+
+.warning-box{background:var(--warn-bg);border:1.5px solid var(--warn-border);border-radius:var(--r2);padding:16px 18px;margin-bottom:20px;font-weight:600;font-size:15px;line-height:1.45}
+.warning-box .icon{font-size:20px;margin-right:6px}
+
+.section{margin-bottom:24px}
+.section h2{font-size:22px;color:var(--acc-deep);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--acc-soft)}
+.section h3{font-size:17px;margin:14px 0 6px;color:var(--fg);font-family:var(--display);font-weight:700}
+.section ul{margin:6px 0 12px;padding-left:22px}
+.section ul li{margin-bottom:6px;line-height:1.45}
+.section ol{margin:6px 0 12px;padding-left:22px}
+.section ol li{margin-bottom:6px;line-height:1.45}
+.section p{margin:6px 0 10px}
+
+.ppe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0}
+.ppe-item{background:var(--acc-soft);border-radius:var(--r2);padding:12px;text-align:center;font-weight:600;font-size:14px}
+.ppe-item .ppe-icon{font-size:28px;display:block;margin-bottom:4px}
+
+.disclaimer{background:var(--glass-lo);border-radius:var(--r2);padding:16px 18px;margin-top:24px;font-size:13px;color:var(--muted);line-height:1.5}
+
+.auth{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
+@media(max-width:480px){.auth-grid{grid-template-columns:1fr}}
+.auth-label{color:var(--muted);font-weight:600}
+
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;text-decoration:none;color:var(--acc);margin-top:20px;padding:8px 16px;border-radius:999px;background:var(--acc-soft);transition:background .2s}
+.back:hover{background:var(--acc-line)}
+
+.theme-toggle{position:fixed;top:12px;right:12px;z-index:100;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
+
+@media print{
+  .sky,.theme-toggle{display:none}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ccc;backdrop-filter:none;background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i></div>
+<button class="theme-toggle" onclick="let r=document.documentElement,t=r.dataset.theme;r.dataset.theme=t==='dark'?'light':'dark'" aria-label="Toggle theme">&#9681;</button>
+
+<div class="gut">
+<div class="wrap">
+  <div class="top">
+    <div class="breadcrumb">
+      <a href="../">Ranfurlie</a> <span>/</span>
+      <a href="./">Safety &amp; SWPs</a> <span>/</span>
+      <span>John Deere / Kubota Tractor</span>
+    </div>
+    <div class="topline">
+      <h1><span class="dot"></span> John Deere / Kubota Tractor</h1>
+    </div>
+    <div class="meta">
+      <span class="tag">SWP</span>
+      <span class="tag">Issue: Nov 2026</span>
+      <span class="tag">Review: Nov 2027</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px">
+      <div><strong>Description:</strong> Operating a Tractor</div>
+      <div><strong>Make / Model:</strong> John Deere 3520 / Kubota L5740</div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="icon">&#9888;</span> DO NOT operate this equipment unless you have been fully trained in its safe use and operation, have read the user manual, and have conducted a risk assessment using the Task Tracker QR system.
+  </div>
+
+  <div class="section card">
+    <h2>1. Hardware and Guards:</h2>
+    <ul>
+      <li>Inspect all hardware (bolts, nuts, and fasteners) for tightness. Replace worn, damaged, or missing components before operation.</li>
+    </ul>
+    <ul>
+      <li>Ensure all guards are correctly fitted and functional. This includes the tractor master shield, driveline shields, and PTO guards. Never operate the machine without guards in place.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Safety Features:</h2>
+    <ul>
+      <li>Check the seatbelt for wear or fraying. Ensure the Roll Over Protective Structure (ROPS) and Falling Object Protective Structure (FOPS) (if fitted) are intact and locked into position.</li>
+    </ul>
+    <ul>
+      <li>Ensure the PTO guard rotates freely and is undamaged.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Tyres and Wheels:</h2>
+    <ul>
+      <li>Verify tyre pressure matches the manufacturer’s recommended levels. Incorrect inflation can lead to blowouts or instability.</li>
+    </ul>
+    <ul>
+      <li>Inspect tyres for cuts, cracks, bubbles, or wear. Ensure rims are free from damage and lug nuts are secure.</li>
+    </ul>
+    <ul>
+      <li>Use a clip-on chuck with an extension hose for tyre inflation to avoid standing directly in front of the tyre. If a safety cage is available, it must be used.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Hydraulic and Pneumatic Systems:</h2>
+    <ul>
+      <li>Check all hydraulic hoses, connectors, and cylinders for leaks or wear. Leaking fluid can cause environmental contamination and reduce system efficiency.</li>
+    </ul>
+    <ul>
+      <li>Ensure linkage arms and stabilisers are free-moving and undamaged.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Safety Signs and Decals:</h2>
+    <ul>
+      <li>Ensure all safety decals are visible, legible, and located near potential danger points. Replace missing or damaged decals.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>6. Fuel Safety:</h2>
+    <ul>
+      <li>Refuel only when the engine is off and has cooled. Ensure the area is free from ignition sources such as sparks, cigarettes, or open flames.</li>
+    </ul>
+    <ul>
+      <li>Refuel outdoors or in a well-ventilated area. Clean up spilled fuel immediately and store fuel safely away from the worksite.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>7. Work Area Assessment:</h2>
+    <ul>
+      <li>Walk through the worksite to identify hazards such as uneven surfaces, holes, embankments, or unstable ground.</li>
+    </ul>
+    <ul>
+      <li>Communicate the work plan with team members to prevent overlapping tasks or accidents.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>8. PPE (Personal Protective Equipment):</h2>
+    <ul>
+      <li>Wear safety goggles or glasses with side shields, a hard hat, long trousers, and enclosed footwear.</li>
+    </ul>
+    <ul>
+      <li>Use hearing protection, such as earplugs, to prevent long-term hearing damage.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>9. Preliminary Safety Checks:</h2>
+    <ul>
+      <li>Test operator presence controls, safety interlocks, parking brakes, and other critical systems.</li>
+    </ul>
+    <ul>
+      <li>Ensure all lights, reflectors, and warning devices are operational, especially if operating near roads.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>10. Road Use Preparation:</h2>
+    <ul>
+      <li>Lock brake pedals together before driving on public roads.</li>
+    </ul>
+    <ul>
+      <li>Use hazard lights and ensure the vehicle is registered and roadworthy.</li>
+    </ul>
+    <p>2. Hitching Implements</p>
+    <h3>Hitching implements safely is critical for preventing accidents or damage during operation. Follow these steps in maximum detail</h3>
+  </div>
+
+  <div class="section card">
+    <h2>1. Preparation:</h2>
+    <ul>
+      <li>Park the tractor on level, stable ground. Disengage the PTO, lower any existing implements, and turn off the engine.</li>
+    </ul>
+    <ul>
+      <li>Apply the parking brake and remove the ignition key before starting the hitching process.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Alignment:</h2>
+    <ul>
+      <li>Reverse the tractor slowly, using a spotter if visibility is restricted, to align the lower hitch arms with the implement's hitch pins.</li>
+    </ul>
+    <ul>
+      <li>Ensure the hitch points are free of debris, rust, or obstructions.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Securing the Connection:</h2>
+    <ul>
+      <li>Attach the lower lift arms to the implement’s hitch pins. Insert lynch pins or safety clips to lock the arms securely.</li>
+    </ul>
+    <ul>
+      <li>Adjust the top link and secure it to the implement’s top hitch point. Tighten to prevent unwanted movement during operation.</li>
+    </ul>
+    <ul>
+      <li>Use stabiliser bars or chains to limit lateral movement. Check that stabilisers are securely tightened.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. PTO Shaft Connection (if applicable):</h2>
+    <ul>
+      <li>Inspect the PTO shaft for wear, debris, or grease build-up. Clean and grease it as necessary.</li>
+    </ul>
+    <ul>
+      <li>Align the shaft with the tractor's PTO stub and engage the locking collar or pin. Confirm the connection is secure.</li>
+    </ul>
+    <ul>
+      <li>Ensure the PTO guard rotates freely and covers the entire driveline.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Hydraulic Connections (if applicable):</h2>
+    <ul>
+      <li>Clean hydraulic couplings to prevent contamination.</li>
+    </ul>
+    <ul>
+      <li>Attach hydraulic hoses to the appropriate tractor connections and test for leaks.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>6. Final Checks:</h2>
+    <ul>
+      <li>Slowly raise and lower the implement using the hydraulics to ensure proper operation.</li>
+    </ul>
+    <ul>
+      <li>Test for stability and secure connections before starting work.</li>
+    </ul>
+    <p>3. Operation</p>
+    <p>General Operating Safety</p>
+    <ul>
+      <li>Use three points of contact when mounting or dismounting the tractor. Never jump on or off.</li>
+    </ul>
+    <ul>
+      <li>Always start the tractor from the operator’s seat, with the transmission in neutral or park. Never bypass starter circuitry.</li>
+    </ul>
+    <ul>
+      <li>Ensure no one is standing near the tractor or implement before starting the engine.</li>
+    </ul>
+    <p>Load Management</p>
+    <ul>
+      <li>Distribute loads evenly in buckets or attachments to avoid instability.</li>
+    </ul>
+    <ul>
+      <li>Keep loads low and close to the tractor while travelling to maintain balance.</li>
+    </ul>
+    <p>Terrain and Slope Safety</p>
+    <ul>
+      <li>Drive straight up or down slopes; avoid turning across them.</li>
+    </ul>
+    <ul>
+      <li>Use low gear and engine braking when descending steep grades.</li>
+    </ul>
+    <ul>
+      <li>Avoid operating near ditches, holes, or embankments that could collapse.</li>
+    </ul>
+    <p>4. Towing Loads Safely</p>
+    <p>Proper towing procedures reduce risks of loss of control or tipping.</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Approved Hitches Only:</h2>
+    <ul>
+      <li>Use only manufacturer-approved hitches. Never attach loads to parts of the tractor not designed for towing.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Weight Limits:</h2>
+    <ul>
+      <li>Do not exceed the total towed weight specified in the tractor’s manual. This includes the weight of the pulling machine, ballast, and operator.</li>
+    </ul>
+    <ul>
+      <li>Add counterweights or wheel weights to the tractor if required to maintain stability.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Speed and Stopping:</h2>
+    <ul>
+      <li>Travel slowly, especially when towing heavy loads.</li>
+    </ul>
+    <ul>
+      <li>Allow extra time and distance for stopping. Avoid sudden stops or changes in direction.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Slopes:</h2>
+    <ul>
+      <li>Reduce load weight when towing on slopes.</li>
+    </ul>
+    <ul>
+      <li>Do not attempt to back up a slope if the towed load is too heavy. Instead, reduce the load or avoid the slope entirely.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Bystander Safety:</h2>
+    <ul>
+      <li>Never allow anyone, especially children, to ride on towed equipment.</li>
+    </ul>
+    <p>5. Post-Operation</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Shutting Down:</h2>
+    <ul>
+      <li>Park the tractor on level ground, disengage the PTO, and lower all implements.</li>
+    </ul>
+    <ul>
+      <li>Turn off the engine, apply the parking brake, and remove the ignition key.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Inspection and Cleaning:</h2>
+    <ul>
+      <li>Remove any debris from the tractor, attachments, and implements.</li>
+    </ul>
+    <ul>
+      <li>Inspect for wear, leaks, or damage and report issues to a supervisor.</li>
+    </ul>
+    <ul>
+      <li>Wash the exterior and cab, and dispose of waste in compliance with environmental regulations.</li>
+    </ul>
+    <p>Competent Persons</p>
+    <p>(The following persons are authorised to operate, supervise and test workers on the equipment/process.)</p>
+    <h3>Name</h3>
+    <h3>Date</h3>
+    <h3>Phone Number</h3>
+    <h3>Signature</h3>
+  </div>
+
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This SWP may not cover all possible hazards associated with this equipment on your specific site and should be used in conjunction with other references including the Operational or User Manual. It is designed as a guide, a safety reminder, and a training support document. Users must undertake an activity risk assessment prior to using any equipment and receive training in its safe use before operation.
+  </div>
+
+  <div class="auth">
+    <div class="auth-grid">
+      <div><span class="auth-label">Authorised By:</span> Andrew Anderson, Golf Course Superintendent</div>
+      <div><span class="auth-label">Issue Date:</span> November 2026</div>
+      <div><span class="auth-label">Organisation:</span> Ranfurlie Golf Club</div>
+      <div><span class="auth-label">Next Review:</span> November 2027</div>
+    </div>
+  </div>
+
+  <a href="./" class="back">&larr; Back to SWP Hub</a>
+  <div style="height:40px"></div>
+</div>
+</div>
+</body>
+</html>

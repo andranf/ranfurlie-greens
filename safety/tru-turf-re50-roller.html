@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tru Turf RE50 Electric Golf Roller - SWP | Ranfurlie Golf Club</title>
+<meta name="description" content="Safe Work Procedure: Operating a Greens Roller">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6);--glass-hi:rgba(255,255,255,.8);--glass-lo:rgba(255,255,255,.36);--glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92);--rim2:rgba(255,255,255,.38);--edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);
+  --acc:#4b5d73;--acc-deep:#2f3d4f;--acc-soft:rgba(75,93,115,.15);--acc-line:rgba(75,93,115,.4);--acc-ink:#fff;
+  --ok:#13a356;--ok-bg:rgba(19,163,86,.14);
+  --hi:#e0313b;--hi-bg:rgba(224,49,59,.12);
+  --med:#b86a00;--med-bg:rgba(255,176,32,.2);
+  --warn-bg:rgba(224,49,59,.08);--warn-border:rgba(224,49,59,.25);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px;--r2:16px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+a{color:var(--acc-deep)}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,rgba(75,93,115,.45) 0,transparent 62%)}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,rgba(75,93,115,.2) 0,transparent 62%)}
+
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+  border-radius:var(--r);padding:20px;min-width:0;
+}
+@media(min-width:640px){.card{padding:28px}}
+
+.top{padding:16px 0 8px}
+.topline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:clamp(28px,6vw,42px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:14px;height:14px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px var(--acc-soft)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+.breadcrumb a{color:var(--acc);text-decoration:none;font-weight:600}
+.breadcrumb a:hover{text-decoration:underline}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.meta .tag{background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:4px 14px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+
+.warning-box{background:var(--warn-bg);border:1.5px solid var(--warn-border);border-radius:var(--r2);padding:16px 18px;margin-bottom:20px;font-weight:600;font-size:15px;line-height:1.45}
+.warning-box .icon{font-size:20px;margin-right:6px}
+
+.section{margin-bottom:24px}
+.section h2{font-size:22px;color:var(--acc-deep);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--acc-soft)}
+.section h3{font-size:17px;margin:14px 0 6px;color:var(--fg);font-family:var(--display);font-weight:700}
+.section ul{margin:6px 0 12px;padding-left:22px}
+.section ul li{margin-bottom:6px;line-height:1.45}
+.section ol{margin:6px 0 12px;padding-left:22px}
+.section ol li{margin-bottom:6px;line-height:1.45}
+.section p{margin:6px 0 10px}
+
+.ppe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0}
+.ppe-item{background:var(--acc-soft);border-radius:var(--r2);padding:12px;text-align:center;font-weight:600;font-size:14px}
+.ppe-item .ppe-icon{font-size:28px;display:block;margin-bottom:4px}
+
+.disclaimer{background:var(--glass-lo);border-radius:var(--r2);padding:16px 18px;margin-top:24px;font-size:13px;color:var(--muted);line-height:1.5}
+
+.auth{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
+@media(max-width:480px){.auth-grid{grid-template-columns:1fr}}
+.auth-label{color:var(--muted);font-weight:600}
+
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;text-decoration:none;color:var(--acc);margin-top:20px;padding:8px 16px;border-radius:999px;background:var(--acc-soft);transition:background .2s}
+.back:hover{background:var(--acc-line)}
+
+.theme-toggle{position:fixed;top:12px;right:12px;z-index:100;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
+
+@media print{
+  .sky,.theme-toggle{display:none}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ccc;backdrop-filter:none;background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i></div>
+<button class="theme-toggle" onclick="let r=document.documentElement,t=r.dataset.theme;r.dataset.theme=t==='dark'?'light':'dark'" aria-label="Toggle theme">&#9681;</button>
+
+<div class="gut">
+<div class="wrap">
+  <div class="top">
+    <div class="breadcrumb">
+      <a href="../">Ranfurlie</a> <span>/</span>
+      <a href="./">Safety &amp; SWPs</a> <span>/</span>
+      <span>Tru Turf RE50 Electric Golf Roller</span>
+    </div>
+    <div class="topline">
+      <h1><span class="dot"></span> Tru Turf RE50 Electric Golf Roller</h1>
+    </div>
+    <div class="meta">
+      <span class="tag">SWP</span>
+      <span class="tag">Issue: Nov 2026</span>
+      <span class="tag">Review: Nov 2027</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px">
+      <div><strong>Description:</strong> Operating a Greens Roller</div>
+      <div><strong>Make / Model:</strong> Tru Turf RE50 Electric Golf Roller</div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="icon">&#9888;</span> DO NOT operate this equipment unless you have been fully trained in its safe use and operation, have read the user manual, and have conducted a risk assessment using the Task Tracker QR system.
+  </div>
+
+  <div class="section card">
+    <h2>1. Familiarise yourself with the operator’s manual, machine controls, and all safety guidelines.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Complete a pre-use risk assessment via the task tracker QR code system to confirm competency.</h2>
+    <p>Inspection of Worksite</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Examine the area for potential hazards such as rocks, debris, sprinkler heads, or wet patches.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Assess the terrain for uneven surfaces, steep slopes, or soft ground that could cause instability.</h2>
+    <p>Equipment Checks</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Tighten all nuts, bolts, and grub screws. Replace or reapply Loctite sealants where seals are broken.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Verify the batteries are fully charged using the charger meter for accurate status. Ensure no overheating or wear on charging leads.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>3. Inspect the steering joystick for looseness and test the foot pedal’s return to the neutral position.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>4. Confirm the draw bar locking mechanism is secure, with the safety pin properly in place.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>5. Inspect all safety decals and operational labels, ensuring they are intact and legible.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>6. Check tyre pressure (15 psi) and avoid over-inflation to maintain stability.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>7. Lubricate all required components, including:</h2>
+    <ul>
+      <li>Bearings (apply lightly).</li>
+    </ul>
+    <ul>
+      <li>Drive chain (use appropriate chain lubricant).</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>8. Verify the emergency stop system is functioning correctly.</h2>
+    <p>Communication and Coordination</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Notify other staff of planned work locations to ensure operational areas are clear.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Plan efficient movement between greens to reduce unnecessary machine wear.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>3. Document any concerns or irregularities noted during the pre-operation inspection.</h2>
+    <p>Operation Procedures</p>
+    <p>Towing and Movement</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Use a suitable towing vehicle, ensuring the roller is properly attached and locked.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Travel at a safe towing speed (not exceeding 7 km/h or golf buggy speed).</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>3. Avoid towing the roller across rough or uneven terrain at high speeds.</h2>
+    <p>Starting the Roller</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Position the roller on the fringe of the green before setup; never tow directly onto the green.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Start the roller on a stable, level surface and drive gently onto the green.</h2>
+    <p>Rolling Greens</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Roll greens in any direction while ensuring no crease lines are left on the surface.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Utilise regenerative braking for smooth stopping, allowing adequate distance to stop safely.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>3. Monitor surroundings continuously to avoid collisions with golfers, maintenance staff, or obstacles.</h2>
+    <p>Operational Safety Practices</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Operate cautiously on slopes, always approaching perpendicularly to minimise the risk of rollover.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Avoid use during heavy rain, fog, or other low-visibility conditions.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>3. Never leave the roller unattended while in operation.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>4. Passengers are not permitted on the machine at any time.</h2>
+    <p>Post-Operation Checklist</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Clean grass and debris from rollers, checking all components for damage during the cleaning process.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Inspect for wear, such as loosened bolts or damaged decals, and address issues promptly.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>3. Park the roller in its designated storage area and connect it to the charging device.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>4. Log all maintenance needs or unusual performance observations in the equipment logbook.</h2>
+    <p>Legislative Compliance</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Occupational Health and Safety Act 2004 (Vic): Adhere to legal requirements for safe plant operation and workplace practices.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Occupational Health and Safety Regulations 2017 (Vic): Follow safety standards for plant, machinery, and manual handling.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>3. Electricity Safety Act 1998 (Vic): Ensure compliance with guidelines for battery-operated equipment.</h2>
+    <p>Training and Competency</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Operators must complete initial training covering machine operation, hazard identification, and legislative requirements.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Supervisors must assess and verify operator competency through supervised tests.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>3. Regular refresher training is mandatory to address equipment updates, procedural changes, or identified safety concerns.</h2>
+    <p>Risk Management</p>
+  </div>
+
+  <div class="section card">
+    <h2>1. Conduct periodic reviews of the Safe Work Procedure to incorporate updates in equipment, site conditions, or legislation.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>2. Perform a Job Safety Analysis (JSA) for tasks involving higher risks or unique environmental conditions.</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>3. Actively encourage reporting of near-misses, hazards, or risks to foster a culture of continuous safety improvement.</h2>
+    <p>Competent Persons</p>
+    <p>(The following persons are authorised to operate, supervise and test workers on the equipment/process.)</p>
+    <h3>Name</h3>
+    <h3>Date</h3>
+    <h3>Phone Number</h3>
+    <h3>Signature</h3>
+  </div>
+
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This SWP may not cover all possible hazards associated with this equipment on your specific site and should be used in conjunction with other references including the Operational or User Manual. It is designed as a guide, a safety reminder, and a training support document. Users must undertake an activity risk assessment prior to using any equipment and receive training in its safe use before operation.
+  </div>
+
+  <div class="auth">
+    <div class="auth-grid">
+      <div><span class="auth-label">Authorised By:</span> Andrew Anderson, Golf Course Superintendent</div>
+      <div><span class="auth-label">Issue Date:</span> November 2026</div>
+      <div><span class="auth-label">Organisation:</span> Ranfurlie Golf Club</div>
+      <div><span class="auth-label">Next Review:</span> November 2027</div>
+    </div>
+  </div>
+
+  <a href="./" class="back">&larr; Back to SWP Hub</a>
+  <div style="height:40px"></div>
+</div>
+</div>
+</body>
+</html>

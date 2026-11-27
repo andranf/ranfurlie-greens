@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>JD Z977R Z-Trac Zero Turn - SWP | Ranfurlie Golf Club</title>
+<meta name="description" content="Safe Work Procedure: Ride-On Zero-Turn Mowing">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6);--glass-hi:rgba(255,255,255,.8);--glass-lo:rgba(255,255,255,.36);--glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92);--rim2:rgba(255,255,255,.38);--edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);
+  --acc:#4b5d73;--acc-deep:#2f3d4f;--acc-soft:rgba(75,93,115,.15);--acc-line:rgba(75,93,115,.4);--acc-ink:#fff;
+  --ok:#13a356;--ok-bg:rgba(19,163,86,.14);
+  --hi:#e0313b;--hi-bg:rgba(224,49,59,.12);
+  --med:#b86a00;--med-bg:rgba(255,176,32,.2);
+  --warn-bg:rgba(224,49,59,.08);--warn-border:rgba(224,49,59,.25);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px;--r2:16px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+a{color:var(--acc-deep)}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,rgba(75,93,115,.45) 0,transparent 62%)}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,rgba(75,93,115,.2) 0,transparent 62%)}
+
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+  border-radius:var(--r);padding:20px;min-width:0;
+}
+@media(min-width:640px){.card{padding:28px}}
+
+.top{padding:16px 0 8px}
+.topline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:clamp(28px,6vw,42px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:14px;height:14px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px var(--acc-soft)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+.breadcrumb a{color:var(--acc);text-decoration:none;font-weight:600}
+.breadcrumb a:hover{text-decoration:underline}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.meta .tag{background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:4px 14px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+
+.warning-box{background:var(--warn-bg);border:1.5px solid var(--warn-border);border-radius:var(--r2);padding:16px 18px;margin-bottom:20px;font-weight:600;font-size:15px;line-height:1.45}
+.warning-box .icon{font-size:20px;margin-right:6px}
+
+.section{margin-bottom:24px}
+.section h2{font-size:22px;color:var(--acc-deep);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--acc-soft)}
+.section h3{font-size:17px;margin:14px 0 6px;color:var(--fg);font-family:var(--display);font-weight:700}
+.section ul{margin:6px 0 12px;padding-left:22px}
+.section ul li{margin-bottom:6px;line-height:1.45}
+.section ol{margin:6px 0 12px;padding-left:22px}
+.section ol li{margin-bottom:6px;line-height:1.45}
+.section p{margin:6px 0 10px}
+
+.ppe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0}
+.ppe-item{background:var(--acc-soft);border-radius:var(--r2);padding:12px;text-align:center;font-weight:600;font-size:14px}
+.ppe-item .ppe-icon{font-size:28px;display:block;margin-bottom:4px}
+
+.disclaimer{background:var(--glass-lo);border-radius:var(--r2);padding:16px 18px;margin-top:24px;font-size:13px;color:var(--muted);line-height:1.5}
+
+.auth{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
+@media(max-width:480px){.auth-grid{grid-template-columns:1fr}}
+.auth-label{color:var(--muted);font-weight:600}
+
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;text-decoration:none;color:var(--acc);margin-top:20px;padding:8px 16px;border-radius:999px;background:var(--acc-soft);transition:background .2s}
+.back:hover{background:var(--acc-line)}
+
+.theme-toggle{position:fixed;top:12px;right:12px;z-index:100;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
+
+@media print{
+  .sky,.theme-toggle{display:none}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ccc;backdrop-filter:none;background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i></div>
+<button class="theme-toggle" onclick="let r=document.documentElement,t=r.dataset.theme;r.dataset.theme=t==='dark'?'light':'dark'" aria-label="Toggle theme">&#9681;</button>
+
+<div class="gut">
+<div class="wrap">
+  <div class="top">
+    <div class="breadcrumb">
+      <a href="../">Ranfurlie</a> <span>/</span>
+      <a href="./">Safety &amp; SWPs</a> <span>/</span>
+      <span>JD Z977R Z-Trac Zero Turn</span>
+    </div>
+    <div class="topline">
+      <h1><span class="dot"></span> JD Z977R Z-Trac Zero Turn</h1>
+    </div>
+    <div class="meta">
+      <span class="tag">SWP</span>
+      <span class="tag">Issue: Nov 2026</span>
+      <span class="tag">Review: Nov 2027</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px">
+      <div><strong>Description:</strong> Ride-On Zero-Turn Mowing</div>
+      <div><strong>Make / Model:</strong> John Deere Z977R Z-Trac</div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="icon">&#9888;</span> DO NOT operate this equipment unless you have been fully trained in its safe use and operation, have read the user manual, and have conducted a risk assessment using the Task Tracker QR system.
+  </div>
+
+  <div class="section card">
+    <h2>1. Potential Hazards</h2>
+    <ul>
+      <li>Rollover: Zero-turn mowers have a high centre of gravity relative to their wheelbase. Operating on slopes greater than 15 degrees, turning sharply on hillsides, or mowing across wet slopes risks rollover, which can pin or crush the operator.</li>
+      <li>Blade contact: Three high-speed blades rotate under the deck. Reaching under the deck, dismounting while blades are engaged, or ejected objects can cause severe lacerations or amputations.</li>
+      <li>Ejected debris: Stones, sticks, irrigation covers, and hidden objects can be thrown at high velocity from under the deck, striking operators, bystanders, or golfers up to 20 metres away.</li>
+      <li>Noise exposure: Operating noise typically exceeds 90 dB(A), causing irreversible hearing damage without protection.</li>
+      <li>Fuel fire: The petrol tank and fuel lines are exposed to heat from the engine. Refuelling a hot engine or spilling fuel creates ignition risk.</li>
+      <li>Struck by golfers: Operating on fairways and rough areas where golf balls are in play. Errant shots can strike the operator.</li>
+      <li>Pinch and crush points: Moving parts in the engine compartment, belt guards, and deck lift mechanism can trap fingers or clothing.</li>
+      <li>Vibration: Whole-body vibration from extended operation contributes to lower back injury.</li>
+      <li>Carbon monoxide: Operating in enclosed or poorly ventilated areas (e.g., under tree canopy in still conditions) can lead to CO exposure.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Required Personal Protective Equipment (PPE)</h2>
+    <ul>
+      <li>Steel-capped boots (mandatory).</li>
+      <li>Hearing protection rated Class 5 (mandatory).</li>
+      <li>Safety glasses or face shield (mandatory).</li>
+      <li>Sun hat and SPF 50+ sunscreen.</li>
+      <li>Long trousers (mandatory - no shorts while operating ride-on mowers).</li>
+      <li>High-visibility vest when working near roads or car parks.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Pre-Operational Checks</h2>
+    <h3>a. Machine Inspection</h3>
+    <ul>
+      <li>Complete pre-start checklist via Task Tracker QR system.</li>
+      <li>Check engine oil, hydraulic oil, and coolant levels.</li>
+      <li>Inspect mower blades for sharpness, cracks, or imbalance. Dull blades tear turf and increase fuel consumption.</li>
+      <li>Check tyre pressures; uneven pressures cause an uneven cut.</li>
+      <li>Verify the deck is level side-to-side and pitched correctly front-to-back.</li>
+      <li>Inspect drive belts for wear and correct tension.</li>
+      <li>Test the seat safety switch: the engine must stop when the operator leaves the seat with blades engaged.</li>
+      <li>Check fuel level; refuel on a hard surface with the engine off and cool.</li>
+    </ul>
+    <h3>b. Work Area</h3>
+    <ul>
+      <li>Walk or visually scan the mowing area for debris, sprinkler heads, tree roots, and hidden hazards.</li>
+      <li>Identify and mark any irrigation valve boxes, drainage pits, or soft ground.</li>
+      <li>Check slope angles; do not operate on slopes exceeding the manufacturer's recommendation (typically 15 degrees).</li>
+      <li>Confirm golfer traffic patterns with the pro shop via two-way radio.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Operation</h2>
+    <h3>a. Start-Up</h3>
+    <ul>
+      <li>Sit in the operator seat, fasten the seatbelt if fitted.</li>
+      <li>Ensure PTO is disengaged, steering levers in neutral, and park brake on.</li>
+      <li>Start the engine and allow it to warm for 60 seconds.</li>
+      <li>Release the park brake, engage the blades only when in the mowing area.</li>
+    </ul>
+    <h3>b. During Operation</h3>
+    <ul>
+      <li>Mow at a consistent speed appropriate to the terrain and grass density.</li>
+      <li>On slopes, travel up and down rather than across to reduce rollover risk.</li>
+      <li>Reduce speed before turning. Avoid sharp zero-radius turns on turf, which tear the surface.</li>
+      <li>Maintain at least 3 metres clearance from bunker edges, garden beds, and tree trunks.</li>
+      <li>Keep the discharge chute directed away from golfers, buildings, paths, and car parks.</li>
+      <li>If the deck clogs in heavy grass, disengage blades, stop the engine, wait for blades to stop, then clear the blockage.</li>
+    </ul>
+    <h3>c. Golf Course Specific Rules</h3>
+    <ul>
+      <li>Yield to all golfers. Stop and wait for groups to pass or play their shots.</li>
+      <li>Do not mow within the golfer exclusion zone when play is in progress on adjacent holes.</li>
+      <li>Avoid mowing wet turf where possible; tyre tracks on soft ground damage the playing surface.</li>
+      <li>Vary mowing patterns weekly to prevent rut formation and grain development.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Emergency Procedures</h2>
+    <h3>a. Fire</h3>
+    <ul>
+      <li>Stop the engine immediately. Disengage the PTO.</li>
+      <li>Dismount and move upwind of the machine.</li>
+      <li>Use the fire extinguisher if the fire is small and contained.</li>
+      <li>Call 000 if the fire cannot be controlled. Notify the superintendent.</li>
+    </ul>
+    <h3>b. Rollover</h3>
+    <ul>
+      <li>Do not attempt to jump off a tipping machine; hold the steering levers firmly and brace yourself.</li>
+      <li>If the machine rolls, do not attempt to lift it; call for assistance immediately.</li>
+      <li>Administer first aid. Call 000 for serious injuries.</li>
+    </ul>
+    <h3>c. Injury</h3>
+    <ul>
+      <li>Stop the machine and render the area safe.</li>
+      <li>Apply first aid. For blade contact injuries, control bleeding with direct pressure.</li>
+      <li>Call 000 for emergencies. Site address: 825 Cranbourne-Frankston Rd, Cranbourne VIC 3977.</li>
+      <li>Complete an incident report in Task Tracker.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>6. Post-Operational Procedures</h2>
+    <ul>
+      <li>Disengage blades and allow them to stop before leaving the seat.</li>
+      <li>Drive the mower to the wash-down bay at reduced speed.</li>
+      <li>Wash down the machine thoroughly, cleaning under the deck.</li>
+      <li>Inspect blades for damage after each use.</li>
+      <li>Refuel for the next operator if tank is below half.</li>
+      <li>Park in the designated bay in the machinery shed. Apply the park brake.</li>
+      <li>Report any faults in Task Tracker.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>7. Maintenance and Servicing</h2>
+    <ul>
+      <li>Daily: clean machine, check oil and tyre pressures, inspect blades.</li>
+      <li>Every 50 hours: change engine oil and filter, grease all zerks, check air filter.</li>
+      <li>Every 200 hours: replace hydraulic oil filter, check drive belts, inspect deck spindles.</li>
+      <li>Blade sharpening: as directed by the superintendent, typically weekly during peak growth.</li>
+      <li>All servicing recorded in Task Tracker.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>8. Relevant Legislation</h2>
+    <ul>
+      <li>Occupational Health and Safety Act 2004 (Vic).</li>
+      <li>Occupational Health and Safety Regulations 2017 (Vic).</li>
+      <li>AS/NZS 4024.1 Safety of Machinery.</li>
+      <li>EPA Victoria noise regulations.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>9. Record Keeping</h2>
+    <ul>
+      <li>Pre-start checklists completed daily via Task Tracker QR system.</li>
+      <li>All faults, repairs, and servicing recorded in Task Tracker.</li>
+      <li>Incident and near-miss reports submitted through Task Tracker.</li>
+      <li>Training records maintained for all operators.</li>
+    </ul>
+  </div>
+
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This SWP may not cover all possible hazards associated with this equipment on your specific site and should be used in conjunction with other references including the Operational or User Manual. It is designed as a guide, a safety reminder, and a training support document. Users must undertake an activity risk assessment prior to using any equipment and receive training in its safe use before operation.
+  </div>
+
+  <div class="auth">
+    <div class="auth-grid">
+      <div><span class="auth-label">Authorised By:</span> Andrew Anderson, Golf Course Superintendent</div>
+      <div><span class="auth-label">Issue Date:</span> November 2026</div>
+      <div><span class="auth-label">Organisation:</span> Ranfurlie Golf Club</div>
+      <div><span class="auth-label">Next Review:</span> November 2027</div>
+    </div>
+  </div>
+
+  <a href="./" class="back">&larr; Back to SWP Hub</a>
+  <div style="height:40px"></div>
+</div>
+</div>
+</body>
+</html>

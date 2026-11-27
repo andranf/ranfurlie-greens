@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>John Deere HD 200 Boom Sprayer - SWP | Ranfurlie Golf Club</title>
+<meta name="description" content="Safe Work Procedure: Applying Pesticides - Boom Spraying">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6);--glass-hi:rgba(255,255,255,.8);--glass-lo:rgba(255,255,255,.36);--glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92);--rim2:rgba(255,255,255,.38);--edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);
+  --acc:#4b5d73;--acc-deep:#2f3d4f;--acc-soft:rgba(75,93,115,.15);--acc-line:rgba(75,93,115,.4);--acc-ink:#fff;
+  --ok:#13a356;--ok-bg:rgba(19,163,86,.14);
+  --hi:#e0313b;--hi-bg:rgba(224,49,59,.12);
+  --med:#b86a00;--med-bg:rgba(255,176,32,.2);
+  --warn-bg:rgba(224,49,59,.08);--warn-border:rgba(224,49,59,.25);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px;--r2:16px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+a{color:var(--acc-deep)}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,rgba(75,93,115,.45) 0,transparent 62%)}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,rgba(75,93,115,.2) 0,transparent 62%)}
+
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+  border-radius:var(--r);padding:20px;min-width:0;
+}
+@media(min-width:640px){.card{padding:28px}}
+
+.top{padding:16px 0 8px}
+.topline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:clamp(28px,6vw,42px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:14px;height:14px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px var(--acc-soft)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+.breadcrumb a{color:var(--acc);text-decoration:none;font-weight:600}
+.breadcrumb a:hover{text-decoration:underline}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.meta .tag{background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:4px 14px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+
+.warning-box{background:var(--warn-bg);border:1.5px solid var(--warn-border);border-radius:var(--r2);padding:16px 18px;margin-bottom:20px;font-weight:600;font-size:15px;line-height:1.45}
+.warning-box .icon{font-size:20px;margin-right:6px}
+
+.section{margin-bottom:24px}
+.section h2{font-size:22px;color:var(--acc-deep);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--acc-soft)}
+.section h3{font-size:17px;margin:14px 0 6px;color:var(--fg);font-family:var(--display);font-weight:700}
+.section ul{margin:6px 0 12px;padding-left:22px}
+.section ul li{margin-bottom:6px;line-height:1.45}
+.section ol{margin:6px 0 12px;padding-left:22px}
+.section ol li{margin-bottom:6px;line-height:1.45}
+.section p{margin:6px 0 10px}
+
+.ppe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0}
+.ppe-item{background:var(--acc-soft);border-radius:var(--r2);padding:12px;text-align:center;font-weight:600;font-size:14px}
+.ppe-item .ppe-icon{font-size:28px;display:block;margin-bottom:4px}
+
+.disclaimer{background:var(--glass-lo);border-radius:var(--r2);padding:16px 18px;margin-top:24px;font-size:13px;color:var(--muted);line-height:1.5}
+
+.auth{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
+@media(max-width:480px){.auth-grid{grid-template-columns:1fr}}
+.auth-label{color:var(--muted);font-weight:600}
+
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;text-decoration:none;color:var(--acc);margin-top:20px;padding:8px 16px;border-radius:999px;background:var(--acc-soft);transition:background .2s}
+.back:hover{background:var(--acc-line)}
+
+.theme-toggle{position:fixed;top:12px;right:12px;z-index:100;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
+
+@media print{
+  .sky,.theme-toggle{display:none}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ccc;backdrop-filter:none;background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i></div>
+<button class="theme-toggle" onclick="let r=document.documentElement,t=r.dataset.theme;r.dataset.theme=t==='dark'?'light':'dark'" aria-label="Toggle theme">&#9681;</button>
+
+<div class="gut">
+<div class="wrap">
+  <div class="top">
+    <div class="breadcrumb">
+      <a href="../">Ranfurlie</a> <span>/</span>
+      <a href="./">Safety &amp; SWPs</a> <span>/</span>
+      <span>John Deere HD 200 Boom Sprayer</span>
+    </div>
+    <div class="topline">
+      <h1><span class="dot"></span> John Deere HD 200 Boom Sprayer</h1>
+    </div>
+    <div class="meta">
+      <span class="tag">SWP</span>
+      <span class="tag">Issue: Nov 2026</span>
+      <span class="tag">Review: Nov 2027</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px">
+      <div><strong>Description:</strong> Applying Pesticides - Boom Spraying</div>
+      <div><strong>Make / Model:</strong> John Deere HD 200</div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="icon">&#9888;</span> DO NOT operate this equipment unless you have been fully trained in its safe use and operation, have read the user manual, and have conducted a risk assessment using the Task Tracker QR system.
+  </div>
+
+  <div class="section card">
+    <h2>1. Potential Hazards</h2>
+    <ul>
+      <li>Chemical Exposure: Risk of skin contact, inhalation, or ingestion of herbicides causing irritation, poisoning, or long-term health issues.</li>
+    </ul>
+    <ul>
+      <li>Incorrect PPE Usage: Failure to follow label-specific PPE requirements may result in severe health risks.</li>
+    </ul>
+    <ul>
+      <li>Environmental Contamination: Herbicides may contaminate watercourses, soil, or non-target vegetation if misapplied or spilled.</li>
+    </ul>
+    <ul>
+      <li>Drift and Runoff: Unintended spray drift or chemical runoff can harm neighbouring ecosystems.</li>
+    </ul>
+    <ul>
+      <li>Equipment Failure: Faulty or poorly maintained sprayers can lead to leaks, uneven application, or operator injury.</li>
+    </ul>
+    <ul>
+      <li>Slip, Trip, and Fall: Wet or uneven terrain during spraying increases the risk of accidents.</li>
+    </ul>
+    <ul>
+      <li>Reputation and Legal Risks: Non-compliance with herbicide laws and poor record-keeping can lead to fines, community complaints, or reputational damage.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Required Personal Protective Equipment (PPE)</h2>
+    <p>PPE requirements must always be determined by consulting the herbicide label and Safety Data Sheet (SDS) prior to mixing or application. Typical PPE includes:</p>
+    <ul>
+      <li>Mandatory:</li>
+    </ul>
+    <ul>
+      <li>Chemical-resistant gloves.</li>
+    </ul>
+    <ul>
+      <li>Long-sleeve shirts and long pants.</li>
+    </ul>
+    <ul>
+      <li>Safety goggles or a face shield.</li>
+    </ul>
+    <ul>
+      <li>Respirator or dust mask (if indicated on the label).</li>
+    </ul>
+    <ul>
+      <li>Steel-capped boots with slip-resistant soles.</li>
+    </ul>
+    <ul>
+      <li>Additional PPE as Per Label Instructions:</li>
+    </ul>
+    <ul>
+      <li>Aprons or coveralls for certain concentrated herbicides.</li>
+    </ul>
+    <ul>
+      <li>Arm shields or specific footwear if required by the label.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Pre-Operational Checks</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Read and Understand the Label:</h2>
+    <ul>
+      <li>Always read the entire label before opening the herbicide container.</li>
+    </ul>
+    <ul>
+      <li>Note specific PPE requirements, mixing ratios, application rates, and restrictions (e.g., wind speed, temperature).</li>
+    </ul>
+    <ul>
+      <li>Follow all label instructions to ensure compliance and effectiveness.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Inspection of the HD200 Sprayer:</h2>
+    <ul>
+      <li>Check hoses, nozzles, and tanks for leaks, cracks, or blockages.</li>
+    </ul>
+    <ul>
+      <li>Ensure pressure gauges, valves, and nozzles are operational.</li>
+    </ul>
+    <ul>
+      <li>Verify that previous herbicides have been fully cleaned from the tank to avoid cross-contamination.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Calibration:</h2>
+    <ul>
+      <li>Use Spray Diary software to calibrate the sprayer based on label specifications for nozzle flow rate, pressure, and ground speed.</li>
+    </ul>
+    <ul>
+      <li>Perform a small test spray on a non-critical area to ensure accuracy.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Weather Conditions:</h2>
+    <ul>
+      <li>Do not spray in winds above 15 km/h to prevent drift.</li>
+    </ul>
+    <ul>
+      <li>Avoid spraying in temperatures above 30°C or during rain to ensure herbicide efficacy and minimise runoff, unless specified otherwise.</li>
+    </ul>
+    <ul>
+      <li>Record weather conditions in Spray Diary.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Herbicide Check:</h2>
+    <ul>
+      <li>Confirm that the herbicide is approved for use in Victoria and suitable for the target area.</li>
+    </ul>
+    <ul>
+      <li>Inspect containers for labels, seals, and expiration dates.</li>
+    </ul>
+    <ul>
+      <li>Use Task Tracker to log inventory withdrawal and track herbicide usage.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Operation</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Mixing Herbicides:</h2>
+    <ul>
+      <li>Mix in a designated area with spill containment measures.</li>
+    </ul>
+    <ul>
+      <li>Wear PPE as indicated on the label.</li>
+    </ul>
+    <ul>
+      <li>Fill the tank halfway with water, then add the herbicide to reduce splashing.</li>
+    </ul>
+    <ul>
+      <li>Stir or agitate the mixture according to label instructions, and never mix more herbicide than needed for the application.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Application:</h2>
+    <ul>
+      <li>Adjust boom height and nozzle spacing on the HD200 sprayer to match the herbicide’s coverage requirements.</li>
+    </ul>
+    <ul>
+      <li>Maintain a consistent ground speed and pressure as per calibration.</li>
+    </ul>
+    <ul>
+      <li>Begin spraying from the centre of the area, avoiding sensitive boundaries such as waterways, trees, or neighbouring properties.</li>
+    </ul>
+    <ul>
+      <li>Overlap spray passes slightly for consistent coverage, avoiding double-spraying to prevent over-application.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Minimising Drift and Runoff:</h2>
+    <ul>
+      <li>Use drift-reduction nozzles if required.</li>
+    </ul>
+    <ul>
+      <li>Operate the sprayer at low pressure and avoid spraying in windy conditions.</li>
+    </ul>
+    <ul>
+      <li>Apply buffer zones as indicated on the label, particularly near water sources or sensitive areas.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>4. Record Keeping:</h2>
+    <ul>
+      <li>Log all spray details in Spray Diary, including:</li>
+    </ul>
+    <ul>
+      <li>Herbicide used, rate of application, and total area covered.</li>
+    </ul>
+    <ul>
+      <li>Operator details, date, time, and weather conditions.</li>
+    </ul>
+    <ul>
+      <li>Calibration settings and any deviations from standard procedure.</li>
+    </ul>
+    <ul>
+      <li>Track remaining inventory in Task Tracker to ensure stock levels are accurate.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>5. Post-Operational Procedures</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Cleaning the Sprayer:</h2>
+    <ul>
+      <li>Rinse the tank, lines, and nozzles with clean water immediately after use.</li>
+    </ul>
+    <ul>
+      <li>Dispose of rinse water per herbicide label and EPA Victoria guidelines to prevent contamination.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Inspection and Maintenance:</h2>
+    <ul>
+      <li>Inspect the sprayer for wear or damage, including nozzles, hoses, and gaskets.</li>
+    </ul>
+    <ul>
+      <li>Record any maintenance actions in Task Tracker.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Storage:</h2>
+    <ul>
+      <li>Store the sprayer in a clean, dry location away from ignition sources.</li>
+    </ul>
+    <ul>
+      <li>Secure herbicides in their original containers in a locked, ventilated storage area.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>6. Emergency Procedures</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Spill Management:</h2>
+    <ul>
+      <li>Contain the spill using absorbent materials or spill kits.</li>
+    </ul>
+    <ul>
+      <li>Notify the supervisor and dispose of contaminated materials as outlined in the herbicide SDS.</li>
+    </ul>
+    <ul>
+      <li>Record the incident in Spray Diary and Task Tracker.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Chemical Exposure:</h2>
+    <ul>
+      <li>For skin contact: Remove contaminated clothing and wash with soap and water for 15 minutes.</li>
+    </ul>
+    <ul>
+      <li>For inhalation: Move to fresh air and seek medical attention if symptoms persist.</li>
+    </ul>
+    <ul>
+      <li>For eye contact: Flush with water for 15 minutes and consult a doctor.</li>
+    </ul>
+    <ul>
+      <li>Document the incident in the club’s incident report system.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>3. Equipment Malfunction:</h2>
+    <ul>
+      <li>Stop the sprayer immediately if leaks or pressure issues occur.</li>
+    </ul>
+    <ul>
+      <li>Tag the sprayer as &quot;Out of Service&quot; and report it to the maintenance team for repair.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>7. Relevant Legislation and Guidelines</h2>
+    <ul>
+      <li>Agricultural and Veterinary Chemicals (Control of Use) Act 1992 (Vic): Governs safe use and application of herbicides.</li>
+    </ul>
+    <ul>
+      <li>EPA Victoria Guidelines: Covers spray drift management, buffer zones, and runoff prevention.</li>
+    </ul>
+    <ul>
+      <li>WorkSafe Victoria Standards: Mandates workplace safety, including PPE and chemical handling.</li>
+    </ul>
+    <ul>
+      <li>APVMA Guidelines: Regulates approved herbicides and labelling requirements.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>8. Record Keeping</h2>
+
+  </div>
+
+  <div class="section card">
+    <h2>1. Spray Diary:</h2>
+    <ul>
+      <li>Log every application, including operator details, herbicides used, and environmental conditions.</li>
+    </ul>
+    <ul>
+      <li>Maintain these records for a minimum of five years to comply with Victorian law.</li>
+    </ul>
+  </div>
+
+  <div class="section card">
+    <h2>2. Task Tracker:</h2>
+    <ul>
+      <li>Track consumables, including herbicide inventory, usage, and reorder needs.</li>
+    </ul>
+    <ul>
+      <li>Use to forecast stock requirements and prevent overordering or wastage.</li>
+    </ul>
+    <p>Competent Persons</p>
+    <p>(The following persons are authorised to operate, supervise and test workers on the equipment/process.)</p>
+    <h3>Name</h3>
+    <h3>Date</h3>
+    <h3>Phone Number</h3>
+    <h3>Signature</h3>
+  </div>
+
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This SWP may not cover all possible hazards associated with this equipment on your specific site and should be used in conjunction with other references including the Operational or User Manual. It is designed as a guide, a safety reminder, and a training support document. Users must undertake an activity risk assessment prior to using any equipment and receive training in its safe use before operation.
+  </div>
+
+  <div class="auth">
+    <div class="auth-grid">
+      <div><span class="auth-label">Authorised By:</span> Andrew Anderson, Golf Course Superintendent</div>
+      <div><span class="auth-label">Issue Date:</span> November 2026</div>
+      <div><span class="auth-label">Organisation:</span> Ranfurlie Golf Club</div>
+      <div><span class="auth-label">Next Review:</span> November 2027</div>
+    </div>
+  </div>
+
+  <a href="./" class="back">&larr; Back to SWP Hub</a>
+  <div style="height:40px"></div>
+</div>
+</div>
+</body>
+</html>

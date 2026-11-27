@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Volunteer Induction - SWP | Ranfurlie Golf Club</title>
+<meta name="description" content="Safe Work Procedure: Volunteer Safety Induction">
+<meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07090d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2313a356'/%3E%3Cpath d='M22 50V14l20 8-20 8' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#e8f1f3;
+  --glass:rgba(255,255,255,.6);--glass-hi:rgba(255,255,255,.8);--glass-lo:rgba(255,255,255,.36);--glass-solid:rgba(247,251,252,.96);
+  --rim:rgba(255,255,255,.92);--rim2:rgba(255,255,255,.38);--edge:rgba(16,52,72,.10);
+  --shadow:0 18px 40px -20px rgba(14,52,76,.35),0 2px 6px -2px rgba(14,52,76,.12);
+  --fg:#0b2231;--muted:#3f5d6e;--faint:#6f8a99;--line:rgba(16,52,72,.12);
+  --acc:#4b5d73;--acc-deep:#2f3d4f;--acc-soft:rgba(75,93,115,.15);--acc-line:rgba(75,93,115,.4);--acc-ink:#fff;
+  --ok:#13a356;--ok-bg:rgba(19,163,86,.14);
+  --hi:#e0313b;--hi-bg:rgba(224,49,59,.12);
+  --med:#b86a00;--med-bg:rgba(255,176,32,.2);
+  --warn-bg:rgba(224,49,59,.08);--warn-border:rgba(224,49,59,.25);
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:24px;--r2:16px;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#06121b;
+  --glass:rgba(18,40,56,.54);--glass-hi:rgba(28,58,78,.68);--glass-lo:rgba(18,40,56,.34);--glass-solid:rgba(13,31,44,.97);
+  --rim:rgba(255,255,255,.2);--rim2:rgba(255,255,255,.06);--edge:rgba(0,0,0,.35);
+  --shadow:0 18px 44px -16px rgba(0,0,0,.6),0 2px 6px -2px rgba(0,0,0,.4);
+  --fg:#f1f8fb;--muted:#a9c4d2;--faint:#7896a6;--line:rgba(255,255,255,.1);
+  --acc:#9fb3cc;--acc-deep:#d5e0ee;--acc-soft:rgba(159,179,204,.15);--acc-line:rgba(159,179,204,.4);--acc-ink:#03141d;
+  --ok:#2fd27a;--ok-bg:rgba(47,210,122,.16);
+  --hi:#ff6b6b;--hi-bg:rgba(255,107,107,.16);
+  --med:#ffbc45;--med-bg:rgba(255,188,69,.15);
+  --warn-bg:rgba(255,107,107,.08);--warn-border:rgba(255,107,107,.2);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;line-height:1.1;letter-spacing:.01em}
+a{color:var(--acc-deep)}
+
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--bg)}
+.sky i{position:absolute;border-radius:50%;filter:blur(10px);opacity:.8}
+.sky i:nth-child(1){width:85vmax;height:85vmax;left:-32vmax;top:-38vmax;background:radial-gradient(circle,rgba(75,93,115,.45) 0,transparent 62%)}
+.sky i:nth-child(2){width:70vmax;height:70vmax;right:-32vmax;top:22vh;background:radial-gradient(circle,rgba(75,93,115,.2) 0,transparent 62%)}
+
+.card{
+  background:linear-gradient(180deg,var(--glass-hi),var(--glass) 40%,var(--glass));
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  box-shadow:inset 0 1px 0 var(--rim),inset 0 0 0 1px var(--rim2),inset 0 -1px 0 var(--edge),var(--shadow);
+  border-radius:var(--r);padding:20px;min-width:0;
+}
+@media(min-width:640px){.card{padding:28px}}
+
+.top{padding:16px 0 8px}
+.topline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:clamp(28px,6vw,42px);display:flex;align-items:center;gap:12px}
+.top h1 .dot{width:14px;height:14px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 5px var(--acc-soft)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+.breadcrumb a{color:var(--acc);text-decoration:none;font-weight:600}
+.breadcrumb a:hover{text-decoration:underline}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.meta .tag{background:var(--acc-soft);color:var(--acc-deep);border-radius:999px;padding:4px 14px;font-family:var(--display);font-weight:700;font-size:14px;white-space:nowrap}
+
+.warning-box{background:var(--warn-bg);border:1.5px solid var(--warn-border);border-radius:var(--r2);padding:16px 18px;margin-bottom:20px;font-weight:600;font-size:15px;line-height:1.45}
+.warning-box .icon{font-size:20px;margin-right:6px}
+
+.section{margin-bottom:24px}
+.section h2{font-size:22px;color:var(--acc-deep);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--acc-soft)}
+.section h3{font-size:17px;margin:14px 0 6px;color:var(--fg);font-family:var(--display);font-weight:700}
+.section ul{margin:6px 0 12px;padding-left:22px}
+.section ul li{margin-bottom:6px;line-height:1.45}
+.section ol{margin:6px 0 12px;padding-left:22px}
+.section ol li{margin-bottom:6px;line-height:1.45}
+.section p{margin:6px 0 10px}
+
+.ppe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0}
+.ppe-item{background:var(--acc-soft);border-radius:var(--r2);padding:12px;text-align:center;font-weight:600;font-size:14px}
+.ppe-item .ppe-icon{font-size:28px;display:block;margin-bottom:4px}
+
+.disclaimer{background:var(--glass-lo);border-radius:var(--r2);padding:16px 18px;margin-top:24px;font-size:13px;color:var(--muted);line-height:1.5}
+
+.auth{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px}
+@media(max-width:480px){.auth-grid{grid-template-columns:1fr}}
+.auth-label{color:var(--muted);font-weight:600}
+
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:15px;text-decoration:none;color:var(--acc);margin-top:20px;padding:8px 16px;border-radius:999px;background:var(--acc-soft);transition:background .2s}
+.back:hover{background:var(--acc-line)}
+
+.theme-toggle{position:fixed;top:12px;right:12px;z-index:100;background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--rim2);border-radius:999px;padding:6px 10px;cursor:pointer;font-size:18px;line-height:1}
+
+@media print{
+  .sky,.theme-toggle{display:none}
+  body{background:#fff;color:#000}
+  .card{box-shadow:none;border:1px solid #ccc;backdrop-filter:none;background:#fff}
+}
+</style>
+</head>
+<body>
+<div class="sky"><i></i><i></i></div>
+<button class="theme-toggle" onclick="let r=document.documentElement,t=r.dataset.theme;r.dataset.theme=t==='dark'?'light':'dark'" aria-label="Toggle theme">&#9681;</button>
+
+<div class="gut">
+<div class="wrap">
+  <div class="top">
+    <div class="breadcrumb">
+      <a href="../">Ranfurlie</a> <span>/</span>
+      <a href="./">Safety &amp; SWPs</a> <span>/</span>
+      <span>Volunteer Induction</span>
+    </div>
+    <div class="topline">
+      <h1><span class="dot"></span> Volunteer Induction</h1>
+    </div>
+    <div class="meta">
+      <span class="tag">SWP</span>
+      <span class="tag">Issue: Nov 2026</span>
+      <span class="tag">Review: Nov 2027</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:15px">
+      <div><strong>Description:</strong> Volunteer Safety Induction</div>
+      <div><strong>Make / Model:</strong> Volunteer Induction</div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <span class="icon">&#9888;</span> DO NOT operate this equipment unless you have been fully trained in its safe use and operation, have read the user manual, and have conducted a risk assessment using the Task Tracker QR system.
+  </div>
+
+  <div class="section card">
+    <p>Keeping our Volunteers Safe</p>
+  </div>
+
+  <div class="section card">
+    <p>------------------------------------------------------------------------
+  Volunteer Name:      
+  -------------------- ---------------------------------------------------
+  Address:</p>
+  </div>
+
+  <div class="section card">
+    <p>Date:                
+  ------------------------------------------------------------------------</p>
+  </div>
+
+  <div class="section card">
+    <p>I understand that as a Volunteer I am responsible for my own health and safety and protection of the environment. I must also ensure my actions (or lack of action) do not adversely affect the health and safety of myself or others or harm the environment.</p>
+  </div>
+
+  <div class="section card">
+    <p>I understand that I must provide my contact phone number to the club so that I am contactable outside of my volunteer work hours in case of emergency (heavy rainfall, high winds etc.).</p>
+  </div>
+
+  <div class="section card">
+    <p>I understand that ____________________________ is my first point of contact in relation to environment, health, and safety issues.</p>
+  </div>
+
+  <div class="section card">
+    <p>By signing this document, I acknowledge that:</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I have been advised of the location of the Emergency Assembly Point/s, and I understand in the event of an emergency I may be directed to this location by the Site Wardens and that I must follow their directions.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   The location of first aid kits has been explained to me.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   The name and contact details of the site first aiders has been explained to me.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I am aware of the requirement to advise management of all workplace incidents, injuries, and illness.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   If I have reason to believe that a task will expose me or others or the environment to a serious risk of harm, I understand that I must STOP the work and advise my Supervisor.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   The location of the emergency shower and eyewash station has been explained to me.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   The location of spill kits has been explained to me and I understand that I am only to use them and respond to a spill event if I have received the appropriate training.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that I can be asked to stop work if I am working in an unsafe manner.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   The site has a speed limit of 10 kph and I understand that when driving any vehicle on the site I must not speed.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I have a current driver’s licence.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that I can only use equipment that I have received training in its safe use.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that when driving equipment on site I must refrain from using handheld mobile phones.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that whilst driving any vehicle I must wear the seat belts if they are fitted to the vehicle.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that skylarking is prohibited on site.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that I am required to wear all appropriate PPE provided to me and to keep it in good condition.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that the failure to wear appropriate PPE when it is required for a work task may result in some form of club disciplinary action.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   The location of Safety Data Sheets has been explained to me.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that I am not to use chemicals unless I have been trained in safe chemical use.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that I can only use equipment that I have been trained to use.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that if I use chemicals that I will follow all label instructions for the chemicals I use.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that the use, possession or sale of illicit drugs is forbidden on site.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that any Volunteer found to be under the influence of alcohol or illicit drugs at work will be considered unfit to continue work and will be suspended from duty.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that the only acceptable blood alcohol concentration when working on site as a Volunteer is 0.000 (BAC).</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that if I identify a workplace hazard (for example, damaged equipment, or a slip or trip hazard) I have a responsibility to report the hazard to my Supervisor.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that I am not to walk, swim or drive through flood waters.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that just 150 mm (six inches) of moving water can knock you down, and 300 mm (one foot) of moving water can sweep a vehicle away.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   The locations of the lunchroom and kitchen facilities has been explained to me.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   The location of toilets and sanitiser stations has been explained to me.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I will follow good hygiene practices and cough and sneeze etiquette when on site.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that I am not to come on site if I am feeling unwell or if I am experiencing any flu like symptoms.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand the importance of staying in communication and adopting a buddy system when working remotely.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that I am to follow all environment and safety protocols when on site.</p>
+  </div>
+
+  <div class="section card">
+    <p>-   I understand that I am required to sign an attendance register every day and I also understand that I must complete this register upon arrival on site and again when I cease duty for the day.</p>
+  </div>
+
+  <div class="section card">
+    <p>-----------------------------------------------------------------------
+  Signature:            
+  --------------------- -------------------------------------------------
+  Print Name:</p>
+  </div>
+
+  <div class="section card">
+    <p>-----------------------------------------------------------------------</p>
+  </div>
+
+  <div class="section card">
+    <p>----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Disclaimer: This document contains material to assist the user in managing Environment Health and Safety (EHS) obligations. We control and retain the copyright in this document, and you may only use this document in accordance with our terms and conditions. Every effort has been made to ensure the accuracy of this information at the time of publication and it is provided as guidance only and does not provide legal advice on meeting your obligations. By amending this document, you will be deemed to have released and discharged epar pty ltd and epar LLC from all liability (including negligence) for all claims, losses expenses, damages, and costs the user may incur as a result of relying on the information in this document. Modifications to this document should be made so that it is specific to the associated site, risks and hazards.
+  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+  </div>
+
+  <div class="section card">
+    <p>----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+  </div>
+
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This SWP may not cover all possible hazards associated with this equipment on your specific site and should be used in conjunction with other references including the Operational or User Manual. It is designed as a guide, a safety reminder, and a training support document. Users must undertake an activity risk assessment prior to using any equipment and receive training in its safe use before operation.
+  </div>
+
+  <div class="auth">
+    <div class="auth-grid">
+      <div><span class="auth-label">Authorised By:</span> Andrew Anderson, Golf Course Superintendent</div>
+      <div><span class="auth-label">Issue Date:</span> November 2026</div>
+      <div><span class="auth-label">Organisation:</span> Ranfurlie Golf Club</div>
+      <div><span class="auth-label">Next Review:</span> November 2027</div>
+    </div>
+  </div>
+
+  <a href="./" class="back">&larr; Back to SWP Hub</a>
+  <div style="height:40px"></div>
+</div>
+</div>
+</body>
+</html>
